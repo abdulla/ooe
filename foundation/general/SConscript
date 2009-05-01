@@ -1,0 +1,25 @@
+Import( Split( 'name ooe platform root' ) )
+
+### configure ##################################################################
+build = root.Clone()
+build.Append( CPPPATH = ooe.freetype.include_path )
+build.Append( LIBPATH = ooe.freetype.library_path )
+setup = Configure( build )
+
+if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
+
+if name == 'posix':
+	for i in ooe.x11.library:
+		if not setup.CheckLib( i ): Exit( 1 )
+
+build = setup.Finish()
+
+### build ######################################################################
+if name == 'darwin':
+	build.Append( FRAMEWORKS = ooe.qtkit.framework )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libgeneral.dylib' )
+
+files = Glob( '*.cpp' ) + Glob( platform + '/foundation/general/*.cpp' )
+files += Glob( platform + '/foundation/general/*.mm' )
+out = build.SharedLibrary( '#/build/library/libgeneral', files )
+build.SideEffect( Glob( '*.rpo' ), out )

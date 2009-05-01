@@ -1,0 +1,22 @@
+Import( Split( 'name ooe root' ) )
+
+### configure ##################################################################
+build = root.Clone()
+build.Append( CXXFLAGS = '-DOOE_EXTENSION=\\"' + build[ 'SHLIBSUFFIX' ] + '\\"' )
+build.Append( LIBS = Split( 'executable general io parallel' ) )
+setup = Configure( build )
+
+if name == 'posix':
+	if not setup.CheckLibWithHeader( 'GLU', 'GL/glu.h', 'c' ): Exit( 1 )
+
+build = setup.Finish()
+
+### build ######################################################################
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+elif name == 'darwin':
+	build.Append( FRAMEWORKS = 'OpenGL' )
+
+out = build.Program( '#/build/maths_test', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
+build.Clean( out, '#/build/maths_test.log' )

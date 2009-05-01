@@ -1,0 +1,11 @@
+Import( Split( 'name root' ) )
+build = root.Clone()
+build.Append( CXXFLAGS = '-DOOE_EXTENSION=\\"' + build[ 'SHLIBSUFFIX' ] + '\\"' )
+build.Append( LIBS = Split( 'executable general image io lua parallel service' ) )
+
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+
+out = build.Program( '#/build/engine', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
+build.Clean( out, '#/build/engine.log' )

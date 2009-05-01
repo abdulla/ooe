@@ -1,0 +1,6 @@
+Import( 'root' )
+build = root.Clone()
+build.Append( LIBS = 'scene' )
+
+out = build.SharedLibrary( '#/build/library/libruntime', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )

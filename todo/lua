@@ -1,0 +1,28 @@
+proper namespaces and modules
+	- like in luabind, with operator[]
+	- maybe use environments?
+	- do it by expanding table, so proper lua terminology
+	- use lua's actual module system
+
+use environment tables for types
+	- requires exporting types in standard lua module way
+	- environment tables can be attached to lua functions
+	- they are the tables where global names in lua functions are resolved at run time
+	- lua 5.1 extended environment tables to C functions, userdata, and threads
+
+modify table::iterator and make in to template
+	- allow for types other than string to be returned
+	- different types on dereference?
+
+allow lua object calls
+	- add operator() to table to allow calls to lua objects
+
+overload function that creates overloads
+	- lua::overload that explicitly creates overloads when needed
+	- creates object that uses metamethod __call, which then calls correact overload
+	- uses number of arguments given to call appropriate overload
+	- can be used for all functions, including constructors
+	- store overloads in metatable, storing functions at index depending on their arity
+
+add lua process shell
+	- allows for a whole program to be written in lua

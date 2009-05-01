@@ -1,0 +1,5 @@
+Import( 'root' )
+build = root.Clone()
+build.Append( LIBS = Split( 'graph scene' ) )
+out = build.SharedLibrary( '#/build/library/libshow', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )

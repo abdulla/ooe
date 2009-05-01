@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+
+import re
+import sys
+
+columns = {}
+header = ''
+
+for pre_line in sys.stdin:
+	line = pre_line.strip()
+
+	# if blank line, skip
+	if not line:
+		continue
+	# if line begins with '>>> ', create new column
+	elif not line.find( '>>> ', 0, 4 ):
+		header = line[ 4 : ]
+		columns[ header ] = []
+	# else, it's column data, so add to column
+	else:
+		columns[ header ].append( line )
+
+rows = []
+type = ''
+row_match = re.compile( r'^(\d+) (\w+), \d+ iterations\.*done$' )
+value_match = re.compile( r'^Average time per call: (\d*\.\d+) microseconds$' )
+
+for header in columns:
+	values = []
+
+	for line in columns[ header ]:
+		row_result = row_match.search( line )
+
+		# if a row value is found
+		if row_result:
+			row = row_result.group( 1 )
+			type = row_result.group( 2 )
+			if row not in rows: rows.append( row )
+			continue
+
+		value_result = value_match.search( line )
+
+		# if a column value is found
+		if value_result:
+			value = value_result.group( 1 )
+			values.append( value )
+
+	columns[ header ] = values
+
+# print column headers
+print '# %s\t%s' % ( type, '\t'.join( columns ) )
+
+# print rows
+for i in xrange( len( rows ) ):
+	# grab value from each column to form row
+	line = [ column[ i ] if len( column ) > i else ''
+		for column in columns.itervalues() ]
+
+	print '%s\t%s' % ( rows[ i ], '\t'.join( line ) )

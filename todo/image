@@ -1,0 +1,4 @@
+move to openjpeg
+	- use for jpeg 2000 instead of jasper
+	- see if it is possible to use it instead of libjpeg too
+	- openjpeg supports tiling - expose that functionality

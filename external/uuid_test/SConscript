@@ -1,0 +1,21 @@
+Import( Split( 'name root' ) )
+
+### configure ##################################################################
+build = root.Clone()
+build.Append( LIBS = [ 'executable' ] )
+setup = Configure( build )
+
+if name == 'posix':
+	if not setup.CheckLibWithHeader( 'uuid', 'uuid/uuid.h', 'c' ): Exit( 1 )
+elif name == 'darwin':
+	if not setup.CheckCHeader( 'uuid/uuid.h' ): Exit( 1 )
+
+build = setup.Finish()
+
+### build ######################################################################
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+
+out = build.Program( '#/build/uuid_test', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
+build.Clean( out, '#/build/uuid_test.log' )

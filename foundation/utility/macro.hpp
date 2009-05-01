@@ -1,0 +1,80 @@
+/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+
+#ifndef OOE_FOUNDATION_UTILITY_MACRO_HPP
+#define OOE_FOUNDATION_UTILITY_MACRO_HPP
+
+#ifdef __GNUC__
+	#define OOE_INLINE			__attribute__( ( __always_inline__ ) )
+	#define OOE_NOINLINE		__attribute__( ( __noinline__ ) )
+	#define OOE_NORETURN		__attribute__( ( __noreturn__ ) )
+	#define OOE_NONNULL			__attribute__( ( __nonnull__ )
+	#define OOE_WARNUNUSED		__attribute__( ( __warn_unused_result__ ) )
+	#define OOE_PACKED			__attribute__( ( __packed__ ) )
+	#define OOE_ALIGN( size )	__attribute__( ( __aligned__( size ) ) )
+
+	#if __GNUC__ >= 4
+		#define OOE_VISIBLE		__attribute__( ( __visibility__( "default" ) ) )
+		#define OOE_HIDDEN		__attribute__( ( __visibility__( "hidden" ) ) )
+	#else
+		#define OOE_VISIBLE
+		#define OOE_HIDDEN
+	#endif
+#else
+	#define OOE_INLINE
+	#define OOE_NOINLINE
+	#define OOE_NORETURN
+	#define OOE_NONNULL
+	#define OOE_WARNUNUSED
+	#define OOE_PACKED
+	#define OOE_ALIGN( size )
+	#define OOE_VISIBLE
+	#define OOE_HIDDEN
+#endif
+
+#define OOE_FOURCC( a, b, c, d ) ( a + ( b << 8 ) + ( c << 16 ) + ( d << 24 ) )
+
+#define OOE_WARNING( id, statement )\
+do\
+{\
+	std::cerr << error::time() << " " id ": " << statement << '\n';\
+	std::cout << id ": " << statement << '\n';\
+}\
+while ( false )
+
+#define OOE_IGNORE( statement )\
+do\
+{\
+	try\
+	{\
+		statement;\
+	}\
+	catch ( ... )\
+	{\
+	}\
+}\
+while ( false )
+
+#define OOE_PRINT( id, statement )\
+do\
+{\
+	try\
+	{\
+		statement;\
+	}\
+	catch ( error::runtime& error )\
+	{\
+		OOE_WARNING( id,\
+				"Uncaught exception:\n" << error.what() << "\n\nStack trace:" << error.where() );\
+	}\
+	catch ( std::exception& error )\
+	{\
+		OOE_WARNING( id, "Uncaught exception:\n" << error.what() );\
+	}\
+	catch ( ... )\
+	{\
+		OOE_WARNING( "executable", "Uncaught exception:\nUnknown\n" );\
+	}\
+}\
+while ( false )
+
+#endif	// OOE_FOUNDATION_UTILITY_MACRO_HPP

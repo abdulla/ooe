@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+import string
+import sys
+
+rows = { 0 : [] }
+max = 0
+column = False
+
+### process files
+for name in sys.argv[ 1 : ]:
+	try:
+		file = open( name, 'r' )
+		header = file.readline().strip()
+
+		if header[ 0 ] != '#':
+			print >> sys.stderr, 'File "%s" does not contain a header' % file
+			continue
+
+		titles = header.lstrip( string.whitespace + '#' ).split( '\t' )
+
+		if column:
+			titles = titles[ 1 : ]
+
+		rows[ 0 ] += titles
+		number = 0
+
+		for line in file:
+			number += 1
+
+			if number > max:
+				rows[ number ] = []
+				max = number
+
+			values = line.strip().split( '\t' )
+
+			if column:
+				values = values[ 1 : ]
+
+			rows[ number ] += [ float( i ) for i in values ]
+			x = len( rows[ 0 ] )
+			y = len( rows[ number ] )
+
+			if x < y:
+				print 'Line %i of file "%s" has too many values' 
+			elif x > y:
+				rows[ number ] += [ 0. for i in xrange( y, x ) ]
+
+		column = True
+	except IOError:
+		print >> sys.stderr, 'Could not open file "%s"' % name
+
+if not len( rows[ 0 ] ):
+	print >> sys.stderr, 'No data in file(s) "%s"' % sys.argv[ 1 : ]
+
+### print latex
+print r'\begin{tabular}{ l |', ' '.join( [ 'c' for i in rows[ 0 ][ 1 : ] ] ), '}'
+print ' & '.join( [ i for i in rows[ 0 ] ] ), r'\\'
+print r'\hline'
+
+for i in xrange( 1, max + 1 ):
+	print ' & '.join( [ '%.2f' % j for j in rows[ i ] ] ), r'\\'
+
+print r'\end{tabular}'

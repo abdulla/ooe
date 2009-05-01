@@ -1,0 +1,77 @@
+/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+
+#define GLX_GLXEXT_PROTOTYPES
+#include <GL/glx.h>
+#undef GLX_GLXEXT_PROTOTYPES
+
+#include "foundation/general/event_queue.hpp"
+#include "foundation/opengl/context.hpp"
+#include "foundation/utility/error.hpp"
+
+#define OOE_X_HEADER_INCLUDED
+#include "foundation/general/view.hpp"
+#undef OOE_X_HEADER_INCLUDED
+
+namespace ooe
+{
+	platform::context context_construct( const ooe::view_data& view )
+	{
+		platform::context glx = glXCreateContext( view.queue.display, view.visual_info, 0, true );
+		XFree( view.visual_info );
+		view.visual_info = 0;
+
+		if ( !glx )
+			throw error::runtime( "opengl: " ) << "Unable to create context";
+
+		return glx;
+	}
+
+	void context_destruct( const ooe::view_data& view, platform::context glx )
+	{
+		glXDestroyContext( view.queue.display, glx );
+	}
+
+	bool context_current( const ooe::view_data& view, platform::context glx )
+	{
+		return glXMakeCurrent( view.queue.display, !glx ? 0 : view.window, glx );
+	}
+
+	bool context_sync( const ooe::view_data&, platform::context, bool vsync )
+	{
+		return !glXSwapIntervalSGI( vsync );
+	}
+
+	void context_swap( const ooe::view_data& view, platform::context )
+	{
+		glXSwapBuffers( view.queue.display, view.window );
+	}
+
+	void setup_context( const ooe::view_data& view, platform::context glx )
+	{
+		if ( !context_current( view, glx ) )
+			throw error::runtime( "opengl: " ) << "Unable to capture context";
+	}
+}
+
+extern "C" void ooe_opengl_choose( const ooe::view_data& ) OOE_VISIBLE;
+extern "C" void ooe_opengl_choose( const ooe::view_data& view )
+{
+	ooe::s32 attributes[] =
+	{
+		GLX_RGBA,			true,
+		GLX_RED_SIZE,		8,
+		GLX_GREEN_SIZE, 	8,
+		GLX_BLUE_SIZE,		8,
+		GLX_ALPHA_SIZE,		8,
+		GLX_DEPTH_SIZE,		24,
+
+		GLX_DOUBLEBUFFER,	true,
+		0
+	};
+
+	view.visual_info =
+		glXChooseVisual( view.queue.display, DefaultScreen( view.queue.display ), attributes );
+
+	if ( !view.visual_info )
+		throw ooe::error::runtime( "view: " ) << "No matching visual information";
+}

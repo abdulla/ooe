@@ -1,0 +1,25 @@
+Import( Split( 'name root' ) )
+
+### executable #################################################################
+build = root.Clone()
+build.Append( LIBS = Split( 'executable io ipc parallel registry' ) )
+
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+
+out = build.Program( '#/build/registry', 'main.cpp' )
+build.SideEffect( 'main.rpo', out )
+build.Clean( out, '#/build/registry.log' )
+
+### library ####################################################################
+build = root.Clone()
+
+if name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libregistry.dylib' )
+
+glob = Glob( '*.cpp', strings = True )
+glob.remove( 'main.cpp' )
+out = build.SharedLibrary( '#/build/library/libregistry', glob )
+glob = Glob( '*.rpo', strings = True )
+glob.remove( 'main.rpo' )
+build.SideEffect( glob, out )

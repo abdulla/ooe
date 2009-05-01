@@ -1,0 +1,12 @@
+Import( Split( 'name ooe platform root' ) )
+build = root.Clone()
+build.Append( LIBS = ooe.dl.library )
+
+if name == 'darwin':
+	build.Append( FRAMEWORKS = ooe.appkit.framework )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libexecutable.dylib' )
+
+files = Glob( '*.cpp' ) + Glob( platform + '/foundation/executable/*.cpp' )
+files += Glob( platform + '/foundation/executable/*.mm' )
+out = build.SharedLibrary( '#/build/library/libexecutable', files )
+build.SideEffect( Glob( '*.rpo' ), out )

@@ -1,0 +1,52 @@
+make performance graphs of components over time
+	- lua/c++ bindings
+
+add translate/localisation functions
+	- use gettext or similar
+
+add optimisation framework
+	- use liboil or accelerate
+
+regression testing
+	- unit testing framework
+	- unit tests for each class/function/etc
+	- could use cxxtest and recipe for scons
+
+more use of exceptions
+	- wherever return values can be unchecked, ie boolean returns
+
+two-pass rendering
+	- z-buffer only, then pixels?
+	- sort only by shader/texture (early z-pass)?
+
+scene graph should do all the video resource management
+	- only it should know about screen dimensions
+
+move to xcb for x11
+	- use xcb instead of libx11
+
+can shared_pointer leak in multi-threaded situations?
+	- test and possibly use atom for references
+
+extend setup_path
+	- use GetModuleFileName() under windows
+	- read /proc/curproc/file on freebsd
+	- would using realpath() help to resolve paths?
+
+extend atom
+	- Interlocked*() under windows
+
+scheduler layered on top of ipc
+	- useful for guaranteeing that no one process can hog processing
+
+multi-thread aware scene graph
+	- able to have multiple threads working on the scene-graph together
+	- no changes are made directly to scene graph, but are requested
+	- before frame is rendered, all requests are applied (perhaps limited by time or depth)
+
+lexical_cast/numeric_cast
+	- used boost *_casts, they are simpler and do more verification
+
+double buffered buffers
+	- double buffering with vbo's in opengl gives a performance boost
+	- rendering from one buffer, while modifying the other, then switch each frame

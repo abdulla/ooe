@@ -1,0 +1,10 @@
+Import( Split( 'name root' ) )
+build = root.Clone()
+build.Append( LIBS = Split( 'executable image io' ) )
+
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+
+out = build.Program( '#/build/image_test', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
+build.Clean( out, '#/build/image_test.log' )

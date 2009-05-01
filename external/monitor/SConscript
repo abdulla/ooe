@@ -1,0 +1,10 @@
+Import( Split( 'name root' ) )
+build = root.Clone()
+build.Append( LIBS = Split( 'executable general image io parallel' ) )
+
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+
+out = build.Program( '#/build/monitor', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
+build.Clean( out, '#/build/monitor.log' )

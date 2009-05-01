@@ -1,0 +1,13 @@
+Import( 'root' )
+
+### configure ##################################################################
+setup = Configure( root.Clone() )
+
+if not setup.CheckCXXHeader( 'boost/call_traits.hpp' ): Exit( 1 )
+if not setup.CheckCXXHeader( 'boost/noncopyable.hpp' ): Exit( 1 )
+if not setup.CheckCXXHeader( 'boost/preprocessor.hpp' ): Exit( 1 )
+if not setup.CheckCXXHeader( 'boost/type_traits.hpp' ): Exit( 1 )
+if not setup.CheckCXXHeader( 'boost/mpl/vector.hpp' ): Exit( 1 )
+if not setup.CheckCXXHeader( 'boost/utility/enable_if.hpp' ): Exit( 1 )
+
+build = setup.Finish()

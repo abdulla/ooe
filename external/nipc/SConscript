@@ -1,0 +1,8 @@
+Import( Split( 'name root' ) )
+build = root.Clone()
+
+if name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libnipc.dylib' )
+
+out = build.SharedLibrary( '#/build/library/libnipc', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )

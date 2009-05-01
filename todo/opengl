@@ -1,0 +1,26 @@
+implement frame buffer objects
+	- class frame, which represents an FBO, not reusing buffer class
+	- void video::draw( const frame&, const object& ) to specify which FBO to draw to
+	- or a video::frame( const frame& ) to set it once for a series of draw calls
+
+add glsl/shader/program support
+	- add shader to convert yuv to rgb, to lower cpu usage of camera
+	- remove all fixed functionality code
+	- use EXT_gpu_program_parameters or EXT_bindable_uniforms to set uniforms
+	- possibly use uniform buffers?
+
+use glDrawRangeElements
+	- could be used to optimise draw calls
+
+more correctly define image units vs texture coordinate sets
+	- this is needed when calling maximum, to appropriately judge hardware limits
+	- MAX_TEXTURE_COORDS, MAX_TEXTURE_IMAGE_UNITS, MAX_VERTEX_IMAGE_UNITS, MAX_COMBINED...
+
+rewrite of video subsystem
+	- use templates to wrap objects, therefore reducing the need to select types (like in uniform)
+	- emphasise runtime linking in shaders, not whole programs
+	- remove fixed function lighting functionality
+
+modify to use EXT_direct_state_access
+	- will remove the need to bind
+	- much cleaner interface for video, easier to port to other APIs

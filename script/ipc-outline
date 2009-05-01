@@ -1,0 +1,34 @@
+#!/bin/sh
+
+trap 'rm -f $FILE; kill -9 $PID 2> /dev/null; echo; exit;' 1 2 3 6 9 14 15
+
+BEGIN=`[ $# -ge 1 ] && echo $1 || echo 0`
+END=`[ $# -ge 2 ] && echo $2 || echo 3`
+FILE=`mktemp`
+
+for X in `seq $BEGIN $END`; do
+	printf ">>> method $X\n"
+
+	for Y in `seq 0 20`; do
+		BYTES=`echo 2^$Y | bc -l`
+		I=50
+		printf "$BYTES bytes, $I iterations"
+
+		./build/ipc_test -s `expr $X % 2` &
+		PID=$!
+		sleep 1
+
+		for Z in `seq $I`; do
+			./build/ipc_test -o $X $BYTES >> $FILE
+			printf .
+		done
+
+		kill -9 $PID
+		VALUES=`cat $FILE | ./script/stddev`
+		rm $FILE
+
+		printf "done\n\tMean (stddev) μs/call: %f (%f)\n" $VALUES
+	done
+
+	printf '\n'
+done

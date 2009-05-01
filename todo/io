@@ -1,0 +1,4 @@
+add an archive class
+	- support for directories
+	- built on top of memory map
+	- just zip/zlib, or more types?

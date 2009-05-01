@@ -1,0 +1,7 @@
+make text node
+	- what should be added to make this flexible?
+	- should this inherit from a billboard node? or just be child of billboard node in tree?
+
+modify chunked async_tasks to query chunk state for operation
+	- instead of explicitly request load/unload, send in function that'll query state and proceed
+	- this should help remove strain with fast movement and consecutive load/unload on chunks

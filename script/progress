@@ -1,0 +1,73 @@
+#!/bin/bash
+
+trap 'rm -rf $DIR $FILE; echo; exit;' 1 2 3 6 9 14 15
+
+DAYS=120
+FILTER=cat
+OUT=chart.pdf
+REPO=svn+ssh://svn@molly.cs.mu.oz.au/ooe/trunk
+SWITCH=l
+TYPE='(pp|mm)'
+
+while getopts 'd:f:o:r:s:t:' FLAG; do
+	case $FLAG in
+	d) DAYS=$OPTARG ;;
+	f) FILTER=$OPTARG ;;
+	o) OUT=$OPTARG ;;
+	r) REPO=$OPTARG ;;
+	s) SWITCH=$OPTARG ;;
+	t) TYPE=$OPTARG ;;
+	*)
+echo "Options:
+   -d <DAYS>
+   -f <FILTER PROGRAM>
+   -o <OUTPUT FILE>
+   -r <REPOSITORY PATH>
+   -s <WC SWITCH>
+   -t <FILE TYPE>"
+		exit 1 ;;
+	esac
+done
+
+shift `expr $OPTIND - 1`
+
+DIR=/tmp/progress-checkout
+FILE=`tempfile`
+BEGIN=`date --iso-8601 --date="$DAYS days ago"`
+END=`date --iso-8601 --date="tomorrow"`
+
+function checkout()
+{
+	rm -rf $DIR
+	svn export -r $1 $REPO $DIR > /dev/null
+	cd $DIR
+	RESULT=0
+
+	for I in `find . | egrep $TYPE$`; do
+		VALUE=`$FILTER $I | wc -$SWITCH`
+		RESULT=$(( RESULT + VALUE ))
+	done
+
+	echo $RESULT
+}
+
+for I in `seq $DAYS -1 0`; do
+	DATE=`date --iso-8601 --date="$I days ago"`
+	printf "\rprocessing date '$DATE' in range [$BEGIN:$END]"
+	printf "%s\t%s\n" $DATE `checkout {$DATE}` >> $FILE
+done
+
+printf "\rprocessing date '$END' in range [$BEGIN:$END]"
+printf "%s\t%s\n" $END `checkout HEAD` >> $FILE
+
+echo "
+set terminal postscript enhanced
+set key off
+set xdata time
+set timefmt \"%Y-%m-%d\"
+
+plot [\"$BEGIN\":\"$END\"] '$FILE' using 1:2 with lines
+" | gnuplot 2> /dev/null | ps2pdf - $OUT
+
+rm -rf $DIR $FILE
+printf "\ndone\n"

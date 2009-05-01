@@ -1,0 +1,19 @@
+replace maths with eigen2
+	- uses expression templates like blitz++ but is sse optimised
+	- other option is to roll my own, considering my limited needs, it is a possibility
+
+use tr1::array
+	- replace all array usage with tr1:arrays, which keep track of their size without using space
+
+modify fonts to use native font manager
+	- use fontconfig/etc where possible for fonts
+	- multi-texture glyphs that require more than one texture
+	- reuse allocated buffers for font layout and dynamic_draw
+	- fontconfig on posix, ats on darwin
+	- map character to pre-rendered glyph (texture + coords) using map, for fast rendering
+
+use harfbuzz for text layout - or - use pango and render to bitmap
+	- possibly stick with freetype for fonts and use harfbuzz for text layout
+	- look at how qt and pango use harfbuzz
+	- could use pango and cairo backend to render text, similar to what clutter does
+	- http://library.gnome.org/devel/pango/unstable/pango-Cairo-Rendering.html
