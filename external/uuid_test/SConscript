@@ -2,7 +2,6 @@ Import( Split( 'name root' ) )
 
 ### configure ##################################################################
 build = root.Clone()
-build.Append( LIBS = [ 'executable' ] )
 setup = Configure( build )
 
 if name == 'posix':
@@ -13,6 +12,8 @@ elif name == 'darwin':
 build = setup.Finish()
 
 ### build ######################################################################
+build.Append( LIBS = [ 'executable' ] )
+
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
 

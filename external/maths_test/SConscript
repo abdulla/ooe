@@ -2,8 +2,6 @@ Import( Split( 'name ooe root' ) )
 
 ### configure ##################################################################
 build = root.Clone()
-build.Append( CXXFLAGS = '-DOOE_EXTENSION=\\"' + build[ 'SHLIBSUFFIX' ] + '\\"' )
-build.Append( LIBS = Split( 'executable general io parallel' ) )
 setup = Configure( build )
 
 if name == 'posix':
@@ -12,6 +10,9 @@ if name == 'posix':
 build = setup.Finish()
 
 ### build ######################################################################
+build.Append( CXXFLAGS = '-DOOE_EXTENSION=\\"' + build[ 'SHLIBSUFFIX' ] + '\\"' )
+build.Append( LIBS = Split( 'executable general io parallel' ) )
+
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
 elif name == 'darwin':
