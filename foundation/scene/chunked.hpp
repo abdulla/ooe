@@ -77,7 +77,7 @@ namespace ooe
 		video_data data;
 		variable var;
 
-		atom state;
+		atom<> state;
 		shared_ptr< uncompressed_image > image;
 		shared_array< f32 > point;
 

@@ -42,7 +42,7 @@ namespace ooe
 	private:
 		ooe::socket socket;
 		const u32 link_id;
-		atom active;
+		atom<> active;
 		ooe::thread thread;
 
 		void* call( void* );
@@ -59,7 +59,7 @@ namespace ooe
 
 	private:
 		ooe::connect connect;
-		atom active;
+		atom<> active;
 		ooe::thread thread;
 
 		void* call( void* );

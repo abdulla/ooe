@@ -45,7 +45,7 @@ namespace ooe
 		const ipc::switchboard& switchboard_, server& server )
 		: link_id( link_id_ ), transport( type( link_name( pid, link_id ), transport::create ) ),
 		switchboard( switchboard_ ), listen( new link_listen( link_name( pid, link_id ) ) ),
-		go( 1 ), thread( make_function( *this, &servlet::call ), &server )
+		active( true ), thread( make_function( *this, &servlet::call ), &server )
 	{
 	}
 
@@ -56,7 +56,7 @@ namespace ooe
 		if ( thread == self )
 			return;
 
-		go = 0;
+		active = false;
 		transport::tuple_type tuple = transport->get();
 		header_type& header = *reinterpret_cast< header_type* >( tuple._0 );
 		header._0 = 0;		// call null function to shutdown
@@ -76,7 +76,7 @@ namespace ooe
 		delete listen.release();
 		transport->unlink();
 
-		while ( go )
+		while ( active )
 			transport->wait( ipc_decode, &tuple );
 
 		return 0;

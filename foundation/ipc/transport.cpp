@@ -40,7 +40,7 @@ namespace
 
 	void transport_spinlock::wait( wait_type function, const void* pointer )
 	{
-		atom& state = *memory.as< atom >();
+		atom<>& state = *memory.as< atom<> >();
 
 		semaphore.down();
 		function( *this, pointer );
@@ -50,7 +50,7 @@ namespace
 
 	void transport_spinlock::notify( void )
 	{
-		atom& state = *memory.as< atom >();
+		atom<>& state = *memory.as< atom<> >();
 
 		state = true;
 		semaphore.up();
@@ -59,7 +59,7 @@ namespace
 
 	ipc::transport::tuple_type transport_spinlock::get( void )
 	{
-		return tuple_type( memory.as< u8 >() + sizeof( atom ), memory.size() - sizeof( atom ) );
+		return tuple_type( memory.as< u8 >() + sizeof( atom<> ), memory.size() - sizeof( atom<> ) );
 	}
 
 	void transport_spinlock::wake_wait( void )
@@ -69,7 +69,7 @@ namespace
 
 	void transport_spinlock::wake_notify( void )
 	{
-		atom& state = *memory.as< atom >();
+		atom<>& state = *memory.as< atom<> >();
 		state = false;
 		thread::yield();
 	}

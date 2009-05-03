@@ -16,10 +16,10 @@ namespace ooe
 	{
 	public:
 		worker_iterator iterator;
-		atom go;
+		atom<> active;
 
 		worker( const thread::function_type& function )
-			: iterator(), go( true ), thread( function, this )
+			: iterator(), active( true ), thread( function, this )
 		{
 		}
 
@@ -67,7 +67,7 @@ namespace ooe
 		{
 			// worker will quit after next execution
 			for ( ; i != end; ++i )
-				( *i )->go = false;
+				( *i )->active = false;
 		}
 		else
 		{
@@ -102,7 +102,7 @@ namespace ooe
 	{
 		ooe::worker& worker = *static_cast< ooe::worker* >( pointer );
 
-		while ( worker.go )
+		while ( worker.active )
 		{
 			task_type task = pop_front();
 			OOE_PRINT( "schedule", task->call() );

@@ -30,7 +30,7 @@ namespace ooe
 		const ipc::switchboard& switchboard;
 
 		scoped_ptr< const link_listen > listen;
-		atom go;
+		atom<> active;
 		ooe::thread thread;
 
 		void* call( void* );

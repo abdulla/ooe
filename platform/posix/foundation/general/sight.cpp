@@ -40,13 +40,13 @@ namespace ooe
 {
 //--- platform::sight ----------------------------------------------------------
 	platform::sight::sight( const call_type& call, u16 width, u16 height )
-		: go( 1 ), task( make_function( *this, &sight::main ), call, width, height )
+		: active( true ), task( make_function( *this, &sight::main ), call, width, height )
 	{
 	}
 
 	platform::sight::~sight( void )
 	{
-		go = 0;
+		active = false;
 		task();
 	}
 
@@ -60,7 +60,7 @@ namespace ooe
 		epoch_t sleep( 0, 15000000 );
 		video_mmap map = { index, height, width, VIDEO_PALETTE_RGB24 };
 
-		for ( ; go; index = 1 - index )
+		for ( ; active; index = 1 - index )
 		{
 			map.frame = 1 - index;
 			desc.control( VIDIOCMCAPTURE, &map );

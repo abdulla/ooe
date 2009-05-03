@@ -11,7 +11,7 @@
 namespace
 {
 	using namespace ooe;
-	atom value( 0 );
+	atom<> value( 0 );
 }
 
 namespace ooe

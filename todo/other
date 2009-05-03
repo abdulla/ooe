@@ -25,9 +25,6 @@ scene graph should do all the video resource management
 move to xcb for x11
 	- use xcb instead of libx11
 
-can shared_pointer leak in multi-threaded situations?
-	- test and possibly use atom for references
-
 extend setup_path
 	- use GetModuleFileName() under windows
 	- read /proc/curproc/file on freebsd
