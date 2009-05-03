@@ -16,97 +16,88 @@ namespace ooe
 #endif
 	}
 
-	class atom
+	template< typename type = int >
+		class atom
 	{
 	public:
-		atom( int value = 0 )
+		atom( type value = 0 )
 			: atomic( value )
 		{
 		}
 
-		operator int( void ) const
+		operator type( void ) const
 		{
 			return atomic;
 		}
 
-		void operator =( int value )
+		void operator =( type value )
 		{
 			exchange( value );
 		}
 
-		int operator ++( void )
+		type operator ++( void )
 		{
 			return exchange_add( 1 ) + 1;
 		}
 
-		int operator ++( int )
+		type operator ++( type )
 		{
 			return exchange_add( 1 );
 		}
 
-		int operator --( void )
+		type operator --( void )
 		{
 			return exchange_add( -1 ) - 1;
 		}
 
-		int operator --( int )
+		type operator --( type )
 		{
 			return exchange_add( -1 );
 		}
 
-		int operator +=( int value )
+		type operator +=( type value )
 		{
 			return exchange_add( value ) + value;
 		}
 
-		int operator -=( int value )
+		type operator -=( type value )
 		{
 			return exchange_add( -value ) - value;
 		}
 
+		bool cas( type compare, type value )
+		{
+			return compare_exchange( compare, value );
+		}
+
 	private:
-		volatile int atomic;
+		type atomic OOE_ALIGN( sizeof( type ) );
 
-		int exchange_add( int value )
-		{
 #if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
-			return __sync_fetch_and_add( &atomic, value );
-#elif defined( __i386__ ) || defined( __x86_64 )
-			__asm__ __volatile__
-			(
-				"lock; xadd %0, %1"
-				: "=r" ( value ), "=m" ( atomic )
-				: "0" ( value ), "m" ( atomic )
-				: "memory", "cc"
-			);
-
-			return value;
-#endif
-		}
-
-		int exchange( int value )
+		type exchange_add( type value )
 		{
-#if defined( __i386__ ) || defined( __x86_64 )
-			__asm__ __volatile__
-			(
-				"lock; xchg %0, %1"
-				: "=r" ( value ), "=m" ( atomic )
-				: "0" ( value ), "m" ( atomic )
-				: "memory", "cc"
-			);
-
-			return value;
-#endif
+			return __sync_fetch_and_add( &atomic, value );
 		}
-	} OOE_ALIGN( sizeof( int ) );
+
+		type exchange( type value )
+		{
+			return __sync_lock_test_and_set( &atomic, value );
+		}
+
+		bool compare_exchange( type compare, type value )
+		{
+			return __sync_bool_compare_and_swap( &atomic, compare, value );
+		}
+#endif
+	};
 
 //--- atom_ptr -----------------------------------------------------------------
 	template< typename type, template< typename > class deleter = delete_ptr >
 		struct atom_ptr
-		: public shared_dereference< type, deleter< type >, atom >
+		: public shared_dereference< type, deleter< type >, atom<> >
 	{
 		atom_ptr( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom >( value )
+			: shared_dereference< type, deleter< type >, atom<> >( value )
 		{
 		}
 	};
@@ -114,10 +105,10 @@ namespace ooe
 //--- atom_array ---------------------------------------------------------------
 	template< typename type, template< typename > class deleter = delete_array >
 		struct atom_array
-		: public shared_dereference< type, deleter< type >, atom >
+		: public shared_dereference< type, deleter< type >, atom<> >
 	{
 		atom_array( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom >( value )
+			: shared_dereference< type, deleter< type >, atom<> >( value )
 		{
 		}
 	};
@@ -125,10 +116,10 @@ namespace ooe
 //--- atom_free ----------------------------------------------------------------
 	template< typename type, template< typename > class deleter = delete_free >
 		struct atom_free
-		: public shared_dereference< type, deleter< type >, atom >
+		: public shared_dereference< type, deleter< type >, atom<> >
 	{
 		atom_free( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom >( value )
+			: shared_dereference< type, deleter< type >, atom<> >( value )
 		{
 		}
 	};
