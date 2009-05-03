@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_SEMAPHORE_HPP
-#define OOE_FOUNDATION_IPC_SEMAPHORE_HPP
+#ifndef OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
+#define OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
 
 #include <semaphore.h>
 
@@ -54,4 +54,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_SEMAPHORE_HPP
+#endif	// OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP

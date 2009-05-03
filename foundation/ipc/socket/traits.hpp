@@ -2,8 +2,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_EXTERNAL_NIPC_TRAITS_HPP
-	#define OOE_EXTERNAL_NIPC_TRAITS_HPP
+	#ifndef OOE_FOUNDATION_IPC_SOCKET_TRAITS_HPP
+	#define OOE_FOUNDATION_IPC_SOCKET_TRAITS_HPP
 
 #include "foundation/io/socket.hpp"
 #include "foundation/utility/traits.hpp"
@@ -23,12 +23,12 @@ namespace ooe
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "external/nipc/traits.hpp"
+	#define BOOST_PP_FILENAME_1 "foundation/ipc/socket/traits.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
-	#endif	// OOE_EXTERNAL_NIPC_TRAITS_HPP
+	#endif	// OOE_FOUNDATION_IPC_SOCKET_TRAITS_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 

@@ -2,8 +2,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_FOUNDATION_IPC_RPC_FORWARD_HPP
-	#define OOE_FOUNDATION_IPC_RPC_FORWARD_HPP
+	#ifndef OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
+	#define OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 
 #include "foundation/ipc/error.hpp"
 #include "foundation/ipc/traits.hpp"
@@ -62,12 +62,12 @@ namespace ooe
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "foundation/ipc/rpc_forward.hpp"
+	#define BOOST_PP_FILENAME_1 "foundation/ipc/memory/rpc_forward.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
-	#endif	// OOE_FOUNDATION_IPC_RPC_FORWARD_HPP
+	#endif	// OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 

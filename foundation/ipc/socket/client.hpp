@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_EXTERNAL_NIPC_CLIENT_HPP
-#define OOE_EXTERNAL_NIPC_CLIENT_HPP
+#ifndef OOE_FOUNDATION_IPC_SOCKET_CLIENT_HPP
+#define OOE_FOUNDATION_IPC_SOCKET_CLIENT_HPP
 
 #include <map>
 
@@ -94,4 +94,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_EXTERNAL_NIPC_CLIENT_HPP
+#endif	// OOE_FOUNDATION_IPC_SOCKET_CLIENT_HPP

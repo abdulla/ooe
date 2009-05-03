@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_LINK_HPP
-#define OOE_FOUNDATION_IPC_LINK_HPP
+#ifndef OOE_FOUNDATION_IPC_MEMORY_LINK_HPP
+#define OOE_FOUNDATION_IPC_MEMORY_LINK_HPP
 
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/transport.hpp"
@@ -66,4 +66,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_LINK_HPP
+#endif	// OOE_FOUNDATION_IPC_MEMORY_LINK_HPP

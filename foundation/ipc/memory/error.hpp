@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_ERROR_HPP
-#define OOE_FOUNDATION_IPC_ERROR_HPP
+#ifndef OOE_FOUNDATION_IPC_MEMORY_ERROR_HPP
+#define OOE_FOUNDATION_IPC_MEMORY_ERROR_HPP
 
 #include "foundation/utility/error.hpp"
 
@@ -54,4 +54,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_ERROR_HPP
+#endif	// OOE_FOUNDATION_IPC_MEMORY_ERROR_HPP

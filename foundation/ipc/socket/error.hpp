@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_EXTERNAL_NIPC_ERROR_HPP
-#define OOE_EXTERNAL_NIPC_ERROR_HPP
+#ifndef OOE_FOUNDATION_IPC_SOCKET_ERROR_HPP
+#define OOE_FOUNDATION_IPC_SOCKET_ERROR_HPP
 
 #include "foundation/utility/error.hpp"
 
@@ -26,4 +26,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_EXTERNAL_NIPC_ERROR_HPP
+#endif	// OOE_FOUNDATION_IPC_SOCKET_ERROR_HPP

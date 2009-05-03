@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_CLIENT_HPP
-#define OOE_FOUNDATION_IPC_CLIENT_HPP
+#ifndef OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP
+#define OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP
 
 #include "foundation/ipc/link.hpp"
 
@@ -31,4 +31,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_CLIENT_HPP
+#endif	// OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP

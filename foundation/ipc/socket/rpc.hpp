@@ -2,8 +2,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_EXTERNAL_NIPC_RPC_HPP
-	#define OOE_EXTERNAL_NIPC_RPC_HPP
+	#ifndef OOE_FOUNDATION_IPC_SOCKET_RPC_HPP
+	#define OOE_FOUNDATION_IPC_SOCKET_RPC_HPP
 
 #include "external/nipc/rpc_forward.hpp"
 
@@ -63,12 +63,12 @@ namespace ooe
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "external/nipc/rpc.hpp"
+	#define BOOST_PP_FILENAME_1 "foundation/ipc/socket/rpc.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
-	#endif	// OOE_EXTERNAL_NIPC_RPC_HPP
+	#endif	// OOE_FOUNDATION_IPC_SOCKET_RPC_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 

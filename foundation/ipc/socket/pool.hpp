@@ -1,15 +1,18 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_POOL_HPP
-#define OOE_FOUNDATION_IPC_POOL_HPP
+#ifndef OOE_FOUNDATION_IPC_SOCKET_POOL_HPP
+#define OOE_FOUNDATION_IPC_SOCKET_POOL_HPP
 
 #include <map>
 
-#include "foundation/ipc/traits.hpp"
+#include "foundation/utility/error.hpp"
+#include "foundation/utility/miscellany.hpp"
+
+#include "external/nipc/traits.hpp"
 
 namespace ooe
 {
-	namespace ipc
+	namespace nipc
 	{
 		class pool;
 
@@ -48,15 +51,15 @@ namespace ooe
 		template< typename >
 			struct is_proxy;
 
-//--- ipc::traits: proxy -------------------------------------------------------
+//--- nipc::traits: proxy ------------------------------------------------------
 		template< typename type >
-			struct replace< type, typename enable_if< is_proxy< type > >::type >;
+			struct size< type, typename enable_if< is_proxy< type > >::type >;
 
 		template< typename type >
-			struct pack< type, typename enable_if< is_proxy< type > >::type >;
+			struct read< type, typename enable_if< is_proxy< type > >::type >;
 
 		template< typename type >
-			struct unpack< type, typename enable_if< is_proxy< type > >::type >;
+			struct write< type, typename enable_if< is_proxy< type > >::type >;
 
 //--- verify -------------------------------------------------------------------
 		template< typename, typename = void >
@@ -75,8 +78,8 @@ namespace ooe
 			struct verify< type, typename enable_if< is_nullable< type > >::type >;
 	}
 
-//--- ipc::pool ----------------------------------------------------------------
-	class ipc::pool
+//--- nipc::pool ---------------------------------------------------------------
+	class nipc::pool
 		: private noncopyable
 	{
 	public:
@@ -94,9 +97,9 @@ namespace ooe
 		map_type map;
 	};
 
-//--- ipc::proxy_ptr -----------------------------------------------------------
+//--- nipc::proxy_ptr ----------------------------------------------------------
 	template< typename type >
-		class ipc::proxy_ptr
+		class nipc::proxy_ptr
 	{
 	public:
 		typedef type* pointer;
@@ -127,9 +130,9 @@ namespace ooe
 		pointer value;
 	};
 
-//--- ipc::construct_ptr -------------------------------------------------------
+//--- nipc::construct_ptr ------------------------------------------------------
 	template< typename type >
-		struct ipc::construct_ptr
+		struct nipc::construct_ptr
 		: public proxy_ptr< type >
 	{
 		construct_ptr( type* value_ = 0 )
@@ -138,9 +141,9 @@ namespace ooe
 		}
 	};
 
-//--- ipc::destruct_ptr --------------------------------------------------------
+//--- nipc::destruct_ptr -------------------------------------------------------
 	template< typename type >
-		struct ipc::destruct_ptr
+		struct nipc::destruct_ptr
 		: public proxy_ptr< type >
 	{
 		destruct_ptr( type* value_ = 0 )
@@ -149,9 +152,9 @@ namespace ooe
 		}
 	};
 
-//--- ipc::nullable_ptr --------------------------------------------------------
+//--- nipc::nullable_ptr -------------------------------------------------------
 	template< typename type >
-		struct ipc::nullable_ptr
+		struct nipc::nullable_ptr
 		: public proxy_ptr< type >
 	{
 		nullable_ptr( type* value_ = 0 )
@@ -160,9 +163,9 @@ namespace ooe
 		}
 	};
 
-//--- ipc::unchecked_ptr -------------------------------------------------------
+//--- nipc::unchecked_ptr ------------------------------------------------------
 	template< typename type >
-		struct ipc::unchecked_ptr
+		struct nipc::unchecked_ptr
 		: public proxy_ptr< type >
 	{
 		unchecked_ptr( type* value_ = 0 )
@@ -171,16 +174,16 @@ namespace ooe
 		}
 	};
 
-//--- ipc::is_pointer ----------------------------------------------------------
+//--- nipc::is_pointer ---------------------------------------------------------
 	template< typename type >
-		struct ipc::is_pointer
+		struct nipc::is_pointer
 	{
 		static const bool value = !is_cstring< type >::value && ooe::is_pointer< type >::value;
 	};
 
-//--- ipc::is_construct --------------------------------------------------------
+//--- nipc::is_construct -------------------------------------------------------
 	template< typename type >
-		struct ipc::is_construct
+		struct nipc::is_construct
 #if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< type, construct_ptr >
 	{
@@ -203,9 +206,9 @@ namespace ooe
 	};
 #endif
 
-//--- ipc::is_destruct ---------------------------------------------------------
+//--- nipc::is_destruct --------------------------------------------------------
 	template< typename type >
-		struct ipc::is_destruct
+		struct nipc::is_destruct
 #if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< type, destruct_ptr >
 	{
@@ -228,9 +231,9 @@ namespace ooe
 	};
 #endif
 
-//--- ipc::is_nullable ---------------------------------------------------------
+//--- nipc::is_nullable --------------------------------------------------------
 	template< typename type >
-		struct ipc::is_nullable
+		struct nipc::is_nullable
 #if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< type, nullable_ptr >
 	{
@@ -253,9 +256,9 @@ namespace ooe
 	};
 #endif
 
-//--- ipc::is_unchecked --------------------------------------------------------
+//--- nipc::is_unchecked -------------------------------------------------------
 	template< typename type >
-		struct ipc::is_unchecked
+		struct nipc::is_unchecked
 #if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< type, unchecked_ptr >
 	{
@@ -278,48 +281,51 @@ namespace ooe
 	};
 #endif
 
-//--- ipc::is_proxy ------------------------------------------------------------
+//--- nipc::is_proxy -----------------------------------------------------------
 	template< typename type >
-		struct ipc::is_proxy
+		struct nipc::is_proxy
 	{
 		static const bool value = is_construct< type >::value || is_destruct< type >::value ||
 			is_nullable< type >::value || is_unchecked< type >::value;
 	};
 
-//--- ipc::traits: proxy -------------------------------------------------------
-	template< typename t >
-		struct ipc::replace< t, typename enable_if< ipc::is_proxy< t > >::type >
+//--- nipc::traits: proxy -----------------------------------------------------
+	template< typename type >
+		struct nipc::size< type, typename enable_if< nipc::is_proxy< type > >::type >
 	{
-		typedef typename no_ref< t >::type::pointer type;
-	};
+		typedef typename no_ref< type >::type::pointer value_type;
 
-	template< typename t >
-		struct ipc::pack< t, typename enable_if< ipc::is_proxy< t > >::type >
-	{
-		typedef typename no_ref< t >::type type;
-		typedef typename replace< t >::type value_type;
-
-		static void call( type in, value_type& out, buffer_pack& )
+		static u32 call( value_type )
 		{
-			out = in;
+			return sizeof( value_type );
 		}
 	};
 
-	template< typename t >
-		struct ipc::unpack< t, typename enable_if< ipc::is_proxy< t > >::type >
+	template< typename type >
+		struct nipc::read< type, typename enable_if< nipc::is_proxy< type > >::type >
 	{
-		typedef typename no_ref< t >::type type;
-		typedef typename replace< t >::type value_type;
+		typedef typename no_ref< type >::type value_type;
 
-		static void call( value_type in, type& out, const buffer_unpack& )
+		static void call( const u8* buffer, value_type& value )
 		{
-			out = in;
+			value = *reinterpret_cast< const value_type* >( buffer );
 		}
 	};
 
-//--- ipc::verify --------------------------------------------------------------
+	template< typename type >
+		struct nipc::write< type, typename enable_if< nipc::is_proxy< type > >::type >
+	{
+		typedef typename no_ref< type >::type::pointer value_type;
+
+		static void call( socket& socket, value_type value, u32 length )
+		{
+			socket.send( &value, length );
+		}
+	};
+
+//--- nipc::verify -------------------------------------------------------------
 	template< typename type, typename >
-		struct ipc::verify
+		struct nipc::verify
 	{
 		static void call( pool&, typename call_traits< type >::param_type, u8 )
 		{
@@ -327,7 +333,7 @@ namespace ooe
 	};
 
 	template< typename type >
-		struct ipc::verify< type, typename enable_if< ipc::is_construct< type > >::type >
+		struct nipc::verify< type, typename enable_if< nipc::is_construct< type > >::type >
 	{
 		static void call( pool& pool, type pointer, u8 )
 		{
@@ -337,7 +343,7 @@ namespace ooe
 	};
 
 	template< typename type >
-		struct ipc::verify< type, typename enable_if< ipc::is_destruct< type > >::type >
+		struct nipc::verify< type, typename enable_if< nipc::is_destruct< type > >::type >
 	{
 		static void call( pool& pool, type pointer, u8 )
 		{
@@ -346,27 +352,27 @@ namespace ooe
 	};
 
 	template< typename type >
-		struct ipc::verify< type, typename enable_if< ipc::is_pointer< type > >::type >
+		struct nipc::verify< type, typename enable_if< nipc::is_pointer< type > >::type >
 	{
 		static void call( pool& pool, type pointer, u8 index )
 		{
 			// could speed up further by checking against known out-of-bounds ranges/values
 			if ( !pool.find( pointer ) )
-				throw error::runtime( "ipc::verify: " ) <<
+				throw error::runtime( "nipc::verify: " ) <<
 					"Invalid pointer " << pointer << " in argument " << index;
 		}
 	};
 
 	template< typename type >
-		struct ipc::verify< type, typename enable_if< ipc::is_nullable< type > >::type >
+		struct nipc::verify< type, typename enable_if< nipc::is_nullable< type > >::type >
 	{
 		static void call( pool& pool, type pointer, u8 index )
 		{
 			if ( pointer && !pool.find( pointer ) )
-				throw error::runtime( "ipc::verify: " ) <<
+				throw error::runtime( "nipc::verify: " ) <<
 					"Invalid pointer " << pointer << " in argument " << index;
 		}
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_POOL_HPP
+#endif	// OOE_FOUNDATION_IPC_SOCKET_POOL_HPP

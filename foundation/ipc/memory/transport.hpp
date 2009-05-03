@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_TRANSPORT_HPP
-#define OOE_FOUNDATION_IPC_TRANSPORT_HPP
+#ifndef OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
+#define OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
 
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/macro.hpp"
@@ -46,4 +46,4 @@ namespace ooe
 	}
 }
 
-#endif	// OOE_FOUNDATION_IPC_TRANSPORT_HPP
+#endif	// OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP

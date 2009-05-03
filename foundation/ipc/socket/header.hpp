@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_EXTERNAL_NIPC_HEADER_HPP
-#define OOE_EXTERNAL_NIPC_HEADER_HPP
+#ifndef OOE_FOUNDATION_IPC_SOCKET_HEADER_HPP
+#define OOE_FOUNDATION_IPC_SOCKET_HEADER_HPP
 
 #include <vector>
 
@@ -20,4 +20,4 @@ namespace ooe
 	}
 }
 
-#endif	// OOE_EXTERNAL_NIPC_HEADER_HPP
+#endif	// OOE_FOUNDATION_IPC_SOCKET_HEADER_HPP

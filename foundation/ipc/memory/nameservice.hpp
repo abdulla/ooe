@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_NAMESERVICE_HPP
-#define OOE_FOUNDATION_IPC_NAMESERVICE_HPP
+#ifndef OOE_FOUNDATION_IPC_MEMORY_NAMESERVICE_HPP
+#define OOE_FOUNDATION_IPC_MEMORY_NAMESERVICE_HPP
 
 #include "foundation/ipc/switchboard.hpp"
 
@@ -51,4 +51,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_NAMESERVICE_HPP
+#endif	// OOE_FOUNDATION_IPC_MEMORY_NAMESERVICE_HPP
