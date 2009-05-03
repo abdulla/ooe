@@ -5,5 +5,6 @@ build.Append( LIBS = ooe.rt.library )
 if name == 'darwin':
 	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libipc.dylib' )
 
-out = build.SharedLibrary( '#/build/library/libipc', Glob( '*.cpp' ) )
+files = Glob( '*.cpp' ) + Glob( 'memory/*.cpp' ) + Glob( 'socket/*.cpp' )
+out = build.SharedLibrary( '#/build/library/libipc', files )
 build.SideEffect( Glob( '*.rpo' ), out )
