@@ -13,8 +13,8 @@
 #include "foundation/utility/traits.hpp"
 #include "foundation/utility/tuple.hpp"
 
-#include "foundation/ipc/buffer.hpp"
-#include "foundation/ipc/traits_forward.hpp"
+#include "foundation/ipc/memory/buffer.hpp"
+#include "foundation/ipc/memory/traits_forward.hpp"
 
 namespace ooe
 {

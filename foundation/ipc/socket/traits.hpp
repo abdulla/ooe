@@ -8,7 +8,7 @@
 #include "foundation/io/socket.hpp"
 #include "foundation/utility/traits.hpp"
 
-#include "external/nipc/traits_forward.hpp"
+#include "foundation/ipc/socket/traits_forward.hpp"
 
 namespace ooe
 {

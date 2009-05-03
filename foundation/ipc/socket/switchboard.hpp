@@ -9,7 +9,7 @@
 
 #include "foundation/utility/miscellany.hpp"
 
-#include "external/nipc/pool.hpp"
+#include "foundation/ipc/socket/pool.hpp"
 
 namespace ooe
 {

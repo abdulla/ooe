@@ -5,9 +5,9 @@
 	#ifndef OOE_FOUNDATION_IPC_SOCKET_RPC_FORWARD_HPP
 	#define OOE_FOUNDATION_IPC_SOCKET_RPC_FORWARD_HPP
 
-#include "external/nipc/client.hpp"
-#include "external/nipc/error.hpp"
-#include "external/nipc/traits.hpp"
+#include "foundation/ipc/socket/client.hpp"
+#include "foundation/ipc/socket/error.hpp"
+#include "foundation/ipc/socket/traits.hpp"
 
 namespace ooe
 {

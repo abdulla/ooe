@@ -6,10 +6,9 @@
 #include <map>
 
 #include "foundation/io/socket.hpp"
+#include "foundation/ipc/socket/header.hpp"
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
-
-#include "external/nipc/header.hpp"
 
 namespace ooe
 {

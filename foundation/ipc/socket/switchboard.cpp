@@ -3,7 +3,7 @@
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 
-#include "external/nipc/switchboard.hpp"
+#include "foundation/ipc/socket/switchboard.hpp"
 
 namespace
 {

@@ -5,9 +5,9 @@
 
 #include <map>
 
-#include "foundation/ipc/switchboard.hpp"
-#include "foundation/ipc/semaphore.hpp"
-#include "foundation/ipc/link.hpp"
+#include "foundation/ipc/memory/switchboard.hpp"
+#include "foundation/ipc/memory/semaphore.hpp"
+#include "foundation/ipc/memory/link.hpp"
 
 namespace ooe
 {

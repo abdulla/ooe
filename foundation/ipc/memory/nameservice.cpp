@@ -1,6 +1,6 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/ipc/nameservice.hpp"
+#include "foundation/ipc/memory/nameservice.hpp"
 
 namespace
 {

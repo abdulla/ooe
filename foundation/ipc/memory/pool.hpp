@@ -5,7 +5,7 @@
 
 #include <map>
 
-#include "foundation/ipc/traits.hpp"
+#include "foundation/ipc/memory/traits.hpp"
 
 namespace ooe
 {

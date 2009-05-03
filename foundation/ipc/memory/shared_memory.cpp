@@ -7,8 +7,8 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#include "foundation/ipc/error.hpp"
-#include "foundation/ipc/shared_memory.hpp"
+#include "foundation/ipc/memory/error.hpp"
+#include "foundation/ipc/memory/shared_memory.hpp"
 
 namespace
 {

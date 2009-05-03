@@ -5,7 +5,7 @@
 	#ifndef OOE_FOUNDATION_IPC_SOCKET_RPC_HPP
 	#define OOE_FOUNDATION_IPC_SOCKET_RPC_HPP
 
-#include "external/nipc/rpc_forward.hpp"
+#include "foundation/ipc/socket/rpc_forward.hpp"
 
 namespace ooe
 {

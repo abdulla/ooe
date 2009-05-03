@@ -1,6 +1,6 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/ipc/pool.hpp"
+#include "foundation/ipc/memory/pool.hpp"
 
 namespace ooe
 {

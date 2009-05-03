@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_NAMESERVICE_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_NAMESERVICE_HPP
 
-#include "foundation/ipc/switchboard.hpp"
+#include "foundation/ipc/memory/switchboard.hpp"
 
 namespace ooe
 {

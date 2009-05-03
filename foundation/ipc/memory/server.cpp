@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-#include "foundation/ipc/name.hpp"
-#include "foundation/ipc/pool.hpp"
-#include "foundation/ipc/server.hpp"
-#include "foundation/ipc/traits.hpp"
+#include "foundation/ipc/memory/name.hpp"
+#include "foundation/ipc/memory/pool.hpp"
+#include "foundation/ipc/memory/server.hpp"
+#include "foundation/ipc/memory/traits.hpp"
 
 namespace
 {

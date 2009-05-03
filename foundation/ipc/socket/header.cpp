@@ -1,9 +1,8 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/ipc/socket/header.hpp"
+#include "foundation/ipc/socket/traits.hpp"
 #include "foundation/utility/error.hpp"
-
-#include "external/nipc/header.hpp"
-#include "external/nipc/traits.hpp"
 
 namespace ooe
 {

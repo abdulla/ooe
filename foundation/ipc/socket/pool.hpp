@@ -5,10 +5,9 @@
 
 #include <map>
 
+#include "foundation/ipc/socket/traits.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
-
-#include "external/nipc/traits.hpp"
 
 namespace ooe
 {

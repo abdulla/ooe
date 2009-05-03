@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-#include "foundation/ipc/client.hpp"
-#include "foundation/ipc/name.hpp"
-#include "foundation/ipc/rpc_forward.hpp"
-#include "foundation/ipc/semaphore.hpp"
+#include "foundation/ipc/memory/client.hpp"
+#include "foundation/ipc/memory/name.hpp"
+#include "foundation/ipc/memory/rpc_forward.hpp"
+#include "foundation/ipc/memory/semaphore.hpp"
 
 namespace
 {

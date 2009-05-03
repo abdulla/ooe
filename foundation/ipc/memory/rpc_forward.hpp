@@ -5,9 +5,9 @@
 	#ifndef OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 	#define OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 
-#include "foundation/ipc/error.hpp"
-#include "foundation/ipc/traits.hpp"
-#include "foundation/ipc/transport.hpp"
+#include "foundation/ipc/memory/error.hpp"
+#include "foundation/ipc/memory/traits.hpp"
+#include "foundation/ipc/memory/transport.hpp"
 
 namespace ooe
 {

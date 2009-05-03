@@ -1,8 +1,8 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/ipc/error.hpp"
-#include "foundation/ipc/switchboard.hpp"
-#include "foundation/ipc/traits.hpp"
+#include "foundation/ipc/memory/error.hpp"
+#include "foundation/ipc/memory/switchboard.hpp"
+#include "foundation/ipc/memory/traits.hpp"
 
 namespace
 {

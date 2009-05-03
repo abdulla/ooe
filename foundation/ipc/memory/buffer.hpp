@@ -6,8 +6,8 @@
 #include <list>
 
 #include "foundation/executable/environment.hpp"
-#include "foundation/ipc/name.hpp"
-#include "foundation/ipc/shared_memory.hpp"
+#include "foundation/ipc/memory/name.hpp"
+#include "foundation/ipc/memory/shared_memory.hpp"
 #include "foundation/utility/error.hpp"
 
 namespace ooe

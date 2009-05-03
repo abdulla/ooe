@@ -4,7 +4,7 @@
 #define OOE_FOUNDATION_IPC_MEMORY_LINK_HPP
 
 #include "foundation/io/socket.hpp"
-#include "foundation/ipc/transport.hpp"
+#include "foundation/ipc/memory/transport.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/utility/atom.hpp"
 

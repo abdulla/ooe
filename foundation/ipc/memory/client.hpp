@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP
 
-#include "foundation/ipc/link.hpp"
+#include "foundation/ipc/memory/link.hpp"
 
 namespace ooe
 {

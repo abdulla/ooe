@@ -3,7 +3,7 @@
 #include <paths.h>
 
 #include "foundation/executable/timer.hpp"
-#include "foundation/ipc/name.hpp"
+#include "foundation/ipc/memory/name.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/pointer.hpp"

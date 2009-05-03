@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "external/nipc/client.hpp"
-#include "external/nipc/rpc_forward.hpp"
+#include "foundation/ipc/socket/client.hpp"
+#include "foundation/ipc/socket/rpc_forward.hpp"
 
 namespace ooe
 {

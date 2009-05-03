@@ -1,9 +1,9 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/environment.hpp"
-#include "foundation/ipc/semaphore.hpp"
-#include "foundation/ipc/shared_memory.hpp"
-#include "foundation/ipc/transport.hpp"
+#include "foundation/ipc/memory/semaphore.hpp"
+#include "foundation/ipc/memory/shared_memory.hpp"
+#include "foundation/ipc/memory/transport.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/utility/atom.hpp"
 

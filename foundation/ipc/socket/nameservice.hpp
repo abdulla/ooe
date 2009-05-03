@@ -5,7 +5,7 @@
 
 #include <typeinfo>
 
-#include "external/nipc/switchboard.hpp"
+#include "foundation/ipc/socket/switchboard.hpp"
 
 namespace ooe
 {

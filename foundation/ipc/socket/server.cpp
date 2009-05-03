@@ -1,6 +1,6 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "external/nipc/server.hpp"
+#include "foundation/ipc/socket/server.hpp"
 
 namespace ooe
 {

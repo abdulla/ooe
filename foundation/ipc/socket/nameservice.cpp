@@ -1,8 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/ipc/socket/nameservice.hpp"
 #include "foundation/utility/error.hpp"
-
-#include "external/nipc/nameservice.hpp"
 
 namespace
 {

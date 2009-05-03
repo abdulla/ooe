@@ -9,8 +9,8 @@
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
 
-#include "external/nipc/header.hpp"
-#include "external/nipc/switchboard.hpp"
+#include "foundation/ipc/socket/header.hpp"
+#include "foundation/ipc/socket/switchboard.hpp"
 
 namespace ooe
 {

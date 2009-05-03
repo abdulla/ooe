@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "foundation/ipc/rpc_forward.hpp"
+#include "foundation/ipc/memory/rpc_forward.hpp"
 
 namespace ooe
 {
