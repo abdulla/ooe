@@ -143,7 +143,7 @@ namespace ooe
 			buffer_pack::allocate_tuple allocate = buffer_pack.allocate( length );
 
 			if ( allocate._1 > 0x7fffffff )
-				error::runtime( "ipc::pack: " ) << "Unable to encode offset " << allocate._1;
+				throw error::runtime( "ipc::pack: " ) << "Unable to encode offset " << allocate._1;
 
 			std::copy( string, string + length, allocate._0 );
 			out.offset = allocate._1;
