@@ -85,9 +85,9 @@ namespace ooe
 				buffer_pack.allocate( sizeof( replaced_type ) * in_size );
 
 			if ( in_size > 0x7fffffff )
-				error::runtime( "ipc::pack: " ) << "Unable to encode size " << in_size;
+				throw error::runtime( "ipc::pack: " ) << "Unable to encode size " << in_size;
 			else if ( allocate._1 > 0xffffffff )
-				error::runtime( "ipc::pack: " ) << "Unable to encode offset " << allocate._1;
+				throw error::runtime( "ipc::pack: " ) << "Unable to encode offset " << allocate._1;
 
 			replaced_type* pointer = reinterpret_cast< replaced_type* >( allocate._0 );
 			out.offset = allocate._1;
