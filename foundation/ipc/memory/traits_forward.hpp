@@ -19,53 +19,53 @@ namespace ooe
 		template< typename >
 			struct is_specialised;
 
-//--- ipc::replace -------------------------------------------------------------
+//--- ipc::size ----------------------------------------------------------------
 		template< typename, typename = void >
-			struct replace;
+			struct size;
 
 		template< typename type >
-			struct replace< type, typename enable_if< is_empty< type > >::type >;
+			struct size< type, typename enable_if< is_empty< type > >::type >;
 
 		template< typename type >
-			struct replace< type, typename enable_if< is_string< type > >::type >;
+			struct size< type, typename enable_if< is_string< type > >::type >;
 
 		template< typename type >
-			struct replace< type, typename enable_if< is_pod< type > >::type >;
+			struct size< type, typename enable_if< is_pod< type > >::type >;
 
 		template< typename type >
-			struct replace< type, typename enable_if< is_array< type > >::type >;
+			struct size< type, typename enable_if< is_array< type > >::type >;
 
-//--- ipc::pack ----------------------------------------------------------------
+//--- ipc::read ----------------------------------------------------------------
 		template< typename, typename = void >
-			struct pack;
+			struct read;
 
 		template< typename type >
-			struct pack< type, typename enable_if< is_empty< type > >::type >;
+			struct read< type, typename enable_if< is_empty< type > >::type >;
 
 		template< typename type >
-			struct pack< type, typename enable_if< is_string< type > >::type >;
+			struct read< type, typename enable_if< is_string< type > >::type >;
 
 		template< typename type >
-			struct pack< type, typename enable_if< is_pod< type > >::type >;
+			struct read< type, typename enable_if< is_pod< type > >::type >;
 
 		template< typename type >
-			struct pack< type, typename enable_if< is_array< type > >::type >;
+			struct read< type, typename enable_if< is_array< type > >::type >;
 
-//--- ipc::unpack --------------------------------------------------------------
+//--- ipc::write ---------------------------------------------------------------
 		template< typename, typename = void >
-			struct unpack;
+			struct write;
 
 		template< typename type >
-			struct unpack< type, typename enable_if< is_empty< type > >::type >;
+			struct write< type, typename enable_if< is_empty< type > >::type >;
 
 		template< typename type >
-			struct unpack< type, typename enable_if< is_string< type > >::type >;
+			struct write< type, typename enable_if< is_string< type > >::type >;
 
 		template< typename type >
-			struct unpack< type, typename enable_if< is_pod< type > >::type >;
+			struct write< type, typename enable_if< is_pod< type > >::type >;
 
 		template< typename type >
-			struct unpack< type, typename enable_if< is_array< type > >::type >;
+			struct write< type, typename enable_if< is_array< type > >::type >;
 	}
 
 //--- ipc::is_empty ------------------------------------------------------------
@@ -102,65 +102,56 @@ namespace ooe
 
 //--- ipc::traits: empty -------------------------------------------------------
 	template< typename t >
-		struct ipc::replace< t, typename enable_if< ipc::is_empty< t > >::type >
+		struct ipc::size< t, typename enable_if< ipc::is_empty< t > >::type >
 	{
-		typedef no_t type;
+		static u32 call( t )
+		{
+			return 0;
+		}
 	};
 
-	template< typename type >
-		struct ipc::pack< type, typename enable_if< ipc::is_empty< type > >::type >
+	template< typename t >
+		struct ipc::read< t, typename enable_if< ipc::is_empty< t > >::type >
 	{
-		static void call( type, type, buffer_pack& )
+		static void call( t, const u8* )
 		{
 		}
 	};
 
-	template< typename type >
-		struct ipc::unpack< type, typename enable_if< ipc::is_empty< type > >::type >
+	template< typename t >
+		struct ipc::write< t, typename enable_if< ipc::is_empty< t > >::type >
 	{
-		static void call( type, type, const buffer_unpack& )
+		static void call( t, u32, u8* )
 		{
 		}
 	};
 
 //--- ipc::traits: string ------------------------------------------------------
 	template< typename t >
-		struct ipc::replace< t, typename enable_if< is_string< t > >::type >
+		struct ipc::size< t, typename enable_if< is_string< t > >::type >
 	{
-		typedef struct { bool external : 1; unsigned offset : 31; } type;
-	};
-
-	template< typename t >
-		struct ipc::pack< t, typename enable_if< is_string< t > >::type >
-	{
-		typedef typename replace< t >::type value_type;
-
-		static void call( typename call_traits< t >::param_type in, value_type& out,
-			buffer_pack& buffer_pack )
+		static u32 call( typename call_traits< t >::param_type value )
 		{
-			up_t length = string_size< t >::call( in ) + 1;
-			const c8* string = string_data< t >::call( in );
-			buffer_pack::allocate_tuple allocate = buffer_pack.allocate( length );
-
-			if ( allocate._1 > 0x7fffffff )
-				throw error::runtime( "ipc::pack: " ) << "Unable to encode offset " << allocate._1;
-
-			std::copy( string, string + length, allocate._0 );
-			out.offset = allocate._1;
-			out.external = allocate._2;
+			return string_size< t >::call( value ) + 1;
 		}
 	};
 
 	template< typename t >
-		struct ipc::unpack< t, typename enable_if< is_string< t > >::type >
+		struct ipc::read< t, typename enable_if< is_string< t > >::type >
 	{
-		typedef typename replace< t >::type value_type;
-
-		static void call( const value_type& in, typename call_traits< t >::reference out,
-			const buffer_unpack& buffer_unpack )
+		static void call( t& value, const u8* buffer )
 		{
-			out = add< c8 >
-				( in.external ? buffer_unpack.external : buffer_unpack.internal, in.offset );
+			value = buffer;
+		}
+	};
+
+	template< typename t >
+		struct ipc::write< t, typename enable_if< is_string< t > >::type >
+	{
+		static void call( typename call_traits< t >::param_type value, u32 size, u8* buffer )
+		{
+			const c8* string = string_data< t >::call( in );
+			std::copy( string, string + size, buffer );
 		}
 	};
 
@@ -168,7 +159,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::replace< t, typename enable_if< ipc::is_pod< t > >::type >
 	{
-		typedef typename no_ref< t >::type type;
+		static u32 call( type )
 	};
 
 	template< typename type >

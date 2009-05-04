@@ -7,6 +7,7 @@ asynchronous rpc wrapper
 	- have an async_client, wraps a client with background thread
 	- have result template that can block on result of async rpc call
 
-merge ipc and nipc
-	- not completely, but have common functionality in a single area: foundation/ipc
-	- and specialised functionality in separate areas: foundation/ipc/local, foundation/ipc/network
+can merge traits of both socket and memory
+	- buffer can be reused for socket, and the setup stage can be different
+	- can simplify buffer by using socket traits scheme of pre-determining size
+	- should also help with performance for memory, as multiple shared-memory regions aren't alloc'd
