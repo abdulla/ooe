@@ -1,6 +1,6 @@
 Import( Split( 'name root' ) )
 build = root.Clone()
-build.Append( LIBS = Split( 'executable io nipc ipc parallel' ) )
+build.Append( LIBS = Split( 'executable io ipc parallel' ) )
 
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/library'" )

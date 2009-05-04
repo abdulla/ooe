@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "foundation/executable/library.hpp"
-#include "foundation/ipc/client.hpp"
+#include "foundation/ipc/memory/client.hpp"
 
 namespace ooe
 {

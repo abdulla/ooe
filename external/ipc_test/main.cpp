@@ -8,19 +8,18 @@
 
 #include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
-#include "foundation/ipc/allocator.hpp"
-#include "foundation/ipc/client.hpp"
-#include "foundation/ipc/jumbo.hpp"
-#include "foundation/ipc/name.hpp"
-#include "foundation/ipc/nameservice.hpp"
-#include "foundation/ipc/pool.hpp"
-#include "foundation/ipc/server.hpp"
-#include "foundation/ipc/rpc.hpp"
+#include "foundation/ipc/memory/allocator.hpp"
+#include "foundation/ipc/memory/client.hpp"
+#include "foundation/ipc/memory/jumbo.hpp"
+#include "foundation/ipc/memory/name.hpp"
+#include "foundation/ipc/memory/nameservice.hpp"
+#include "foundation/ipc/memory/pool.hpp"
+#include "foundation/ipc/memory/server.hpp"
+#include "foundation/ipc/memory/rpc.hpp"
+#include "foundation/ipc/socket/nameservice.hpp"
+#include "foundation/ipc/socket/rpc.hpp"
+#include "foundation/ipc/socket/server.hpp"
 #include "foundation/parallel/task.hpp"
-
-#include "external/nipc/nameservice.hpp"
-#include "external/nipc/rpc.hpp"
-#include "external/nipc/server.hpp"
 
 namespace
 {

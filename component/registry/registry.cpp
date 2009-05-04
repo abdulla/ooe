@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "component/registry/registry.hpp"
-#include "foundation/ipc/rpc.hpp"
+#include "foundation/ipc/memory/rpc.hpp"
 
 namespace
 {

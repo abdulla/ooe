@@ -5,8 +5,8 @@
 
 #include "component/registry/registry.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/ipc/semaphore.hpp"
-#include "foundation/ipc/server.hpp"
+#include "foundation/ipc/memory/semaphore.hpp"
+#include "foundation/ipc/memory/server.hpp"
 
 namespace
 {
