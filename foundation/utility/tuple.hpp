@@ -87,8 +87,7 @@ namespace ooe
 	template< typename type >
 		struct tuple_size< type, typename enable_if< is_tuple< type > >::type >
 	{
-		typedef typename no_ref< type >::type value_type;
-		static const unsigned value = value_type::size;
+		static const unsigned value = no_ref< type >::type::size;
 	};
 
 //--- tuple_equal --------------------------------------------------------------
