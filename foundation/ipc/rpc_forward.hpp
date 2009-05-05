@@ -93,7 +93,7 @@ namespace ooe
 		: public rpc_base
 	{
 	public:
-		buffer_unpack operator ()( BOOST_PP_ENUM_BINARY_PARAMS
+		buffer_unpack operator ()( memory_type& memory BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) ) const
 		{
 			transport::tuple_type tuple = transport.get();
@@ -101,7 +101,6 @@ namespace ooe
 			layout_pack< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 				call( buffer_pack BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 			header_type& header = *reinterpret_cast< header_type* >( tuple._0 );
-			memory_type memory( 0 );
 
 			header._0 = index;
 			buffer_pack.store( header, memory );
@@ -134,7 +133,8 @@ namespace ooe
 		result_type operator ()( BOOST_PP_ENUM_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) ) const
 		{
-			base_type::operator ()( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+			memory_type memory( 0 );
+			base_type::operator ()( memory BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 		}
 	};
 
@@ -153,8 +153,9 @@ namespace ooe
 		result_type operator ()( BOOST_PP_ENUM_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) ) const
 		{
+			memory_type memory( 0 );
 			buffer_unpack buffer_unpack =
-				base_type::operator ()( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+				base_type::operator ()( memory BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			result_type value;
 			layout_unpack< result_type >::call( buffer_unpack, value );
