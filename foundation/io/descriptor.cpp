@@ -16,9 +16,9 @@ namespace
 {
 	using namespace ooe;
 
-	void statistics( s32 handle, struct stat& status )
+	void statistics( s32 fd, struct stat& status )
 	{
-		if ( fstat( handle, &status ) )
+		if ( fstat( fd, &status ) )
 			throw error::io( "descriptor: " ) << "Unable to stat descriptor: " <<
 				error::number( errno );
 	}
@@ -51,30 +51,36 @@ namespace
 namespace ooe
 {
 //--- descriptor_id ------------------------------------------------------------
-	descriptor_id::descriptor_id( s32 handle_ )
-		: handle( handle_ )
+	descriptor_id::descriptor_id( s32 fd_ )
+		: fd( fd_ )
 	{
-		if ( handle == -1 )
+		if ( fd == -1 )
 			throw error::io( "descriptor: " ) << "Unable to open: " << error::number( errno );
+		else if ( fcntl( fd, F_SETFD, FD_CLOEXEC ) )
+			throw error::io( "descriptor: " ) <<
+				"Unable to set close-on-exec: " << error::number( errno );
 	}
 
 	descriptor_id::descriptor_id( const std::string& path, s32 flags )
-		: handle( open( path.c_str(), flags, 0600 ) )
+		: fd( open( path.c_str(), flags, 0600 ) )
 	{
-		if ( handle == -1 )
+		if ( fd == -1 )
 			throw error::io( "descriptor: " ) << "Unable to open \"" << path << "\": " <<
 				error::number( errno );
+		else if ( fcntl( fd, F_SETFD, FD_CLOEXEC ) )
+			throw error::io( "descriptor: " ) <<
+				"Unable to set close-on-exec for \"" << path << "\": " << error::number( errno );
 	}
 
 	descriptor_id::~descriptor_id( void )
 	{
-		if ( close( handle ) )
+		if ( close( fd ) )
 			OOE_WARNING( "descriptor", "Unable to close: " << error::number( errno ) );
 	}
 
 //--- descriptor ---------------------------------------------------------------
-	descriptor::descriptor( s32 handle )
-		: id( new descriptor_id( handle ) )
+	descriptor::descriptor( s32 fd )
+		: id( new descriptor_id( fd ) )
 	{
 	}
 
@@ -85,7 +91,7 @@ namespace ooe
 
 	s32 descriptor::get( void ) const
 	{
-		return id->handle;
+		return id->fd;
 	}
 
 	descriptor::node_type descriptor::type( void ) const

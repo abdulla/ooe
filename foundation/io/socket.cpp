@@ -30,17 +30,17 @@ namespace
 namespace ooe
 {
 //--- socket -------------------------------------------------------------------
-	socket::socket( s32 handle )
-		: descriptor( handle )
+	socket::socket( s32 fd )
+		: descriptor( fd )
 	{
 #ifdef __APPLE__
 		option( SOL_SOCKET, SO_NOSIGPIPE, true );
 #endif
 	}
 
-	socket socket::create( s32 handle ) const
+	socket socket::create( s32 fd ) const
 	{
-		return socket( handle );
+		return socket( fd );
 	}
 
 	up_t socket::receive( void* buffer, up_t bytes )

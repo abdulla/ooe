@@ -12,7 +12,7 @@ namespace ooe
 {
 	struct descriptor_id
 	{
-		const s32 handle;
+		const s32 fd;
 
 		descriptor_id( s32 );
 		descriptor_id( const std::string&, s32 );

@@ -69,7 +69,7 @@ namespace
 	}
 
 	//--- surrogate ------------------------------------------------------------
-	void surrogate( const std::string& path, const std::string& module_name )
+	void surrogate( const std::string& path, const std::string& /*module_name*/ )
 	{
 		ipc::switchboard switchboard;
 		ipc::server server( ipc::create_semaphore, path, switchboard );
@@ -79,11 +79,6 @@ namespace
 			ipc::semaphore semaphore( gate.c_str() );
 			semaphore.up();
 		}
-
-		ooe::registry registry;
-		module_type module = registry.find( module_name, module::internal );
-		
-		// iterate through interfaces, find facade for each, insert in to switchboard
 
 		while ( !executable::signal() && server.decode() ) {}
 	}

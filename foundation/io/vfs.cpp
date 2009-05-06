@@ -1,7 +1,5 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include <cerrno>
-
 #include <sys/stat.h>
 
 #include "foundation/io/error.hpp"
@@ -22,13 +20,6 @@ namespace
 
 		up_t j = string.find_last_not_of( "/" ) + 1;
 		return std::string( string, i, j - i );
-	}
-
-	void statistics( s32 handle, struct stat& status )
-	{
-		if ( fstat( handle, &status ) )
-			throw error::io( "descriptor: " ) << "Unable to stat descriptor: " <<
-				error::number( errno );
 	}
 
 	bool lru( const std::string& path, vfs::list_type& list, vfs::list_type::iterator& i )
