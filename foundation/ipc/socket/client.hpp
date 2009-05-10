@@ -24,6 +24,37 @@ namespace ooe
 	}
 
 //--- nipc::client -------------------------------------------------------------
+	/*class OOE_VISIBLE nipc::client
+	{
+	public:
+		typedef tuple< u8*, up_t > buffer_tuple;
+		typedef tuple< array_type, bool > map_tuple;
+		typedef std::map< u32, map_tuple > map_type;
+
+		client( const address& );
+		~client( void );
+
+		array_type wait( result_base< void >& );
+		void erase( const map_type::iterator& );
+		map_type::iterator insert( void );
+
+		buffer_tuple get( void ) const;
+		void write( up_t );
+
+	private:
+		ooe::connect connect;
+		u8 buffer[ executable::static_page_size ];	// write_buffer
+		map_type map;
+		u32 in;
+		u32 out;
+
+		ooe::mutex mutex;
+		ooe::condition condition;
+		ooe::thread thread;
+
+		void* call( void* ) OOE_HIDDEN;
+	};*/
+
 	class OOE_VISIBLE nipc::client
 	{
 	public:

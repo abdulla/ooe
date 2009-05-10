@@ -8,13 +8,21 @@
 #include <utility>
 
 #include <boost/mpl/at.hpp>
+#include <boost/mpl/clear.hpp>
+#include <boost/mpl/distance.hpp>
 #include <boost/mpl/iterator_tags.hpp>
+#include <boost/mpl/minus.hpp>
+#include <boost/mpl/plus.hpp>
+#include <boost/mpl/push_back.hpp>
+#include <boost/mpl/push_front.hpp>
+#include <boost/mpl/size.hpp>
 
 #include "foundation/utility/preprocessor.hpp"
 #include "foundation/utility/traits.hpp"
 
 namespace ooe
 {
+	struct no_t;
 	struct tuple_tag;
 
 	template< unsigned, typename, bool >
@@ -317,6 +325,7 @@ namespace ooe
 		typedef type BOOST_PP_CAT( t, LIMIT );
 
 		tuple_base( void ) {}
+
 		tuple_base( typename call_traits< type >::param_type t )
 			: type( t )
 		{
@@ -330,6 +339,7 @@ namespace ooe
 		type BOOST_PP_CAT( _, LIMIT );
 
 		tuple_base( void ) {}
+
 		tuple_base( typename call_traits< type >::param_type t )
 			: BOOST_PP_CAT( _, LIMIT )( t )
 		{
@@ -409,7 +419,7 @@ namespace ooe
 	template< typename t >
 		struct tuple_element< MINUS, t >
 	{
-		typedef typename t:: BOOST_PP_CAT( t, MINUS ) type;
+		typedef typename no_ref< t >::type:: BOOST_PP_CAT( t, MINUS ) type;
 	};
 
 //--- tuple_equal --------------------------------------------------------------

@@ -11,30 +11,33 @@ namespace
 {
 	using namespace ooe;
 
-	typedef tuple< const ipc::switchboard&, ipc::memory_type*, ipc::pool* > tuple_type;
+	typedef tuple< const ipc::switchboard&, ipc::buffer_type*, ipc::pool* > tuple_type;
 
-	void ipc_decode( ipc::transport& transport, const void* pointer )
+	void ipc_decode( const ipc::buffer_tuple& tuple, const void* pointer )
 	{
-		ipc::transport::tuple_type t0 = transport.get();
-		const tuple_type& t1 = *static_cast< const tuple_type* >( pointer );
-		t1._0.execute( t0._0, t0._1, *t1._1, *t1._2 );
+		const tuple_type& args = *static_cast< const tuple_type* >( pointer );
+		args._0.execute( tuple, *args._1, *args._2 );
 	}
 
-	void ipc_link( any any, const ipc::buffer_unpack& buffer_unpack, ipc::buffer_pack& buffer_pack,
-		ipc::pool& )
+	void ipc_link( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
+		ipc::buffer_type& buffer, ipc::pool& )
 	{
 		pid_t pid;
-		ipc::layout_unpack< pid_t >::call( buffer_unpack, pid );
+		ipc::stream_read< pid_t >::call( data, pid );
+
 		u32 link = static_cast< ipc::server* >( any.pointer )->link( pid );
-		ipc::layout_pack< u32 >::call( buffer_pack, link );
+		up_t size = ipc::stream_size< u32 >::call( link );
+		ipc::stream_write< u32 >::call( return_write( tuple, buffer, size ), link );
 	}
 
-	void ipc_unlink( any any, const ipc::buffer_unpack& buffer_unpack, ipc::buffer_pack&,
-		ipc::pool& )
+	void ipc_unlink( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
+		ipc::buffer_type& buffer, ipc::pool& )
 	{
 		u32 link;
-		ipc::layout_unpack< u32 >::call( buffer_unpack, link );
+		ipc::stream_read< u32 >::call( data, link );
+
 		static_cast< ipc::server* >( any.pointer )->unlink( link );
+		return_write( tuple, buffer );
 	}
 }
 
@@ -57,19 +60,16 @@ namespace ooe
 			return;
 
 		active = false;
-		transport::tuple_type tuple = transport->get();
-		header_type& header = *reinterpret_cast< header_type* >( tuple._0 );
-		header._0 = 0;		// call null function to shutdown
-		header._1 = false;	// not using rpc to avoid check
+		stream_write< bool, u32 >::call( transport->get()._0, true, 0 );
 		transport->wake_wait();
 		thread.join();
 	}
 
 	void* ipc::servlet::call( void* pointer )
 	{
-		memory_type memory( 0 );
+		buffer_type buffer( transport->get(), 0 );
 		pool pool;
-		tuple_type tuple( switchboard, &memory, &pool );
+		tuple_type tuple( switchboard, &buffer, &pool );
 
 		ipc::server& server = *static_cast< ipc::server* >( pointer );
 		link_server link( listen->accept(), link_id, server );
@@ -102,8 +102,8 @@ namespace ooe
 
 	bool ipc::server::decode( void )
 	{
-		memory_type memory( 0 );
-		tuple_type tuple( internal, &memory, 0 );
+		buffer_type buffer( transport->get(), 0 );
+		tuple_type tuple( internal, &buffer /*0*/, 0 );
 		transport->wait( ipc_decode, &tuple );
 		return !servlets.empty();
 	}

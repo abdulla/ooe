@@ -7,6 +7,8 @@
 
 #include <vector>
 
+#include "foundation/ipc/memory/error.hpp"
+#include "foundation/ipc/memory/header.hpp"
 #include "foundation/ipc/memory/pool.hpp"
 
 namespace ooe
@@ -20,17 +22,21 @@ namespace ooe
 
 		template< typename, typename >
 			struct invoke_member;
+
+		inline u8* return_write
+			( const buffer_tuple&, buffer_type&, up_t = 0, error::ipc = error::none );
 	}
 
 //--- ipc::switchboard ---------------------------------------------------------
 	class ipc::switchboard
 	{
 	public:
-		typedef void ( * call_type )( any, const buffer_unpack&, buffer_pack&, pool& );
+		typedef void ( * call_type )
+			( const any&, const u8*, const buffer_tuple&, buffer_type&, pool& );
 
 		switchboard( void ) OOE_VISIBLE;
 
-		void execute( u8*, up_t, memory_type&, pool& ) const;
+		void execute( const buffer_tuple&, buffer_type&, pool& ) const;
 		u32 insert_direct( call_type, any ) OOE_VISIBLE;
 
 		template< typename type >
@@ -56,6 +62,17 @@ namespace ooe
 
 		vector_type vector;
 	};
+
+//--- ipc ----------------------------------------------------------------------
+	inline u8* ipc::return_write
+		( const buffer_tuple& tuple, buffer_type& buffer, up_t size, error::ipc error )
+	{
+		up_t extra = ipc::size< u32 >::call( error );
+		buffer_type( tuple, size + extra ).swap( buffer );
+		u8* data = buffer.get();
+		stream_write< u32 >::call( data, error );
+		return data + extra;
+	}
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
@@ -96,38 +113,40 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct ipc::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, const buffer_unpack& buffer_unpack, buffer_pack&,
-			pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
+		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+			buffer_type& buffer, pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
 		{
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
 
 			BOOST_PP_REPEAT( LIMIT, ARGUMENT, ~ )
-			layout_unpack< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-				call( buffer_unpack BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+			return_write( tuple, buffer );
 		}
 	};
 
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct ipc::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, const buffer_unpack& buffer_unpack, buffer_pack& buffer_pack,
-			pool& pool )
+		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+			buffer_type& buffer, pool& pool )
 		{
 			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
 
 			BOOST_PP_REPEAT( LIMIT, ARGUMENT, ~ )
-			layout_unpack< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-				call( buffer_unpack BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 			verify< r >::call( pool, value, 0 );
-			layout_pack< r >::call( buffer_pack, value );
+			up_t size = stream_size< r >::call( value );
+			stream_write< r >::call( return_write( tuple, buffer, size ), value );
 		}
 	};
 
@@ -136,42 +155,44 @@ namespace ooe
 	template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, const buffer_unpack& buffer_unpack, buffer_pack&,
-			pool& pool )
+		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+			buffer_type& buffer, pool& pool )
 		{
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );
 
 			t0* a0;
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, ARGUMENT, ~ )
-			layout_unpack< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
-				call( buffer_unpack BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			stream_read< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
+				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			verify< t0* >::call( pool, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
 			( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+			return_write( tuple, buffer );
 		}
 	};
 
 	template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, const buffer_unpack& buffer_unpack, buffer_pack& buffer_pack,
-			pool& pool )
+		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+			buffer_type& buffer, pool& pool )
 		{
 			typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );
 
 			t0* a0;
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, ARGUMENT, ~ )
-			layout_unpack< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
-				call( buffer_unpack BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			stream_read< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
+				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			verify< t0* >::call( pool, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
 			r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 			verify< r >::call( pool, value, 0 );
-			layout_pack< r >::call( buffer_pack, value );
+			up_t size = stream_size< r >::call( value );
+			stream_write< r >::call( return_write( tuple, buffer, size ), value );
 		}
 	};
 #endif

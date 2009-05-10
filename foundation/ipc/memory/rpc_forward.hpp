@@ -6,7 +6,7 @@
 	#define OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 
 #include "foundation/ipc/memory/error.hpp"
-#include "foundation/ipc/memory/traits.hpp"
+#include "foundation/ipc/memory/header.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 
 namespace ooe
@@ -16,12 +16,10 @@ namespace ooe
 		class rpc_base;
 
 		template< typename >
-			class rpc_operator;
-
-		template< typename >
 			struct rpc;
 
-		inline void validate( u32, const buffer_unpack& );
+
+		inline const u8* validate( const u8* );
 	}
 
 //--- ipc::rpc_base ------------------------------------------------------------
@@ -38,22 +36,23 @@ namespace ooe
 	};
 
 //--- ipc ----------------------------------------------------------------------
-	inline void ipc::validate( u32 type, const buffer_unpack& buffer_unpack )
+	inline const u8* ipc::validate( const u8* data )
 	{
-		const c8* what;
-		const c8* where;
+		u32 type;
+		data += read< u32 >::call( data, type );
 
 		switch ( type )
 		{
 		case error::none:
-			return;
+			return data;
 
 		case error::link:
 			throw error::connection();
 
 		case error::exception:
-			layout_unpack< const c8*, const c8* >::call( buffer_unpack, what, where );
-			throw error::rpc() << what << "\n\nServer stack trace:" << where;
+			const c8* string;
+			read< const c8* >::call( data, string );
+			throw error::rpc() << string;
 
 		default:
 			throw error::rpc() << "Unknown error code";
@@ -75,11 +74,9 @@ namespace ooe
 
 namespace ooe
 {
+#if LIMIT != OOE_PP_LIMIT
 	namespace ipc
 	{
-		template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
-			struct rpc_operator< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
-
 		template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 			struct rpc< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
 
@@ -87,80 +84,81 @@ namespace ooe
 			struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
 	}
 
-//--- ipc::rpc_operator --------------------------------------------------------
-	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
-		class ipc::rpc_operator< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: public rpc_base
-	{
-	public:
-		buffer_unpack operator ()( BOOST_PP_ENUM_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) ) const
-		{
-			transport::tuple_type tuple = transport.get();
-			buffer_pack buffer_pack( tuple._0, tuple._1, sizeof( header_type ) );
-			layout_pack< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-				call( buffer_pack BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-			header_type& header = *reinterpret_cast< header_type* >( tuple._0 );
-			memory_type memory( 0 );
-
-			header._0 = index;
-			buffer_pack.store( header, memory );
-			transport.notify();
-			buffer_unpack buffer_unpack( tuple._0, sizeof( header_type ), header, memory );
-			validate( header._0, buffer_unpack );
-			return buffer_unpack;
-		}
-
-	protected:
-		rpc_operator( ipc::transport& transport_, u32 index_ )
-			: rpc_base( transport_, index_ )
-		{
-		}
-	};
-
 //--- ipc::rpc -----------------------------------------------------------------
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct ipc::rpc< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: public rpc_operator< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		: private rpc_base
 	{
-		typedef rpc_operator< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > base_type;
 		typedef void result_type;
 
 		rpc( ipc::transport& transport_, u32 index_ )
-			: base_type( transport_, index_ )
+			: rpc_base( transport_, index_ )
 		{
 		}
 
-		result_type operator ()( BOOST_PP_ENUM_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) ) const
+		result_type operator ()
+			( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) ) const
 		{
-			base_type::operator ()( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+			buffer_tuple tuple = header_adjust( transport.get() );
+
+			{
+				up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+					call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+				buffer_type buffer( tuple, size );
+
+				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
+					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+				header_write( tuple._0, buffer );
+			}
+
+			transport.notify();
+
+			{
+				buffer_type buffer( header_read( tuple._0 ), tuple._0 );
+				validate( buffer.get() );
+			}
 		}
 	};
 
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct ipc::rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: public rpc_operator< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		: private rpc_base
 	{
-		typedef rpc_operator< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > base_type;
 		typedef typename no_ref< r >::type result_type;
 
 		rpc( ipc::transport& transport_, u32 index_ )
-			: base_type( transport_, index_ )
+			: rpc_base( transport_, index_ )
 		{
 		}
 
-		result_type operator ()( BOOST_PP_ENUM_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) ) const
+		result_type operator ()
+			( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) ) const
 		{
-			buffer_unpack buffer_unpack =
-				base_type::operator ()( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+			buffer_tuple tuple = header_adjust( transport.get() );
 
-			result_type value;
-			layout_unpack< result_type >::call( buffer_unpack, value );
-			return value;
+			{
+				up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+					call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+				buffer_type buffer( tuple, size );
+
+				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
+					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+				header_write( tuple._0, buffer );
+			}
+
+			transport.notify();
+
+			{
+				buffer_type buffer( header_read( tuple._0 ), tuple._0 );
+				const u8* data = validate( buffer.get() );
+
+				result_type value;
+				stream_read< result_type >::call( data, value );
+				return value;
+			}
 		}
 	};
+#endif
 }
 
 	#undef LIMIT

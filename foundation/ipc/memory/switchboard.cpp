@@ -1,15 +1,22 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/ipc/memory/error.hpp"
+#include "foundation/ipc/memory/header.hpp"
 #include "foundation/ipc/memory/switchboard.hpp"
-#include "foundation/ipc/memory/traits.hpp"
 
 namespace
 {
 	using namespace ooe;
 
-	void ipc_null( any, const ipc::buffer_unpack&, ipc::buffer_pack&, ipc::pool& )
+	void ipc_null( const any&, const u8*, const ipc::buffer_tuple&, ipc::buffer_type&, ipc::pool& )
 	{
+	}
+
+	void return_error
+		( const ipc::buffer_tuple& tuple, ipc::buffer_type& buffer, const std::string& string )
+	{
+		up_t size = ipc::stream_size< std::string >::call( string );
+		u8* data = return_write( tuple, buffer, size, error::exception );
+		ipc::stream_write< std::string >::call( data, string );
 	}
 }
 
@@ -22,42 +29,47 @@ namespace ooe
 		insert_direct( ipc_null, 0 );
 	}
 
-	void ipc::switchboard::execute( u8* buffer, up_t size, memory_type& memory, pool& pool ) const
+	void ipc::switchboard::
+		execute( const buffer_tuple& tuple, buffer_type& buffer, pool& pool ) const
 	{
-		header_type& header = *reinterpret_cast< header_type* >( buffer );
-		buffer_pack buffer_pack( buffer, size, sizeof( header_type ) );
+		buffer_tuple adjust = header_adjust( tuple );
 
 		try
 		{
-			if ( header._0 >= vector.size() )
-				throw error::runtime( "ipc::switchboard: " ) <<
-					"Unable to execute function, index " << header._0 << " out of range";
+			buffer_type input( header_read( adjust._0 ), adjust._0 );
 
-			buffer_unpack buffer_unpack( buffer, sizeof( header_type ), header, memory );
-			const vector_tuple& tuple = vector[ header._0 ];
-			tuple._0( tuple._1, buffer_unpack, buffer_pack, pool );
-			header._0 = error::none;
+			u32 index;
+			u8* data = input.get();
+			data += read< u32 >::call( data, index );
+
+			if ( index >= vector.size() )
+				throw error::runtime( "ipc::switchboard: " ) <<
+					"Unable to execute function, index " << index << " out of range";
+
+			const vector_tuple& args = vector[ index ];
+			args._0( args._1, data, adjust, buffer, pool );
 		}
 		catch ( error::runtime& error )
 		{
-			header._0 = error::exception;
-			layout_pack< const c8*, const c8* >::call( buffer_pack, error.what(), error.where() );
+			std::string string;
+			string << error.what() << "\n\nServer stack trace:" << error.where();
+			return_error( tuple, buffer, string );
 		}
 		catch ( std::exception& error )
 		{
-			header._0 = error::exception;
-			layout_pack< const c8*, const c8* >::call( buffer_pack, error.what(),
-				"\nNo stack trace available" );
+			std::string string;
+			string << error.what() << "\n\nServer stack trace:" << "\nNo stack trace available";
+			return_error( tuple, buffer, string );
 		}
 		catch ( ... )
 		{
-			header._0 = error::exception;
-			layout_pack< const c8*, const c8* >::call( buffer_pack,
-				"An unknown exception was thrown", "\nNo stack trace available" );
+			std::string string;
+			string << "An unknown exception was thrown" <<
+				"\n\nServer stack trace:" << "\nNo stack trace available";
+			return_error( tuple, buffer, string );;
 		}
 
-		delete memory.release();
-		buffer_pack.store( header, memory );
+		header_write( adjust._0, buffer );
 	}
 
 	u32 ipc::switchboard::insert_direct( call_type call, any any )

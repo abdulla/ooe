@@ -11,14 +11,14 @@ namespace ooe
 {
 	namespace ipc
 	{
+		typedef tuple< u8*, up_t > buffer_tuple;
 		struct transport;
 	}
 
 //--- ipc::transport -----------------------------------------------------------
 	struct ipc::transport
 	{
-		typedef tuple< u8* /* buffer */, up_t /* size */ > tuple_type;
-		typedef void ( * wait_type )( transport&, const void* );
+		typedef void ( * wait_type )( const buffer_tuple&, const void* );
 
 		enum type
 		{
@@ -29,7 +29,7 @@ namespace ooe
 		virtual ~transport( void ) {}
 		virtual void wait( wait_type, const void* ) = 0;
 		virtual void notify( void ) = 0;
-		virtual tuple_type get( void ) = 0;
+		virtual buffer_tuple get( void ) const = 0;
 
 		virtual void wake_wait( void ) = 0;
 		virtual void wake_notify( void ) = 0;

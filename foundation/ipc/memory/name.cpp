@@ -2,11 +2,9 @@
 
 #include <paths.h>
 
-#include "foundation/executable/timer.hpp"
 #include "foundation/ipc/memory/name.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/convert.hpp"
-#include "foundation/utility/pointer.hpp"
 
 namespace
 {
@@ -19,8 +17,8 @@ namespace ooe
 //--- ipc ----------------------------------------------------------------------
 	std::string ipc::link_name( pid_t pid, u32 link_id )
 	{
-		std::string name;
-		return name << "/ooe." << hex( pid ) << 'l' << hex( link_id );
+		std::string name( "/ooe." );
+		return name << hex( pid ) << 'l' << hex( link_id );
 	}
 
 	std::string ipc::local_name( const std::string& name )
@@ -30,12 +28,7 @@ namespace ooe
 
 	std::string ipc::unique_name( void )
 	{
-		std::string name;
-		return name << "/ooe." << hex( getpid() ) << 'r' << hex( value++ );
-	}
-
-	void ipc::unique_name( c8* buffer, up_t size )
-	{
-		std::snprintf( buffer, size, "/ooe.%xr%x", getpid(), value++ );
+		std::string name( "/ooe." );
+		return name << hex( getpid() ) << 'r' << hex( value++ );
 	}
 }

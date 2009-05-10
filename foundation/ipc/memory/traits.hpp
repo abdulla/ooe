@@ -5,15 +5,10 @@
 	#ifndef OOE_FOUNDATION_IPC_MEMORY_TRAITS_HPP
 	#define OOE_FOUNDATION_IPC_MEMORY_TRAITS_HPP
 
-#include <boost/mpl/transform.hpp>
-
-#include "foundation/utility/error.hpp"
-#include "foundation/utility/convert.hpp"
-#include "foundation/utility/miscellany.hpp"
+#include "foundation/utility/string.hpp"
 #include "foundation/utility/traits.hpp"
 #include "foundation/utility/tuple.hpp"
 
-#include "foundation/ipc/memory/buffer.hpp"
 #include "foundation/ipc/memory/traits_forward.hpp"
 
 namespace ooe
@@ -72,18 +67,18 @@ namespace ooe
 		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
 			typedef typename no_ref< t >::type type;
-			up_t size = reinterpret_cast< const up_t* >( buffer );
+			up_t size = *reinterpret_cast< const up_t* >( buffer );
 			reserve< type >::call( value, size );
 			const u8* pointer = buffer + sizeof( up_t );
 
 			for ( up_t i = 0; i != size; ++i )
 			{
 				typename type::value_type element;
-				pointer += read< typename type::value_type >::call( element, pointer );
+				pointer += read< typename type::value_type >::call( pointer, element );
 				value.insert( value.end(), element );
 			}
 
-			return reinterpret_cast< up_t >( pointer - buffer );
+			return pointer - buffer;
 		}
 	};
 
@@ -98,9 +93,9 @@ namespace ooe
 
 			for ( typename type::const_iterator i = value.begin(), end = value.end();
 				i != end; ++i )
-				pointer += write< typename type::value_type >::call( *i, pointer );
+				pointer += write< typename type::value_type >::call( pointer, *i );
 
-			return reinterpret_cast< up_t >( pointer - buffer );
+			return pointer - buffer;
 		}
 	};
 
@@ -136,15 +131,16 @@ namespace ooe
 	#define LIMIT BOOST_PP_ITERATION()
 
 	#define SIZE( z, n, _ ) + size< t ## n >::call( a ## n )
-	#define READ( z, n, _ ) buffer += read< t ## n >::call( buffer, a ## n );
+	#define READ( z, n, _ ) buffer +=\
+		read< typename no_ref< t ## n >::type >::call( buffer, a ## n );
 	#define WRITE( z, n, _ ) buffer += write< t ## n >::call( buffer, a ## n );
 
 	#define TUPLE_SIZE( z, n, _ ) +\
 		size< typename tuple_element< n, t >::type >::call( value._ ## n )
 	#define TUPLE_READ( z, n, _ ) pointer +=\
-		read< typename tuple_element< n, t >::type >::call( at< n >( value ), pointer );
+		read< typename tuple_element< n, t >::type >::call( pointer, at< n >( value ) );
 	#define TUPLE_WRITE( z, n, _ ) pointer +=\
-		write< typename tuple_element< n, t >::type >::call( at< n >( value ), pointer );
+		write< typename tuple_element< n, t >::type >::call( pointer, at< n >( value ) );
 
 namespace ooe
 {
@@ -202,7 +198,7 @@ namespace ooe
 		{
 			const u8* pointer = buffer;
 			BOOST_PP_REPEAT( LIMIT, TUPLE_READ, _ )
-			return reinterpret_cast< up_t >( pointer - buffer );
+			return pointer - buffer;
 		}
 	};
 
@@ -214,7 +210,7 @@ namespace ooe
 		{
 			u8* pointer = buffer;
 			BOOST_PP_REPEAT( LIMIT, TUPLE_WRITE, _ )
-			return reinterpret_cast< up_t >( pointer - buffer );
+			return pointer - buffer;
 		}
 	};
 
@@ -226,8 +222,8 @@ namespace ooe
 		struct ipc::stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >
 #endif
 	{
-		static up_t call( const u8* BOOST_PP_EXPR_IF( LIMIT, buffer )
-			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, typename call_traits< t, >::reference a ) )
+		static up_t
+			call( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) )
 		{
 			return 0 BOOST_PP_REPEAT( LIMIT, SIZE, _ );
 		}
@@ -242,7 +238,7 @@ namespace ooe
 #endif
 	{
 		static void call( const u8* BOOST_PP_EXPR_IF( LIMIT, buffer )
-			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, typename call_traits< t, >::reference a ) )
+			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, typename no_ref< t, >::type& a ) )
 		{
 			BOOST_PP_REPEAT( LIMIT, READ, _ )
 		}

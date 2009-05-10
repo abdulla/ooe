@@ -6,29 +6,33 @@ namespace
 {
 	using namespace ooe;
 
-	void ipc_find( any any, const ipc::buffer_unpack& buffer_unpack, ipc::buffer_pack& buffer_pack,
-		ipc::pool& )
+	void ipc_find( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
+		ipc::buffer_type& buffer, ipc::pool& )
 	{
 		const c8* name;
 		const c8* type;
-		ipc::layout_unpack< const c8*, const c8* >::call( buffer_unpack, name, type );
+		ipc::stream_read< const c8*, const c8* >::call( data, name, type );
 
 		u32 value = static_cast< ipc::nameservice* >( any.pointer )->find( name, type );
-		ipc::layout_pack< u32 >::call( buffer_pack, value );
+		up_t size = ipc::stream_size< u32 >::call( value );
+		ipc::stream_write< u32 >::call( return_write( tuple, buffer, size ), value );
 	}
 
-	void ipc_list( any any, const ipc::buffer_unpack&, ipc::buffer_pack& buffer_pack, ipc::pool& )
+	void ipc_list( const any& any, const u8*, const ipc::buffer_tuple& tuple,
+		ipc::buffer_type& buffer, ipc::pool& )
 	{
-		ipc::nameservice::list_type value = static_cast< ipc::nameservice* >( any.pointer )->list();
-		ipc::layout_pack< ipc::nameservice::list_type >::call( buffer_pack, value );
+		typedef ipc::nameservice::list_type list_type;
+		list_type value = static_cast< ipc::nameservice* >( any.pointer )->list();
+		up_t size = ipc::stream_size< list_type >::call( value );
+		ipc::stream_write< list_type >::call( return_write( tuple, buffer, size ), value );
 	}
 
-	void ipc_find_all( any any, const ipc::buffer_unpack& buffer_unpack,
-		ipc::buffer_pack& buffer_pack, ipc::pool& )
+	void ipc_find_all( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
+		ipc::buffer_type& buffer, ipc::pool& )
 	{
-		typedef std::vector< tuple< std::string, std::string > > in_type;
+		typedef std::vector< ooe::tuple< std::string, std::string > > in_type;
 		in_type in;
-		ipc::layout_unpack< in_type >::call( buffer_unpack, in );
+		ipc::stream_read< in_type >::call( data, in );
 
 		typedef std::vector< u32 > out_type;
 		out_type out;
@@ -39,7 +43,8 @@ namespace
 		for ( in_type::const_iterator i = in.begin(), end = in.end(); i != end; ++i )
 			out.push_back( nameservice.find( i->_0, i->_1 ) );
 
-		ipc::layout_pack< out_type >::call( buffer_pack, out );
+		up_t size = ipc::stream_size< out_type >::call( out );
+		ipc::stream_write< out_type >::call( return_write( tuple, buffer, size ), out );
 	}
 }
 

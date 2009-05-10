@@ -9,6 +9,7 @@
 #include "foundation/ipc/memory/name.hpp"
 #include "foundation/ipc/memory/shared_memory.hpp"
 #include "foundation/ipc/memory/traits.hpp"
+#include "foundation/utility/error.hpp"
 
 namespace ooe
 {
@@ -33,13 +34,13 @@ namespace ooe
 			struct is_container;
 
 		template< typename type >
-			struct replace< type, typename enable_if< ipc::is_container< type > >::type >;
+			struct size< type, typename enable_if< ipc::is_container< type > >::type >;
 
 		template< typename type >
-			struct pack< type, typename enable_if< ipc::is_container< type > >::type >;
+			struct read< type, typename enable_if< ipc::is_container< type > >::type >;
 
 		template< typename type >
-			struct unpack< type, typename enable_if< ipc::is_container< type > >::type >;
+			struct write< type, typename enable_if< ipc::is_container< type > >::type >;
 
 		template< typename type >
 			bool operator ==( const allocator< type >& x, const allocator< type >& y );
@@ -212,40 +213,40 @@ namespace ooe
 
 //--- ipc::traits: container ---------------------------------------------------
 	template< typename t >
-		struct ipc::replace< t, typename enable_if< ipc::is_container< t > >::type >
+		struct ipc::size< t, typename enable_if< ipc::is_container< t > >::type >
 	{
-		typedef tuple< std::string, up_t > value_type;
-		typedef typename replace< value_type >::type type;
-	};
-
-	template< typename t >
-		struct ipc::pack< t, typename enable_if< ipc::is_container< t > >::type >
-	{
-		typedef typename no_ref< t >::type type;
-		typedef typename replace< t >::type value_type;
-
-		static void call( const type& in, value_type& out, buffer_pack& buffer_pack )
+		static up_t call( typename call_traits< t >::param_type value )
 		{
-			typedef typename replace< t >::value_type contained_type;
-			contained_type value( in.get_allocator().name(), in.size() );
-			pack< contained_type >::call( value, out, buffer_pack );
+			typedef tuple< std::string, up_t > tuple_type;
+			tuple_type tuple( value.get_allocator().name(), value.size() );
+			return size< tuple_type >::call( tuple );
 		}
 	};
 
 	template< typename t >
-		struct ipc::unpack< t, typename enable_if< ipc::is_container< t > >::type >
+		struct ipc::read< t, typename enable_if< ipc::is_container< t > >::type >
 	{
-		typedef typename no_ref< t >::type type;
-		typedef typename replace< t >::type value_type;
-
-		static void call( const value_type& in, type& out, const buffer_unpack& buffer_unpack )
+		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
-			typedef typename replace< t >::value_type contained_type;
-			contained_type value;
-			unpack< contained_type >::call( in, value, buffer_unpack );
+			typedef tuple< std::string, up_t > tuple_type;
+			tuple_type tuple;
+			up_t size = read< tuple_type >::call( buffer, tuple );
 
-			typedef typename type::allocator_type allocator_type;
-			out = type( allocator_type( value._0, value._1 ) );
+			typedef typename no_ref< t >::type type;
+			value = type( typename type::allocator_type( tuple._0, tuple._1 ) );
+
+			return size;
+		}
+	};
+
+	template< typename t >
+		struct ipc::write< t, typename enable_if< ipc::is_container< t > >::type >
+	{
+		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
+		{
+			typedef tuple< std::string, up_t > tuple_type;
+			tuple_type tuple( value.get_allocator().name(), value.size() );
+			return write< tuple_type >::call( buffer, tuple );
 		}
 	};
 }

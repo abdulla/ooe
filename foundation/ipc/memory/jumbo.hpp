@@ -3,8 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
 
-#include "foundation/ipc/memory/name.hpp"
-#include "foundation/ipc/memory/shared_memory.hpp"
+#include "foundation/ipc/memory/buffer.hpp"
 #include "foundation/ipc/memory/traits.hpp"
 
 namespace ooe
@@ -18,13 +17,13 @@ namespace ooe
 			class jumbo;
 
 		template< typename type >
-			struct replace< type, typename enable_if< is_jumbo< type > >::type >;
+			struct size< type, typename enable_if< is_jumbo< type > >::type >;
 
 		template< typename type >
-			struct pack< type, typename enable_if< is_jumbo< type > >::type >;
+			struct read< type, typename enable_if< is_jumbo< type > >::type >;
 
 		template< typename type >
-			struct unpack< type, typename enable_if< is_jumbo< type > >::type >;
+			struct write< type, typename enable_if< is_jumbo< type > >::type >;
 	}
 
 //--- ipc::is_jumbo ------------------------------------------------------------
@@ -52,85 +51,75 @@ namespace ooe
 	{
 	public:
 		jumbo( void )
-			: memory()
+			: buffer()
 		{
 		}
 
 		jumbo( const std::string& name_ )
-			: memory( new shared_memory( name_ ) )
+			: buffer( new buffer_type( name_, 0 ) )
 		{
 		}
 
 		std::string name( void ) const
 		{
-			if ( !memory )
+			if ( !buffer )
 				throw error::runtime( "ipc::jumbo: " ) << "Jumbo is uninitialised";
 
-			return memory->name();
+			return buffer->name();
 		}
 
 		void operator ()( const type& value )
 		{
-			u8 buffer[ size ];
-			buffer_pack buffer_pack( buffer, size, 0 );
-			layout_pack< type >::call( buffer_pack, value );
-
-			header_type header;
-			buffer_pack.store( header, memory, size );
-			std::copy( buffer, buffer + size, memory->as< u8 >() );
+			up_t size = stream_size< type >::call( value );
+			buffer = new buffer_type( buffer_tuple( 0, 0 ), size );
+			stream_write< type >::call( buffer->get(), value );
 		}
 
 		operator type( void ) const
 		{
-			if ( !memory )
+			if ( !buffer )
 				throw error::runtime( "ipc::jumbo: " ) << "Jumbo is uninitialised";
 
-			u8* buffer = memory->as< u8 >();
-			buffer_unpack buffer_unpack( buffer, buffer + size );
 			type value;
-			layout_unpack< type >::call( buffer_unpack, value );
+			stream_read< type >::call( buffer->get(), value );
 			return value;
 		}
 
 	private:
-		static const up_t size = sizeof( typename layout_replace< type >::type );
-
-		shared_ptr< shared_memory > memory;
+		typedef ipc::buffer< shared_memory > buffer_type;
+		shared_ptr< buffer_type > buffer;
 	};
 
 //--- ipc::traits: jumbo -------------------------------------------------------
 	template< typename t >
-		struct ipc::replace< t, typename enable_if< ipc::is_jumbo< t > >::type >
+		struct ipc::size< t, typename enable_if< ipc::is_jumbo< t > >::type >
 	{
-		typedef std::string value_type;
-		typedef typename replace< value_type >::type type;
-	};
-
-	template< typename t >
-		struct ipc::pack< t, typename enable_if< ipc::is_jumbo< t > >::type >
-	{
-		typedef typename no_ref< t >::type type;
-		typedef typename replace< t >::type value_type;
-
-		static void call( const type& in, value_type& out, buffer_pack& buffer_pack )
+		static up_t call( typename call_traits< t >::param_type value )
 		{
-			typedef typename replace< t >::value_type contained_type;
-			pack< contained_type >::call( in.name(), out, buffer_pack );
+			return size< std::string >::call( value.name() );
 		}
 	};
 
 	template< typename t >
-		struct ipc::unpack< t, typename enable_if< ipc::is_jumbo< t > >::type >
+		struct ipc::read< t, typename enable_if< ipc::is_jumbo< t > >::type >
 	{
-		typedef typename no_ref< t >::type type;
-		typedef typename replace< t >::type value_type;
-
-		static void call( const value_type& in, type& out, const buffer_unpack& buffer_unpack )
+		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
-			typedef typename replace< t >::value_type contained_type;
-			contained_type name;
-			unpack< contained_type >::call( in, name, buffer_unpack );
-			out = type( name );
+			std::string name;
+			up_t size = read< std::string >::call( buffer, name );
+
+			value = typename no_ref< t >::type( name );
+
+			return size;
+		}
+	};
+
+	template< typename t >
+		struct ipc::write< t, typename enable_if< ipc::is_jumbo< t > >::type >
+	{
+		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
+		{
+			return write< std::string >::call( buffer, value.name() );
 		}
 	};
 }

@@ -21,7 +21,7 @@ namespace
 
 		virtual void wait( wait_type, const void* );
 		virtual void notify( void );
-		virtual tuple_type get( void );
+		virtual ipc::buffer_tuple get( void ) const;
 
 		virtual void wake_wait( void );
 		virtual void wake_notify( void );
@@ -43,7 +43,7 @@ namespace
 		atom<>& state = *memory.as< atom<> >();
 
 		semaphore.down();
-		function( *this, pointer );
+		function( get(), pointer );
 		state = false;
 		thread::yield();
 	}
@@ -57,9 +57,10 @@ namespace
 		while ( state ) {}
 	}
 
-	ipc::transport::tuple_type transport_spinlock::get( void )
+	ipc::buffer_tuple transport_spinlock::get( void ) const
 	{
-		return tuple_type( memory.as< u8 >() + sizeof( atom<> ), memory.size() - sizeof( atom<> ) );
+		up_t size = sizeof( atom<> );
+		return ipc::buffer_tuple( memory.as< u8 >() + size, memory.size() - size );
 	}
 
 	void transport_spinlock::wake_wait( void )
@@ -90,7 +91,7 @@ namespace
 
 		virtual void wait( wait_type, const void* );
 		virtual void notify( void );
-		virtual tuple_type get( void );
+		virtual ipc::buffer_tuple get( void ) const;
 
 		virtual void wake_wait( void );
 		virtual void wake_notify( void );
@@ -112,7 +113,7 @@ namespace
 	void transport_semaphore::wait( wait_type function, const void* pointer )
 	{
 		semaphore_in.down();
-		function( *this, pointer );
+		function( get(), pointer );
 		semaphore_out.up();
 	}
 
@@ -122,9 +123,9 @@ namespace
 		semaphore_out.down();
 	}
 
-	ipc::transport::tuple_type transport_semaphore::get( void )
+	ipc::buffer_tuple transport_semaphore::get( void ) const
 	{
-		return tuple_type( memory.as< u8 >(), memory.size() );
+		return ipc::buffer_tuple( memory.as< u8 >(), memory.size() );
 	}
 
 	void transport_semaphore::wake_wait( void )

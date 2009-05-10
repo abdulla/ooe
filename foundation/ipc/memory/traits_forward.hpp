@@ -143,7 +143,7 @@ namespace ooe
 	{
 		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
-			value = buffer;
+			value = reinterpret_cast< const c8* >( buffer );
 			return size< t >::call( value );
 		}
 	};
@@ -173,7 +173,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::read< t, typename enable_if< ipc::is_pod< t > >::type >
 	{
-		static up_t call( const u8* buffer, t& value )
+		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
 			value = *reinterpret_cast< const t* >( buffer );
 			return size< t >::call( value );
@@ -218,7 +218,7 @@ namespace ooe
 			for ( up_t i = 0; i != extent< type >::value; ++i )
 				pointer += read< type >::call( pointer, value[ i ] );
 
-			return reinterpret_cast< up_t >( pointer - buffer );
+			return pointer - buffer;
 		}
 	};
 
@@ -233,7 +233,7 @@ namespace ooe
 			for ( up_t i = 0; i != extent< type >::value; ++i )
 				pointer += write< type >::call( pointer, value[ i ] );
 
-			return reinterpret_cast< up_t >( pointer - buffer );
+			return pointer - buffer;
 		}
 	};
 }
