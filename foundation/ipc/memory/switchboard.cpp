@@ -30,13 +30,13 @@ namespace ooe
 	}
 
 	void ipc::switchboard::
-		execute( const buffer_tuple& tuple, buffer_type& buffer, pool& pool ) const
+		execute( const buffer_tuple& adjust, buffer_type& buffer, pool& pool ) const
 	{
-		buffer_tuple adjust = header_adjust( tuple );
+		buffer_tuple tuple = header_adjust( adjust );
 
 		try
 		{
-			buffer_type input( header_read( adjust._0 ), adjust._0 );
+			buffer_type input( header_read( tuple._0 ), tuple._0 );
 
 			u32 index;
 			u8* data = input.get();
@@ -47,7 +47,7 @@ namespace ooe
 					"Unable to execute function, index " << index << " out of range";
 
 			const vector_tuple& args = vector[ index ];
-			args._0( args._1, data, adjust, buffer, pool );
+			args._0( args._1, data, tuple, buffer, pool );
 		}
 		catch ( error::runtime& error )
 		{
@@ -69,7 +69,7 @@ namespace ooe
 			return_error( tuple, buffer, string );;
 		}
 
-		header_write( adjust._0, buffer );
+		header_write( tuple._0, buffer );
 	}
 
 	u32 ipc::switchboard::insert_direct( call_type call, any any )

@@ -103,7 +103,7 @@ namespace ooe
 	bool ipc::server::decode( void )
 	{
 		buffer_type buffer( transport->get(), 0 );
-		tuple_type tuple( internal, &buffer /*0*/, 0 );
+		tuple_type tuple( internal, &buffer, 0 );
 		transport->wait( ipc_decode, &tuple );
 		return !servlets.empty();
 	}

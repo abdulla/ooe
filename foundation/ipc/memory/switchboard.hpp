@@ -67,9 +67,10 @@ namespace ooe
 	inline u8* ipc::return_write
 		( const buffer_tuple& tuple, buffer_type& buffer, up_t size, error::ipc error )
 	{
-		up_t extra = ipc::size< u32 >::call( error );
+		up_t extra = stream_size< u32 >::call( error );
 		buffer_type( tuple, size + extra ).swap( buffer );
 		u8* data = buffer.get();
+
 		stream_write< u32 >::call( data, error );
 		return data + extra;
 	}

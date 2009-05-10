@@ -19,13 +19,15 @@ namespace ooe
 //--- ipc ----------------------------------------------------------------------
 	inline ipc::buffer_tuple ipc::header_adjust( const buffer_tuple& tuple )
 	{
-		return buffer_tuple( tuple._0 + sizeof( bool ), tuple._1 - sizeof( bool ) );
+		up_t size = stream_size< u32 >::call( 0 );
+		return buffer_tuple( tuple._0 + size, tuple._1 - size );
 	}
 
 	inline void ipc::header_write( u8* data, const buffer_type& buffer )
 	{
-		bool is_internal = buffer.is_internal();
-		stream_write< bool >::call( data - sizeof( bool ), is_internal );
+		up_t size = stream_size< u32 >::call( 0 );
+		u32 is_internal = buffer.is_internal();
+		stream_write< u32 >::call( data - size, is_internal );
 
 		if ( is_internal )
 			return;
@@ -35,8 +37,9 @@ namespace ooe
 
 	inline std::string ipc::header_read( const u8* data )
 	{
-		bool is_internal;
-		stream_read< bool >::call( data - sizeof( bool ), is_internal );
+		up_t size = stream_size< u32 >::call( 0 );
+		u32 is_internal;
+		stream_read< u32 >::call( data - size, is_internal );
 
 		if ( is_internal )
 			return std::string();
