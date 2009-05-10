@@ -108,10 +108,10 @@ namespace ooe
 	void opengl::texture::load( const void* data, u32 width, u32 height, u8 image_type, u8 flags )
 	{
 		s32 internal;
-		s32 external;
-		u32 type;
+		s32 external = 0;
+		u32 type = 0;
 
-		u32 block;
+		u32 block = 0;
 		bool compressed = false;
 
 		switch ( image_type )
