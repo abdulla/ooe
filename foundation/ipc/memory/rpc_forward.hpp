@@ -55,7 +55,7 @@ namespace ooe
 			throw error::rpc() << string;
 
 		default:
-			throw error::rpc() << "Unknown error code";
+			throw error::rpc() << "Unknown error code: " << type;
 		}
 	}
 }
@@ -109,9 +109,9 @@ namespace ooe
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 				header_write( tuple._0, buffer );
-			}
 
-			transport.notify();
+				transport.notify();
+			}
 
 			{
 				buffer_type buffer( header_read( tuple._0 ), tuple._0 );
@@ -144,9 +144,9 @@ namespace ooe
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 				header_write( tuple._0, buffer );
-			}
 
-			transport.notify();
+				transport.notify();
+			}
 
 			{
 				buffer_type buffer( header_read( tuple._0 ), tuple._0 );
