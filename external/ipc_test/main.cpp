@@ -13,7 +13,6 @@
 #include "foundation/ipc/memory/jumbo.hpp"
 #include "foundation/ipc/memory/name.hpp"
 #include "foundation/ipc/memory/nameservice.hpp"
-#include "foundation/ipc/memory/pool.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/socket/nameservice.hpp"

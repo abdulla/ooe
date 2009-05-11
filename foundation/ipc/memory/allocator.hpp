@@ -6,9 +6,9 @@
 #include <vector>
 
 #include "foundation/executable/environment.hpp"
+#include "foundation/ipc/traits.hpp"
 #include "foundation/ipc/memory/name.hpp"
 #include "foundation/ipc/memory/shared_memory.hpp"
-#include "foundation/ipc/memory/traits.hpp"
 #include "foundation/utility/error.hpp"
 
 namespace ooe
