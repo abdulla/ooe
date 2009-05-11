@@ -131,44 +131,12 @@ namespace ooe
 
 	template< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, typename s )
 		BOOST_PP_ENUM_TRAILING_PARAMS( OOE_PP_LIMIT, typename t ) >
-		bool operator !=( const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, s ) >& x,
-		const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, t ) >& y )
-	{
-		return !( x == y );
-	}
-
-	template< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, typename s )
-		BOOST_PP_ENUM_TRAILING_PARAMS( OOE_PP_LIMIT, typename t ) >
 		bool operator <( const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, s ) >& x,
 		const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, t ) >& y )
 	{
 		typedef tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, s ) > a;
 		typedef tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, t ) > b;
 		return tuple_less< tuple_size< a >::value, a, b >::call( x, y );
-	}
-
-	template< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, typename s )
-		BOOST_PP_ENUM_TRAILING_PARAMS( OOE_PP_LIMIT, typename t ) >
-		bool operator >( const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, s ) >& x,
-		const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, t ) >& y )
-	{
-		return y < x;
-	}
-
-	template< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, typename s )
-		BOOST_PP_ENUM_TRAILING_PARAMS( OOE_PP_LIMIT, typename t ) >
-		bool operator <=( const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, s ) >& x,
-		const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, t ) >& y )
-	{
-		return !( y < x );
-	}
-
-	template< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, typename s )
-		BOOST_PP_ENUM_TRAILING_PARAMS( OOE_PP_LIMIT, typename t ) >
-		bool operator >=( const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, s ) >& x,
-		const tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, t ) >& y )
-	{
-		return !( x < y );
 	}
 
 //--- tuple_print --------------------------------------------------------------
