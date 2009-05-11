@@ -2,14 +2,11 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_FOUNDATION_IPC_MEMORY_TRAITS_HPP
-	#define OOE_FOUNDATION_IPC_MEMORY_TRAITS_HPP
+	#ifndef OOE_FOUNDATION_IPC_TRAITS_HPP
+	#define OOE_FOUNDATION_IPC_TRAITS_HPP
 
-#include "foundation/utility/string.hpp"
-#include "foundation/utility/traits.hpp"
+#include "foundation/ipc/traits_forward.hpp"
 #include "foundation/utility/tuple.hpp"
-
-#include "foundation/ipc/memory/traits_forward.hpp"
 
 namespace ooe
 {
@@ -119,12 +116,12 @@ namespace ooe
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "foundation/ipc/memory/traits.hpp"
+	#define BOOST_PP_FILENAME_1 "foundation/ipc/traits.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
-	#endif	// OOE_FOUNDATION_IPC_MEMORY_TRAITS_HPP
+	#endif	// OOE_FOUNDATION_IPC_TRAITS_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 

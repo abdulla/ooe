@@ -7,9 +7,9 @@
 
 #include <vector>
 
+#include "foundation/ipc/pool.hpp"
 #include "foundation/ipc/memory/error.hpp"
 #include "foundation/ipc/memory/header.hpp"
-#include "foundation/ipc/memory/pool.hpp"
 
 namespace ooe
 {

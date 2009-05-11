@@ -1,11 +1,11 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_MEMORY_POOL_HPP
-#define OOE_FOUNDATION_IPC_MEMORY_POOL_HPP
+#ifndef OOE_FOUNDATION_IPC_POOL_HPP
+#define OOE_FOUNDATION_IPC_POOL_HPP
 
 #include <map>
 
-#include "foundation/ipc/memory/traits.hpp"
+#include "foundation/ipc/traits.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/miscellany.hpp"
@@ -372,4 +372,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_POOL_HPP
+#endif	// OOE_FOUNDATION_IPC_POOL_HPP

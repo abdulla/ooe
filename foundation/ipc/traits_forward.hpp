@@ -1,7 +1,10 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_MEMORY_TRAITS_FORWARD_HPP
-#define OOE_FOUNDATION_IPC_MEMORY_TRAITS_FORWARD_HPP
+#ifndef OOE_FOUNDATION_IPC_TRAITS_FORWARD_HPP
+#define OOE_FOUNDATION_IPC_TRAITS_FORWARD_HPP
+
+#include "foundation/utility/string.hpp"
+#include "foundation/utility/traits.hpp"
 
 namespace ooe
 {
@@ -238,4 +241,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_TRAITS_FORWARD_HPP
+#endif	// OOE_FOUNDATION_IPC_TRAITS_FORWARD_HPP

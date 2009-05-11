@@ -3,9 +3,7 @@
 #include <iostream>
 
 #include "foundation/ipc/memory/name.hpp"
-#include "foundation/ipc/memory/pool.hpp"
 #include "foundation/ipc/memory/server.hpp"
-#include "foundation/ipc/memory/traits.hpp"
 
 namespace
 {

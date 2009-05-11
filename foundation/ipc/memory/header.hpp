@@ -1,8 +1,8 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_HEADER_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_HEADER_HPP
 
+#include "foundation/ipc/traits.hpp"
 #include "foundation/ipc/memory/buffer.hpp"
-#include "foundation/ipc/memory/traits.hpp"
 
 namespace ooe
 {
