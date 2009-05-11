@@ -3,6 +3,8 @@
 #ifndef OOE_FOUNDATION_IPC_TRAITS_FORWARD_HPP
 #define OOE_FOUNDATION_IPC_TRAITS_FORWARD_HPP
 
+#include <boost/static_assert.hpp>
+
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/traits.hpp"
 
@@ -101,6 +103,37 @@ namespace ooe
 		struct ipc::is_specialised
 		: public false_type
 	{
+	};
+
+//--- ipc::traits: default -----------------------------------------------------
+	template< typename NO_SPECIALISATION_DEFINED, typename >
+		struct ipc::size
+	{
+		static up_t call( NO_SPECIALISATION_DEFINED )
+		{
+			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+			return 0;
+		}
+	};
+
+	template< typename NO_SPECIALISATION_DEFINED, typename >
+		struct ipc::read
+	{
+		static up_t call( const u8*, NO_SPECIALISATION_DEFINED )
+		{
+			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+			return 0;
+		}
+	};
+
+	template< typename NO_SPECIALISATION_DEFINED, typename >
+		struct ipc::write
+	{
+		static up_t call( u8*, NO_SPECIALISATION_DEFINED )
+		{
+			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+			return 0;
+		}
 	};
 
 //--- ipc::traits: empty -------------------------------------------------------
