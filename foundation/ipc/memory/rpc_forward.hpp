@@ -39,7 +39,7 @@ namespace ooe
 	inline const u8* ipc::validate( const u8* data )
 	{
 		u32 type;
-		stream_read< u32 >::call( data, type );
+		data += read< u32 >::call( data, type );
 
 		switch ( type )
 		{
@@ -52,7 +52,6 @@ namespace ooe
 		case error::exception:
 			const c8* what;
 			const c8* where;
-			data += stream_size< u32 >::call( 0 );
 			stream_read< const c8*, const c8* >::call( data, what, where );
 			throw error::rpc() << what << "\n\nServer stack trace:" << where;
 
