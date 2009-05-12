@@ -11,12 +11,12 @@ namespace
 	{
 	}
 
-	void return_error
-		( const ipc::buffer_tuple& tuple, ipc::buffer_type& buffer, const std::string& string )
+	void return_error( const ipc::buffer_tuple& tuple, ipc::buffer_type& buffer, const c8* what,
+		const c8* where )
 	{
-		up_t size = ipc::stream_size< std::string >::call( string );
+		up_t size = ipc::stream_size< const c8*, const c8* >::call( what, where );
 		u8* data = return_write( tuple, buffer, size, error::exception );
-		ipc::stream_write< std::string >::call( data, string );
+		ipc::stream_write< const c8*, const c8* >::call( data, what, where );
 	}
 }
 
@@ -51,22 +51,16 @@ namespace ooe
 		}
 		catch ( error::runtime& error )
 		{
-			std::string string;
-			string << error.what() << "\n\nServer stack trace:" << error.where();
-			return_error( tuple, buffer, string );
+			return_error( tuple, buffer, error.what(), error.where() );
 		}
 		catch ( std::exception& error )
 		{
-			std::string string;
-			string << error.what() << "\n\nServer stack trace:" << "\nNo stack trace available";
-			return_error( tuple, buffer, string );
+			return_error( tuple, buffer, error.what(), "\nNo stack trace available" );
 		}
 		catch ( ... )
 		{
-			std::string string;
-			string << "An unknown exception was thrown" <<
-				"\n\nServer stack trace:" << "\nNo stack trace available";
-			return_error( tuple, buffer, string );;
+			return_error( tuple, buffer, "An unknown exception was thrown",
+				"\nNo stack trace available" );
 		}
 
 		header_write( tuple._0, buffer );
