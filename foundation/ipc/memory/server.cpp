@@ -9,7 +9,7 @@ namespace
 {
 	using namespace ooe;
 
-	typedef tuple< const ipc::switchboard&, ipc::buffer_type*, ipc::pool* > tuple_type;
+	typedef tuple< const ipc::switchboard&, ipc::write_buffer*, ipc::pool* > tuple_type;
 
 	void ipc_decode( const ipc::buffer_tuple& tuple, const void* pointer )
 	{
@@ -18,7 +18,7 @@ namespace
 	}
 
 	void ipc_link( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::buffer_type& buffer, ipc::pool& )
+		ipc::write_buffer& buffer, ipc::pool& )
 	{
 		pid_t pid;
 		ipc::stream_read< pid_t >::call( data, pid );
@@ -29,7 +29,7 @@ namespace
 	}
 
 	void ipc_unlink( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::buffer_type& buffer, ipc::pool& )
+		ipc::write_buffer& buffer, ipc::pool& )
 	{
 		u32 link;
 		ipc::stream_read< u32 >::call( data, link );
@@ -65,7 +65,7 @@ namespace ooe
 
 	void* ipc::servlet::call( void* pointer )
 	{
-		buffer_type buffer( transport->get(), 0 );
+		write_buffer buffer( transport->get(), 0 );
 		pool pool;
 		tuple_type tuple( switchboard, &buffer, &pool );
 
@@ -100,7 +100,7 @@ namespace ooe
 
 	bool ipc::server::decode( void )
 	{
-		buffer_type buffer( transport->get(), 0 );
+		write_buffer buffer( transport->get(), 0 );
 		tuple_type tuple( internal, &buffer, 0 );
 		transport->wait( ipc_decode, &tuple );
 		return !servlets.empty();

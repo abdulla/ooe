@@ -24,7 +24,7 @@ namespace ooe
 			struct invoke_member;
 
 		inline u8* return_write
-			( const buffer_tuple&, buffer_type&, up_t = 0, error::ipc = error::none );
+			( const buffer_tuple&, write_buffer&, up_t = 0, error::ipc = error::none );
 	}
 
 //--- ipc::switchboard ---------------------------------------------------------
@@ -32,11 +32,11 @@ namespace ooe
 	{
 	public:
 		typedef void ( * call_type )
-			( const any&, const u8*, const buffer_tuple&, buffer_type&, pool& );
+			( const any&, const u8*, const buffer_tuple&, write_buffer&, pool& );
 
 		switchboard( void ) OOE_VISIBLE;
 
-		void execute( const buffer_tuple&, buffer_type&, pool& ) const;
+		void execute( const buffer_tuple&, write_buffer&, pool& ) const;
 		u32 insert_direct( call_type, any ) OOE_VISIBLE;
 
 		template< typename type >
@@ -65,14 +65,13 @@ namespace ooe
 
 //--- ipc ----------------------------------------------------------------------
 	inline u8* ipc::return_write
-		( const buffer_tuple& tuple, buffer_type& buffer, up_t size, error::ipc error )
+		( const buffer_tuple& tuple, write_buffer& buffer, up_t size, error::ipc error )
 	{
-		up_t extra = stream_size< u32 >::call( error );
-		buffer_type( tuple, size + extra ).swap( buffer );
+		write_buffer( tuple, size + sizeof( u32 ) ).swap( buffer );
 		u8* data = buffer.get();
 
 		stream_write< u32 >::call( data, error );
-		return data + extra;
+		return data + sizeof( u32 );
 	}
 }
 
@@ -115,7 +114,7 @@ namespace ooe
 		struct ipc::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			buffer_type& buffer, pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
+			write_buffer& buffer, pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
 		{
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
@@ -134,7 +133,7 @@ namespace ooe
 		struct ipc::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			buffer_type& buffer, pool& pool )
+			write_buffer& buffer, pool& pool )
 		{
 			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
@@ -157,7 +156,7 @@ namespace ooe
 		struct ipc::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			buffer_type& buffer, pool& pool )
+			write_buffer& buffer, pool& pool )
 		{
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );
@@ -178,7 +177,7 @@ namespace ooe
 		struct ipc::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			buffer_type& buffer, pool& pool )
+			write_buffer& buffer, pool& pool )
 		{
 			typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );

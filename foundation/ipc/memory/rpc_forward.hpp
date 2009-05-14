@@ -105,7 +105,7 @@ namespace ooe
 			{
 				up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 					call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-				buffer_type buffer( tuple, size );
+				write_buffer buffer( tuple, size );
 
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
@@ -115,7 +115,7 @@ namespace ooe
 			}
 
 			{
-				buffer_type buffer( header_read( tuple._0 ), tuple._0 );
+				write_buffer buffer( header_read( tuple._0 ), tuple._0 );
 				validate( buffer.get() );
 			}
 		}
@@ -140,7 +140,7 @@ namespace ooe
 			{
 				up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 					call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-				buffer_type buffer( tuple, size );
+				write_buffer buffer( tuple, size );
 
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
@@ -150,7 +150,7 @@ namespace ooe
 			}
 
 			{
-				buffer_type buffer( header_read( tuple._0 ), tuple._0 );
+				write_buffer buffer( header_read( tuple._0 ), tuple._0 );
 				const u8* data = validate( buffer.get() );
 
 				result_type value;

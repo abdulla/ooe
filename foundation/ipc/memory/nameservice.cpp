@@ -7,7 +7,7 @@ namespace
 	using namespace ooe;
 
 	void ipc_find( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::buffer_type& buffer, ipc::pool& )
+		ipc::write_buffer& buffer, ipc::pool& )
 	{
 		const c8* name;
 		const c8* type;
@@ -19,7 +19,7 @@ namespace
 	}
 
 	void ipc_list( const any& any, const u8*, const ipc::buffer_tuple& tuple,
-		ipc::buffer_type& buffer, ipc::pool& )
+		ipc::write_buffer& buffer, ipc::pool& )
 	{
 		typedef ipc::nameservice::list_type list_type;
 		list_type value = static_cast< ipc::nameservice* >( any.pointer )->list();
@@ -28,7 +28,7 @@ namespace
 	}
 
 	void ipc_find_all( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::buffer_type& buffer, ipc::pool& )
+		ipc::write_buffer& buffer, ipc::pool& )
 	{
 		typedef std::vector< ooe::tuple< std::string, std::string > > in_type;
 		in_type in;

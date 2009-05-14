@@ -7,11 +7,11 @@ namespace
 {
 	using namespace ooe;
 
-	void ipc_null( const any&, const u8*, const ipc::buffer_tuple&, ipc::buffer_type&, ipc::pool& )
+	void ipc_null( const any&, const u8*, const ipc::buffer_tuple&, ipc::write_buffer&, ipc::pool& )
 	{
 	}
 
-	void return_error( const ipc::buffer_tuple& tuple, ipc::buffer_type& buffer, const c8* what,
+	void return_error( const ipc::buffer_tuple& tuple, ipc::write_buffer& buffer, const c8* what,
 		const c8* where )
 	{
 		up_t size = ipc::stream_size< const c8*, const c8* >::call( what, where );
@@ -30,13 +30,13 @@ namespace ooe
 	}
 
 	void ipc::switchboard::
-		execute( const buffer_tuple& adjust, buffer_type& buffer, pool& pool ) const
+		execute( const buffer_tuple& adjust, write_buffer& buffer, pool& pool ) const
 	{
 		buffer_tuple tuple = header_adjust( adjust );
 
 		try
 		{
-			buffer_type input( header_read( tuple._0 ), tuple._0 );
+			write_buffer input( header_read( tuple._0 ), tuple._0 );
 
 			u32 index;
 			u8* data = input.get();
