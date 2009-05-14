@@ -22,6 +22,7 @@ namespace ooe
 	{
 	public:
 		Display* display;
+		mutable up_t wm_delete;
 		mutable function< void ( void ) > configure;
 
 		event_queue( void );

@@ -88,12 +88,9 @@ namespace ooe
 
 		if ( !window )
 			throw error::runtime( "view: " ) << "Unable to create window";
-		else if ( full )
-			return;
 
+		XSetWMProtocols( queue.display, window, &queue.wm_delete, 1 );
 		XStoreName( queue.display, window, "OOE" );
-		Atom wm_delete = XInternAtom( queue.display, "WM_DELETE_WINDOW", 1 );
-		XSetWMProtocols( queue.display, window, &wm_delete, 1 );
 	}
 
 	view_data::~view_data( void )
