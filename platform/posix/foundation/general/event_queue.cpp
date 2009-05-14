@@ -65,7 +65,7 @@ namespace ooe
 
 			case ClientMessage:
 				if ( xevent.xclient.data.l[ 0 ] == static_cast< sp_t >( wm_delete ) )
-					return event::none;
+					return event::exit_flag;
 				else
 					break;
 
