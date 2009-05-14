@@ -4,7 +4,7 @@
 #define OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
 
 #include "foundation/ipc/traits.hpp"
-#include "foundation/ipc/memory/buffer.hpp"
+#include "foundation/ipc/memory/write_buffer.hpp"
 
 namespace ooe
 {
@@ -56,7 +56,7 @@ namespace ooe
 		}
 
 		jumbo( const std::string& name_ )
-			: buffer( new buffer_type( name_, 0 ) )
+			: buffer( new write_buffer( name_, 0 ) )
 		{
 		}
 
@@ -71,7 +71,7 @@ namespace ooe
 		void operator ()( const type& value )
 		{
 			up_t size = stream_size< type >::call( value );
-			buffer = new buffer_type( buffer_tuple( 0, 0 ), size );
+			buffer = new write_buffer( buffer_tuple( 0, 0 ), size );
 			stream_write< type >::call( buffer->get(), value );
 		}
 
@@ -86,8 +86,7 @@ namespace ooe
 		}
 
 	private:
-		typedef ipc::buffer< shared_memory > buffer_type;
-		shared_ptr< buffer_type > buffer;
+		shared_ptr< write_buffer > buffer;
 	};
 
 //--- ipc::traits: jumbo -------------------------------------------------------
