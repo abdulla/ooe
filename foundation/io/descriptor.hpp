@@ -55,6 +55,7 @@ namespace ooe
 
 		void resize( up_t );
 		void control( u32, void* );
+		up_t splice( const descriptor&, up_t );
 
 	protected:
 		s32 get( void ) const OOE_HIDDEN;

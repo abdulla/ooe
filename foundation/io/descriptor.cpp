@@ -139,4 +139,14 @@ namespace ooe
 		if ( ioctl( get(), request, pointer ) == -1 )
 			throw error::io( "descriptor: " ) << "Unable to control: " << error::number( errno );
 	}
+
+	up_t descriptor::splice( const descriptor& desc, up_t bytes )
+	{
+		sp_t spliced = ::splice( get(), 0, desc.get(), 0, bytes, SPLICE_F_MOVE );
+
+		if ( spliced == -1 )
+			throw error::io( "descriptor: " ) << "Unable to splice: " << error::number( errno );
+
+		return spliced;
+	}
 }
