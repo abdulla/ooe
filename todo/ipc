@@ -11,3 +11,9 @@ can merge traits of both socket and memory
 	- buffer can be reused for socket, and the setup stage can be different
 	- can simplify buffer by using socket traits scheme of pre-determining size
 	- should also help with performance for memory, as multiple shared-memory regions aren't alloc'd
+
+could use sendfile or equivalent to pass data to /dev/null
+	- data would not have to be copied to user-space and the kernel could destroy the buffers
+
+could modify usage of write_buffer in switchboard for memory--based ipc, and unify
+	- not have so many parameters to the callbacks and reuse the write_buffer

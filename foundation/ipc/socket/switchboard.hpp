@@ -7,32 +7,34 @@
 
 #include <vector>
 
-#include "foundation/utility/miscellany.hpp"
-
-#include "foundation/ipc/socket/pool.hpp"
+#include "foundation/ipc/pool.hpp"
 
 namespace ooe
 {
-	namespace nipc
+	namespace ipc
 	{
-		class switchboard;
+		namespace socket
+		{
+			class switchboard;
 
-		template< typename >
-			struct invoke_function;
+			template< typename >
+				struct invoke_function;
 
-		template< typename, typename >
-			struct invoke_member;
+			template< typename, typename >
+				struct invoke_member;
+		}
 	}
 
-//--- nipc::switchboard --------------------------------------------------------
-	class nipc::switchboard
+//--- ipc::socket::switchboard -------------------------------------------------
+	class ipc::socket::switchboard
 	{
 	public:
-		typedef void ( * call_type )( any, socket&, u8*, pool& );
+		typedef void ( * call_type )
+			( const any&, const u8*, const buffer_tuple&, ooe::socket&, pool& );
 
 		switchboard( void ) OOE_VISIBLE;
 
-		void execute( socket&, u8*, pool& ) const;
+		void execute( const u8*, ooe::socket&, pool& ) const;
 		u32 insert_direct( call_type, any ) OOE_VISIBLE;
 
 		template< typename type >
@@ -57,6 +59,7 @@ namespace ooe
 		typedef std::vector< vector_tuple > vector_type;
 
 		vector_type vector;
+		u8 buffer[ executable::static_page_size ];
 	};
 }
 
@@ -77,26 +80,30 @@ namespace ooe
 
 namespace ooe
 {
-	namespace nipc
+	namespace ipc
 	{
-		template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
-			struct invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+		namespace socket
+		{
+			template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
+				struct invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
 
-		template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-			struct invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+			template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+				struct invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
 
 #if LIMIT
-		template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
-			struct invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >;
+			template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+				struct invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >;
 
-		template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
-			struct invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >;
+			template< typename r,
+				typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+				struct invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >;
 #endif
+		}
 	}
 
-//--- nipc::invoke_function ----------------------------------------------------
+//--- ipc::socket::invoke_function ---------------------------------------------
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
-		struct nipc::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct ipc::socket::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( any any, socket& socket, u8* buffer,
 			pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
@@ -115,7 +122,7 @@ namespace ooe
 	};
 
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct nipc::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct ipc::socket::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( any any, socket& socket, u8* buffer, pool& pool )
 		{
@@ -134,9 +141,9 @@ namespace ooe
 	};
 
 #if LIMIT
-//--- nipc::invoke_member ------------------------------------------------------
+//--- ipc::socket::invoke_member -----------------------------------------------
 	template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
-		struct nipc::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
+		struct ipc::socket::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( any any, socket& socket, u8* buffer, pool& pool )
 		{
@@ -156,7 +163,7 @@ namespace ooe
 	};
 
 	template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
-		struct nipc::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
+		struct ipc::socket::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( any any, socket& socket, u8* buffer, pool& pool )
 		{

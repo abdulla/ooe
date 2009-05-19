@@ -9,18 +9,18 @@ namespace ooe
 {
 	namespace error
 	{
-		struct nrpc;
+		struct socket_rpc;
 	}
 
-	struct OOE_VISIBLE error::nrpc
+	struct OOE_VISIBLE error::socket_rpc
 		: virtual public runtime
 	{
-		nrpc( void )
-			: runtime( "nipc::rpc: " )
+		socket_rpc( void )
+			: runtime( "ipc::socket::rpc: " )
 		{
 		}
 
-		virtual ~nrpc( void ) throw()
+		virtual ~socket_rpc( void ) throw()
 		{
 		}
 	};

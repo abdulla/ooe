@@ -9,19 +9,22 @@
 
 namespace ooe
 {
-	namespace nipc
+	namespace ipc
 	{
-		class nameservice;
+		namespace socket
+		{
+			class nameservice;
+		}
 	}
 
-//--- nipc::nameservice --------------------------------------------------------
-	class nipc::nameservice
+//--- ipc::socket::nameservice -------------------------------------------------
+	class ipc::socket::nameservice
 		: private noncopyable
 	{
 	public:
 		nameservice( void ) OOE_VISIBLE;
 
-		operator const nipc::switchboard&( void ) const OOE_VISIBLE;
+		operator const socket::switchboard&( void ) const OOE_VISIBLE;
 		u32 find( const std::string&, const std::string& ) const;
 		void insert_direct( const std::string&, const std::string&, u32 ) OOE_VISIBLE;
 
@@ -45,7 +48,7 @@ namespace ooe
 		typedef tuple< std::string, std::string > map_tuple;
 		typedef std::map< map_tuple, u32 > map_type;
 
-		nipc::switchboard switchboard;
+		socket::switchboard switchboard;
 		map_type map;
 	};
 }

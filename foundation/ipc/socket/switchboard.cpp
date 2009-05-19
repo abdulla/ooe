@@ -9,34 +9,37 @@ namespace
 {
 	using namespace ooe;
 
-	void nipc_null( any, socket& socket, u8*, nipc::pool& )
+	void ipc_null( const any&, const u8*, const buffer_tuple&, socket& socket, ipc::pool& )
 	{
-		nipc::layout_write<>::call( socket );
+		u32 size = 0;
+		
+		if ( socket.send( &size, sizeof( u32 ) ) != 0 )
+			throw error::runtime( "ipc::socket::switchboard: " ) << "Unable to write size";
 	}
 }
 
 namespace ooe
 {
-//--- nipc::switchboard -----------------------------------------------------------
-	nipc::switchboard::switchboard( void )
-		: vector()
+//--- ipc::socket::switchboard -------------------------------------------------
+	ipc::socket::switchboard::switchboard( void )
+		: vector(), buffer()
 	{
-		insert_direct( nipc_null, 0 );
+		insert_direct( ipc_null, 0 );
 	}
 
-	void nipc::switchboard::execute( socket& socket, u8* buffer, pool& pool ) const
+	void ipc::socket::switchboard::execute( const u8* data, ooe::socket& socket, pool& pool ) const
 	{
-		u32 index;
-		layout_read< u32 >::call( &buffer[ 0 ], index );
-
 		try
 		{
+			u32 index;
+			data += read< u32 >::call( data, index );
+
 			if ( index >= vector.size() )
-				throw error::runtime( "nipc::switchboard: " ) <<
+				throw error::runtime( "ipc::socket::switchboard: " ) <<
 					"Unable to execute function, index " << index << " out of range";
 
 			const vector_tuple& tuple = vector[ index ];
-			tuple._0( tuple._1, socket, buffer + sizeof( u32 ), pool );
+			tuple._0( tuple._1, data, buffer_tuple( buffer, sizeof( buffer ) ), socket, pool );
 		}
 		catch ( error::runtime& error )
 		{
@@ -57,7 +60,7 @@ namespace ooe
 		}
 	}
 
-	u32 nipc::switchboard::insert_direct( call_type call, any any )
+	u32 ipc::socket::switchboard::insert_direct( call_type call, any any )
 	{
 		vector.push_back( vector_tuple( call, any ) );
 		return vector.size() - 1;

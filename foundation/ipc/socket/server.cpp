@@ -30,8 +30,8 @@ namespace ooe
 			if ( !header_size( socket, size ) )
 				break;
 
-			header_read( socket, buffer, size );
-			switchboard.execute( socket, &buffer[ 0 ], pool );
+			header_read( socket, size, buffer );
+			switchboard.execute( &buffer[ 0 ], socket, pool );
 		}
 
 		static_cast< server* >( pointer )->erase( iterator );

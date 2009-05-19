@@ -5,40 +5,46 @@
 	#ifndef OOE_FOUNDATION_IPC_SOCKET_RPC_FORWARD_HPP
 	#define OOE_FOUNDATION_IPC_SOCKET_RPC_FORWARD_HPP
 
+#include "foundation/ipc/traits.hpp"
 #include "foundation/ipc/socket/client.hpp"
 #include "foundation/ipc/socket/error.hpp"
-#include "foundation/ipc/socket/traits.hpp"
 
 namespace ooe
 {
-	namespace nipc
+	namespace ipc
 	{
-		template< typename >
-			class result;
+		namespace socket
+		{
+			template< typename >
+				class result;
 
-		template<>
-			class result< void >;
+			template<>
+				class result< void >;
 
-		class rpc_base;
+			class rpc_base;
 
-		template< typename >
-			struct rpc;
+			template< typename >
+				struct rpc;
 
-		inline void except( const u8* );
+			inline void except( const u8* );
+		}
 	}
 
-//--- nipc::result -------------------------------------------------------------
+//--- ipc::socket::result ------------------------------------------------------
 	template<>
-		struct nipc::result< void >
+		struct ipc::socket::result< void >
 	{
 	public:
-		result( nipc::client& client, const nipc::client::map_type::iterator& i )
+		result( client& client, const client::iterator_type& i )
 			: base( new base_type( client, i ) )
 		{
 		}
 
 		void operator ()( void )
 		{
+			if ( base->state == base_type::done )
+				return;
+
 			array_type array;
 
 			if ( base->state == base_type::wait )
@@ -54,16 +60,19 @@ namespace ooe
 	};
 
 	template< typename type >
-		class nipc::result
+		class ipc::socket::result
 	{
 	public:
-		result( nipc::client& client, const nipc::client::map_type::iterator& i )
+		result( client& client, const client::iterator_type& i )
 			: base( new base_type( client, i ) )
 		{
 		}
 
 		type& operator ()( void ) const
 		{
+			if ( base->state == base_type::done )
+				return base->value;
+
 			array_type array;
 
 			if ( base->state == base_type::wait )
@@ -72,7 +81,7 @@ namespace ooe
 			if ( base->state == base_type::error )
 				except( array );
 
-			layout_read< type >::call( array, base->value );
+			stream_read< type >::call( array, base->value );
 			return base->value;
 		}
 
@@ -81,26 +90,26 @@ namespace ooe
 		shared_ptr< base_type > base;
 	};
 
-//--- nipc::rpc_base -----------------------------------------------------------
-	class nipc::rpc_base
+//--- ipc::socket::rpc_base ----------------------------------------------------
+	class ipc::socket::rpc_base
 	{
 	protected:
-		nipc::client& client;
+		socket::client& client;
 		const u32 index;
 
-		rpc_base( nipc::client& client_, u32 index_ )
+		rpc_base( socket::client& client_, u32 index_ )
 			: client( client_ ), index( index_ )
 		{
 		}
 	};
 
-//--- nipc ---------------------------------------------------------------------
-	inline void nipc::except( const u8* buffer )
+//--- ipc::socket --------------------------------------------------------------
+	inline void ipc::socket::except( const u8* buffer )
 	{
 		const c8* what;
 		const c8* where;
-		layout_read< const c8*, const c8* >::call( buffer, what, where );
-		throw error::nrpc() << what << "\n\nServer stack trace:" << where;
+		stream_read< const c8*, const c8* >::call( buffer, what, where );
+		throw error::socket_rpc() << what << "\n\nServer stack trace:" << where;
 	}
 }
 
@@ -119,28 +128,37 @@ namespace ooe
 	#if LIMIT != OOE_PP_LIMIT
 namespace ooe
 {
-	namespace nipc
+	namespace ipc
 	{
-		template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-			struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+		namespace socket
+		{
+			template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+				struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+		}
 	}
 
-//--- nipc::rpc ----------------------------------------------------------------
+//--- ipc::socket::rpc ---------------------------------------------------------
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct nipc::rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct ipc::socket::rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 		: private rpc_base
 	{
-		rpc( nipc::client& client_, u32 index_ )
+		rpc( socket::client& client_, u32 index_ )
 			: rpc_base( client_, index_ )
 		{
 		}
 
 		result< r > operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
 		{
-			client::map_type::iterator i = client.insert();
-			layout_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
-				call( client, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-			return result< r >( client, i );
+			up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
+				call( index u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) );
+			write_buffer buffer( client.get(), size );
+			u8* data = buffer.get();
+
+			stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
+				call( data, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			client.write( data, size );
+
+			return result< r >( client, client.insert() );
 		}
 	};
 }

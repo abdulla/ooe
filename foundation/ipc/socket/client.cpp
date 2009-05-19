@@ -1,25 +1,24 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/ipc/socket/client.hpp"
-#include "foundation/ipc/socket/rpc_forward.hpp"
 
 namespace ooe
 {
-//--- nipc::client -------------------------------------------------------------
-	nipc::client::client( const address& address )
-		: connect( address ), map(), in( 0 ), out( 0 ), mutex(), condition(),
+//--- ipc::socket::client ------------------------------------------------------
+	ipc::socket::client::client( const address& address )
+		: connect( address ), buffer(), map(), in( 0 ), out( 0 ), mutex(), condition(),
 		thread( make_function( *this, &client::call ), 0 )
 	{
 	}
 
-	nipc::client::~client( void )
+	ipc::socket::client::~client( void )
 	{
 		rpc< void ( void ) >( *this, 0 )()();	// call null function to flush pending calls
 		connect.shutdown( socket::read_write );	// shutdown socket to stop reader thread
 		thread.join();
 	}
 
-	nipc::array_type nipc::client::wait( result_base< void >& result )
+	ipc::socket::array_type ipc::socket::client::wait( result_type& result )
 	{
 		lock lock( mutex );
 
@@ -27,29 +26,35 @@ namespace ooe
 			condition.wait( lock );
 
 		array_type array = result.i->second._0;
+		result.state = result.i->second._1 ? result_type::done : result_type::error;
 		map.erase( result.i );
-		result.state = result.i->second._1 ? result_base< void >::done : result_base< void >::error;
 		return array;
 	}
 
-	void nipc::client::erase( const map_type::iterator& i )
+	void ipc::socket::client::erase( const iterator_type& i )
 	{
 		lock lock( mutex );
 		map.erase( i );
 	}
 
-	nipc::client::map_type::iterator nipc::client::insert( void )
+	ipc::socket::client::iterator_type ipc::socket::client::insert( void )
 	{
 		lock lock( mutex );
 		return map.insert( map.end(), map_type::value_type( ++out, map_tuple() ) );
 	}
 
-	nipc::client::operator socket&( void )
+	ipc::buffer_tuple ipc::socket::get( void ) const
 	{
-		return connect;
+		return buffer_tuple( buffer + sizeof( u32 ), sizeof( buffer ) - sizeof( u32 ) );
 	}
 
-	void* nipc::client::call( void* )
+	void ipc::socket::write( const void* buffer, up_t size )
+	{
+		*( u32* )buffer = size;
+		socket.write( buffer, size + sizeof( u32 ) );
+	}
+
+	void* ipc::socket::client::call( void* )
 	{
 		while ( true )
 		{
