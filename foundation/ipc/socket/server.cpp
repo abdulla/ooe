@@ -1,27 +1,28 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/ipc/socket/header.hpp"
 #include "foundation/ipc/socket/server.hpp"
 
 namespace ooe
 {
-//--- nipc::servlet ------------------------------------------------------------
-	nipc::servlet::servlet( const servlet_list::iterator& iterator_, ooe::socket& socket_,
-		const nipc::switchboard& switchboard_, server& server )
+//--- ipc::socket::servlet -----------------------------------------------------
+	ipc::socket::servlet::servlet( const servlet_list::iterator& iterator_, ooe::socket& socket_,
+		const socket::switchboard& switchboard_, server& server )
 		: iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ),
 		thread( make_function( *this, &servlet::call ), &server )
 	{
 	}
 
-	void nipc::servlet::join( void )
+	void ipc::socket::servlet::join( void )
 	{
-		socket.shutdown( socket::read_write );
+		socket.shutdown( ooe::socket::read_write );
 		thread.join();
 	}
 
-	void* nipc::servlet::call( void* pointer )
+	void* ipc::socket::servlet::call( void* pointer )
 	{
 		buffer_type buffer;
-		nipc::pool pool;
+		ipc::pool pool;
 
 		while ( true )
 		{
@@ -38,28 +39,28 @@ namespace ooe
 		return 0;
 	}
 
-//--- nipc::server -------------------------------------------------------------
-	nipc::server::server( const address& address )
+//--- ipc::socket::server ------------------------------------------------------
+	ipc::socket::server::server( const address& address )
 		: listen( address ), mutex(), list()
 	{
 	}
 
-	nipc::server::~server( void )
+	ipc::socket::server::~server( void )
 	{
 		for ( servlet_list::iterator i = list.begin(), end = list.end(); i != end; ++i )
 			( *i )->join();
 	}
 
-	void nipc::server::accept( const switchboard& switchboard )
+	void ipc::socket::server::accept( const switchboard& switchboard )
 	{
-		socket socket = listen.accept();
+		ooe::socket socket = listen.accept();
 
 		lock lock( mutex );
 		list.push_back( servlet_list::value_type() );
 		list.back() = new servlet( --list.end(), socket, switchboard, *this );
 	}
 
-	void nipc::server::erase( const servlet_list::iterator& iterator )
+	void ipc::socket::server::erase( const servlet_list::iterator& iterator )
 	{
 		lock lock( mutex );
 		list.erase( iterator );

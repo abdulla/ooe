@@ -6,14 +6,15 @@ namespace
 {
 	using namespace ooe;
 
-	void ipc_find( any any, socket& socket, u8* buffer, ipc::pool& )
+	void ipc_find( const any& any, const u8* data, const ipc::socket::buffer_tuple& tuple,
+		socket& socket, ipc::pool& )
 	{
 		const c8* name;
 		const c8* type;
-		ipc::stream_read< const c8*, const c8* >::call( buffer, name, type );
+		ipc::stream_read< const c8*, const c8* >::call( data, name, type );
 
-		u32 value = static_cast< nipc::nameservice* >( any.pointer )->find( name, type );
-		ipc::streamt_write< u32 >::call( socket, value );
+		u32 value = static_cast< ipc::socket::nameservice* >( any.pointer )->find( name, type );
+		ipc::socket::return_write< u32 >( tuple, socket, value );
 	}
 }
 

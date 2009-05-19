@@ -1,20 +1,31 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/executable/environment.hpp"
+#include "foundation/ipc/socket/switchboard.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
-
-#include "foundation/ipc/socket/switchboard.hpp"
 
 namespace
 {
 	using namespace ooe;
 
-	void ipc_null( const any&, const u8*, const buffer_tuple&, socket& socket, ipc::pool& )
+	void ipc_null( const any&, const u8*, const ipc::socket::buffer_tuple& tuple, socket& socket,
+		ipc::pool& )
 	{
-		u32 size = 0;
-		
-		if ( socket.send( &size, sizeof( u32 ) ) != 0 )
-			throw error::runtime( "ipc::socket::switchboard: " ) << "Unable to write size";
+		ipc::socket::return_write( tuple, socket );
+	}
+
+	void error_write( const ipc::socket::buffer_tuple& tuple, socket& socket, const c8* what,
+		const c8* where )
+	{
+		up_t size = ipc::stream_size< const c8*, const c8* >::call( what, where );
+		up_t total = size + sizeof( u32 ) * 2;
+		ipc::socket::write_buffer buffer( tuple, total );
+		u8* data = buffer.get();
+		ipc::stream_write< u32, u32, const c8*, const c8* >::call( data, -1, size, what, where );
+
+		if ( socket.send( data, total ) != total )
+			throw error::runtime( "ipc::socket::switchboard: " ) << "Unable to write data";
 	}
 }
 
@@ -22,13 +33,16 @@ namespace ooe
 {
 //--- ipc::socket::switchboard -------------------------------------------------
 	ipc::socket::switchboard::switchboard( void )
-		: vector(), buffer()
+		: vector()
 	{
 		insert_direct( ipc_null, 0 );
 	}
 
 	void ipc::socket::switchboard::execute( const u8* data, ooe::socket& socket, pool& pool ) const
 	{
+		u8 buffer[ executable::static_page_size ];
+		buffer_tuple tuple( buffer, sizeof( buffer ) );
+
 		try
 		{
 			u32 index;
@@ -38,24 +52,20 @@ namespace ooe
 				throw error::runtime( "ipc::socket::switchboard: " ) <<
 					"Unable to execute function, index " << index << " out of range";
 
-			const vector_tuple& tuple = vector[ index ];
-			tuple._0( tuple._1, data, buffer_tuple( buffer, sizeof( buffer ) ), socket, pool );
+			const vector_tuple& args = vector[ index ];
+			args._0( args._1, data, tuple, socket, pool );
 		}
 		catch ( error::runtime& error )
 		{
-			write< u32 >::call( socket, -1, sizeof( u32 ) );
-			layout_write< const c8*, const c8* >::call( socket, error.what(), error.where() );
+			error_write( tuple, socket, error.what(), error.where() );
 		}
 		catch ( std::exception& error )
 		{
-			write< u32 >::call( socket, -1, sizeof( u32 ) );
-			layout_write< const c8*, const c8* >::call( socket, error.what(),
-				"\nNo stack trace available" );
+			error_write( tuple, socket, error.what(), "\nNo stack trace available" );
 		}
 		catch ( ... )
 		{
-			write< u32 >::call( socket, -1, sizeof( u32 ) );
-			layout_write< const c8*, const c8* >::call( socket,
+			error_write( tuple, socket,
 				"An unknown exception was thrown", "\nNo stack trace available" );
 		}
 	}

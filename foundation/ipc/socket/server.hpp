@@ -6,43 +6,44 @@
 #include <list>
 
 #include "foundation/io/socket.hpp"
+#include "foundation/ipc/socket/switchboard.hpp"
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
 
-#include "foundation/ipc/socket/header.hpp"
-#include "foundation/ipc/socket/switchboard.hpp"
-
 namespace ooe
 {
-	namespace nipc
+	namespace ipc
 	{
-		class servlet;
-		class server;
+		namespace socket
+		{
+			class servlet;
+			class server;
 
-		typedef shared_ptr< servlet > servlet_type;
-		typedef std::list< servlet_type > servlet_list;
-		typedef std::list< servlet_type >::iterator servlet_iterator;
+			typedef shared_ptr< servlet > servlet_type;
+			typedef std::list< servlet_type > servlet_list;
+			typedef std::list< servlet_type >::iterator servlet_iterator;
+		}
 	}
 
-//--- nipc::servlet ------------------------------------------------------------
-	class nipc::servlet
+//--- ipc::socket::servlet -----------------------------------------------------
+	class ipc::socket::servlet
 	{
 	public:
-		servlet( const servlet_iterator&, ooe::socket&, const nipc::switchboard&, server& );
+		servlet( const servlet_iterator&, ooe::socket&, const socket::switchboard&, server& );
 
 		void join( void );
 
 	private:
 		servlet_iterator iterator;
 		ooe::socket socket;
-		const nipc::switchboard& switchboard;
+		const socket::switchboard& switchboard;
 		ooe::thread thread;
 
 		void* call( void* );
 	};
 
-//--- nipc::server -------------------------------------------------------------
-	class OOE_VISIBLE nipc::server
+//--- ipc::socket::server ------------------------------------------------------
+	class OOE_VISIBLE ipc::socket::server
 	{
 	public:
 		server( const address& );

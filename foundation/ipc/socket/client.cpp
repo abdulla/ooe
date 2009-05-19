@@ -49,9 +49,10 @@ namespace ooe
 		return buffer_tuple( buffer, sizeof( buffer ) );
 	}
 
-	ipc::socket::client::operator ooe::socket&( void )
+	void ipc::socket::client::write( const u8* data, up_t size )
 	{
-		return connect;
+		if ( connect.send( data, size ) != size )
+			throw error::runtime( "ipc::socket::client: " ) << "Unable to write data";
 	}
 
 	void* ipc::socket::client::call( void* )

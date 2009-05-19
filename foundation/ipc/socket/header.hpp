@@ -17,25 +17,19 @@ namespace ooe
 			typedef shared_array< u8 > array_type;
 			typedef std::vector< u8 > buffer_type;
 
-			const u32 header_add = sizeof( u32 );
-
-			bool header_size( ooe::socket&, u32& );
-			array_type header_read( ooe::socket&, u32 );
-			void header_read( ooe::socket&, u32, buffer_type& );
-
-			u32 header_adjust( u32 );
-			u8* header_adjust( u8* );
-			void header_write( ooe::socket&, u8*, u32 );
+			inline bool header_size( ooe::socket&, u32& );
+			inline array_type header_read( ooe::socket&, u32 );
+			inline void header_read( ooe::socket&, u32, buffer_type& );
 		}
 	}
 
 //--- ipc::socket --------------------------------------------------------------
-	bool ipc::socket::header_size( ooe::socket& socket, u32& size )
+	inline bool ipc::socket::header_size( ooe::socket& socket, u32& size )
 	{
 		return socket.receive( &size, sizeof( u32 ) ) == sizeof( u32 );
 	}
 
-	ipc::socket::array_type ipc::socket::header_read( ooe::socket& socket, u32 size )
+	inline ipc::socket::array_type ipc::socket::header_read( ooe::socket& socket, u32 size )
 	{
 		if ( !size )
 			return array_type();
@@ -48,7 +42,7 @@ namespace ooe
 		return array;
 	}
 
-	void ipc::socket::header_read( ooe::socket& socket, u32 size, buffer_type& buffer )
+	inline void ipc::socket::header_read( ooe::socket& socket, u32 size, buffer_type& buffer )
 	{
 		if ( !size )
 			return;
@@ -57,15 +51,6 @@ namespace ooe
 
 		if ( socket.receive( &buffer[ 0 ], size ) != size )
 			throw error::runtime( "ipc::socket::header_read: " ) << "Unable to read data";
-	}
-
-	void ipc::socket::header_write( ooe::socket& socket, u8* buffer, u32 size )
-	{
-		// make space for u32 in buffer, write size in to it, do single send
-		*reinterpret_cast< u32* >( buffer ) = size - header_add;
-
-		if ( socket.send( buffer, size ) != size )
-			throw error::runtime( "ipc::socket::header_write: " ) << "Unable to write data";
 	}
 }
 

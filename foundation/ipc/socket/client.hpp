@@ -45,7 +45,7 @@ namespace ooe
 		iterator_type insert( void );
 
 		buffer_tuple get( void );
-		operator ooe::socket&( void );
+		void write( const u8*, up_t );
 
 	private:
 		ooe::connect connect;

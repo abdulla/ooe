@@ -8,6 +8,7 @@
 #include "foundation/ipc/traits.hpp"
 #include "foundation/ipc/socket/client.hpp"
 #include "foundation/ipc/socket/error.hpp"
+#include "foundation/ipc/socket/write_buffer.hpp"
 
 namespace ooe
 {
@@ -125,7 +126,7 @@ namespace ooe
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-	#if LIMIT != OOE_PP_LIMIT
+	#if LIMIT < BOOST_PP_DEC( OOE_PP_LIMIT )
 namespace ooe
 {
 	namespace ipc
@@ -150,13 +151,13 @@ namespace ooe
 		result< r > operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
 		{
 			up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
-				call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ) + header_add;
-			write_buffer buffer( client.get(), size );
+				call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			write_buffer buffer( client.get(), size + sizeof( u32 ) );
 			u8* data = buffer.get();
 
-			stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
-				call( data + header_add, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-			header_write( client, data, size );
+			stream_write< u32, u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
+				call( data, size, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			client.write( data, size + sizeof( u32 ) );
 
 			return result< r >( client, client.insert() );
 		}
