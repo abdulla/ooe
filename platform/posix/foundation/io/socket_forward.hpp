@@ -18,11 +18,12 @@ namespace ooe
 		: private ooe::descriptor
 	{
 	public:
-		using descriptor::get;
 		using descriptor::splice;
 
 	protected:
 		socket( s32 );
+
+		using descriptor::get;
 	};
 }
 

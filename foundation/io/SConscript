@@ -4,7 +4,7 @@ Import( Split( 'name platform root' ) )
 setup = Configure( root.Clone() )
 
 if name == 'posix':
-	if not setup.CheckFunc( 'splice', 'fcntl.h' ): Exit( 1 )
+	if not setup.CheckFunc( 'splice', '#include <fcntl.h>' ): Exit( 1 )
 
 build = setup.Finish()
 

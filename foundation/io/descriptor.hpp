@@ -61,6 +61,8 @@ namespace ooe
 
 	private:
 		shared_ptr< descriptor_id > id;
+
+		friend struct platform::descriptor;
 	};
 }
 

@@ -13,9 +13,11 @@ namespace ooe
 		struct descriptor;
 	}
 
+	class descriptor;
+
 	struct OOE_VISIBLE platform::descriptor
 	{
-		up_t splice( const descriptor&, up_t );
+		up_t splice( const ooe::descriptor&, up_t );
 	};
 }
 

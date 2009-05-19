@@ -17,11 +17,10 @@ namespace ooe
 	class platform::socket
 		: private ooe::descriptor
 	{
-	public:
-		using descriptor::get;
-
 	protected:
 		socket( s32 );
+
+		using descriptor::get;
 	};
 }
 
