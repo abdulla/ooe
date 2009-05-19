@@ -30,14 +30,14 @@ namespace
 namespace ooe
 {
 //--- socket -------------------------------------------------------------------
-	socket::socket( s32 handle )
-		: platform::socket( handle )
+	socket::socket( s32 fd )
+		: platform::socket( fd )
 	{
 	}
 
-	socket socket::create( s32 handle ) const
+	socket socket::create( s32 fd ) const
 	{
-		return socket( handle );
+		return socket( fd );
 	}
 
 	up_t socket::receive( void* buffer, up_t bytes )

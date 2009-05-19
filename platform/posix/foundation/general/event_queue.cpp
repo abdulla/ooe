@@ -12,10 +12,12 @@ namespace ooe
 {
 //--- platform::event_queue ----------------------------------------------------
 	platform::event_queue::event_queue( void )
-		: display( XOpenDisplay( 0 ) ), configure(), x(), y()
+		: display( XOpenDisplay( 0 ) ), wm_delete(), configure(), x(), y()
 	{
 		if ( !display )
 			throw error::runtime( "view: " ) << "Display not opened";
+
+		wm_delete = XInternAtom( display, "WM_DELETE_WINDOW", 1 );
 	}
 
 	platform::event_queue::~event_queue( void )
@@ -60,6 +62,12 @@ namespace ooe
 				event.button.value = xevent.xbutton.button;
 				event.button.press = true;
 				return event::button_flag;
+
+			case ClientMessage:
+				if ( xevent.xclient.data.l[ 0 ] == static_cast< sp_t >( wm_delete ) )
+					return event::exit_flag;
+				else
+					break;
 
 			case ConfigureNotify:
 				x = xevent.xconfigure.x;

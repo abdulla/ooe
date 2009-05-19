@@ -18,7 +18,8 @@ namespace ooe
 
 			motion_flag,
 			button_flag,
-			key_flag
+			key_flag,
+			exit_flag
 		};
 
 		union
