@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_IO_SOCKET_HPP
 #define OOE_FOUNDATION_IO_SOCKET_HPP
 
-#include "foundation/io/descriptor.hpp"
+#include "foundation/io/socket_forward.hpp"
 
 struct sockaddr;
 
@@ -13,7 +13,7 @@ namespace ooe
 
 //--- socket -------------------------------------------------------------------
 	class OOE_VISIBLE socket
-		: private descriptor
+		: public platform::socket
 	{
 	public:
 		enum poll_type
@@ -35,14 +35,12 @@ namespace ooe
 
 		poll_type poll( void ) const;
 		void shutdown( shutdown_type );
-		void option( u32, u32, u32 );
+		void option( u32, u32 );
 
 	protected:
 		socket( s32 ) OOE_HIDDEN;
 
 		socket create( s32 ) const OOE_HIDDEN;
-
-		using descriptor::get;
 	};
 
 //--- listen -------------------------------------------------------------------

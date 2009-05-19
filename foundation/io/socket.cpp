@@ -31,11 +31,8 @@ namespace ooe
 {
 //--- socket -------------------------------------------------------------------
 	socket::socket( s32 handle )
-		: descriptor( handle )
+		: platform::socket( handle )
 	{
-#ifdef __APPLE__
-		option( SOL_SOCKET, SO_NOSIGPIPE, true );
-#endif
 	}
 
 	socket socket::create( s32 handle ) const
@@ -55,12 +52,7 @@ namespace ooe
 
 	up_t socket::send( const void* buffer, up_t bytes )
 	{
-#ifdef __linux__
-		u32 flags = MSG_NOSIGNAL;
-#else
-		u32 flags = 0;
-#endif
-		sp_t sent = ::send( get(), buffer, bytes, flags );
+		sp_t sent = ::send( get(), buffer, bytes, OOE_SOCKET_SEND_FLAG );
 
 		if ( sent == -1 )
 			throw error::io( "socket: " ) << "Unable to send: " << error::number( errno );
@@ -110,9 +102,9 @@ namespace ooe
 			throw error::io( "socket: " ) << "Unable to shutdown: " << error::number( errno );
 	}
 
-	void socket::option( u32 level, u32 name, u32 value )
+	void socket::option( u32 key, u32 value )
 	{
-		if ( setsockopt( get(), level, name, &value, sizeof( u32 ) ) )
+		if ( setsockopt( get(), SOL_SOCKET, key, &value, sizeof( u32 ) ) )
 			throw error::io( "socket: " ) << "Unable to set option: " << error::number( errno );
 	}
 

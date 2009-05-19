@@ -1,8 +1,17 @@
-Import( Split( 'name root' ) )
-build = root.Clone()
+Import( Split( 'name platform root' ) )
 
+### configure ##################################################################
+setup = Configure( root.Clone() )
+
+if name == 'posix':
+	if not setup.CheckFunc( 'splice', 'fcntl.h' ): Exit( 1 )
+
+build = setup.Finish()
+
+### build ######################################################################
 if name == 'darwin':
 	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libio.dylib' )
 
-out = build.SharedLibrary( '#/build/library/libio', Glob( '*.cpp' ) )
+files = Glob( '*.cpp' ) + Glob( platform + '/foundation/io/*.cpp' )
+out = build.SharedLibrary( '#/build/library/libio', files )
 build.SideEffect( Glob( '*.rpo' ), out )

@@ -3,8 +3,7 @@
 #ifndef OOE_FOUNDATION_IO_DESCRIPTOR_HPP
 #define OOE_FOUNDATION_IO_DESCRIPTOR_HPP
 
-#include "foundation/utility/fundamental.hpp"
-#include "foundation/utility/macro.hpp"
+#include "foundation/io/descriptor_forward.hpp"
 #include "foundation/utility/pointer.hpp"
 #include "foundation/utility/string.hpp"
 
@@ -20,6 +19,7 @@ namespace ooe
 	};
 
 	class OOE_VISIBLE descriptor
+		: public platform::descriptor
 	{
 	public:
 		enum
@@ -55,7 +55,6 @@ namespace ooe
 
 		void resize( up_t );
 		void control( u32, void* );
-		up_t splice( const descriptor&, up_t );
 
 	protected:
 		s32 get( void ) const OOE_HIDDEN;
