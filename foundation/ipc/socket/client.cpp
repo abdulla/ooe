@@ -1,6 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/ipc/socket/client.hpp"
+#include "foundation/ipc/socket/rpc.hpp"
 
 namespace ooe
 {
@@ -13,8 +14,8 @@ namespace ooe
 
 	ipc::socket::client::~client( void )
 	{
-		rpc< void ( void ) >( *this, 0 )()();	// call null function to flush pending calls
-		connect.shutdown( socket::read_write );	// shutdown socket to stop reader thread
+		rpc< void ( void ) >( *this, 0 )()();			// call null function to flush pending calls
+		connect.shutdown( ooe::socket::read_write );	// shutdown socket to stop reader thread
 		thread.join();
 	}
 
@@ -43,15 +44,14 @@ namespace ooe
 		return map.insert( map.end(), map_type::value_type( ++out, map_tuple() ) );
 	}
 
-	ipc::buffer_tuple ipc::socket::get( void ) const
+	ipc::socket::buffer_tuple ipc::socket::client::get( void )
 	{
-		return buffer_tuple( buffer + sizeof( u32 ), sizeof( buffer ) - sizeof( u32 ) );
+		return buffer_tuple( buffer, sizeof( buffer ) );
 	}
 
-	void ipc::socket::write( const void* buffer, up_t size )
+	ipc::socket::client::operator ooe::socket&( void )
 	{
-		*( u32* )buffer = size;
-		socket.write( buffer, size + sizeof( u32 ) );
+		return connect;
 	}
 
 	void* ipc::socket::client::call( void* )

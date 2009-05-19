@@ -7,7 +7,10 @@
 
 #include <vector>
 
+#include "foundation/executable/environment.hpp"
+#include "foundation/io/socket.hpp"
 #include "foundation/ipc/pool.hpp"
+#include "foundation/ipc/socket/write_buffer.hpp"
 
 namespace ooe
 {
@@ -105,38 +108,49 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, socket& socket, u8* buffer,
-			pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
+		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+			ooe::socket& socket, pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
 		{
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
 
 			BOOST_PP_REPEAT( LIMIT, ARGUMENT, ~ )
-			layout_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-				call( buffer BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ );
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-			layout_write<>::call( socket );
+
+			up_t size = header_add;
+			write_buffer buffer( tuple, size );
+			u8* out = buffer.get();
+			stream_write<>::call( out );
+			header_write( socket, out, size );
 		}
 	};
 
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, socket& socket, u8* buffer, pool& pool )
+		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+			ooe::socket& socket, pool& pool )
 		{
 			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
 
 			BOOST_PP_REPEAT( LIMIT, ARGUMENT, ~ )
-			layout_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-				call( buffer BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 			verify< r >::call( pool, value, 0 );
-			layout_write< r >::call( socket, value );
+
+			up_t size = stream_size< r >::call( value ) + header_add;
+			write_buffer buffer( tuple, size );
+			u8* out = buffer.get();
+			stream_write< r >::call( out, value );
+			header_write( socket, out, size );
 		}
 	};
 
@@ -145,27 +159,33 @@ namespace ooe
 	template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, socket& socket, u8* buffer, pool& pool )
+		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+			ooe::socket& socket, pool& pool )
 		{
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );
 
 			t0* a0;
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, ARGUMENT, ~ )
-			layout_read< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
-				call( buffer BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			stream_read< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
+				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			verify< t0* >::call( pool, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
 			( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
-			layout_write<>::call( socket );
+
+			up_t size = header_add;
+			write_buffer buffer( tuple, size );
+			u8* out = buffer.get();
+			stream_write<>::call( out );
+			header_write( socket, out, size );
 		}
 	};
 
 	template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( any any, socket& socket, u8* buffer, pool& pool )
+		static void call( any any, ooe::socket& socket, u8* buffer, pool& pool )
 		{
 			typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );

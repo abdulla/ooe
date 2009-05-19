@@ -7,6 +7,8 @@
 
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/socket/header.hpp"
+#include "foundation/ipc/socket/write_buffer.hpp"
+#include "foundation/executable/environment.hpp"
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
 
@@ -42,8 +44,8 @@ namespace ooe
 		void erase( const iterator_type& );
 		iterator_type insert( void );
 
-		buffer_tuple get( void ) const;
-		void write( const void*, up_t );
+		buffer_tuple get( void );
+		operator ooe::socket&( void );
 
 	private:
 		ooe::connect connect;

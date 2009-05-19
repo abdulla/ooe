@@ -17,7 +17,7 @@ namespace ooe
 	}
 
 //--- ipc::socket::write_buffer ------------------------------------------------
-	class ipc::write_buffer
+	class ipc::socket::write_buffer
 	{
 	public:
 		write_buffer( buffer_tuple tuple, up_t size )

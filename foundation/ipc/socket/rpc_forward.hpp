@@ -150,13 +150,13 @@ namespace ooe
 		result< r > operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
 		{
 			up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
-				call( index u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) );
+				call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ) + header_add;
 			write_buffer buffer( client.get(), size );
 			u8* data = buffer.get();
 
 			stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
-				call( data, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-			client.write( data, size );
+				call( data + header_add, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			header_write( client, data, size );
 
 			return result< r >( client, client.insert() );
 		}

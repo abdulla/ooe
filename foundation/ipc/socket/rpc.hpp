@@ -53,7 +53,7 @@ namespace ooe
 	{
 		typedef rpc< u32 ( const c8*, const c8* ) > base_type;
 
-		find( nipc::client& client_ )
+		find( socket::client& client_ )
 			: base_type( client_, 1 )
 		{
 		}
