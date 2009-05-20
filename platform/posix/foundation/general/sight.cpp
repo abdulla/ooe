@@ -53,7 +53,7 @@ namespace ooe
 	void platform::sight::main( call_type call, u16 width, u16 height )
 	{
 		up_t offset[ 2 ];
-		descriptor desc( "/dev/video0" );
+		ooe::descriptor desc( "/dev/video0" );
 		memory memory( initialise( desc, width, height, offset ) );
 
 		u8 index = 0;
