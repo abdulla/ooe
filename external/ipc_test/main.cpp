@@ -60,12 +60,12 @@ namespace
 		delete p;
 	}
 
-	nipc::construct_ptr< print > print_nconstruct( void )
+	ipc::construct_ptr< print > print_nconstruct( void )
 	{
 		return new print;
 	}
 
-	void print_ndestruct( nipc::destruct_ptr< print > p )
+	void print_ndestruct( ipc::destruct_ptr< print > p )
 	{
 		delete p;
 	}
@@ -219,21 +219,18 @@ namespace
 		ipc::client client( ipc::create_semaphore, "/ooe" );
 
 		ipc::rpc< void ( void ) > out_of_range( client, static_cast< u32 >( -1 ) );
-		OOE_PRINT( "client_fail", out_of_range() );	// throw!
-		std::cout << '\n';
+		OOE_PRINT( "CLIENT_FAIL", out_of_range() );	// throw!
 
 		ipc::find_all find_all( client );
 		ipc::find_all::tuple_type tuple( "no_function", "no_type" );
 		ipc::find_all::parameter_type parameter( 3, tuple );
-		OOE_PRINT( "client_fail", find_all( parameter ) );
-		std::cout << '\n';
+		OOE_PRINT( "\nCLIENT_FAIL", find_all( parameter ) );
 
 		ipc::call< void ( print* ) > printer( client, "printer" );
-		OOE_PRINT( "client_fail", printer( 0 ) );
-		std::cout << '\n';
+		OOE_PRINT( "\nCLIENT_FAIL", printer( 0 ) );
 
 		ipc::call< void ( void ) > unknown( client, "unknown" );
-		OOE_PRINT( "client_fail", unknown() );
+		OOE_PRINT( "\nCLIENT_FAIL", unknown() );
 	}
 
 	void client_ptr( void )
@@ -275,18 +272,18 @@ namespace
 
 	void client_ntest( void )
 	{
-		nipc::client client( local( _PATH_TMP "ooe" ) );
+		ipc::socket::client client( local( _PATH_TMP "ooe" ) );
 
-		nipc::rpc< void ( void ) > out_of_range( client, static_cast< u32 >( -1 ) );
-		OOE_PRINT( "client_fail", out_of_range()() );	// throw!
+		ipc::socket::rpc< void ( void ) > out_of_range( client, static_cast< u32 >( -1 ) );
+		OOE_PRINT( "CLIENT_FAIL", out_of_range()() );	// throw!
 
-		nipc::call< void ( print* ) > printer( client, "printer" );
-		OOE_PRINT( "client_fail", printer( 0 )() );
+		ipc::socket::call< void ( print* ) > printer( client, "printer" );
+		OOE_PRINT( "\nCLIENT_FAIL", printer( 0 )() );
 
-		nipc::call< void ( void ) > unknown( client, "unknown" );
-		OOE_PRINT( "client_fail", unknown()() );
+		ipc::socket::call< void ( void ) > unknown( client, "unknown" );
+		OOE_PRINT( "\nCLIENT_FAIL", unknown()() );
 
-		nipc::call< nipc::construct_ptr< print > ( void ) >
+		ipc::socket::call< ipc::construct_ptr< print > ( void ) >
 			print_nconstruct( client, "print_nconstruct" );
 
 		for ( up_t i = 0; i != iteration_limit; ++i )
@@ -295,14 +292,14 @@ namespace
 
 	void server_ntest( void )
 	{
-		nipc::nameservice nameservice;
+		ipc::socket::nameservice nameservice;
 		nameservice.insert( "print_nconstruct", print_nconstruct );
 		nameservice.insert( "print_ndestruct", print_ndestruct );
 		nameservice.insert( "printer", &print::printer );
 		nameservice.insert( "unknown", unknown );
 
 		unlink( _PATH_TMP "ooe" );
-		nipc::server server( local( _PATH_TMP "ooe" ) );
+		ipc::socket::server server( local( _PATH_TMP "ooe" ) );
 
 		while ( !executable::signal() )
 			server.accept( nameservice );
@@ -310,7 +307,7 @@ namespace
 
 //--- run ----------------------------------------------------------------------
 	typedef ipc::rpc< void ( void ) > rpc_type;
-	typedef nipc::rpc< void ( void ) > nrpc_type;
+	typedef ipc::socket::rpc< void ( void ) > nrpc_type;
 
 	f32 run_ipc( const rpc_type& rpc, up_t limit )
 	{
@@ -339,7 +336,7 @@ namespace
 		return run_ipc( null, iteration_limit );
 	}
 
-	f32 run_task_nipc( nipc::client& client, u32 value )
+	f32 run_task_nipc( ipc::socket::client& client, u32 value )
 	{
 		nrpc_type null( client, value );
 		return run_nipc( null, iteration_limit );
@@ -363,8 +360,8 @@ namespace
 
 	f32 client_nipc( const address& address )
 	{
-		nipc::client client( address );
-		nipc::find find( client );
+		ipc::socket::client client( address );
+		ipc::socket::find find( client );
 		u32 value = find( "null", typeid( null ).name() )();
 		nrpc_type null( client, value );
 
@@ -399,16 +396,16 @@ namespace
 
 	f32 client_task_nipc( const address& address, up_t size )
 	{
-		typedef shared_ptr< nipc::client > client_pointer;
+		typedef shared_ptr< ipc::socket::client > client_pointer;
 		scoped_array< client_pointer > client_array( new client_pointer[ size ] );
 
 		for ( up_t i = 0; i != size; ++i )
-			client_array[ i ] = new nipc::client( address );
+			client_array[ i ] = new ipc::socket::client( address );
 
-		nipc::find find( *client_array[ 0 ] );
+		ipc::socket::find find( *client_array[ 0 ] );
 		u32 value = find( "null", typeid( null ).name() )();
 
-		typedef unique_task< f32 ( nipc::client&, u32 ) > task_type;
+		typedef unique_task< f32 ( ipc::socket::client&, u32 ) > task_type;
 		typedef shared_ptr< task_type > task_pointer;
 		scoped_array< task_pointer > task_array( new task_pointer[ size ] );
 
@@ -441,10 +438,10 @@ namespace
 
 	f32 client_inline_nipc( const address& address, up_t size )
 	{
-		nipc::client client( address );
-		nipc::find find( client );
+		ipc::socket::client client( address );
+		ipc::socket::find find( client );
 		u32 value = find( "null_inline", typeid( null_inline ).name() )();
-		nipc::rpc< void ( const c8* ) > rpc( client, value );
+		ipc::socket::rpc< void ( const c8* ) > rpc( client, value );
 
 		std::string string( size - 1, 'n' );
 		timer timer;
@@ -510,11 +507,11 @@ namespace
 
 	void server_nipc( const address& address )
 	{
-		nipc::nameservice nameservice;
+		ipc::socket::nameservice nameservice;
 		nameservice.insert( "null", null );
 		nameservice.insert( "null_inline", null_inline );
 
-		nipc::server server( address );
+		ipc::socket::server server( address );
 
 		while ( !executable::signal() )
 			server.accept( nameservice );
