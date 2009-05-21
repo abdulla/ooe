@@ -40,7 +40,7 @@ namespace ooe
 			return exchange_add( 1 ) + 1;
 		}
 
-		type operator ++( type )
+		type operator ++( int )
 		{
 			return exchange_add( 1 );
 		}
@@ -50,7 +50,7 @@ namespace ooe
 			return exchange_add( -1 ) - 1;
 		}
 
-		type operator --( type )
+		type operator --( int )
 		{
 			return exchange_add( -1 );
 		}
