@@ -88,7 +88,7 @@ namespace ooe
 					i->second = map_tuple( array, done );
 			}
 
-			condition.notify_all();
+			condition.notify_one();
 		}
 
 		return 0;
