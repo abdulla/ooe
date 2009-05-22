@@ -1,4 +1,4 @@
-/* Copyright (C) 2008 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include <AppKit/AppKit.h>
 
