@@ -16,7 +16,7 @@ namespace ooe
 #endif
 	}
 
-	template< typename type = int >
+	template< typename type >
 		class atom
 	{
 	public:
@@ -94,10 +94,10 @@ namespace ooe
 //--- atom_ptr -----------------------------------------------------------------
 	template< typename type, template< typename > class deleter = delete_ptr >
 		struct atom_ptr
-		: public shared_dereference< type, deleter< type >, atom<> >
+		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
 		atom_ptr( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom<> >( value )
+			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
 		{
 		}
 	};
@@ -105,10 +105,10 @@ namespace ooe
 //--- atom_array ---------------------------------------------------------------
 	template< typename type, template< typename > class deleter = delete_array >
 		struct atom_array
-		: public shared_dereference< type, deleter< type >, atom<> >
+		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
 		atom_array( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom<> >( value )
+			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
 		{
 		}
 	};
@@ -116,10 +116,10 @@ namespace ooe
 //--- atom_free ----------------------------------------------------------------
 	template< typename type, template< typename > class deleter = delete_free >
 		struct atom_free
-		: public shared_dereference< type, deleter< type >, atom<> >
+		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
 		atom_free( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom<> >( value )
+			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
 		{
 		}
 	};

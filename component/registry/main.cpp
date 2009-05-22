@@ -17,7 +17,7 @@ namespace
 	typedef std::map< std::string, module::type > module_map;
 
 	//--- globals --------------------------------------------------------------
-	atom<> seed;
+	atom< u32 > seed;
 	std::string self;
 	module_map modules;
 

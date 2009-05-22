@@ -9,7 +9,7 @@
 namespace
 {
 	using namespace ooe;
-	atom<> value( 0 );
+	atom< u32 > value( 0 );
 }
 
 namespace ooe

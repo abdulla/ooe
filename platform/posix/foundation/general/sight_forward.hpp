@@ -22,7 +22,7 @@ namespace ooe
 		~sight( void ) OOE_VISIBLE;
 
 	private:
-		atom<> active;
+		atom< u32 > active;
 		unique_task< void ( call_type, u16, u16 ) > task;
 
 		void main( call_type, u16, u16 );

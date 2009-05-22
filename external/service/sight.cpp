@@ -6,7 +6,7 @@ namespace ooe
 {
 //--- sight_provider -----------------------------------------------------------
 	sight_provider::sight_provider( u16 width, u16 height )
-		: sight(), size( width * height * 4 ), frame( new u8[ size ] ), state_( 0 ),
+		: sight(), size( width * height * 4 ), frame( new u8[ size ] ), state_( false ),
 		sight_( sight::call_type( *this, &sight_provider::call ), width, height )
 	{
 	}
@@ -18,13 +18,13 @@ namespace ooe
 
 	void sight_provider::done( void )
 	{
-		state_ = 0;
+		state_ = false;
 	}
 
 	void sight_provider::call( const u8* data )
 	{
 		std::copy( data, data + size, frame.get() );
-		state_ = 1;
+		state_ = true;
 	}
 
 	const u8* sight_provider::get( void ) const

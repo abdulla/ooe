@@ -33,7 +33,7 @@ namespace ooe
 		const memory::switchboard& switchboard;
 
 		scoped_ptr< const link_listen > listen;
-		atom<> active;
+		atom< u32 > active;
 		ooe::thread thread;
 
 		void* call( void* );

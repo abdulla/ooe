@@ -150,7 +150,7 @@ namespace
 		return 0x55555555 & ( ( 1 << depth * 2 ) - 1 );
 	}
 
-	void unload_f( chunk& chunk, atom<>& state )
+	void unload_f( chunk& chunk, atom< u32 >& state )
 	{
 		chunk.parallel_unload();
 		state = chunk::none;
@@ -412,7 +412,7 @@ namespace ooe
 			if ( leaf_state == half )
 			{
 				leaf.state = wait;
-				schedule.push_back< void, chunk&, atom<>& >( unload_f, leaf, leaf.state );
+				schedule.push_back< void, chunk&, atom< u32 >& >( unload_f, leaf, leaf.state );
 			}
 			else if ( leaf_state == full )
 			{

@@ -16,7 +16,7 @@ namespace ooe
 	{
 	public:
 		worker_iterator iterator;
-		atom<> active;
+		atom< u32 > active;
 
 		worker( const thread::function_type& function )
 			: iterator(), active( true ), thread( function, this )
