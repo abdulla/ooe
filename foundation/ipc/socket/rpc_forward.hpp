@@ -31,12 +31,21 @@ namespace ooe
 		}
 	}
 
+//--- ipc::socket --------------------------------------------------------------
+	inline void ipc::socket::except( const u8* buffer )
+	{
+		const c8* what;
+		const c8* where;
+		stream_read< const c8*, const c8* >::call( buffer, what, where );
+		throw error::socket_rpc() << what << "\n\nServer stack trace:" << where;
+	}
+
 //--- ipc::socket::result ------------------------------------------------------
 	template<>
 		struct ipc::socket::result< void >
 	{
 	public:
-		result( client& client, const client::iterator_type& i )
+		result( client& client, const client::iterator& i )
 			: base( new base_type( client, i ) )
 		{
 		}
@@ -53,6 +62,8 @@ namespace ooe
 
 			if ( base->state == base_type::error )
 				except( array );
+
+			base->state = base_type::done;
 		}
 
 	private:
@@ -64,7 +75,7 @@ namespace ooe
 		class ipc::socket::result
 	{
 	public:
-		result( client& client, const client::iterator_type& i )
+		result( client& client, const client::iterator& i )
 			: base( new base_type( client, i ) )
 		{
 		}
@@ -83,6 +94,7 @@ namespace ooe
 				except( array );
 
 			stream_read< type >::call( array, base->value );
+			base->state = base_type::done;
 			return base->value;
 		}
 
@@ -103,15 +115,6 @@ namespace ooe
 		{
 		}
 	};
-
-//--- ipc::socket --------------------------------------------------------------
-	inline void ipc::socket::except( const u8* buffer )
-	{
-		const c8* what;
-		const c8* where;
-		stream_read< const c8*, const c8* >::call( buffer, what, where );
-		throw error::socket_rpc() << what << "\n\nServer stack trace:" << where;
-	}
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
@@ -157,9 +160,10 @@ namespace ooe
 
 			stream_write< u32, u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 				call( data, size, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+			client::iterator i = client.insert();
 			client.write( data, size + sizeof( u32 ) );
 
-			return result< r >( client, client.insert() );
+			return result< r >( client, i );
 		}
 	};
 }

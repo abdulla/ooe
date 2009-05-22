@@ -21,24 +21,31 @@ namespace ooe
 
 	ipc::socket::array_type ipc::socket::client::wait( result_type& result )
 	{
-		lock lock( mutex );
+		map_tuple tuple;
 
-		while ( result.i->first > in )
-			condition.wait( lock );
+		{
+			lock lock( mutex );
 
-		array_type array = result.i->second._0;
-		result.state = result.i->second._1 ? result_type::done : result_type::error;
-		map.erase( result.i );
-		return array;
+			while ( result.i->first > in )
+				condition.wait( lock );
+
+			tuple = result.i->second;
+			map.erase( result.i );
+		}
+
+		if ( !tuple._1 )
+			result.state = result_type::error;
+
+		return tuple._0;
 	}
 
-	void ipc::socket::client::erase( const iterator_type& i )
+	void ipc::socket::client::erase( const iterator& i )
 	{
 		lock lock( mutex );
 		map.erase( i );
 	}
 
-	ipc::socket::client::iterator_type ipc::socket::client::insert( void )
+	ipc::socket::client::iterator ipc::socket::client::insert( void )
 	{
 		lock lock( mutex );
 		return map.insert( map.end(), map_type::value_type( ++out, map_tuple() ) );

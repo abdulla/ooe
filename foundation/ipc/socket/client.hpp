@@ -34,15 +34,15 @@ namespace ooe
 	public:
 		typedef tuple< array_type, bool > map_tuple;
 		typedef std::map< u32, map_tuple > map_type;
-		typedef map_type::iterator iterator_type;
+		typedef map_type::iterator iterator;
 		typedef result_base< void > result_type;
 
 		client( const address& );
 		~client( void );
 
 		array_type wait( result_type& );
-		void erase( const iterator_type& );
-		iterator_type insert( void );
+		void erase( const iterator& );
+		iterator insert( void );
 
 		buffer_tuple get( void );
 		void write( const u8*, up_t );
@@ -75,13 +75,13 @@ namespace ooe
 		};
 
 		typedef socket::client client_type;
-		typedef client_type::map_type::iterator iterator_type;
+		typedef client_type::map_type::iterator iterator;
 
 		client_type& client;
-		const iterator_type i;
+		const iterator i;
 		state_type state;
 
-		result_base( client_type& client_, const iterator_type& i_ )
+		result_base( client_type& client_, const iterator& i_ )
 			: client( client_ ), i( i_ ), state( wait )
 		{
 		}
@@ -99,7 +99,7 @@ namespace ooe
 	{
 		type value;
 
-		result_base( client_type& client_, const iterator_type& i_ )
+		result_base( client_type& client_, const iterator& i_ )
 			: result_base< void >( client_, i_ ), value()
 		{
 		}
