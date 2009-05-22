@@ -9,48 +9,49 @@ namespace
 {
 	using namespace ooe;
 
-	typedef tuple< const ipc::switchboard&, ipc::write_buffer*, ipc::pool* > tuple_type;
+	typedef tuple< const ipc::memory::switchboard&, ipc::memory::write_buffer*, ipc::pool* >
+		tuple_type;
 
-	void ipc_decode( const ipc::buffer_tuple& tuple, const void* pointer )
+	void ipc_decode( const ipc::memory::buffer_tuple& tuple, const void* pointer )
 	{
 		const tuple_type& args = *static_cast< const tuple_type* >( pointer );
 		args._0.execute( tuple, *args._1, *args._2 );
 	}
 
-	void ipc_link( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::write_buffer& buffer, ipc::pool& )
+	void ipc_link( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		pid_t pid;
 		ipc::stream_read< pid_t >::call( data, pid );
 
-		u32 link = static_cast< ipc::server* >( any.pointer )->link( pid );
+		u32 link = static_cast< ipc::memory::server* >( any.pointer )->link( pid );
 		up_t size = ipc::stream_size< u32 >::call( link );
 		ipc::stream_write< u32 >::call( return_write( tuple, buffer, size ), link );
 	}
 
-	void ipc_unlink( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::write_buffer& buffer, ipc::pool& )
+	void ipc_unlink( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		u32 link;
 		ipc::stream_read< u32 >::call( data, link );
 
-		static_cast< ipc::server* >( any.pointer )->unlink( link );
+		static_cast< ipc::memory::server* >( any.pointer )->unlink( link );
 		return_write( tuple, buffer );
 	}
 }
 
 namespace ooe
 {
-//--- ipc::servlet -------------------------------------------------------------
-	ipc::servlet::servlet( pid_t pid, u32 link_id_, transport_type type,
-		const ipc::switchboard& switchboard_, server& server )
+//--- ipc::memory::servlet -------------------------------------------------------------
+	ipc::memory::servlet::servlet( pid_t pid, u32 link_id_, transport_type type,
+		const memory::switchboard& switchboard_, server& server )
 		: link_id( link_id_ ), transport( type( link_name( pid, link_id ), transport::create ) ),
 		switchboard( switchboard_ ), listen( new link_listen( link_name( pid, link_id ) ) ),
 		active( true ), thread( make_function( *this, &servlet::call ), &server )
 	{
 	}
 
-	ipc::servlet::~servlet( void )
+	ipc::memory::servlet::~servlet( void )
 	{
 		ooe::thread self;
 
@@ -63,13 +64,13 @@ namespace ooe
 		thread.join();
 	}
 
-	void* ipc::servlet::call( void* pointer )
+	void* ipc::memory::servlet::call( void* pointer )
 	{
 		write_buffer buffer( transport->get(), 0 );
 		pool pool;
 		tuple_type tuple( switchboard, &buffer, &pool );
 
-		ipc::server& server = *static_cast< ipc::server* >( pointer );
+		memory::server& server = *static_cast< memory::server* >( pointer );
 		link_server link( listen->accept(), link_id, server );
 		delete listen.release();
 		transport->unlink();
@@ -80,8 +81,8 @@ namespace ooe
 		return 0;
 	}
 
-//--- ipc::server --------------------------------------------------------------
-	ipc::server::
+//--- ipc::memory::server --------------------------------------------------------------
+	ipc::memory::server::
 		server( transport_type type_, const std::string& name, const switchboard& external_ )
 		: semaphore( name + ".s", semaphore::create ), internal(), external( external_ ),
 		type( type_ ), transport( type( name, transport::create ) ), seed(), servlets()
@@ -94,11 +95,11 @@ namespace ooe
 	}
 
 	// note: so that ~servlet() does not need to be visible
-	ipc::server::~server( void )
+	ipc::memory::server::~server( void )
 	{
 	}
 
-	bool ipc::server::decode( void )
+	bool ipc::memory::server::decode( void )
 	{
 		write_buffer buffer( transport->get(), 0 );
 		tuple_type tuple( internal, &buffer, 0 );
@@ -107,7 +108,7 @@ namespace ooe
 	}
 
 	// note: no need for lock or atomics, semaphore is used when calling link/unlink via decode
-	u32 ipc::server::link( pid_t pid )
+	u32 ipc::memory::server::link( pid_t pid )
 	{
 		u32 link_id = seed++;
 		servlet_map::value_type
@@ -116,7 +117,7 @@ namespace ooe
 		return link_id;
 	}
 
-	void ipc::server::unlink( u32 link_id )
+	void ipc::memory::server::unlink( u32 link_id )
 	{
 		servlets.erase( link_id );
 	}

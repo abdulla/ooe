@@ -9,24 +9,27 @@ namespace ooe
 {
 	namespace ipc
 	{
-		class client;
+		namespace memory
+		{
+			class client;
+		}
 	}
 
-//--- ipc::client --------------------------------------------------------------
-	class OOE_VISIBLE ipc::client
+//--- ipc::memory::client ------------------------------------------------------
+	class OOE_VISIBLE ipc::memory::client
 	{
 	public:
 		client( transport_type, const std::string& );
 		~client( void );
 
-		operator ipc::transport&( void );
+		operator memory::transport&( void );
 
 	private:
 		transport_type type;
 		const std::string name;
 		const u32 link_id;
 
-		const scoped_ptr< ipc::transport > transport;
+		const scoped_ptr< memory::transport > transport;
 		link_client link;
 	};
 }

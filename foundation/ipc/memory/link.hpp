@@ -12,14 +12,17 @@ namespace ooe
 {
 	namespace ipc
 	{
-		class server;
-		class link_listen;
-		class link_server;
-		class link_client;
+		namespace memory
+		{
+			class server;
+			class link_listen;
+			class link_server;
+			class link_client;
+		}
 	}
 
-//--- ipc::link_listen ---------------------------------------------------------
-	class ipc::link_listen
+//--- ipc::memory::link_listen -------------------------------------------------
+	class ipc::memory::link_listen
 	{
 	public:
 		link_listen( const std::string& );
@@ -32,8 +35,8 @@ namespace ooe
 		ooe::listen listen;
 	};
 
-//--- ipc::link_server ---------------------------------------------------------
-	class ipc::link_server
+//--- ipc::memory::link_server -------------------------------------------------
+	class ipc::memory::link_server
 	{
 	public:
 		link_server( const ooe::socket&, u32, server& );
@@ -48,8 +51,8 @@ namespace ooe
 		void* call( void* );
 	};
 
-//--- ipc::link_client ---------------------------------------------------------
-	class ipc::link_client
+//--- ipc::memory::link_client -------------------------------------------------
+	class ipc::memory::link_client
 	{
 	public:
 		link_client( const std::string&, transport& );

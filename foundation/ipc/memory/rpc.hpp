@@ -13,22 +13,25 @@ namespace ooe
 {
 	namespace ipc
 	{
-		struct find;
-		struct list;
-		struct find_all;
+		namespace memory
+		{
+			struct find;
+			struct list;
+			struct find_all;
 
-		template< typename >
-			struct call;
+			template< typename >
+				struct call;
+		}
 	}
 
-//--- ipc::find ----------------------------------------------------------------
-	struct ipc::find
+//--- ipc::memory::find --------------------------------------------------------
+	struct ipc::memory::find
 		: private rpc< u32 ( const c8*, const c8* ) >
 	{
 		typedef rpc< u32 ( const c8*, const c8* ) > base_type;
 		using base_type::result_type;
 
-		find( ipc::transport& transport_ )
+		find( memory::transport& transport_ )
 			: base_type( transport_, 1 )
 		{
 		}
@@ -40,23 +43,23 @@ namespace ooe
 			if ( i != static_cast< u32 >( -1 ) )
 				return i;
 
-			throw error::runtime( "ipc::find: " ) <<
+			throw error::runtime( "ipc::memory::find: " ) <<
 				"Unable to find \"" << name << "\" of type \"" << type << '\"';
 		}
 	};
 
-//--- ipc::list ----------------------------------------------------------------
-	struct ipc::list
+//--- ipc::memory::list --------------------------------------------------------
+	struct ipc::memory::list
 		: public rpc< std::vector< tuple< std::string, std::string > > ( void ) >
 	{
-		list( ipc::transport& transport_ )
+		list( memory::transport& transport_ )
 			: rpc< std::vector< tuple< std::string, std::string > > ( void ) >( transport_, 2 )
 		{
 		}
 	};
 
-//--- ipc::find_all ------------------------------------------------------------
-	struct ipc::find_all
+//--- ipc::memory::find_all ----------------------------------------------------
+	struct ipc::memory::find_all
 		: private rpc< std::vector< u32 > ( std::vector< tuple< std::string, std::string > > ) >
 	{
 		typedef tuple< std::string, std::string > tuple_type;
@@ -64,7 +67,7 @@ namespace ooe
 		typedef rpc< result_type ( parameter_type ) > base_type;
 		using base_type::result_type;
 
-		find_all( ipc::transport& transport_ )
+		find_all( memory::transport& transport_ )
 			: base_type( transport_, 3 )
 		{
 		}
@@ -78,7 +81,7 @@ namespace ooe
 				if ( result[ i ] != static_cast< u32 >( -1 ) )
 					continue;
 
-				throw error::runtime( "ipc::rpc: ipc::find_all: " ) << "Unable to find \"" <<
+				throw error::runtime( "ipc::memory::find_all: " ) << "Unable to find \"" <<
 					parameter[ i ]._0 << "\" of type \"" << parameter[ i ]._1 << '\"';
 			}
 
@@ -103,19 +106,22 @@ namespace ooe
 {
 	namespace ipc
 	{
-		template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-			struct call< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+		namespace memory
+		{
+			template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+				struct call< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+		}
 	}
 
-//--- ipc::call ----------------------------------------------------------------
+//--- ipc::memory::call --------------------------------------------------------
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct ipc::call< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct ipc::memory::call< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 		: public rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		typedef r signature_type( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 		typedef rpc< signature_type > base_type;
 
-		call( ipc::transport& transport_, const c8* name )
+		call( memory::transport& transport_, const c8* name )
 			: base_type( transport_, find( transport_ )( name, typeid( signature_type ).name() ) )
 		{
 		}

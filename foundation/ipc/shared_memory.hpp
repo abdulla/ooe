@@ -35,7 +35,7 @@ namespace ooe
 
 //--- ipc::shared_memory -------------------------------------------------------
 	struct OOE_VISIBLE ipc::shared_memory
-		: private shared_memory_base, private memory
+		: private shared_memory_base, private ooe::memory
 	{
 		enum type
 		{

@@ -11,12 +11,15 @@ namespace ooe
 {
 	namespace ipc
 	{
-		typedef tuple< u8*, up_t > buffer_tuple;
-		struct transport;
+		namespace memory
+		{
+			typedef tuple< u8*, up_t > buffer_tuple;
+			struct transport;
+		}
 	}
 
-//--- ipc::transport -----------------------------------------------------------
-	struct ipc::transport
+//--- ipc::memory::transport ---------------------------------------------------
+	struct ipc::memory::transport
 	{
 		typedef void ( * wait_type )( const buffer_tuple&, const void* );
 
@@ -38,11 +41,14 @@ namespace ooe
 
 	namespace ipc
 	{
-//--- ipc ----------------------------------------------------------------------
-		typedef transport* ( * transport_type )( const std::string&, transport::type );
+		namespace memory
+		{
+//--- ipc::memory --------------------------------------------------------------
+			typedef transport* ( * transport_type )( const std::string&, transport::type );
 
-		transport* create_spinlock( const std::string&, transport::type ) OOE_VISIBLE;
-		transport* create_semaphore( const std::string&, transport::type ) OOE_VISIBLE;
+			transport* create_spinlock( const std::string&, transport::type ) OOE_VISIBLE;
+			transport* create_semaphore( const std::string&, transport::type ) OOE_VISIBLE;
+		}
 	}
 }
 

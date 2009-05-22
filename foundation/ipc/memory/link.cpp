@@ -11,20 +11,20 @@
 
 namespace ooe
 {
-//--- ipc::link_listen ---------------------------------------------------------
-	ipc::link_listen::link_listen( const std::string& name )
+//--- ipc::memory::link_listen -------------------------------------------------
+	ipc::memory::link_listen::link_listen( const std::string& name )
 		: path( local_name( name ) ), listen( local( path ) )
 	{
 	}
 
-	ipc::link_listen::~link_listen( void )
+	ipc::memory::link_listen::~link_listen( void )
 	{
 		if ( path.size() && unlink( path.c_str() ) )
 			OOE_WARNING( "ipc::link_listen",
 				"Unable to unlink \"" << path << "\": " << error::number( errno ) );
 	}
 
-	socket ipc::link_listen::accept( void ) const
+	socket ipc::memory::link_listen::accept( void ) const
 	{
 		socket socket = listen.accept();
 
@@ -32,18 +32,19 @@ namespace ooe
 			throw error::runtime( "ipc::link_server: " ) <<
 				"Unable to unlink \"" << path << "\": " << error::number( errno );
 
-		path = std::string();	// required to force deallocation of string
+		path.clear();
 		return socket;
 	}
 
-//--- ipc::link_server ---------------------------------------------------------
-	ipc::link_server::link_server( const ooe::socket& socket_, u32 link_id_, server& server )
+//--- ipc::memory::link_server -------------------------------------------------
+	ipc::memory::link_server::
+		link_server( const ooe::socket& socket_, u32 link_id_, server& server )
 		: socket( socket_ ), link_id( link_id_ ), active( true ),
 		thread( make_function( *this, &link_server::call ), &server )
 	{
 	}
 
-	ipc::link_server::~link_server( void )
+	ipc::memory::link_server::~link_server( void )
 	{
 		if ( !active )
 			return;
@@ -53,9 +54,9 @@ namespace ooe
 		thread.join();
 	}
 
-	void* ipc::link_server::call( void* pointer )
+	void* ipc::memory::link_server::call( void* pointer )
 	{
-		ipc::server& server = *static_cast< ipc::server* >( pointer );
+		memory::server& server = *static_cast< memory::server* >( pointer );
 		socket.poll();
 
 		if ( !active )
@@ -66,14 +67,14 @@ namespace ooe
 		return 0;
 	}
 
-//--- ipc::link_client ---------------------------------------------------------
-	ipc::link_client::link_client( const std::string& name, transport& transport )
+//--- ipc::memory::link_client -------------------------------------------------
+	ipc::memory::link_client::link_client( const std::string& name, transport& transport )
 		: connect( local( local_name( name ) ) ), active( true ),
 		thread( make_function( *this, &link_client::call ), &transport )
 	{
 	}
 
-	ipc::link_client::~link_client( void )
+	ipc::memory::link_client::~link_client( void )
 	{
 		if ( !active )
 			return;
@@ -83,14 +84,14 @@ namespace ooe
 		thread.join();
 	}
 
-	ipc::link_client::operator bool( void ) const
+	ipc::memory::link_client::operator bool( void ) const
 	{
 		return active;
 	}
 
-	void* ipc::link_client::call( void* pointer )
+	void* ipc::memory::link_client::call( void* pointer )
 	{
-		ipc::transport& transport = *static_cast< ipc::transport* >( pointer );
+		memory::transport& transport = *static_cast< memory::transport* >( pointer );
 		connect.poll();
 
 		if ( !active )

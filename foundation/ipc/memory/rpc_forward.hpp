@@ -13,30 +13,33 @@ namespace ooe
 {
 	namespace ipc
 	{
-		class rpc_base;
+		namespace memory
+		{
+			class rpc_base;
 
-		template< typename >
-			struct rpc;
+			template< typename >
+				struct rpc;
 
 
-		inline const u8* validate( const u8* );
+			inline const u8* validate( const u8* );
+		}
 	}
 
-//--- ipc::rpc_base ------------------------------------------------------------
-	class ipc::rpc_base
+//--- ipc::memory::rpc_base ----------------------------------------------------
+	class ipc::memory::rpc_base
 	{
 	protected:
-		ipc::transport& transport;
+		memory::transport& transport;
 		const u32 index;
 
-		rpc_base( ipc::transport& transport_, u32 index_ )
+		rpc_base( memory::transport& transport_, u32 index_ )
 			: transport( transport_ ), index( index_ )
 		{
 		}
 	};
 
-//--- ipc ----------------------------------------------------------------------
-	inline const u8* ipc::validate( const u8* data )
+//--- ipc::memory --------------------------------------------------------------
+	inline const u8* ipc::memory::validate( const u8* data )
 	{
 		u32 type;
 		data += read< u32 >::call( data, type );
@@ -53,10 +56,10 @@ namespace ooe
 			const c8* what;
 			const c8* where;
 			stream_read< const c8*, const c8* >::call( data, what, where );
-			throw error::rpc() << what << "\n\nServer stack trace:" << where;
+			throw error::memory_rpc() << what << "\n\nServer stack trace:" << where;
 
 		default:
-			throw error::rpc() << "Unknown error code: " << type;
+			throw error::memory_rpc() << "Unknown error code: " << type;
 		}
 	}
 }
@@ -78,21 +81,24 @@ namespace ooe
 #if LIMIT != OOE_PP_LIMIT
 	namespace ipc
 	{
-		template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
-			struct rpc< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+		namespace memory
+		{
+			template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
+				struct rpc< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
 
-		template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-			struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+			template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+				struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+		}
 	}
 
-//--- ipc::rpc -----------------------------------------------------------------
+//--- ipc::memory::rpc ---------------------------------------------------------
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
-		struct ipc::rpc< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct ipc::memory::rpc< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 		: private rpc_base
 	{
 		typedef void result_type;
 
-		rpc( ipc::transport& transport_, u32 index_ )
+		rpc( memory::transport& transport_, u32 index_ )
 			: rpc_base( transport_, index_ )
 		{
 		}
@@ -122,12 +128,12 @@ namespace ooe
 	};
 
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct ipc::rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct ipc::memory::rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 		: private rpc_base
 	{
 		typedef typename no_ref< r >::type result_type;
 
-		rpc( ipc::transport& transport_, u32 index_ )
+		rpc( memory::transport& transport_, u32 index_ )
 			: rpc_base( transport_, index_ )
 		{
 		}

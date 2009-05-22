@@ -5,29 +5,32 @@
 
 #include <map>
 
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/switchboard.hpp"
-#include "foundation/ipc/memory/semaphore.hpp"
 #include "foundation/ipc/memory/link.hpp"
 
 namespace ooe
 {
 	namespace ipc
 	{
-		class servlet;
-		class server;
+		namespace memory
+		{
+			class servlet;
+			class server;
+		}
 	}
 
-//--- ipc::servlet -------------------------------------------------------------
-	class ipc::servlet
+//--- ipc::memory::servlet -----------------------------------------------------
+	class ipc::memory::servlet
 	{
 	public:
-		servlet( pid_t, u32, transport_type, const ipc::switchboard&, server& );
+		servlet( pid_t, u32, transport_type, const memory::switchboard&, server& );
 		~servlet( void );
 
 	private:
 		const u32 link_id;
-		const scoped_ptr< ipc::transport > transport;
-		const ipc::switchboard& switchboard;
+		const scoped_ptr< memory::transport > transport;
+		const memory::switchboard& switchboard;
 
 		scoped_ptr< const link_listen > listen;
 		atom<> active;
@@ -36,8 +39,8 @@ namespace ooe
 		void* call( void* );
 	};
 
-//--- ipc::server --------------------------------------------------------------
-	class ipc::server
+//--- ipc::memory::server ------------------------------------------------------
+	class ipc::memory::server
 	{
 	public:
 		server( transport_type, const std::string&, const switchboard& ) OOE_VISIBLE;
@@ -52,10 +55,10 @@ namespace ooe
 		typedef std::map< u32, shared_ptr< servlet > > servlet_map;
 
 		ipc::semaphore semaphore;
-		ipc::switchboard internal;
-		const ipc::switchboard& external;
+		memory::switchboard internal;
+		const memory::switchboard& external;
 		const transport_type type;
-		const scoped_ptr< ipc::transport > transport;
+		const scoped_ptr< memory::transport > transport;
 
 		u32 seed;
 		servlet_map servlets;

@@ -6,29 +6,29 @@ namespace
 {
 	using namespace ooe;
 
-	void ipc_find( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::write_buffer& buffer, ipc::pool& )
+	void ipc_find( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		const c8* name;
 		const c8* type;
 		ipc::stream_read< const c8*, const c8* >::call( data, name, type );
 
-		u32 value = static_cast< ipc::nameservice* >( any.pointer )->find( name, type );
+		u32 value = static_cast< ipc::memory::nameservice* >( any.pointer )->find( name, type );
 		up_t size = ipc::stream_size< u32 >::call( value );
 		ipc::stream_write< u32 >::call( return_write( tuple, buffer, size ), value );
 	}
 
-	void ipc_list( const any& any, const u8*, const ipc::buffer_tuple& tuple,
-		ipc::write_buffer& buffer, ipc::pool& )
+	void ipc_list( const any& any, const u8*, const ipc::memory::buffer_tuple& tuple,
+		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
-		typedef ipc::nameservice::list_type list_type;
-		list_type value = static_cast< ipc::nameservice* >( any.pointer )->list();
+		typedef ipc::memory::nameservice::list_type list_type;
+		list_type value = static_cast< ipc::memory::nameservice* >( any.pointer )->list();
 		up_t size = ipc::stream_size< list_type >::call( value );
 		ipc::stream_write< list_type >::call( return_write( tuple, buffer, size ), value );
 	}
 
-	void ipc_find_all( const any& any, const u8* data, const ipc::buffer_tuple& tuple,
-		ipc::write_buffer& buffer, ipc::pool& )
+	void ipc_find_all( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		typedef std::vector< ooe::tuple< std::string, std::string > > in_type;
 		in_type in;
@@ -38,7 +38,8 @@ namespace
 		out_type out;
 		out.reserve( in.size() );
 
-		ipc::nameservice& nameservice = *static_cast< ipc::nameservice* >( any.pointer );
+		ipc::memory::nameservice& nameservice =
+			*static_cast< ipc::memory::nameservice* >( any.pointer );
 
 		for ( in_type::const_iterator i = in.begin(), end = in.end(); i != end; ++i )
 			out.push_back( nameservice.find( i->_0, i->_1 ) );
@@ -50,8 +51,8 @@ namespace
 
 namespace ooe
 {
-//--- ipc::nameservice ---------------------------------------------------------
-	ipc::nameservice::nameservice( void )
+//--- ipc::memory::nameservice ---------------------------------------------------------
+	ipc::memory::nameservice::nameservice( void )
 		: switchboard(), map()
 	{
 		if ( switchboard.insert_direct( ipc_find, this ) != 1 )
@@ -64,18 +65,18 @@ namespace ooe
 			throw error::runtime( "ipc::nameservice: " ) << "\"find_all\" not at index 3";
 	}
 
-	ipc::nameservice::operator const ipc::switchboard&( void ) const
+	ipc::memory::nameservice::operator const memory::switchboard&( void ) const
 	{
 		return switchboard;
 	}
 
-	u32 ipc::nameservice::find( const std::string& name, const std::string& type ) const
+	u32 ipc::memory::nameservice::find( const std::string& name, const std::string& type ) const
 	{
 		map_type::const_iterator i = map.find( map_tuple( name, type ) );
 		return i == map.end() ? -1 : i->second;
 	}
 
-	ipc::nameservice::list_type ipc::nameservice::list( void ) const
+	ipc::memory::nameservice::list_type ipc::memory::nameservice::list( void ) const
 	{
 		list_type value;
 		value.reserve( map.size() );
@@ -86,7 +87,7 @@ namespace ooe
 		return value;
 	}
 
-	void ipc::nameservice::
+	void ipc::memory::nameservice::
 		insert_direct( const std::string& name, const std::string& type, u32 index )
 	{
 		map.insert( map_type::value_type( map_tuple( name, type ), index ) );

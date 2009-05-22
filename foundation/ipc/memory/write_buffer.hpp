@@ -11,12 +11,15 @@ namespace ooe
 {
 	namespace ipc
 	{
-		typedef tuple< u8*, up_t > buffer_tuple;
-		class write_buffer;
+		namespace memory
+		{
+			typedef tuple< u8*, up_t > buffer_tuple;
+			class write_buffer;
+		}
 	}
 
-//--- ipc::write_buffer --------------------------------------------------------
-	class ipc::write_buffer
+//--- ipc::memory::write_buffer ------------------------------------------------
+	class ipc::memory::write_buffer
 	{
 	public:
 		write_buffer( buffer_tuple tuple, up_t size )

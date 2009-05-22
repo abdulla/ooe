@@ -3,8 +3,9 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
 
+#include "foundation/ipc/name.hpp"
+#include "foundation/ipc/shared_memory.hpp"
 #include "foundation/ipc/traits.hpp"
-#include "foundation/ipc/memory/write_buffer.hpp"
 
 namespace ooe
 {
@@ -51,42 +52,42 @@ namespace ooe
 	{
 	public:
 		jumbo( void )
-			: buffer()
+			: memory()
 		{
 		}
 
 		jumbo( const std::string& name_ )
-			: buffer( new write_buffer( name_, 0 ) )
+			: memory( new shared_memory( name_ ) )
 		{
 		}
 
 		std::string name( void ) const
 		{
-			if ( !buffer )
+			if ( !memory )
 				throw error::runtime( "ipc::jumbo: " ) << "Jumbo is uninitialised";
 
-			return buffer->name();
+			return memory->name();
 		}
 
 		void operator ()( const type& value )
 		{
 			up_t size = stream_size< type >::call( value );
-			buffer = new write_buffer( buffer_tuple( 0, 0 ), size );
-			stream_write< type >::call( buffer->get(), value );
+			memory = new shared_memory( unique_name(), shared_memory::create, size );
+			stream_write< type >::call( memory->as< u8 >(), value );
 		}
 
 		operator type( void ) const
 		{
-			if ( !buffer )
+			if ( !memory )
 				throw error::runtime( "ipc::jumbo: " ) << "Jumbo is uninitialised";
 
 			type value;
-			stream_read< type >::call( buffer->get(), value );
+			stream_read< type >::call( memory->as< u8 >(), value );
 			return value;
 		}
 
 	private:
-		shared_ptr< write_buffer > buffer;
+		shared_ptr< shared_memory > memory;
 	};
 
 //--- ipc::traits: jumbo -------------------------------------------------------

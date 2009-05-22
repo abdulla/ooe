@@ -1,8 +1,8 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/environment.hpp"
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/shared_memory.hpp"
-#include "foundation/ipc/memory/semaphore.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/utility/atom.hpp"
@@ -13,7 +13,7 @@ namespace
 
 //--- transport_spinlock -------------------------------------------------------
 	class transport_spinlock
-		: public ipc::transport
+		: public ipc::memory::transport
 	{
 	public:
 		transport_spinlock( const std::string&, type );
@@ -21,7 +21,7 @@ namespace
 
 		virtual void wait( wait_type, const void* );
 		virtual void notify( void );
-		virtual ipc::buffer_tuple get( void ) const;
+		virtual ipc::memory::buffer_tuple get( void ) const;
 
 		virtual void wake_wait( void );
 		virtual void wake_notify( void );
@@ -57,10 +57,10 @@ namespace
 		while ( state ) {}
 	}
 
-	ipc::buffer_tuple transport_spinlock::get( void ) const
+	ipc::memory::buffer_tuple transport_spinlock::get( void ) const
 	{
 		up_t size = sizeof( atom<> );
-		return ipc::buffer_tuple( memory.as< u8 >() + size, memory.size() - size );
+		return ipc::memory::buffer_tuple( memory.as< u8 >() + size, memory.size() - size );
 	}
 
 	void transport_spinlock::wake_wait( void )
@@ -83,7 +83,7 @@ namespace
 
 //--- transport_semaphore ------------------------------------------------------
 	class transport_semaphore
-		: public ipc::transport
+		: public ipc::memory::transport
 	{
 	public:
 		transport_semaphore( const std::string&, type );
@@ -91,7 +91,7 @@ namespace
 
 		virtual void wait( wait_type, const void* );
 		virtual void notify( void );
-		virtual ipc::buffer_tuple get( void ) const;
+		virtual ipc::memory::buffer_tuple get( void ) const;
 
 		virtual void wake_wait( void );
 		virtual void wake_notify( void );
@@ -123,9 +123,9 @@ namespace
 		semaphore_out.down();
 	}
 
-	ipc::buffer_tuple transport_semaphore::get( void ) const
+	ipc::memory::buffer_tuple transport_semaphore::get( void ) const
 	{
-		return ipc::buffer_tuple( memory.as< u8 >(), memory.size() );
+		return ipc::memory::buffer_tuple( memory.as< u8 >(), memory.size() );
 	}
 
 	void transport_semaphore::wake_wait( void )
@@ -148,13 +148,15 @@ namespace
 
 namespace ooe
 {
-//--- ipc ----------------------------------------------------------------------
-	ipc::transport* ipc::create_spinlock( const std::string& name, transport::type mode )
+//--- ipc::memory ----------------------------------------------------------------------
+	ipc::memory::transport* ipc::memory::
+		create_spinlock( const std::string& name, transport::type mode )
 	{
 		return new transport_spinlock( name, mode );
 	}
 
-	ipc::transport* ipc::create_semaphore( const std::string& name, transport::type mode )
+	ipc::memory::transport* ipc::memory::
+		create_semaphore( const std::string& name, transport::type mode )
 	{
 		return new transport_semaphore( name, mode );
 	}

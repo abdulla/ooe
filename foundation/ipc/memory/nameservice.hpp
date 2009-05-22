@@ -9,11 +9,14 @@ namespace ooe
 {
 	namespace ipc
 	{
-		class nameservice;
+		namespace memory
+		{
+			class nameservice;
+		}
 	}
 
-//--- ipc::nameservice ---------------------------------------------------------
-	class ipc::nameservice
+//--- ipc::memory::nameservice ---------------------------------------------------------
+	class ipc::memory::nameservice
 		: private noncopyable
 	{
 	public:
@@ -22,7 +25,7 @@ namespace ooe
 
 		nameservice( void ) OOE_VISIBLE;
 
-		operator const ipc::switchboard&( void ) const OOE_VISIBLE;
+		operator const memory::switchboard&( void ) const OOE_VISIBLE;
 		u32 find( const std::string&, const std::string& ) const;
 		list_type list( void ) const;
 		void insert_direct( const std::string&, const std::string&, u32 ) OOE_VISIBLE;
@@ -46,7 +49,7 @@ namespace ooe
 	private:
 		typedef std::map< map_tuple, u32 > map_type;
 
-		ipc::switchboard switchboard;
+		memory::switchboard switchboard;
 		map_type map;
 	};
 }

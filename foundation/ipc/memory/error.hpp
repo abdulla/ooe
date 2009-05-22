@@ -16,19 +16,19 @@ namespace ooe
 			exception
 		};
 
-		struct rpc;
+		struct memory_rpc;
 		struct connection;
 	}
 
-	struct OOE_VISIBLE error::rpc
+	struct OOE_VISIBLE error::memory_rpc
 		: virtual public runtime
 	{
-		rpc( void )
-			: runtime( "ipc::rpc: " )
+		memory_rpc( void )
+			: runtime( "ipc::memory::rpc: " )
 		{
 		}
 
-		virtual ~rpc( void ) throw()
+		virtual ~memory_rpc( void ) throw()
 		{
 		}
 	};
@@ -37,7 +37,7 @@ namespace ooe
 		: virtual public runtime
 	{
 		connection( void )
-			: runtime( "ipc::rpc: " )
+			: runtime( "ipc::memory::rpc: " )
 		{
 			*this << "Connection down";
 		}
