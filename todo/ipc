@@ -7,9 +7,5 @@ asynchronous rpc wrapper
 	- have an async_client, wraps a client with background thread
 	- have result template that can block on result of async rpc call
 
-could use sendfile or equivalent to pass data to /dev/null
-	- data would not have to be copied to user-space and the kernel could destroy the buffers
-	- splice() seems like the only credible solution, need to make platform specific use and test
-
 could modify usage of write_buffer in switchboard for memory-based ipc, and unify
 	- not have so many parameters to the callbacks and reuse the write_buffer

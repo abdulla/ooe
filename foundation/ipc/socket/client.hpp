@@ -5,7 +5,7 @@
 
 #include <map>
 
-#include "foundation/io/socket.hpp"
+#include "foundation/ipc/socket/client_forward.hpp"
 #include "foundation/ipc/socket/header.hpp"
 #include "foundation/ipc/socket/write_buffer.hpp"
 #include "foundation/executable/environment.hpp"
@@ -30,6 +30,7 @@ namespace ooe
 
 //--- ipc::socket::client ------------------------------------------------------
 	class OOE_VISIBLE ipc::socket::client
+		: private platform::ipc::socket::client
 	{
 	public:
 		typedef tuple< array_type, bool > map_tuple;

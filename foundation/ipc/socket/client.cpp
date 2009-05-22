@@ -7,8 +7,8 @@ namespace ooe
 {
 //--- ipc::socket::client ------------------------------------------------------
 	ipc::socket::client::client( const address& address )
-		: connect( address ), buffer(), map(), in( 0 ), out( 0 ), mutex(), condition(),
-		thread( make_function( *this, &client::call ), 0 )
+		: platform::ipc::socket::client(), connect( address ), buffer(), map(), in( 0 ), out( 0 ),
+		mutex(), condition(), thread( make_function( *this, &client::call ), 0 )
 	{
 	}
 
@@ -78,14 +78,14 @@ namespace ooe
 				done = false;
 			}
 
-			array_type array = header_read( connect, size );
-
 			{
 				lock lock( mutex );
 				map_type::iterator i = map.find( ++in );
 
 				if ( i != map.end() )
-					i->second = map_tuple( array, done );
+					i->second = map_tuple( header_read( connect, size ), done );
+				else
+					splice( connect, size );	// data not needed, splice out of stream
 			}
 
 			condition.notify_one();
