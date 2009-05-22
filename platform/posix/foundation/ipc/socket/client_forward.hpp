@@ -21,7 +21,7 @@ namespace ooe
 	class platform::ipc::socket::client
 	{
 	protected:
-		descriptor null;
+		ooe::descriptor null;
 
 		client( void );
 

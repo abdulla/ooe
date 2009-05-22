@@ -6,7 +6,7 @@ namespace ooe
 {
 //--- platform::ipc::socket::client --------------------------------------------
 	platform::ipc::socket::client::client( void )
-		: null( "/dev/null", descriptor::write )
+		: null( "/dev/null", ooe::descriptor::write )
 	{
 	}
 
