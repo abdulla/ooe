@@ -88,8 +88,8 @@ namespace
 	void vector_test( const ipc_vector& v )
 	{
 		std::cout << "vector_test - ";
-		typedef std::ostream_iterator< ipc_vector::value_type > iterator_type;
-		std::copy( v.begin(), v.end(), iterator_type( std::cout, "" ) );
+		typedef std::ostream_iterator< ipc_vector::value_type > iterator;
+		std::copy( v.begin(), v.end(), iterator( std::cout, "" ) );
 		std::cout << '\n';
 	}
 

@@ -19,12 +19,12 @@ namespace ooe
 		global[ "fragment" ] = shader::fragment;
 		vm.load( "effect", desc );
 
-		typedef lua::table::iterator iterator_type;
+		typedef lua::table::iterator iterator;
 		lua::table table = global[ "table" ];
 
-		for ( iterator_type i = table.begin(), end = table.end(); i != end; ++i )
+		for ( iterator i = table.begin(), end = table.end(); i != end; ++i )
 		{
-			const iterator_type::value_type value( *i );
+			const iterator::value_type value( *i );
 			scoped_ptr< ooe::shader > shader( video.shader( value.second ) );
 			memory memory( vfs[ value.first ] );
 			shader->compile( memory.as< c8 >(), memory.size() );

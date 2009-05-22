@@ -65,12 +65,12 @@ namespace ooe
 		global[ "root" ] = path.root;
 		vm.load( "setup_vfs", descriptor( path.vfs ) );
 
-		typedef lua::table::iterator iterator_type;
+		typedef lua::table::iterator iterator;
 		lua::table table = global[ "table" ];
 
-		for ( iterator_type i = table.begin(), end = table.end(); i != end; ++i )
+		for ( iterator i = table.begin(), end = table.end(); i != end; ++i )
 		{
-			const iterator_type::value_type& value = *i;
+			const iterator::value_type& value = *i;
 			vfs.insert( value.first, value.second );
 		}
 
