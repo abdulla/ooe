@@ -5,12 +5,6 @@
 
 #include "foundation/utility/error.hpp"
 
-#if defined( __linux__ )
-	#define OOE_NOEXIST ENOENT
-#elif defined( __APPLE__ )
-	#define OOE_NOEXIST EINVAL
-#endif
-
 namespace ooe
 {
 	namespace error

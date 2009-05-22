@@ -2,8 +2,8 @@
 
 #include <iostream>
 
+#include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/client.hpp"
-#include "foundation/ipc/memory/name.hpp"
 #include "foundation/ipc/memory/rpc_forward.hpp"
 #include "foundation/ipc/memory/semaphore.hpp"
 

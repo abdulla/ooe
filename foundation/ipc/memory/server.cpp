@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "foundation/ipc/memory/name.hpp"
+#include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
 namespace

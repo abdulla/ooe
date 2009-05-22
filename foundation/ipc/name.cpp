@@ -2,7 +2,7 @@
 
 #include <paths.h>
 
-#include "foundation/ipc/memory/name.hpp"
+#include "foundation/ipc/name.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/convert.hpp"
 

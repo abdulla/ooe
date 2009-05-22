@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_MEMORY_NAME_HPP
-#define OOE_FOUNDATION_IPC_MEMORY_NAME_HPP
+#ifndef OOE_FOUNDATION_IPC_NAME_HPP
+#define OOE_FOUNDATION_IPC_NAME_HPP
 
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
@@ -16,4 +16,4 @@ namespace ooe
 	}
 }
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_NAME_HPP
+#endif	// OOE_FOUNDATION_IPC_NAME_HPP

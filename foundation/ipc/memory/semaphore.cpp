@@ -6,7 +6,7 @@
 
 #include <fcntl.h>
 
-#include "foundation/ipc/memory/error.hpp"
+#include "foundation/ipc/error.hpp"
 #include "foundation/ipc/memory/semaphore.hpp"
 
 namespace ooe

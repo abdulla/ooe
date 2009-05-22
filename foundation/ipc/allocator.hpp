@@ -1,14 +1,14 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_MEMORY_ALLOCATOR_HPP
-#define OOE_FOUNDATION_IPC_MEMORY_ALLOCATOR_HPP
+#ifndef OOE_FOUNDATION_IPC_ALLOCATOR_HPP
+#define OOE_FOUNDATION_IPC_ALLOCATOR_HPP
 
 #include <vector>
 
 #include "foundation/executable/environment.hpp"
+#include "foundation/ipc/name.hpp"
+#include "foundation/ipc/shared_memory.hpp"
 #include "foundation/ipc/traits.hpp"
-#include "foundation/ipc/memory/name.hpp"
-#include "foundation/ipc/memory/shared_memory.hpp"
 #include "foundation/utility/error.hpp"
 
 namespace ooe
@@ -251,4 +251,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_ALLOCATOR_HPP
+#endif	// OOE_FOUNDATION_IPC_ALLOCATOR_HPP

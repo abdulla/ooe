@@ -8,10 +8,9 @@
 
 #include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
-#include "foundation/ipc/memory/allocator.hpp"
+#include "foundation/ipc/allocator.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/jumbo.hpp"
-#include "foundation/ipc/memory/name.hpp"
 #include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/ipc/memory/rpc.hpp"

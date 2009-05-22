@@ -3,8 +3,8 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_BUFFER_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_BUFFER_HPP
 
-#include "foundation/ipc/memory/name.hpp"
-#include "foundation/ipc/memory/shared_memory.hpp"
+#include "foundation/ipc/name.hpp"
+#include "foundation/ipc/shared_memory.hpp"
 #include "foundation/utility/error.hpp"
 
 namespace ooe
