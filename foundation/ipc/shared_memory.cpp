@@ -70,6 +70,10 @@ namespace ooe
 	{
 	}
 
+	ipc::shared_memory::~shared_memory( void )
+	{
+	}
+
 	std::string ipc::shared_memory::name( void ) const
 	{
 		return shared_memory_base::id ? shared_memory_base::id->name : std::string();

@@ -36,6 +36,8 @@ namespace ooe
 		};
 
 		shared_memory( const std::string&, type = open, up_t = 0 );
+		~shared_memory( void );
+
 		std::string name( void ) const;
 		void unlink( void );
 
