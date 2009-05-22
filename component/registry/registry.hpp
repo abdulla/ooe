@@ -70,10 +70,10 @@ namespace ooe
 		virtual list_type interface_list( void ) const;
 
 		u32 find( const std::string& ) const;
-		ipc::client& get( void ) const;
+		ipc::memory::client& get( void ) const;
 
 	private:
-		mutable ipc::client client;
+		mutable ipc::memory::client client;
 	};
 
 //--- registry -----------------------------------------------------------------
@@ -86,7 +86,7 @@ namespace ooe
 		module_type find( const std::string&, module::type ) const;
 
 	private:
-		mutable ipc::client client;
+		mutable ipc::memory::client client;
 	};
 }
 

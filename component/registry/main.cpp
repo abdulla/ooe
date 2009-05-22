@@ -5,7 +5,7 @@
 
 #include "component/registry/registry.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/ipc/memory/semaphore.hpp"
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
 namespace
@@ -58,11 +58,11 @@ namespace
 	{
 		self = root + name;
 
-		ipc::switchboard switchboard;
+		ipc::memory::switchboard switchboard;
 		switchboard.insert( insert );
 		switchboard.insert( find );
 
-		ipc::server server( ipc::create_semaphore, "/ooe.registry", switchboard );
+		ipc::memory::server server( ipc::memory::create_semaphore, "/ooe.registry", switchboard );
 
 		while ( !executable::signal() )
 			server.decode();
@@ -71,8 +71,8 @@ namespace
 	//--- surrogate ------------------------------------------------------------
 	void surrogate( const std::string& path, const std::string& /*module_name*/ )
 	{
-		ipc::switchboard switchboard;
-		ipc::server server( ipc::create_semaphore, path, switchboard );
+		ipc::memory::switchboard switchboard;
+		ipc::memory::server server( ipc::memory::create_semaphore, path, switchboard );
 
 		{
 			std::string gate = path + ".g";

@@ -43,7 +43,7 @@ namespace ooe
 
 //--- module_external ----------------------------------------------------------
 	module_external::module_external( const std::string& path )
-		: client( ipc::create_semaphore, path )
+		: client( ipc::memory::create_semaphore, path )
 	{
 	}
 
@@ -54,7 +54,7 @@ namespace ooe
 
 	u32 module_external::find( const std::string& interface ) const
 	{
-		typedef ipc::rpc< u32 ( const std::string& ) > rpc_type;
+		typedef ipc::memory::rpc< u32 ( const std::string& ) > rpc_type;
 		return rpc_type( client, 1 )( interface );
 	}
 
@@ -63,27 +63,27 @@ namespace ooe
 		return list_type();
 	}
 
-	ipc::client& module_external::get( void ) const
+	ipc::memory::client& module_external::get( void ) const
 	{
 		return client;
 	}
 
 //--- registry -----------------------------------------------------------------
 	registry::registry( void )
-		: client( ipc::create_semaphore, "/ooe.registry" )
+		: client( ipc::memory::create_semaphore, "/ooe.registry" )
 	{
 	}
 
 	void registry::insert( const std::string& path, module::type type )
 	{
-		typedef ipc::rpc< void ( const std::string&, module::type ) > rpc_type;
+		typedef ipc::memory::rpc< void ( const std::string&, module::type ) > rpc_type;
 		rpc_type( client, 1 )( path, type );
 	}
 
 	module_type registry::find( const std::string& name, module::type type ) const
 	{
 		typedef tuple< std::string, module::type > tuple_type;
-		typedef ipc::rpc< tuple_type ( const std::string&, module::type ) > rpc_type;
+		typedef ipc::memory::rpc< tuple_type ( const std::string&, module::type ) > rpc_type;
 		tuple_type tuple = rpc_type( client, 2 )( name, type );
 
 		return tuple._1 == module::internal ?

@@ -9,8 +9,8 @@
 #include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
 #include "foundation/ipc/allocator.hpp"
+#include "foundation/ipc/jumbo.hpp"
 #include "foundation/ipc/memory/client.hpp"
-#include "foundation/ipc/memory/jumbo.hpp"
 #include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
@@ -74,9 +74,9 @@ namespace
 	typedef ipc::vector< c8 > ipc_vector;
 	typedef ipc::jumbo< const c8* > jumbo_type;
 
-	u32 test( u32 i, u32 j, const std::string& s, const tuple_type& t, const vector_type& v )
+	u32 test( u32 i, u32 j, const tuple_type& t, const vector_type& v )
 	{
-		std::cout << "test - " << i << " " << j << " " << s << '\n';
+		std::cout << "test - " << i << " " << j << '\n';
 		std::cout << "test - " << t << '\n';
 		std::cout << "test - ";
 		std::copy( v.begin(), v.end(), std::ostream_iterator< std::string >( std::cout, " " ) );
@@ -129,32 +129,32 @@ namespace
 //--- test ---------------------------------------------------------------------
 	void client_test( void )
 	{
-		ipc::client client( ipc::create_semaphore, "/ooe" );
-		ipc::list list( client );
-		ipc::list::result_type result_1 = list();
+		ipc::memory::client client( ipc::memory::create_semaphore, "/ooe" );
+		ipc::memory::list list( client );
+		ipc::memory::list::result_type result_1 = list();
 
-		typedef ipc::list::result_type::const_iterator list_iterator;
+		typedef ipc::memory::list::result_type::const_iterator list_iterator;
 
 		for ( list_iterator i = result_1.begin(), end = result_1.end(); i != end; ++i )
 			std::cout << "list = " << i->_0 << " " << i->_1 << '\n';
 
 		//----------------------------------------------------------------------
-		ipc::find find( client );
+		ipc::memory::find find( client );
 		u32 value = find( "test", typeid( test ).name() );
 		std::cout << "find = " << value << '\n';
 
-		ipc::rpc< u32 ( u32, u32, const std::string&, const tuple_type&, const vector_type& ) >
+		ipc::memory::rpc< u32 ( u32, u32, const tuple_type&, const vector_type& ) >
 			test( client, value );
-		value = test( 5, 7, "foobar", tuple_type( "hello", "world" ), vector_type( 3, "string" ) );
+		value = test( 5, 7, tuple_type( "hello", "world" ), vector_type( 3, "string" ) );
 		std::cout << "test = " << value << '\n';
 
 		//----------------------------------------------------------------------
-		ipc::find_all find_all( client );
-		ipc::find_all::tuple_type tuple( "null", typeid( null ).name() );
-		ipc::find_all::parameter_type parameter( 3, tuple );
-		ipc::find_all::result_type result_2 = find_all( parameter );
+		ipc::memory::find_all find_all( client );
+		ipc::memory::find_all::tuple_type tuple( "null", typeid( null ).name() );
+		ipc::memory::find_all::parameter_type parameter( 3, tuple );
+		ipc::memory::find_all::result_type result_2 = find_all( parameter );
 
-		typedef ipc::find_all::result_type::const_iterator find_iterator;
+		typedef ipc::memory::find_all::result_type::const_iterator find_iterator;
 
 		for ( find_iterator i = result_2.begin(), end = result_2.end(); i != end; ++i )
 			std::cout << "find_all = " << *i << '\n';
@@ -165,7 +165,7 @@ namespace
 			vector.insert( vector.end(), 64, '.' );
 			std::cout << "vector name = " << vector.get_allocator().name() << '\n';
 
-			ipc::call< void ( const ipc_vector& ) > vector_test( client, "vector_test" );
+			ipc::memory::call< void ( const ipc_vector& ) > vector_test( client, "vector_test" );
 			vector_test( vector );
 		}
 
@@ -175,27 +175,27 @@ namespace
 			jumbo( "a brimful of asha" );
 			std::cout << "jumbo name = " << jumbo.name() << '\n';
 
-			ipc::call< void ( const jumbo_type& ) > jumbo_test( client, "jumbo_test" );
+			ipc::memory::call< void ( const jumbo_type& ) > jumbo_test( client, "jumbo_test" );
 			jumbo_test( jumbo );
 		}
 
 		//----------------------------------------------------------------------
-		ipc::call< void ( const vector_type& ) > inline_test( client, "inline_test" );
+		ipc::memory::call< void ( const vector_type& ) > inline_test( client, "inline_test" );
 		inline_test( vector_type( 10 * 1024, "." ) );
 
 		//----------------------------------------------------------------------
-		ipc::call< ipc::construct_ptr< print > ( void ) >
+		ipc::memory::call< ipc::construct_ptr< print > ( void ) >
 			print_construct( client, "print_construct" );
 		print* p = print_construct();
 
-		ipc::call< void ( print* ) > printer( client, "printer" );
+		ipc::memory::call< void ( print* ) > printer( client, "printer" );
 		printer( p );
 
-		ipc::call< u32 ( print*, u32, u32 ) > multiply( client, "multiply" );
+		ipc::memory::call< u32 ( print*, u32, u32 ) > multiply( client, "multiply" );
 		value = multiply( p, 2, 8 );
 		std::cout << "multiply( " << p << ", 2, 8 ) = " << value << '\n';
 
-		ipc::call< void ( ipc::destruct_ptr< print > ) >
+		ipc::memory::call< void ( ipc::destruct_ptr< print > ) >
 			print_destruct( client, "print_destruct" );
 		print_destruct( p );
 
@@ -203,7 +203,7 @@ namespace
 		std::cout << "leaking = " << print_construct() << '\n';	// leak
 
 		//----------------------------------------------------------------------
-		ipc::call< void ( void ) > null( client, "null" );
+		ipc::memory::call< void ( void ) > null( client, "null" );
 		timer timer;
 
 		for ( up_t i = 0; i != iteration_limit; ++i )
@@ -215,29 +215,29 @@ namespace
 
 	void client_fail( void )
 	{
-		ipc::client client( ipc::create_semaphore, "/ooe" );
+		ipc::memory::client client( ipc::memory::create_semaphore, "/ooe" );
 
-		ipc::rpc< void ( void ) > out_of_range( client, static_cast< u32 >( -1 ) );
+		ipc::memory::rpc< void ( void ) > out_of_range( client, static_cast< u32 >( -1 ) );
 		OOE_PRINT( "CLIENT_FAIL", out_of_range() );	// throw!
 
-		ipc::find_all find_all( client );
-		ipc::find_all::tuple_type tuple( "no_function", "no_type" );
-		ipc::find_all::parameter_type parameter( 3, tuple );
+		ipc::memory::find_all find_all( client );
+		ipc::memory::find_all::tuple_type tuple( "no_function", "no_type" );
+		ipc::memory::find_all::parameter_type parameter( 3, tuple );
 		OOE_PRINT( "\nCLIENT_FAIL", find_all( parameter ) );
 
-		ipc::call< void ( print* ) > printer( client, "printer" );
+		ipc::memory::call< void ( print* ) > printer( client, "printer" );
 		OOE_PRINT( "\nCLIENT_FAIL", printer( 0 ) );
 
-		ipc::call< void ( void ) > unknown( client, "unknown" );
+		ipc::memory::call< void ( void ) > unknown( client, "unknown" );
 		OOE_PRINT( "\nCLIENT_FAIL", unknown() );
 	}
 
 	void client_ptr( void )
 	{
-		ipc::client client( ipc::create_semaphore, "/ooe" );
-		ipc::call< ipc::construct_ptr< print > ( void ) >
+		ipc::memory::client client( ipc::memory::create_semaphore, "/ooe" );
+		ipc::memory::call< ipc::construct_ptr< print > ( void ) >
 			print_construct( client, "print_construct" );
-		ipc::call< void ( print* ) > printer( client, "printer" );
+		ipc::memory::call< void ( print* ) > printer( client, "printer" );
 		std::set< print* > set;
 
 		for ( up_t i = 0; i != iteration_limit; ++i )
@@ -251,7 +251,7 @@ namespace
 
 	void server_test( void )
 	{
-		ipc::nameservice nameservice;
+		ipc::memory::nameservice nameservice;
 		nameservice.insert( "test", test );
 		nameservice.insert( "vector_test", vector_test );
 		nameservice.insert( "jumbo_test", jumbo_test );
@@ -263,7 +263,7 @@ namespace
 		nameservice.insert( "null", null );
 		nameservice.insert( "unknown", unknown );
 
-		ipc::server server( ipc::create_semaphore, "/ooe", nameservice );
+		ipc::memory::server server( ipc::memory::create_semaphore, "/ooe", nameservice );
 
 		while ( !executable::signal() )
 			server.decode();
@@ -305,7 +305,7 @@ namespace
 	}
 
 //--- run ----------------------------------------------------------------------
-	typedef ipc::rpc< void ( void ) > rpc_type;
+	typedef ipc::memory::rpc< void ( void ) > rpc_type;
 	typedef ipc::socket::rpc< void ( void ) > nrpc_type;
 
 	f32 run_ipc( const rpc_type& rpc, up_t limit )
@@ -329,7 +329,7 @@ namespace
 		return timer.elapsed();
 	}
 
-	f32 run_task_ipc( ipc::client& client, u32 value )
+	f32 run_task_ipc( ipc::memory::client& client, u32 value )
 	{
 		rpc_type null( client, value );
 		return run_ipc( null, iteration_limit );
@@ -347,10 +347,10 @@ namespace
 	}
 
 //--- client -------------------------------------------------------------------
-	f32 client_ipc( ipc::transport_type type )
+	f32 client_ipc( ipc::memory::transport_type type )
 	{
-		ipc::client client( type, "/ooe" );
-		ipc::find find( client );
+		ipc::memory::client client( type, "/ooe" );
+		ipc::memory::find find( client );
 		u32 value = find( "null", typeid( null ).name() );
 		rpc_type null( client, value );
 
@@ -367,18 +367,18 @@ namespace
 		return run_nipc( null, iteration_limit );
 	}
 
-	f32 client_task_ipc( ipc::transport_type type, up_t size )
+	f32 client_task_ipc( ipc::memory::transport_type type, up_t size )
 	{
-		typedef shared_ptr< ipc::client > client_pointer;
+		typedef shared_ptr< ipc::memory::client > client_pointer;
 		scoped_array< client_pointer > client_array( new client_pointer[ size ] );
 
 		for ( up_t i = 0; i != size; ++i )
-			client_array[ i ] = new ipc::client( type, "/ooe" );
+			client_array[ i ] = new ipc::memory::client( type, "/ooe" );
 
-		ipc::find find( *client_array[ 0 ] );
+		ipc::memory::find find( *client_array[ 0 ] );
 		u32 value = find( "null", typeid( null ).name() );
 
-		typedef unique_task< f32 ( ipc::client&, u32 ) > task_type;
+		typedef unique_task< f32 ( ipc::memory::client&, u32 ) > task_type;
 		typedef shared_ptr< task_type > task_pointer;
 		scoped_array< task_pointer > task_array( new task_pointer[ size ] );
 
@@ -419,12 +419,12 @@ namespace
 		return elapsed / static_cast< f32 >( size );
 	}
 
-	f32 client_inline_ipc( ipc::transport_type type, up_t size )
+	f32 client_inline_ipc( ipc::memory::transport_type type, up_t size )
 	{
-		ipc::client client( type, "/ooe" );
-		ipc::find find( client );
+		ipc::memory::client client( type, "/ooe" );
+		ipc::memory::find find( client );
 		u32 value = find( "null_inline", typeid( null_inline ).name() );
-		ipc::rpc< void ( const c8* ) > rpc( client, value );
+		ipc::memory::rpc< void ( const c8* ) > rpc( client, value );
 
 		std::string string( size - 1, 'i' );
 		timer timer;
@@ -452,12 +452,12 @@ namespace
 		return timer.elapsed();
 	}
 
-	f32 client_allocator( ipc::transport_type type, up_t size )
+	f32 client_allocator( ipc::memory::transport_type type, up_t size )
 	{
-		ipc::client client( type, "/ooe" );
-		ipc::find find( client );
+		ipc::memory::client client( type, "/ooe" );
+		ipc::memory::find find( client );
 		u32 value = find( "null_allocator", typeid( null_allocator ).name() );
-		ipc::rpc< void ( const ipc_vector& ) > rpc( client, value );
+		ipc::memory::rpc< void ( const ipc_vector& ) > rpc( client, value );
 
 		ipc_vector vector;
 		vector.insert( vector.end(), size - 1, 'a' );
@@ -471,12 +471,12 @@ namespace
 		return timer.elapsed();
 	}
 
-	f32 client_jumbo( ipc::transport_type type, up_t size )
+	f32 client_jumbo( ipc::memory::transport_type type, up_t size )
 	{
-		ipc::client client( type, "/ooe" );
-		ipc::find find( client );
+		ipc::memory::client client( type, "/ooe" );
+		ipc::memory::find find( client );
 		u32 value = find( "null_jumbo", typeid( null_jumbo ).name() );
-		ipc::rpc< void ( const jumbo_type& ) > rpc( client, value );
+		ipc::memory::rpc< void ( const jumbo_type& ) > rpc( client, value );
 
 		jumbo_type jumbo;
 		jumbo( std::string( size - 1, 'j' ).c_str() );
@@ -490,15 +490,15 @@ namespace
 	}
 
 //--- server -------------------------------------------------------------------
-	void server_ipc( ipc::transport_type type )
+	void server_ipc( ipc::memory::transport_type type )
 	{
-		ipc::nameservice nameservice;
+		ipc::memory::nameservice nameservice;
 		nameservice.insert( "null", null );
 		nameservice.insert( "null_inline", null_inline );
 		nameservice.insert( "null_allocator", null_allocator );
 		nameservice.insert( "null_jumbo", null_jumbo );
 
-		ipc::server server( type, "/ooe", nameservice );
+		ipc::memory::server server( type, "/ooe", nameservice );
 
 		while ( !executable::signal() )
 			server.decode();
@@ -524,11 +524,11 @@ namespace
 		switch ( index )
 		{
 		case 0:
-			elapsed = client_ipc( ipc::create_spinlock );
+			elapsed = client_ipc( ipc::memory::create_spinlock );
 			break;
 
 		case 1:
-			elapsed = client_ipc( ipc::create_semaphore );
+			elapsed = client_ipc( ipc::memory::create_semaphore );
 			break;
 
 		case 2:
@@ -553,12 +553,12 @@ namespace
 		switch ( index )
 		{
 		case 0:
-			server_ipc( ipc::create_spinlock );
+			server_ipc( ipc::memory::create_spinlock );
 			break;
 
 		case 4:
 		case 1:
-			server_ipc( ipc::create_semaphore );
+			server_ipc( ipc::memory::create_semaphore );
 			break;
 
 		case 2:
@@ -606,11 +606,11 @@ namespace
 		switch ( index )
 		{
 		case 0:
-			elapsed = client_task_ipc( ipc::create_spinlock, size );
+			elapsed = client_task_ipc( ipc::memory::create_spinlock, size );
 			break;
 
 		case 1:
-			elapsed = client_task_ipc( ipc::create_semaphore, size );
+			elapsed = client_task_ipc( ipc::memory::create_semaphore, size );
 			break;
 
 		case 2:
@@ -643,11 +643,11 @@ namespace
 		switch ( index )
 		{
 		case 0:
-			elapsed = client_inline_ipc( ipc::create_spinlock, size );
+			elapsed = client_inline_ipc( ipc::memory::create_spinlock, size );
 			break;
 
 		case 1:
-			elapsed = client_inline_ipc( ipc::create_semaphore, size );
+			elapsed = client_inline_ipc( ipc::memory::create_semaphore, size );
 			break;
 
 		case 2:
@@ -680,19 +680,19 @@ namespace
 		switch ( index )
 		{
 		case 0:
-			elapsed = client_allocator( ipc::create_spinlock, size );
+			elapsed = client_allocator( ipc::memory::create_spinlock, size );
 			break;
 
 		case 1:
-			elapsed = client_allocator( ipc::create_semaphore, size );
+			elapsed = client_allocator( ipc::memory::create_semaphore, size );
 			break;
 
 		case 2:
-			elapsed = client_jumbo( ipc::create_spinlock, size );
+			elapsed = client_jumbo( ipc::memory::create_spinlock, size );
 			break;
 
 		case 3:
-			elapsed = client_jumbo( ipc::create_semaphore, size );
+			elapsed = client_jumbo( ipc::memory::create_semaphore, size );
 			break;
 
 		default:
