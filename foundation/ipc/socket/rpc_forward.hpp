@@ -62,8 +62,6 @@ namespace ooe
 
 			if ( base->state == base_type::error )
 				except( array );
-
-			base->state = base_type::done;
 		}
 
 	private:
@@ -94,7 +92,6 @@ namespace ooe
 				except( array );
 
 			stream_read< type >::call( array, base->value );
-			base->state = base_type::done;
 			return base->value;
 		}
 

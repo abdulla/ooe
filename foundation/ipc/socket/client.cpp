@@ -33,9 +33,7 @@ namespace ooe
 			map.erase( result.i );
 		}
 
-		if ( !tuple._1 )
-			result.state = result_type::error;
-
+		result.state = tuple._1 ? result_type::done : result_type::error;
 		return tuple._0;
 	}
 
