@@ -58,7 +58,7 @@ namespace ooe
 			return;
 
 		active = false;
-		stream_write< bool, u32 >::call( transport->get()._0, true, 0 );
+		stream_write< u32, u32 >::call( transport->get()._0, true, 0 );
 		transport->wake_wait();
 		thread.join();
 	}
