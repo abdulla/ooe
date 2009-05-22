@@ -14,20 +14,12 @@ namespace ooe
 		struct shared_memory;
 	}
 
-//--- ipc::shared_memory_id ----------------------------------------------------
-	struct ipc::shared_memory_id
-	{
-		std::string name;
-
-		shared_memory_id( const std::string& );
-		~shared_memory_id( void ) OOE_VISIBLE;
-	};
-
 //--- ipc::shared_memory_base --------------------------------------------------
 	class ipc::shared_memory_base
 	{
 	public:
 		shared_memory_base( const std::string&, bool );
+		~shared_memory_base( void );
 
 	protected:
 		scoped_ptr< shared_memory_id > id;
