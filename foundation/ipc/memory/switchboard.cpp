@@ -7,8 +7,8 @@ namespace
 {
 	using namespace ooe;
 
-	void ipc_null( const any&, const u8*, const ipc::memory::buffer_tuple&,
-		ipc::memory::write_buffer&, ipc::pool& )
+	void ipc_null( const any&, const ipc::memory::buffer_tuple&, ipc::memory::write_buffer&,
+		ipc::pool& )
 	{
 	}
 
@@ -16,7 +16,7 @@ namespace
 		const c8* what, const c8* where )
 	{
 		up_t size = ipc::stream_size< const c8*, const c8* >::call( what, where );
-		u8* data = ipc::memory::return_write( tuple, buffer, size, error::exception );
+		u8* data = return_write( tuple, buffer, size, error::exception );
 		ipc::stream_write< const c8*, const c8* >::call( data, what, where );
 	}
 }
@@ -37,18 +37,17 @@ namespace ooe
 
 		try
 		{
-			write_buffer input( header_read( tuple._0 ), tuple._0 );
+			write_buffer( header_read( tuple._0 ), tuple._0 ).swap( buffer );
 
 			u32 index;
-			u8* data = input.get();
-			data += read< u32 >::call( data, index );
+			stream_read< u32 >::call( buffer.get(), index );
 
 			if ( index >= vector.size() )
 				throw error::runtime( "ipc::switchboard: " ) <<
 					"Unable to execute function, index " << index << " out of range";
 
 			const vector_tuple& args = vector[ index ];
-			args._0( args._1, data, tuple, buffer, pool );
+			args._0( args._1, tuple, buffer, pool );
 		}
 		catch ( error::runtime& error )
 		{

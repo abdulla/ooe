@@ -18,22 +18,22 @@ namespace
 		args._0.execute( tuple, *args._1, *args._2 );
 	}
 
-	void ipc_link( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+	void ipc_link( const any& any, const ipc::memory::buffer_tuple& tuple,
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		pid_t pid;
-		ipc::stream_read< pid_t >::call( data, pid );
+		ipc::stream_read< pid_t >::call( header_adjust( buffer ), pid );
 
 		u32 link = static_cast< ipc::memory::server* >( any.pointer )->link( pid );
 		up_t size = ipc::stream_size< u32 >::call( link );
 		ipc::stream_write< u32 >::call( return_write( tuple, buffer, size ), link );
 	}
 
-	void ipc_unlink( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+	void ipc_unlink( const any& any, const ipc::memory::buffer_tuple& tuple,
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		u32 link;
-		ipc::stream_read< u32 >::call( data, link );
+		ipc::stream_read< u32 >::call( header_adjust( buffer ), link );
 
 		static_cast< ipc::memory::server* >( any.pointer )->unlink( link );
 		return_write( tuple, buffer );

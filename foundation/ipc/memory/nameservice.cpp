@@ -6,19 +6,19 @@ namespace
 {
 	using namespace ooe;
 
-	void ipc_find( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+	void ipc_find( const any& any, const ipc::memory::buffer_tuple& tuple,
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		const c8* name;
 		const c8* type;
-		ipc::stream_read< const c8*, const c8* >::call( data, name, type );
+		ipc::stream_read< const c8*, const c8* >::call( header_adjust( buffer ), name, type );
 
 		u32 value = static_cast< ipc::memory::nameservice* >( any.pointer )->find( name, type );
 		up_t size = ipc::stream_size< u32 >::call( value );
 		ipc::stream_write< u32 >::call( return_write( tuple, buffer, size ), value );
 	}
 
-	void ipc_list( const any& any, const u8*, const ipc::memory::buffer_tuple& tuple,
+	void ipc_list( const any& any, const ipc::memory::buffer_tuple& tuple,
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		typedef ipc::memory::nameservice::list_type list_type;
@@ -27,12 +27,12 @@ namespace
 		ipc::stream_write< list_type >::call( return_write( tuple, buffer, size ), value );
 	}
 
-	void ipc_find_all( const any& any, const u8* data, const ipc::memory::buffer_tuple& tuple,
+	void ipc_find_all( const any& any, const ipc::memory::buffer_tuple& tuple,
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		typedef std::vector< ooe::tuple< std::string, std::string > > in_type;
 		in_type in;
-		ipc::stream_read< in_type >::call( data, in );
+		ipc::stream_read< in_type >::call( header_adjust( buffer ), in );
 
 		typedef std::vector< u32 > out_type;
 		out_type out;

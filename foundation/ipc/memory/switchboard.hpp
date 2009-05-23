@@ -34,8 +34,7 @@ namespace ooe
 	class ipc::memory::switchboard
 	{
 	public:
-		typedef void ( * call_type )
-			( const any&, const u8*, const buffer_tuple&, write_buffer&, pool& );
+		typedef void ( * call_type )( const any&, const buffer_tuple&, write_buffer&, pool& );
 
 		switchboard( void ) OOE_VISIBLE;
 
@@ -120,15 +119,15 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct ipc::memory::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			write_buffer& buffer, pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
+		static void call( const any& any, const buffer_tuple& tuple, write_buffer& buffer,
+			pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
 		{
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
 
 			BOOST_PP_REPEAT( LIMIT, ARGUMENT, ~ )
 			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+				call( header_adjust( buffer ) BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
@@ -139,15 +138,15 @@ namespace ooe
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct ipc::memory::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			write_buffer& buffer, pool& pool )
+		static void call( const any& any, const buffer_tuple& tuple, write_buffer& buffer,
+			pool& pool )
 		{
 			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
 
 			BOOST_PP_REPEAT( LIMIT, ARGUMENT, ~ )
 			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+				call( header_adjust( buffer ) BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
@@ -162,8 +161,8 @@ namespace ooe
 	template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::memory::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			write_buffer& buffer, pool& pool )
+		static void call( const any& any, const buffer_tuple& tuple, write_buffer& buffer,
+			pool& pool )
 		{
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );
@@ -171,7 +170,7 @@ namespace ooe
 			t0* a0;
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, ARGUMENT, ~ )
 			stream_read< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
-				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+				call( header_adjust( buffer ) BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			verify< t0* >::call( pool, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
@@ -183,8 +182,8 @@ namespace ooe
 	template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::memory::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			write_buffer& buffer, pool& pool )
+		static void call( const any& any, const buffer_tuple& tuple, write_buffer& buffer,
+			pool& pool )
 		{
 			typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );
@@ -192,7 +191,7 @@ namespace ooe
 			t0* a0;
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, ARGUMENT, ~ )
 			stream_read< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
-				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+				call( header_adjust( buffer ) BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			verify< t0* >::call( pool, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
