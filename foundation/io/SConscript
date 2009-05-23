@@ -10,8 +10,8 @@ build = setup.Finish()
 
 ### build ######################################################################
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libio.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libio.dylib' )
 
 files = Glob( '*.cpp' ) + Glob( platform + '/foundation/io/*.cpp' )
-out = build.SharedLibrary( '#/build/library/libio', files )
+out = build.SharedLibrary( '#library/libio', files )
 build.SideEffect( Glob( '*.rpo' ), out )

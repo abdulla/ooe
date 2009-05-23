@@ -16,21 +16,21 @@ for X in `seq $BEGIN $END`; do
 		LID=''
 
 		for N in `seq $Y`; do
-			./build/ipc_test -l 1 &
+			binary/ipc_test -l 1 &
 			LID="$LID $!"
 		done
 
-		./build/ipc_test -s $X &
+		binary/ipc_test -s $X &
 		PID=$!
 		sleep 1
 
 		for Z in `seq $I`; do
-			./build/ipc_test -c $X >> $FILE
+			binary/ipc_test -c $X >> $FILE
 			printf .
 		done
 
 		kill -9 $LID $PID
-		VALUES=`cat $FILE | ./script/stddev`
+		VALUES=`cat $FILE | script/stddev`
 		rm $FILE
 
 		printf "done\n\tMean (stddev) μs/call: %f (%f)\n" $VALUES

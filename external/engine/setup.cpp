@@ -19,7 +19,7 @@ namespace ooe
 	{
 		path.vfs = path.root + "../resource/vfs.lua";
 		path.settings = "settings.lua";
-		path.runtime = path.root + "library/libruntime";
+		path.runtime = path.root + "../library/libruntime";
 		up_t i;
 		up_t j;
 

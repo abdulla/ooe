@@ -2,7 +2,7 @@ Import( Split( 'name root' ) )
 build = root.Clone()
 
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libscene.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libscene.dylib' )
 
-out = build.SharedLibrary( '#build/library/libscene', Glob( '*.cpp' ) )
+out = build.SharedLibrary( '#library/libscene', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )

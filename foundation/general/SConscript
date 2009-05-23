@@ -17,9 +17,9 @@ build = setup.Finish()
 ### build ######################################################################
 if name == 'darwin':
 	build.Append( FRAMEWORKS = ooe.qtkit.framework )
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libgeneral.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libgeneral.dylib' )
 
 files = Glob( '*.cpp' ) + Glob( platform + '/foundation/general/*.cpp' )
 files += Glob( platform + '/foundation/general/*.mm' )
-out = build.SharedLibrary( '#/build/library/libgeneral', files )
+out = build.SharedLibrary( '#library/libgeneral', files )
 build.SideEffect( Glob( '*.rpo' ), out )

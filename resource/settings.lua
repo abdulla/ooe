@@ -1,6 +1,6 @@
 service =
 {
-	path = "library/libservice",
+	path = "../library/libservice",
 	input = true,
 	sight = false
 }
@@ -14,7 +14,7 @@ view =
 
 video =
 {
-	path = "library/libopengl",
+	path = "../library/libopengl",
 	sync = true
 }
 

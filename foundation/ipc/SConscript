@@ -3,9 +3,9 @@ build = root.Clone()
 build.Append( LIBS = ooe.rt.library )
 
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/library/libipc.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libipc.dylib' )
 
 files = Glob( '*.cpp' ) + Glob( 'memory/*.cpp' ) + Glob( 'socket/*.cpp' )
 files += Glob( platform + '/foundation/ipc/socket/*.cpp' )
-out = build.SharedLibrary( '#/build/library/libipc', files )
+out = build.SharedLibrary( '#library/libipc', files )
 build.SideEffect( Glob( '*.rpo' ), out )

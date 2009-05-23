@@ -15,7 +15,7 @@ flags_cxx += Split( '-Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wnon-virtual-
 	# -Wold-style-cast
 
 ### setup ######################################################################
-root = Environment( CPPPATH = '#', LIBPATH = '#/build/library', CXXFLAGS = flags_cxx )
+root = Environment( CPPPATH = '#', LIBPATH = '#library', CXXFLAGS = flags_cxx )
 #root.SetOption( 'silent', True )
 #root.SetOption( 'num_jobs', 4 )
 

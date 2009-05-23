@@ -3,8 +3,8 @@ build = root.Clone()
 build.Append( LIBS = Split( 'executable io ipc parallel registry' ) )
 
 if name == 'posix':
-	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
 
-out = build.Program( '#/build/component_test', Glob( '*.cpp' ) )
+out = build.Program( '#binary/component_test', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )
-build.Clean( out, '#/build/component_test.log' )
+build.Clean( out, '#binary/component_test.log' )

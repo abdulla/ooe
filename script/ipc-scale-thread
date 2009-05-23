@@ -13,17 +13,17 @@ for X in `seq $BEGIN $END`; do
 		I=50
 		printf "$Y threads, $I iterations"
 
-		./build/ipc_test -s $X &
+		binary/ipc_test -s $X &
 		PID=$!
 		sleep 1
 
 		for Z in `seq $I`; do
-			./build/ipc_test -t $X $Y >> $FILE
+			binary/ipc_test -t $X $Y >> $FILE
 			printf .
 		done
 
 		kill -9 $PID
-		VALUES=`cat $FILE | ./script/stddev`
+		VALUES=`cat $FILE | script/stddev`
 		rm $FILE
 
 		printf "done\n\tMean (stddev) μs/call: %f (%f)\n" $VALUES

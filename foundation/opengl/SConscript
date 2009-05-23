@@ -14,5 +14,5 @@ build = setup.Finish()
 ### build ######################################################################
 files = Glob( '*.cpp' ) + Glob( platform + '/foundation/opengl/*.cpp' )
 files += Glob( platform + '/foundation/opengl/*.mm' )
-out = build.SharedLibrary( '#/build/library/libopengl', files )
+out = build.SharedLibrary( '#library/libopengl', files )
 build.SideEffect( Glob( '*.rpo' ), out )

@@ -20,7 +20,7 @@ FILE=`mktemp`
 function spawn()
 {
 	for I in `seq $2`; do
-		./build/ipc_test -c $1 | bc -l > /tmp/result-$I &
+		binary/ipc_test -c $1 | bc -l > /tmp/result-$I &
 		LIST="$LIST $!"
 	done
 
@@ -42,7 +42,7 @@ for X in `seq $BEGIN $END`; do
 		I=50
 		printf "$Y processes, $I iterations"
 
-		./build/ipc_test -s $X &
+		binary/ipc_test -s $X &
 		PID=$!
 		sleep 1
 
@@ -52,7 +52,7 @@ for X in `seq $BEGIN $END`; do
 		done
 
 		kill -9 $PID
-		VALUES=`cat $FILE | ./script/stddev`
+		VALUES=`cat $FILE | script/stddev`
 		rm $FILE
 
 		printf "done\n\tMean (stddev) μs/call: %f (%f)\n" $VALUES

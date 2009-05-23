@@ -3,8 +3,8 @@ build = root.Clone()
 build.Append( LIBS = Split( 'executable general graph image io lua parallel' ) )
 
 if name == 'posix':
-	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
 
-out = build.Program( '#/build/tools', Glob( '*.cpp' ) )
+out = build.Program( '#binary/tools', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )
-build.Clean( out, '#/build/tools.log' )
+build.Clean( out, '#binary/tools.log' )

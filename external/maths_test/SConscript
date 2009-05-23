@@ -14,10 +14,10 @@ build.Append( CXXFLAGS = '-DOOE_EXTENSION=\\"' + build[ 'SHLIBSUFFIX' ] + '\\"' 
 build.Append( LIBS = Split( 'executable general io parallel' ) )
 
 if name == 'posix':
-	build.Append( RPATH = "'$$$${ORIGIN}/library'" )
+	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
 elif name == 'darwin':
 	build.Append( FRAMEWORKS = 'OpenGL' )
 
-out = build.Program( '#/build/maths_test', Glob( '*.cpp' ) )
+out = build.Program( '#binary/maths_test', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )
-build.Clean( out, '#/build/maths_test.log' )
+build.Clean( out, '#binary/maths_test.log' )
