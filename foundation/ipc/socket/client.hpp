@@ -55,6 +55,7 @@ namespace ooe
 		map_type map;
 		u32 in;
 		u32 out;
+		u32 notify;
 
 		ooe::mutex mutex;
 		ooe::condition condition;

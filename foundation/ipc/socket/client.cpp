@@ -8,7 +8,7 @@ namespace ooe
 //--- ipc::socket::client ------------------------------------------------------
 	ipc::socket::client::client( const address& address )
 		: platform::ipc::socket::client(), connect( address ), buffer(), map(), in( 0 ), out( 0 ),
-		mutex(), condition(), thread( make_function( *this, &client::call ), 0 )
+		notify( 0 ), mutex(), condition(), thread( make_function( *this, &client::call ), 0 )
 	{
 	}
 
@@ -26,8 +26,11 @@ namespace ooe
 		{
 			lock lock( mutex );
 
-			while ( result.i->first > in )
+			if ( result.i->first > in )
+			{
+				notify = result.i->first;
 				condition.wait( lock );
+			}
 
 			tuple = result.i->second;
 			map.erase( result.i );
@@ -78,17 +81,17 @@ namespace ooe
 				done = false;
 			}
 
-			{
-				lock lock( mutex );
-				map_type::iterator i = map.find( ++in );
 
-				if ( i != map.end() )
-					i->second = map_tuple( header_read( connect, size ), done );
-				else
-					splice( connect, size );	// data not needed, splice out of stream
-			}
+			lock lock( mutex );
+			map_type::iterator i = map.find( ++in );
 
-			condition.notify_one();
+			if ( i != map.end() )
+				i->second = map_tuple( header_read( connect, size ), done );
+			else
+				splice( connect, size );	// data not needed, splice out of stream
+
+			if ( in == notify )
+				condition.notify_one();
 		}
 
 		return 0;
