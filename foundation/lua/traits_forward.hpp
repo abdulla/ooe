@@ -515,7 +515,8 @@ namespace ooe
 		error::lua lua( traits< const c8* >::to( stack, -1 ) );
 		stack.pop( 1 );
 
-		throw lua << "bad argument " << index << " (" << demangle( typeid( type ).name() ) <<
+		throw static_cast< error::runtime& >( lua ) << "bad argument " << index <<
+			" (" << demangle( typeid( type ).name() ) <<
 			" expected, got " << stack.type_name( stack.type( index ) ) << ")";
 	}
 

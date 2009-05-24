@@ -566,7 +566,8 @@ namespace ooe
 		if ( stack.type( -1 ) != id::table )
 		{
 			stack.pop( 1 );
-			throw error::lua( "constructor: " )
+			error::lua lua( "constructor: " );
+			throw static_cast< error::runtime& >( lua )
 				<< "Type \"" << demangle( name ) << "\" not defined";
 		}
 

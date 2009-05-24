@@ -67,13 +67,19 @@ namespace ooe
 	}
 
 	template< typename type >
-		type& operator <<( type& out, void* value )
+		type& operator <<( type& out, const void* value )
 	{
 		c8 buffer[ 32 ];
 		u32 field_width = sizeof( void* ) * 2 + 2;
 		up_t pointer = reinterpret_cast< up_t >( value );
 		std::snprintf( buffer, sizeof( buffer ), "%#0*lx", field_width, pointer );
 		return out << buffer;
+	}
+
+	template< typename type >
+		type& operator <<( type& out, bool value )
+	{
+		return out << ( value ? "true" : "false" );
 	}
 
 //--- hexadecimal --------------------------------------------------------------

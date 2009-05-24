@@ -115,7 +115,8 @@ namespace ooe
 			else if ( reserve && p == reserve->as< type >() )
 				reserve = 0;
 			else
-				throw error::runtime( "ipc::allocator: " ) << "Invalid pointer " << p;
+				throw error::runtime( "ipc::allocator: " ) <<
+					"Invalid pointer " << static_cast< const void* >( p );
 		}
 
 		void construct( pointer p, const type& v )
