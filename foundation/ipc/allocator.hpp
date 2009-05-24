@@ -169,6 +169,13 @@ namespace ooe
 			assign( _M_impl );
 		}
 
+		vector& operator =( const allocator_type& a )
+		{
+			_M_impl = a;
+			assign( a );
+			return *this;
+		}
+
 		vector& operator =( const vector& v )
 		{
 			_M_impl = v.get_allocator();
@@ -229,9 +236,7 @@ namespace ooe
 			tuple_type tuple;
 			up_t size = read< tuple_type >::call( buffer, tuple );
 
-			typedef typename no_ref< t >::type type;
-			value = type( typename type::allocator_type( tuple._0, tuple._1 ) );
-
+			value = typename no_ref< t >::type::allocator_type( tuple._0, tuple._1 );
 			return size;
 		}
 	};
