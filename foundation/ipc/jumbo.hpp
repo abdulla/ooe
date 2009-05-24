@@ -6,6 +6,7 @@
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/shared_memory.hpp"
 #include "foundation/ipc/traits.hpp"
+#include "foundation/utility/error.hpp"
 
 namespace ooe
 {
