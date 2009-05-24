@@ -99,12 +99,8 @@ namespace ooe
 
 		pointer allocate( size_type size, std::allocator< void >::const_pointer = 0 )
 		{
-			if ( !memory || memory->size() < size )
-			{
-				reserve = memory;
-				memory = new shared_memory( unique_name(), shared_memory::create, size );
-			}
-
+			reserve = memory;
+			memory = new shared_memory( unique_name(), shared_memory::create, size );
 			return memory->as< type >();
 		}
 
