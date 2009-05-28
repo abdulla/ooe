@@ -20,10 +20,10 @@ root = Environment( CPPPATH = '#', LIBPATH = '#library', CXXFLAGS = flags_cxx )
 #root.SetOption( 'num_jobs', 4 )
 
 ### arguments ##################################################################
-switches = Variables()
-switches.Add( 'build', EnumVariable( 'build', 'build type', 'debug', ( 'debug', 'release' ) ) )
-Help( switches.GenerateHelpText( root ) )
-root.Replace( variables = switches )
+vars = Variables()
+vars.Add( EnumVariable( 'build', 'build type', 'debug', ( 'debug', 'release' ) ) )
+Help( vars.GenerateHelpText( root ) )
+root.Replace( variables = vars )
 
 build = ARGUMENTS.get( 'build', 'debug' )
 print 'Build:', build
