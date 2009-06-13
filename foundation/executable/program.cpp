@@ -10,7 +10,6 @@
 #include <cstdlib>
 
 #include <fcntl.h>
-#include <sys/wait.h>
 
 #include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
@@ -29,11 +28,6 @@ namespace
 
 		switch ( code )
 		{
-		case SIGCHLD:
-			// ensure there are no zombies
-			waitpid( -1, 0, WNOHANG | WUNTRACED | WCONTINUED );
-			break;
-
 		case SIGFPE:
 		case SIGBUS:
 		case SIGSEGV:
@@ -76,7 +70,6 @@ namespace ooe
 	{
 		std::memset( &action, 0, sizeof( action ) );
 		action.sa_handler = handler;
-		action.sa_flags = SA_NOCLDSTOP | SA_NOCLDWAIT;
 
 		struct sigaction prior;
 		std::memset( &prior, 0, sizeof( prior ) );
@@ -120,12 +113,10 @@ namespace ooe
 
 		std::set_terminate( __gnu_cxx::__verbose_terminate_handler );
 		struct sigaction action;
-		executable::signal( action, signal_handler, SIGCHLD );
+		executable::signal( action, SIG_IGN, SIGCHLD );
 		executable::signal( action, signal_handler, SIGFPE );
 		executable::signal( action, signal_handler, SIGBUS );
 		executable::signal( action, signal_handler, SIGSEGV );
-		executable::signal( action, signal_handler, SIGINT );
-		executable::signal( action, signal_handler, SIGQUIT );
 		executable::signal( action, signal_handler, SIGTERM );
 
 		s32 status = EXIT_FAILURE;
