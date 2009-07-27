@@ -50,7 +50,7 @@ namespace
 	driver::driver( core_type& core, const settings& set, service& service )
 		: slot(), cache( core.vfs, core.video ), rotate( vec3::zero ), translate( vec3::zero ),
 		speed( 1 ), camera( degree( 45 ), divide( set.view.width, set.view.height ) ), queue(),
-		chunked( "chunked/puget", core.schedule, cache, degree( 45 ), set.view.width, 2.5 )
+		chunked( "chunked/puget", core.scheduler, cache, degree( 45 ), set.view.width, 2.5 )
 	{
 		slot.frame = make_function( *this, &driver::frame );
 		slot.motion = make_function( *this, &driver::motion );

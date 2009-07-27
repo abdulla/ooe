@@ -213,7 +213,7 @@ namespace ooe
 //--- update_args --------------------------------------------------------------
 	struct update_args
 	{
-		ooe::schedule& schedule;
+		ooe::scheduler& scheduler;
 		const ooe::video& video;
 		const ooe::tqt& tqt;
 		const attribute_type& delta;
@@ -222,9 +222,9 @@ namespace ooe
 		const f32 max_lod;
 		const u16 tree_depth;
 
-		update_args( ooe::schedule& schedule_, const ooe::video& video_, const ooe::tqt& tqt_,
+		update_args( ooe::scheduler& scheduler_, const ooe::video& video_, const ooe::tqt& tqt_,
 			const attribute_type& delta_, const vec3& eye_, f32 max_lod_, u16 tree_depth_ )
-			: schedule( schedule_ ), video( video_ ), tqt( tqt_ ), delta( delta_ ), eye( eye_ ),
+			: scheduler( scheduler_ ), video( video_ ), tqt( tqt_ ), delta( delta_ ), eye( eye_ ),
 			max_lod( max_lod_ ), tree_depth( tree_depth_ )
 		{
 		}
@@ -398,7 +398,7 @@ namespace ooe
 		data.index = 0;
 	}
 
-	void chunk::unload_subtree( schedule& schedule )
+	void chunk::unload_subtree( scheduler& scheduler )
 	{
 		if ( !child[ 0 ] )
 			return;
@@ -412,7 +412,7 @@ namespace ooe
 			if ( leaf_state == half )
 			{
 				leaf.state = wait;
-				schedule.push_back< void, chunk&, atom< u32 >& >( unload_f, leaf, leaf.state );
+				scheduler.push_back< void, chunk&, atom< u32 >& >( unload_f, leaf, leaf.state );
 			}
 			else if ( leaf_state == full )
 			{
@@ -422,7 +422,7 @@ namespace ooe
 			else
 				continue;
 
-			leaf.unload_subtree( schedule );
+			leaf.unload_subtree( scheduler );
 		}
 	}
 
@@ -434,7 +434,7 @@ namespace ooe
 		if ( !child[ 0 ] || this_lod < ( lod | 0xff ) )
 		{
 			// if children, unload
-			unload_subtree( args.schedule );
+			unload_subtree( args.scheduler );
 
 			// root chunk, calculate lod
 			if ( !( lod & 0xff00 ) )
@@ -457,7 +457,7 @@ namespace ooe
 			if ( leaf_state == none )
 			{
 				leaf.state = wait;
-				args.schedule.push_back< void, const tqt&, const attribute_type& >
+				args.scheduler.push_back< void, const tqt&, const attribute_type& >
 					( make_function( leaf, &chunk::parallel_load ), args.tqt, args.delta );
 				split = false;
 				continue;
@@ -470,7 +470,7 @@ namespace ooe
 			else if ( leaf_state == half )
 			{
 				leaf.serial_load( args.video, args.tqt.depth() );
-				args.schedule.push_back( make_function( leaf, &chunk::parallel_unload ) );
+				args.scheduler.push_back( make_function( leaf, &chunk::parallel_unload ) );
 			}
 		}
 
@@ -513,12 +513,12 @@ namespace ooe
 	}
 
 //--- chunked ------------------------------------------------------------------
-	chunked::chunked( const std::string& path, ooe::schedule& schedule_,  cache& cache, radian fov,
-		u32 width, f32 max_pixel )
+	chunked::chunked( const std::string& path, ooe::scheduler& scheduler_,  cache& cache,
+		radian fov, u32 width, f32 max_pixel )
 		: tqt( cache.vfs[ path + ".tqt" ] ), memory( cache.vfs[ path + ".chu" ] ),
 		header( chunked_header_f( memory.get() ) ), chunk( new chunk::type[ header.chunk_count ] ),
 		lod( ( header.max_error / max_pixel ) * ( static_cast< f32 >( width ) / std::tan( fov ) ) ),
-		schedule( schedule_ ), video( cache.video ),
+		scheduler( scheduler_ ), video( cache.video ),
 		program( cache.program( "effect/chunked.lua" ) ), delta()
 	{
 		program.bind();
@@ -555,7 +555,7 @@ namespace ooe
 		const vec3& eye = instance.position;
 		const frustum& frustum = instance.frustum;
 
-		chunk[ 0 ]->update( update_args( schedule, video, tqt, delta, eye, lod, depth ) );
+		chunk[ 0 ]->update( update_args( scheduler, video, tqt, delta, eye, lod, depth ) );
 		chunk[ 0 ]->includes( includes_args( frustum, queue, program ), geometry::outside );
 	}
 

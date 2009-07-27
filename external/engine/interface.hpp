@@ -17,7 +17,7 @@ namespace ooe
 	typedef slot< void ( f32 ) > frame_slot;
 
 	struct event_queue;
-	class schedule;
+	class scheduler;
 	class service;
 	class vfs;
 	struct video;
@@ -25,14 +25,14 @@ namespace ooe
 	struct register_type
 	{
 		ooe::service& service;
-		ooe::schedule& schedule;
+		ooe::scheduler& scheduler;
 		const event_queue& queue;
 	};
 
 	struct core_type
 	{
 		ooe::vfs& vfs;
-		ooe::schedule& schedule;
+		ooe::scheduler& scheduler;
 		ooe::video& video;
 	};
 

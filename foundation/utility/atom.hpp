@@ -71,7 +71,7 @@ namespace ooe
 		}
 
 	private:
-		volatile type atomic OOE_ALIGN( sizeof( type ) );
+		volatile type atomic;
 
 #if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
 		type exchange_add( type value )

@@ -4,7 +4,7 @@
 #define OOE_FOUNDATION_SCENE_CHUNKED_HPP
 
 #include "foundation/io/memory.hpp"
-#include "foundation/parallel/schedule.hpp"
+#include "foundation/parallel/scheduler.hpp"
 #include "foundation/scene/cache.hpp"
 #include "foundation/scene/graph.hpp"
 #include "foundation/utility/atom.hpp"
@@ -57,7 +57,7 @@ namespace ooe
 		void serial_load( const video&, u32 );
 		void serial_unload( void );
 
-		void unload_subtree( schedule& );
+		void unload_subtree( scheduler& );
 		void find_neighbours( const chunked_header&, const array_type& );
 		void update( const update_args& );
 		void includes( const includes_args&, geometry::intersection ) const;
@@ -91,7 +91,7 @@ namespace ooe
 		: public node
 	{
 	public:
-		chunked( const std::string&, ooe::schedule&, cache&, radian, u32, f32 );
+		chunked( const std::string&, ooe::scheduler&, cache&, radian, u32, f32 );
 		virtual ~chunked( void ) {}
 
 		virtual ooe::aabb aabb( void ) const;
@@ -105,7 +105,7 @@ namespace ooe
 		chunk::array_type chunk;
 		f32 lod;
 
-		ooe::schedule& schedule;
+		ooe::scheduler& scheduler;
 		const ooe::video& video;
 		ooe::program& program;
 		attribute_type delta;

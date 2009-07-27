@@ -2,8 +2,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_FOUNDATION_PARALLEL_SCHEDULE_HPP
-	#define OOE_FOUNDATION_PARALLEL_SCHEDULE_HPP
+	#ifndef OOE_FOUNDATION_PARALLEL_SCHEDULER_HPP
+	#define OOE_FOUNDATION_PARALLEL_SCHEDULER_HPP
 
 #include <list>
 
@@ -74,19 +74,19 @@ namespace ooe
 		task_type task;
 	};
 
-//--- schedule -----------------------------------------------------------------
-	class OOE_VISIBLE schedule
+//--- scheduler ----------------------------------------------------------------
+	class OOE_VISIBLE scheduler
 		: private noncopyable
 	{
 	public:
-		schedule( up_t = 0 );
-		~schedule( void );
+		scheduler( up_t = 0 );
+		~scheduler( void );
 
 		up_t size( void ) const;
 		void resize( up_t );
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "foundation/parallel/schedule.hpp"
+	#define BOOST_PP_FILENAME_1 "foundation/parallel/scheduler.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
@@ -108,7 +108,7 @@ namespace ooe
 	};
 }
 
-	#endif	// OOE_FOUNDATION_PARALLEL_SCHEDULE_HPP
+	#endif	// OOE_FOUNDATION_PARALLEL_SCHEDULER_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 

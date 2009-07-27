@@ -11,7 +11,7 @@
 #include "foundation/general/video.hpp"
 #include "foundation/general/view.hpp"
 #include "foundation/io/vfs.hpp"
-#include "foundation/parallel/schedule.hpp"
+#include "foundation/parallel/scheduler.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 
@@ -66,13 +66,13 @@ namespace
 		return name.substr( i, j );
 	}
 
-	void inform( const path& path, const settings& set, const schedule& schedule, timer& timer )
+	void inform( const path& path, const settings& set, const scheduler& scheduler, timer& timer )
 	{
 		std::cerr <<
 			"Created virtual file system from \"" << name_only( path.vfs ) << ".lua\"\n"
 			"Loaded settings from \"" << name_only( path.settings ) << ".lua\"\n"
 			"Created task scheduler\n"
-			"\tsize: " << schedule.size() << "\n"
+			"\tsize: " << scheduler.size() << "\n"
 			"Created view\n"
 			"\twidth: " << set.view.width << "\n"
 			"\theight: " << set.view.height << "\n";
@@ -108,7 +108,7 @@ namespace
 
 		settings set;
 		setup_settings( set, vfs[ path.settings ] );
-		schedule schedule;
+		scheduler scheduler;
 
 		dynamic dynamic;
 		dynamic.load( path.root + set.video.path, library::global_lazy );
@@ -127,13 +127,13 @@ namespace
 		service.insert( "second", second_signal );
 		service.insert( "frame", frame_signal );
 
-		register_type reg = { service, schedule, queue };
+		register_type reg = { service, scheduler, queue };
 		dynamic.load( path.root + set.service.path, "ooe_open", set, reg );
 
-		core_type core = { vfs, schedule, video };
+		core_type core = { vfs, scheduler, video };
 		dynamic.load( path.runtime, "ooe_open", core, set, service );
 
-		inform( path, set, schedule, timer );
+		inform( path, set, scheduler, timer );
 		guard< void ( ooe::dynamic& ) > guard_dynamic( dynamic_unload, dynamic );
 		std::time_t epoch = timer.get()._0;
 

@@ -1,7 +1,7 @@
-create some sorta dependency tree with schedule
+create some sorta dependency tree with scheduler
 	- possibly find a way of create trees of work
-	- create a framework for pumping dependent tasks through schedule
-	- take a schedule reference, have a list of tasks, each tasks has an iterator range of depends
+	- create a framework for pumping dependent tasks through scheduler
+	- take a scheduler reference, have a list of tasks, each tasks has an iterator range of depends
 
 a nice graph-based parallelisation architecture
 	- with a nice syntax like dot:

@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "foundation/executable/environment.hpp"
-#include "foundation/parallel/schedule.hpp"
+#include "foundation/parallel/scheduler.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/error.hpp"
 
@@ -27,15 +27,15 @@ namespace ooe
 		ooe::thread thread;
 	};
 
-//--- schedule -----------------------------------------------------------------
-	schedule::schedule( up_t workers )
+//--- scheduler ----------------------------------------------------------------
+	scheduler::scheduler( up_t workers )
 		: worker_mutex(), worker_condition(), worker_list(), task_mutex(), task_condition(),
 		task_list()
 	{
 		resize( workers ? workers : executable::cpu_cores() * 2 - 1 );
 	}
 
-	schedule::~schedule( void )
+	scheduler::~scheduler( void )
 	{
 		resize( 0 );
 		lock lock( worker_mutex );
@@ -47,13 +47,13 @@ namespace ooe
 			worker_condition.wait( lock );
 	}
 
-	up_t schedule::size( void ) const
+	up_t scheduler::size( void ) const
 	{
 		lock lock( worker_mutex );
 		return worker_list.size();
 	}
 
-	void schedule::resize( up_t workers )
+	void scheduler::resize( up_t workers )
 	{
 		lock lock( worker_mutex );
 		worker_iterator i = worker_list.begin();
@@ -73,20 +73,20 @@ namespace ooe
 		{
 			for ( ; j != workers; ++j )
 			{
-				worker_list.push_back( new worker( make_function( *this, &schedule::call ) ) );
+				worker_list.push_back( new worker( make_function( *this, &scheduler::call ) ) );
 				worker_list.back()->iterator = --worker_list.end();
 			}
 		}
 	}
 
-	void schedule::push_back( task_type task )
+	void scheduler::push_back( task_type task )
 	{
 		lock lock( task_mutex );
 		task_list.push_back( task );
 		task_condition.notify_one();
 	}
 
-	task_type schedule::pop_front( void )
+	task_type scheduler::pop_front( void )
 	{
 		lock lock( task_mutex );
 
@@ -98,14 +98,14 @@ namespace ooe
 		return task;
 	}
 
-	void* schedule::call( void* pointer )
+	void* scheduler::call( void* pointer )
 	{
 		ooe::worker& worker = *static_cast< ooe::worker* >( pointer );
 
 		while ( worker.active )
 		{
 			task_type task = pop_front();
-			OOE_PRINT( "schedule", task->call() );
+			OOE_PRINT( "scheduler", task->call() );
 			task->condition.notify_all();
 		}
 
