@@ -163,23 +163,31 @@ namespace ooe
 		else if ( pid )
 			return pid;
 
-		std::vector< const c8* > argument;
-		argument.push_back( path.c_str() );
-		const c8* string;
-
-		va_list list;
-		va_start( list, path );
-
-		do
+		try
 		{
-			string = va_arg( list, const c8* );
-			argument.push_back( string );
-		}
-		while ( string );
+			std::vector< const c8* > argument;
+			argument.push_back( path.c_str() );
+			const c8* string;
 
-		va_end( list );
-		execv( path.c_str(), const_cast< c8** >( &argument[ 0 ] ) );
-		OOE_WARNING( "excutable", "Unable to exec process: " << error::number( errno ) );
+			va_list list;
+			va_start( list, path );
+
+			do
+			{
+				string = va_arg( list, const c8* );
+				argument.push_back( string );
+			}
+			while ( string );
+
+			va_end( list );
+			execv( path.c_str(), const_cast< c8** >( &argument[ 0 ] ) );
+			OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error::number( errno ) );
+		}
+		catch ( std::exception& error )
+		{
+			OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error.what() );
+		}
+
 		_exit( EXIT_FAILURE );
 	}
 }
