@@ -47,11 +47,10 @@ namespace
 	f32 gettimeofday_rand_test( void )
 	{
 		timer timer;
-		epoch_t epoch;
 
 		for ( up_t i = 0; i != limit; ++i )
 		{
-			timer::epoch( epoch );
+			timer::epoch();
 			rand();
 		}
 

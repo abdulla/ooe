@@ -7,25 +7,36 @@
 #include "foundation/executable/timer.hpp"
 #include "foundation/utility/error.hpp"
 
+namespace
+{
+	using namespace ooe;
+
+	f32 difference( const epoch_t& begin, const epoch_t& end )
+	{
+		return static_cast< f32 >( end._0 - begin._0 ) +
+			static_cast< f32 >( end._1 - begin._1 ) * 1e-9f;
+	}
+}
+
 namespace ooe
 {
 //--- timer --------------------------------------------------------------------
 	timer::timer( void )
-		: time()
+		: time( epoch() )
 	{
-		epoch( time );
 	}
 
-	f32 timer::elapsed( void )
+	f32 timer::update( void )
 	{
-		epoch_t now;
-		epoch( now );
-
-		f32 seconds = static_cast< f32 >( now._0 - time._0 ) +
-			static_cast< f32 >( now._1 - time._1 ) * 1e-9f;
-
+		epoch_t now = epoch();
+		f32 seconds = difference( time, now );
 		time = now;
 		return seconds;
+	}
+
+	f32 timer::elapsed( void ) const
+	{
+		return difference( time, epoch() );
 	}
 
 	epoch_t timer::get( void ) const
@@ -33,12 +44,14 @@ namespace ooe
 		return time;
 	}
 
-	void timer::epoch( epoch_t& time )
+	epoch_t timer::epoch( void )
 	{
-		if ( gettimeofday( reinterpret_cast< timeval* >( &time ), 0 ) )
+		timeval value;
+
+		if ( gettimeofday( &value, 0 ) )
 			throw error::runtime( "timer: " ) << "Unable to get UTC: " << error::number( errno );
 
-		time._1 *= 1000;
+		return epoch_t( value.tv_sec, value.tv_usec * 1000 );
 	}
 
 	void timer::sleep( epoch_t& time )

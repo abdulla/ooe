@@ -10,7 +10,6 @@
 
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/executable/timer.hpp"
 #include "foundation/general/event_queue.hpp"
 #include "foundation/general/maths.hpp"
 #include "foundation/general/view.hpp"
@@ -304,27 +303,6 @@ namespace
 		}
 	};
 
-	void call_test( void )
-	{
-		concrete stack;
-		interface& reference = stack;
-		typedef void ( interface::* member_type )( void );
-		member_type member = static_cast< member_type >( &concrete::call );
-		timer timer;
-
-		for ( up_t i = 0; i != 65536; ++i )
-			reference.call();
-
-		std::cout << "virtual call took " << timer.elapsed() << '\n';
-		stack.value = 0;
-		timer.elapsed();
-
-		for ( up_t i = 0; i != 65536; ++i )
-			( reference.*member )();
-
-		std::cout << "pointer call took " << timer.elapsed() << '\n';
-	}
-
 	bool launch( const std::string& root, const std::string&, s32, c8** )
 	{
 		library library( root + "library/libopengl" OOE_EXTENSION, library::global_lazy );
@@ -338,7 +316,6 @@ namespace
 		guard< void ( void* ) > guard_video( close._1, close._0 );
 
 		test();
-		call_test();
 		return true;
 	}
 }

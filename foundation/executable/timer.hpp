@@ -18,10 +18,11 @@ namespace ooe
 	public:
 		timer( void );
 
-		f32 elapsed( void );
+		f32 update( void );
+		f32 elapsed( void ) const;
 		epoch_t get( void ) const;
 
-		static void epoch( epoch_t& );
+		static epoch_t epoch( void );
 		static void sleep( epoch_t& );
 
 	private:

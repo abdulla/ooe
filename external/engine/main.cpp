@@ -43,7 +43,7 @@ namespace
 
 	void timer_unload( timer& timer )
 	{
-		std::cerr << "Unloaded in " << timer.elapsed() << " seconds\n";
+		std::cerr << "Unloaded in " << timer.update() << " seconds\n";
 	}
 
 	void dynamic_unload( dynamic& dynamic )
@@ -89,7 +89,7 @@ namespace
 			"Created video system from \"" << name_only( set.video.path ) << "\"\n"
 			"Created runtime from \"" << name_only( path.runtime ) << "\"\n"
 			"Created services from \"" << name_only( set.service.path ) << "\"\n"
-			"Loaded in " << timer.elapsed() << " seconds\n";
+			"Loaded in " << timer.update() << " seconds\n";
 	}
 
 	bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
@@ -141,7 +141,7 @@ namespace
 		{
 			service();
 			video.clear();
-			frame_signal( timer.elapsed() );
+			frame_signal( timer.update() );
 			video.swap();
 			executable::yield();
 
