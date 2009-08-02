@@ -44,22 +44,42 @@ namespace
 
 namespace ooe
 {
+//--- directory_id -------------------------------------------------------------
+	directory_id::directory_id( void )
+		: last( 0 ), next( 0 ), limit( 0 ), buffer()
+	{
+	}
+
 //--- directory ----------------------------------------------------------------
 	directory::directory( const descriptor& desc )
-		: descriptor( desc ), last( 0 ), next( 0 ), limit( 0 ), buffer()
+		: descriptor( desc ), id()
 	{
-		if ( type() != descriptor::directory )
+		if ( type() == descriptor::directory )
+			id = new directory_id;
+		else
 			throw error::io( "directory: " ) << "Descriptor is not a directory";
+	}
+
+	directory::directory( const directory& copy )
+		: descriptor( copy ), id( copy.id )
+	{
+	}
+
+	directory& directory::operator =( const directory& copy )
+	{
+		static_cast< directory& >( *this ) = copy;
+		id = copy.id;
+		return *this;
 	}
 
 	bool directory::operator ++( void )
 	{
-		last = next;
-		return next_entry( get(), next, limit, buffer, sizeof( buffer ) );
+		id->last = id->next;
+		return next_entry( get(), id->next, id->limit, id->buffer, sizeof( id->buffer ) );
 	}
 
 	std::string directory::operator *( void ) const
 	{
-		return reinterpret_cast< const dirent* >( buffer + last )->d_name;
+		return reinterpret_cast< const dirent* >( id->buffer + id->last )->d_name;
 	}
 }

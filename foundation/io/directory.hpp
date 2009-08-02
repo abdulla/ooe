@@ -8,20 +8,30 @@
 
 namespace ooe
 {
+	struct directory_id
+	{
+		up_t last;
+		up_t next;
+		up_t limit;
+		c8 buffer[ executable::static_page_size ];
+
+		directory_id( void );
+	};
+
 	class OOE_VISIBLE directory
 		: private descriptor
 	{
 	public:
 		directory( const descriptor& );
 
+		directory( const directory& );
+		directory& operator =( const directory& );
+
 		bool operator ++( void );
 		std::string operator *( void ) const;
 
 	private:
-		up_t last;
-		up_t next;
-		up_t limit;
-		c8 buffer[ executable::static_page_size ];
+		shared_ptr< directory_id > id;
 	};
 }
 

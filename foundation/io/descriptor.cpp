@@ -19,8 +19,7 @@ namespace
 	void statistics( s32 fd, struct stat& status )
 	{
 		if ( fstat( fd, &status ) )
-			throw error::io( "descriptor: " ) << "Unable to stat descriptor: " <<
-				error::number( errno );
+			throw error::io( "descriptor: " ) << "Unable to stat: " << error::number( errno );
 	}
 
 	s32 transform( u8 flags )

@@ -60,7 +60,7 @@ namespace ooe
 		s32 get( void ) const OOE_HIDDEN;
 
 	private:
-		shared_ptr< descriptor_id > id;
+		shared_ptr< const descriptor_id > id;
 
 		friend struct platform::descriptor;
 	};
