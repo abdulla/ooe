@@ -7,6 +7,45 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/guard.hpp"
 
+namespace
+{
+	using namespace ooe;
+
+	void swap_io( s32& read, s32& write )
+	{
+		s32 in = dup( STDIN_FILENO );
+
+		if ( in == -1 )
+			throw error::runtime( "executable::fork_io: " ) <<
+				"Unable to duplicate fd " << STDIN_FILENO << ": " << error::number( errno );
+
+		guard< int ( int ) > guard_in( close, in );
+		s32 out = dup( STDOUT_FILENO );
+
+		if ( out == -1 )
+			throw error::runtime( "executable::fork_io: " ) <<
+				"Unable to duplicate fd " << STDOUT_FILENO << ": " << error::number( errno );
+
+		guard< int ( int ) > guard_out( close, out );
+
+		if ( dup2( read, STDIN_FILENO ) == -1 )
+			throw error::runtime( "executable::fork_io: " ) <<
+				"Unable to duplicate fd " << read << ": " << error::number( errno );
+		else if ( dup2( write, STDOUT_FILENO ) == -1 )
+		{
+			// attempt to restore stdin
+			dup2( in, STDIN_FILENO );
+			throw error::runtime( "executable::fork_io: " ) <<
+				"Unable to duplicate fd " << write << ": " << error::number( errno );
+		}
+
+		read = in;
+		write = out;
+		guard_in.clear();
+		guard_out.clear();
+	}
+}
+
 namespace ooe
 {
 //--- executable::fork_id ------------------------------------------------------
@@ -57,6 +96,7 @@ namespace ooe
 			guard_2a.clear();
 			read = pipe_2[ 0 ];
 			write = pipe_1[ 1 ];
+			swap_io( read, write );
 		}
 	}
 
