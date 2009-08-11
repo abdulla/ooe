@@ -1,0 +1,12 @@
+Import( Split( 'name root' ) )
+
+### configure ##################################################################
+setup = Configure( root.Clone() )
+build = setup.Finish()
+
+### build ######################################################################
+if name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libunit.dylib' )
+
+out = build.SharedLibrary( '#library/libunit', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
