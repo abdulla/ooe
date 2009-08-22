@@ -3,6 +3,8 @@
 #ifndef OOE_TEST_UNIT_ASSERT_HPP
 #define OOE_TEST_UNIT_ASSERT_HPP
 
+#include "foundation/utility/string.hpp"
+
 namespace ooe
 {
 	namespace unit

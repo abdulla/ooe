@@ -4,9 +4,8 @@
 #define OOE_TEST_UNIT_RUNNER_HPP
 
 #include <map>
-#include <string>
 
-#include "foundation/utility/fundamental.hpp"
+#include "foundation/utility/string.hpp"
 
 namespace ooe
 {

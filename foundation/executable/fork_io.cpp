@@ -20,18 +20,18 @@ namespace
 				"Unable to duplicate fd " << STDIN_FILENO << ": " << error::number( errno );
 
 		guard< int ( int ) > guard_in( close, in );
-		s32 out = dup( STDOUT_FILENO );
+		s32 out = dup( STDERR_FILENO );
 
 		if ( out == -1 )
 			throw error::runtime( "executable::fork_io: " ) <<
-				"Unable to duplicate fd " << STDOUT_FILENO << ": " << error::number( errno );
+				"Unable to duplicate fd " << STDERR_FILENO << ": " << error::number( errno );
 
 		guard< int ( int ) > guard_out( close, out );
 
 		if ( dup2( read, STDIN_FILENO ) == -1 )
 			throw error::runtime( "executable::fork_io: " ) <<
 				"Unable to duplicate fd " << read << ": " << error::number( errno );
-		else if ( dup2( write, STDOUT_FILENO ) == -1 )
+		else if ( dup2( write, STDERR_FILENO ) == -1 )
 		{
 			// attempt to restore stdin
 			dup2( in, STDIN_FILENO );
@@ -131,7 +131,7 @@ namespace ooe
 	{
 		sp_t read_ = ::read( id->read, buffer, bytes );
 
-		if ( read_ )
+		if ( read_ == -1 )
 			throw error::runtime( "executable::fork_io: " ) <<
 				"Unable to read from process " << id->pid << ": " << error::number( errno );
 
