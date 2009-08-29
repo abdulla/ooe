@@ -13,40 +13,10 @@ extern "C" void free( void* ) __THROW;
 
 namespace ooe
 {
-//--- delete_ptr ---------------------------------------------------------------
-	template< typename type >
-		struct delete_ptr
-	{
-		static void call( type* value )
-		{
-			delete value;
-		}
-	};
-
-//--- delete_array -------------------------------------------------------------
-	template< typename type >
-		struct delete_array
-	{
-		static void call( type* value )
-		{
-			delete[] value;
-		}
-	};
-
-//--- delete_free --------------------------------------------------------------
-	template< typename type >
-		struct delete_free
-	{
-		static void call( type* value )
-		{
-			free( value );
-		}
-	};
-
 //--- linked_ptr ---------------------------------------------------------------
 
 //--- scoped_base --------------------------------------------------------------
-	template< typename type, typename deleter >
+	template< typename type, void ( * function )( void* ) >
 		class scoped_base
 		: private noncopyable
 	{
@@ -96,14 +66,14 @@ namespace ooe
 
 		~scoped_base( void )
 		{
-			deleter::call( value );
+			function( ( void* )value );
 		}
 	};
 
 //--- scoped_dereference -------------------------------------------------------
-	template< typename type, typename deleter >
+	template< typename type, void ( * function )( void* ) >
 		class scoped_dereference
-		: public scoped_base< type, deleter >
+		: public scoped_base< type, function >
 	{
 	public:
 		type& operator *( void ) const
@@ -113,57 +83,57 @@ namespace ooe
 
 	protected:
 		scoped_dereference( type* value_ )
-			: scoped_base< type, deleter >( value_ )
+			: scoped_base< type, function >( value_ )
 		{
 		}
 	};
 
-	template< typename deleter >
-		class scoped_dereference< void, deleter >
-		: public scoped_base< void, deleter >
+	template< void ( * function )( void* ) >
+		class scoped_dereference< void, function >
+		: public scoped_base< void, function >
 	{
 	protected:
 		scoped_dereference( void* value_ )
-			: scoped_base< void, deleter >( value_ )
+			: scoped_base< void, function >( value_ )
 		{
 		}
 	};
 
 //--- scoped_ptr ---------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_ptr >
+	template< typename type >
 		struct scoped_ptr
-		: public scoped_dereference< type, deleter< type > >
+		: public scoped_dereference< type, operator delete >
 	{
 		scoped_ptr( type* value_ )
-			: scoped_dereference< type, deleter< type > >( value_ )
+			: scoped_dereference< type, operator delete >( value_ )
 		{
 		}
 	};
 
 //--- scoped_array -------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_array >
+	template< typename type >
 		struct scoped_array
-		: public scoped_dereference< type, deleter< type > >
+		: public scoped_dereference< type, operator delete[] >
 	{
 		scoped_array( type* value_ )
-			: scoped_dereference< type, deleter< type > >( value_ )
+			: scoped_dereference< type, operator delete[] >( value_ )
 		{
 		}
 	};
 
 //--- scoped_free --------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_free >
+	template< typename type >
 		struct scoped_free
-		: public scoped_dereference< type, deleter< type > >
+		: public scoped_dereference< type, free >
 	{
 		scoped_free( type* value_ )
-			: scoped_dereference< type, deleter< type > >( value_ )
+			: scoped_dereference< type, free >( value_ )
 		{
 		}
 	};
 
 //--- shared_ref -------------------------------------------------------------------
-	template< typename type, typename deleter, typename ref_t >
+	template< typename type, void ( * function )( void* ), typename ref_t >
 		class shared_ref
 	{
 	public:
@@ -182,7 +152,7 @@ namespace ooe
 			if ( --refs )
 				return;
 
-			deleter::call( value );
+			function( ( void* )value );
 			delete this;
 		}
 
@@ -197,7 +167,7 @@ namespace ooe
 	};
 
 //--- shared_base --------------------------------------------------------------
-	template< typename type, typename deleter, typename ref_t >
+	template< typename type, void ( * function )( void* ), typename ref_t >
 		class shared_base
 	{
 	public:
@@ -244,7 +214,7 @@ namespace ooe
 		}
 
 	protected:
-		typedef shared_ref< type, deleter, ref_t > ref_type;
+		typedef shared_ref< type, function, ref_t > ref_type;
 		ref_type* ref;
 
 		shared_base( type* value )
@@ -259,9 +229,9 @@ namespace ooe
 	};
 
 //--- shared_dereference -------------------------------------------------------
-	template< typename type, typename deleter, typename ref_t >
+	template< typename type, void ( * function )( void* ), typename ref_t >
 		class shared_dereference
-		: public shared_base< type, deleter, ref_t >
+		: public shared_base< type, function, ref_t >
 	{
 	public:
 		type& operator *( void ) const
@@ -271,51 +241,51 @@ namespace ooe
 
 	protected:
 		shared_dereference( type* value )
-			: shared_base< type, deleter, ref_t >( value )
+			: shared_base< type, function, ref_t >( value )
 		{
 		}
 	};
 
-	template< typename deleter, typename ref_t >
-		class shared_dereference< void, deleter, ref_t >
-		: public shared_base< void, deleter, ref_t >
+	template< void ( * function )( void* ), typename ref_t >
+		class shared_dereference< void, function, ref_t >
+		: public shared_base< void, function, ref_t >
 	{
 	protected:
 		shared_dereference( void* value )
-			: shared_base< void, deleter, ref_t >( value )
+			: shared_base< void, function, ref_t >( value )
 		{
 		}
 	};
 
 //--- shared_ptr ---------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_ptr >
+	template< typename type >
 		struct shared_ptr
-		: public shared_dereference< type, deleter< type >, unsigned >
+		: public shared_dereference< type, operator delete, unsigned >
 	{
 		shared_ptr( type* value = 0 )
-			: shared_dereference< type, deleter< type >, unsigned >( value )
+			: shared_dereference< type, operator delete, unsigned >( value )
 		{
 		}
 	};
 
 //--- shared_array -------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_array >
+	template< typename type >
 		struct shared_array
-		: public shared_dereference< type, deleter< type >, unsigned >
+		: public shared_dereference< type, operator delete[], unsigned >
 	{
 		shared_array( type* value = 0 )
-			: shared_dereference< type, deleter< type >, unsigned >( value )
+			: shared_dereference< type, operator delete[], unsigned >( value )
 		{
 		}
 	};
 
 //--- shared_free --------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_free >
+	template< typename type >
 		struct shared_free
-		: public shared_dereference< type, deleter< type >, unsigned >
+		: public shared_dereference< type, free, unsigned >
 	{
 		shared_free( type* value = 0 )
-			: shared_dereference< type, deleter< type >, unsigned >( value )
+			: shared_dereference< type, free, unsigned >( value )
 		{
 		}
 	};
