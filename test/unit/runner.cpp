@@ -20,7 +20,7 @@ namespace
 	using namespace ooe;
 	typedef tuple< up_t, executable::fork_io, timer > list_tuple;
 	typedef std::list< list_tuple > list_type;
-	typedef tuple< up_t, bool, std::string > vector_tuple;
+	typedef tuple< bool, std::string > vector_tuple;
 	typedef std::vector< vector_tuple > vector_type;
 
 	void run_test( const unit::group_base::iterator_type& i )
@@ -80,7 +80,7 @@ namespace
 					i->_1.signal( SIGKILL );
 			}
 
-			vector.push_back( vector_tuple( i->_0, passed, read_output( i->_1 ) ) );
+			vector[ i->_0 ] = vector_tuple( passed, read_output( i->_1 ) );
 			list.erase( i );
 		}
 	}
@@ -92,21 +92,22 @@ namespace
 
 		for ( vector_type::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
 		{
-			if ( !i->_1 )
+			if ( !i->_0 )
 				++j;
 
-			std::cout << std::setw( 5 ) << i->_0 << ": " << ( i->_1 ? "Passed" : "Failed" ) << '\n';
+			up_t x = std::distance( vector.begin(), i );
+			std::cout << std::setw( 5 ) << x << ": " << ( i->_0 ? "Passed" : "Failed" ) << '\n';
 		}
 
-		std::cout << '\n';
 		up_t k = 0;
 
 		for ( vector_type::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
 		{
-			if ( i->_1 )
+			if ( i->_0 )
 				continue;
 
-			std::cout << '(' << ++k << " of " << j << ") Test " << i->_0 << ":\n" << i->_2 << '\n';
+			up_t x = std::distance( vector.begin(), i );
+			std::cout << "\n(" << ++k << " of " << j << ") Test " << x << ":\n" << i->_1;
 		}
 	}
 
@@ -125,7 +126,7 @@ namespace
 				run_test( i );
 		}
 
-		vector_type vector;
+		vector_type vector( j );
 
 		while ( !list.empty() )
 			collect_tests( vector, list, time_out );
