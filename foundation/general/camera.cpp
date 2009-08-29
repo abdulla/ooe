@@ -44,17 +44,17 @@ namespace ooe
 	void camera::rotate( const vec3& change )
 	{
 		const mat3 rotate_y( axis_angle< mat3 >( axis.y, change.y ) );
-		axis.x = rotate_y * axis.x;
-		axis.z = rotate_y * axis.z;
+		axis.x = dot( rotate_y, axis.x );
+		axis.z = dot( rotate_y, axis.z );
 
-		look.x = rotate_y * look.x;
-		look.y = rotate_y * look.y;
-		look.z = rotate_y * look.z;
+		look.x = dot( rotate_y, look.x );
+		look.y = dot( rotate_y, look.y );
+		look.z = dot( rotate_y, look.z );
 
 		const mat3 rotate_z( axis_angle< mat3 >( axis.z, change.z ) );
-		look.x = rotate_z * look.x;
-		look.y = rotate_z * look.y;
-		look.z = rotate_z * look.z;
+		look.x = dot( rotate_z, look.x );
+		look.y = dot( rotate_z, look.y );
+		look.z = dot( rotate_z, look.z );
 	}
 
 	vec3 camera::position( void ) const

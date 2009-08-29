@@ -64,7 +64,7 @@ namespace
 
 		aabb box = chunked.aabb();
 		vec3 center = aabb_center( box );
-		vec3 viewer = vec3( center.x, -center.y - aabb_extent( box ).y - 10, center.z );
+		vec3 viewer = vec3( -center.x, -center.y - aabb_extent( box ).y - 10, -center.z );
 		camera.rotate( vec3( 0, maths::pi_half, 0 ) );
 		camera.translate( viewer );
 		camera.rotate( vec3( 0, maths::pi_half, 0 ) );
@@ -86,8 +86,8 @@ namespace
 
 	void driver::motion( s32 x, s32 y )
 	{
-		rotate.y -= static_cast< f32 >( x );	// y motion rotates around the x axis
-		rotate.z -= static_cast< f32 >( y );	// x motion rotates around the y axis
+		rotate.y += static_cast< f32 >( x );	// y motion rotates around the x axis
+		rotate.z += static_cast< f32 >( y );	// x motion rotates around the y axis
 	}
 
 	void driver::button( u32, bool )

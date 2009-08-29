@@ -127,6 +127,16 @@ namespace ooe
 		return vec3( v ) *= u;
 	}
 
+	bool operator ==( const vec3& v, const vec3& u )
+	{
+		return is_equal( v.x, u.x ) && is_equal( v.y, u.y ) && is_equal( v.z, u.z );
+	}
+
+	bool operator !=( const vec3& v, const vec3& u )
+	{
+		return !( v == u );
+	}
+
 	f32 magnitude_squared( const vec3& v )
 	{
 		return v.x * v.x + v.y * v.y + v.z * v.z;
@@ -196,25 +206,20 @@ namespace ooe
 		m[ 2 ][ 0 ] = _20;	m[ 2 ][ 1 ] = _21;	m[ 2 ][ 2 ] = _22;
 	}
 
-	mat3::matrix( const mat4& i )
+	mat3::matrix( const mat4& n )
 		: m()
 	{
-		*this = i;
+		*this = n;
 	}
 
 	mat3& mat3::operator =( const mat4& n )
 	{
-		m[ 0 ][ 0 ] = n[ 0 ][ 0 ];
-		m[ 0 ][ 1 ] = n[ 0 ][ 1 ];
-		m[ 0 ][ 2 ] = n[ 0 ][ 2 ];
+		for ( u8 i = 0; i != 3; ++i )
+		{
+			for ( u8 j = 0; j != 3; ++j )
+				m[ i ][ j ] = n[ i ][ j ];
+		}
 
-		m[ 1 ][ 0 ] = n[ 1 ][ 0 ];
-		m[ 1 ][ 1 ] = n[ 1 ][ 1 ];
-		m[ 1 ][ 2 ] = n[ 1 ][ 2 ];
-
-		m[ 2 ][ 0 ] = n[ 2 ][ 0 ];
-		m[ 2 ][ 1 ] = n[ 2 ][ 1 ];
-		m[ 2 ][ 2 ] = n[ 2 ][ 2 ];
 		return *this;
 	}
 
@@ -228,66 +233,76 @@ namespace ooe
 		return m[ i ];
 	}
 
-	mat3& mat3::operator -=( const matrix& i )
+	mat3& mat3::operator -=( const matrix& n )
 	{
-		return *this += -i;
+		for ( u8 i = 0; i != 3; ++i )
+		{
+			for ( u8 j = 0; j != 3; ++j )
+				m[ i ][ j ] -= n[ i ][ j ];
+		}
+
+		return *this;
 	}
 
-	mat3& mat3::operator +=( const matrix& i )
+	mat3& mat3::operator +=( const matrix& n )
 	{
-		m[ 0 ][ 0 ] += i[ 0 ][ 0 ];
-		m[ 0 ][ 1 ] += i[ 0 ][ 1 ];
-		m[ 0 ][ 2 ] += i[ 0 ][ 2 ];
+		for ( u8 i = 0; i != 3; ++i )
+		{
+			for ( u8 j = 0; j != 3; ++j )
+				m[ i ][ j ] += n[ i ][ j ];
+		}
 
-		m[ 1 ][ 0 ] += i[ 1 ][ 0 ];
-		m[ 1 ][ 1 ] += i[ 1 ][ 1 ];
-		m[ 1 ][ 2 ] += i[ 1 ][ 2 ];
-
-		m[ 2 ][ 0 ] += i[ 2 ][ 0 ];
-		m[ 2 ][ 1 ] += i[ 2 ][ 1 ];
-		m[ 2 ][ 2 ] += i[ 2 ][ 2 ];
 		return *this;
 	}
 
 	mat3& mat3::operator /=( f32 f )
 	{
-		return *this *= 1 / f;
+		for ( u8 i = 0; i != 3; ++i )
+		{
+			for ( u8 j = 0; j != 3; ++j )
+				m[ i ][ j ] /= f;
+		}
+
+		return *this;
 	}
 
 	mat3& mat3::operator *=( f32 f )
 	{
-		m[ 0 ][ 0 ] *= f;	m[ 0 ][ 1 ] *= f;	m[ 0 ][ 2 ] *= f;
-		m[ 1 ][ 0 ] *= f;	m[ 1 ][ 1 ] *= f;	m[ 1 ][ 2 ] *= f;
-		m[ 2 ][ 0 ] *= f;	m[ 2 ][ 1 ] *= f;	m[ 2 ][ 2 ] *= f;
+		for ( u8 i = 0; i != 3; ++i )
+		{
+			for ( u8 j = 0; j != 3; ++j )
+				m[ i ][ j ] *= f;
+		}
+
 		return *this;
 	}
 
-	mat3& mat3::operator *=( const matrix& i )
+	mat3& mat3::operator *=( const matrix& n )
 	{
 		return *this = matrix(
-			// i column 0
-			m[ 0 ][ 0 ] * i[ 0 ][ 0 ] + m[ 1 ][ 0 ] * i[ 0 ][ 1 ] +
-			m[ 2 ][ 0 ] * i[ 0 ][ 2 ],
-			m[ 0 ][ 1 ] * i[ 0 ][ 0 ] + m[ 1 ][ 1 ] * i[ 0 ][ 1 ] +
-			m[ 2 ][ 1 ] * i[ 0 ][ 2 ],
-			m[ 0 ][ 2 ] * i[ 0 ][ 0 ] + m[ 1 ][ 2 ] * i[ 0 ][ 1 ] +
-			m[ 2 ][ 2 ] * i[ 0 ][ 2 ],
+			// column 0
+			m[ 0 ][ 0 ] * n[ 0 ][ 0 ] + m[ 1 ][ 0 ] * n[ 0 ][ 1 ] +
+			m[ 2 ][ 0 ] * n[ 0 ][ 2 ],
+			m[ 0 ][ 1 ] * n[ 0 ][ 0 ] + m[ 1 ][ 1 ] * n[ 0 ][ 1 ] +
+			m[ 2 ][ 1 ] * n[ 0 ][ 2 ],
+			m[ 0 ][ 2 ] * n[ 0 ][ 0 ] + m[ 1 ][ 2 ] * n[ 0 ][ 1 ] +
+			m[ 2 ][ 2 ] * n[ 0 ][ 2 ],
 
-			// i column 1
-			m[ 0 ][ 0 ] * i[ 1 ][ 0 ] + m[ 1 ][ 0 ] * i[ 1 ][ 1 ] +
-			m[ 2 ][ 0 ] * i[ 1 ][ 2 ],
-			m[ 0 ][ 1 ] * i[ 1 ][ 0 ] + m[ 1 ][ 1 ] * i[ 1 ][ 1 ] +
-			m[ 2 ][ 1 ] * i[ 1 ][ 2 ],
-			m[ 0 ][ 2 ] * i[ 1 ][ 0 ] + m[ 1 ][ 2 ] * i[ 1 ][ 1 ] +
-			m[ 2 ][ 2 ] * i[ 1 ][ 2 ],
+			// column 1
+			m[ 0 ][ 0 ] * n[ 1 ][ 0 ] + m[ 1 ][ 0 ] * n[ 1 ][ 1 ] +
+			m[ 2 ][ 0 ] * n[ 1 ][ 2 ],
+			m[ 0 ][ 1 ] * n[ 1 ][ 0 ] + m[ 1 ][ 1 ] * n[ 1 ][ 1 ] +
+			m[ 2 ][ 1 ] * n[ 1 ][ 2 ],
+			m[ 0 ][ 2 ] * n[ 1 ][ 0 ] + m[ 1 ][ 2 ] * n[ 1 ][ 1 ] +
+			m[ 2 ][ 2 ] * n[ 1 ][ 2 ],
 
-			// i column 2
-			m[ 0 ][ 0 ] * i[ 2 ][ 0 ] + m[ 1 ][ 0 ] * i[ 2 ][ 1 ] +
-			m[ 2 ][ 0 ] * i[ 2 ][ 2 ],
-			m[ 0 ][ 1 ] * i[ 2 ][ 0 ] + m[ 1 ][ 1 ] * i[ 2 ][ 1 ] +
-			m[ 2 ][ 1 ] * i[ 2 ][ 2 ],
-			m[ 0 ][ 2 ] * i[ 2 ][ 0 ] + m[ 1 ][ 2 ] * i[ 2 ][ 1 ] +
-			m[ 2 ][ 2 ] * i[ 2 ][ 2 ] );
+			// column 2
+			m[ 0 ][ 0 ] * n[ 2 ][ 0 ] + m[ 1 ][ 0 ] * n[ 2 ][ 1 ] +
+			m[ 2 ][ 0 ] * n[ 2 ][ 2 ],
+			m[ 0 ][ 1 ] * n[ 2 ][ 0 ] + m[ 1 ][ 1 ] * n[ 2 ][ 1 ] +
+			m[ 2 ][ 1 ] * n[ 2 ][ 2 ],
+			m[ 0 ][ 2 ] * n[ 2 ][ 0 ] + m[ 1 ][ 2 ] * n[ 2 ][ 1 ] +
+			m[ 2 ][ 2 ] * n[ 2 ][ 2 ] );
 	}
 
 	mat3 operator -( const mat3& m )
@@ -298,32 +313,67 @@ namespace ooe
 			-m[ 2 ][ 0 ],	-m[ 2 ][ 1 ],	-m[ 2 ][ 2 ] );
 	}
 
-	mat3 operator -( const mat3& one, const mat3& two )
+	mat3 operator -( const mat3& m, const mat3& n )
 	{
-		return mat3( one ) -= two;
+		return mat3( m ) -= n;
 	}
 
-	mat3 operator +( const mat3& one, const mat3& two )
+	mat3 operator +( const mat3& m, const mat3& n )
 	{
-		return mat3( one ) += two;
+		return mat3( m ) += n;
 	}
 
-	mat3 operator /( const mat3& one, f32 two )
+	mat3 operator /( const mat3& m, f32 n )
 	{
-		return mat3( one ) /= two;
+		return mat3( m ) /= n;
 	}
 
-	mat3 operator *( const mat3& one, f32 two )
+	mat3 operator *( const mat3& m, f32 n )
 	{
-		return mat3( one ) *= two;
+		return mat3( m ) *= n;
 	}
 
-	mat3 operator *( const mat3& one, const mat3& two )
+	mat3 operator *( const mat3& m, const vec3& v )
 	{
-		return mat3( one ) *= two;
+		return mat3(
+			m[ 0 ][ 0 ] * v.x, m[ 0 ][ 1 ] * v.x, m[ 0 ][ 2 ] * v.x,
+			m[ 1 ][ 0 ] * v.y, m[ 1 ][ 1 ] * v.y, m[ 1 ][ 2 ] * v.y,
+			m[ 2 ][ 0 ] * v.z, m[ 2 ][ 1 ] * v.z, m[ 2 ][ 2 ] * v.z );
 	}
 
-	vec3 operator *( const mat3& m, const vec3& v )
+	mat3 operator *( const mat3& m, const mat3& n )
+	{
+		return mat3( m ) *= n;
+	}
+
+	bool operator ==( const mat3& m, const mat3& n )
+	{
+		for ( u8 i = 0; i != 3; ++i )
+		{
+			for ( u8 j = 0; j != 3; ++j )
+			{
+				if ( !is_equal( m[ i ][ j ], n[ i ][ j ] ) )
+					return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool operator !=( const mat3& m, const mat3& n )
+	{
+		return !( m == n );
+	}
+
+	vec3 dot( const mat3& m, const vec3& v )
+	{
+		return vec3(
+			m[ 0 ][ 0 ] * v.x + m[ 0 ][ 1 ] * v.y + m[ 0 ][ 2 ] * v.z,
+			m[ 1 ][ 0 ] * v.x + m[ 1 ][ 1 ] * v.y + m[ 1 ][ 2 ] * v.z,
+			m[ 2 ][ 0 ] * v.x + m[ 2 ][ 1 ] * v.y + m[ 2 ][ 2 ] * v.z );
+	}
+
+	vec3 dot( const vec3& v, const mat3& m )
 	{
 		return vec3(
 			m[ 0 ][ 0 ] * v.x + m[ 1 ][ 0 ] * v.y + m[ 2 ][ 0 ] * v.z,

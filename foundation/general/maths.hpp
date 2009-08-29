@@ -97,6 +97,8 @@ namespace ooe
 	vec3 operator +( const vec3&, const vec3& ) OOE_VISIBLE;
 	vec3 operator /( const vec3&, f32 ) OOE_VISIBLE;
 	vec3 operator *( const vec3&, f32 ) OOE_VISIBLE;
+	bool operator ==( const vec3&, const vec3& ) OOE_VISIBLE;
+	bool operator !=( const vec3&, const vec3& ) OOE_VISIBLE;
 
 	f32 magnitude_squared( const vec3& ) OOE_VISIBLE;
 	f32 magnitude( const vec3& ) OOE_VISIBLE;
@@ -144,9 +146,13 @@ namespace ooe
 	mat3 operator +( const mat3&, const mat3& ) OOE_VISIBLE;
 	mat3 operator /( const mat3&, f32 ) OOE_VISIBLE;
 	mat3 operator *( const mat3&, f32 ) OOE_VISIBLE;
+	mat3 operator *( const mat3&, const vec3& ) OOE_VISIBLE;
 	mat3 operator *( const mat3&, const mat3& ) OOE_VISIBLE;
-	vec3 operator *( const mat3&, const vec3& ) OOE_VISIBLE;
+	bool operator ==( const mat3&, const mat3& ) OOE_VISIBLE;
+	bool operator !=( const mat3&, const mat3& ) OOE_VISIBLE;
 
+	vec3 dot( const mat3&, const vec3& ) OOE_VISIBLE;
+	vec3 dot( const vec3&, const mat3& ) OOE_VISIBLE;
 	mat3 transpose( const mat3& ) OOE_VISIBLE;
 	mat4 translate( const mat3&, const vec3& ) OOE_VISIBLE;
 

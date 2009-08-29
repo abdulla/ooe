@@ -244,34 +244,6 @@ namespace
 		perspective();
 		orthographic();
 		look_at();
-
-		mat4 a( make() );
-		mat3 w( a );
-		mat4 u( w );
-		vec3 v( 8, 4, 2 );
-		print( "mat3 * vec3", w * v );
-		print( "mat4 * vec3", u * v );
-
-		print( "normal mat3", w );
-		print( "transpose mat3", transpose( w ) );
-
-		print( "normal mat4", a );
-		print( "transpose mat4", transpose( a ) );
-
-		quat q( euler_angle< quat >( degree( 30 ), degree( 60 ), degree( 90 ) ) );
-		f32 x = static_cast< f32 >( std::rand() % 32 );
-		f32 y = static_cast< f32 >( std::rand() % 32 );
-		f32 z = static_cast< f32 >( std::rand() % 32 );
-		vec3 vec( x, y, z );
-
-		print( "camera short", translate( to_matrix( q ), vec ) );
-
-		mat3 rot( to_matrix( q ) );
-		vec3 trans( rot * vec );
-		mat4 mat( rot );
-		column( mat[ 3 ], trans );
-
-		print( "camera long", mat );
 	}
 
 	struct interface
