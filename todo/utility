@@ -1,3 +1,6 @@
 add little-endian, big-endian types, which can automatically translate
 	- on assignment or reading it translates depending on the platform it was compiled for
 	- le< u64 >, be< s32 > or possible little_endian< u64 >, big_endian< s32 > templates
+
+consider removing operator type*() from pointer
+	- this would ensure that pointer could not be accidentally abused
