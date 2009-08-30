@@ -138,7 +138,7 @@ namespace ooe
 
 		for ( s32 i = 0; i != used; ++i )
 		{
-			string << "\n#" << i << ' ' << address[ i ];
+			string << '\n' << i << ": " << address[ i ];
 
 			if ( dladdr( address[ i ], &info ) && info.dli_sname )
 				string << ' ' << demangle( info.dli_sname );

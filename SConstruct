@@ -55,4 +55,4 @@ root.Append( SHLINKFLAGS = ooe.link_flags )
 
 ### export #####################################################################
 Export( Split( 'name ooe platform root' ) )
-SConscript( dirs = Split( 'component external foundation' ) )
+SConscript( dirs = Split( 'component external foundation test' ) )

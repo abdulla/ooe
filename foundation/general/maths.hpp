@@ -97,6 +97,8 @@ namespace ooe
 	vec3 operator +( const vec3&, const vec3& ) OOE_VISIBLE;
 	vec3 operator /( const vec3&, f32 ) OOE_VISIBLE;
 	vec3 operator *( const vec3&, f32 ) OOE_VISIBLE;
+	bool operator ==( const vec3&, const vec3& ) OOE_VISIBLE;
+	bool operator !=( const vec3&, const vec3& ) OOE_VISIBLE;
 
 	f32 magnitude_squared( const vec3& ) OOE_VISIBLE;
 	f32 magnitude( const vec3& ) OOE_VISIBLE;
@@ -132,6 +134,7 @@ namespace ooe
 		mat3& operator +=( const mat3& );
 		mat3& operator /=( f32 );
 		mat3& operator *=( f32 );
+		mat3& operator *=( const vec3& );
 		mat3& operator *=( const mat3& );
 
 	private:
@@ -144,9 +147,13 @@ namespace ooe
 	mat3 operator +( const mat3&, const mat3& ) OOE_VISIBLE;
 	mat3 operator /( const mat3&, f32 ) OOE_VISIBLE;
 	mat3 operator *( const mat3&, f32 ) OOE_VISIBLE;
+	mat3 operator *( const mat3&, const vec3& ) OOE_VISIBLE;
 	mat3 operator *( const mat3&, const mat3& ) OOE_VISIBLE;
-	vec3 operator *( const mat3&, const vec3& ) OOE_VISIBLE;
+	bool operator ==( const mat3&, const mat3& ) OOE_VISIBLE;
+	bool operator !=( const mat3&, const mat3& ) OOE_VISIBLE;
 
+	vec3 dot( const mat3&, const vec3& ) OOE_VISIBLE;
+	vec3 dot( const vec3&, const mat3& ) OOE_VISIBLE;
 	mat3 transpose( const mat3& ) OOE_VISIBLE;
 	mat4 translate( const mat3&, const vec3& ) OOE_VISIBLE;
 
@@ -195,8 +202,11 @@ namespace ooe
 	mat4 operator /( const mat4&, f32 ) OOE_VISIBLE;
 	mat4 operator *( const mat4&, f32 ) OOE_VISIBLE;
 	mat4 operator *( const mat4&, const mat4& ) OOE_VISIBLE;
-	vec3 operator *( const mat4&, const vec3& ) OOE_VISIBLE;
+	bool operator ==( const mat4&, const mat4& ) OOE_VISIBLE;
+	bool operator !=( const mat4&, const mat4& ) OOE_VISIBLE;
 
+	vec3 dot( const mat4&, const vec3& ) OOE_VISIBLE;
+	vec3 dot( const vec3&, const mat4& ) OOE_VISIBLE;
 	mat4 transpose( const mat4& ) OOE_VISIBLE;
 	mat4 translate( const mat4&, const vec3& ) OOE_VISIBLE;
 	mat4 scale( const mat4&, const vec3& ) OOE_VISIBLE;
@@ -209,6 +219,9 @@ namespace ooe
 	{
 		static const quat zero;
 		static const quat identity;
+		static const quat x_180;
+		static const quat y_180;
+		static const quat z_180;
 
 		f32 x;
 		f32 y;
@@ -230,9 +243,12 @@ namespace ooe
 	quat operator +( const quat&, const quat& ) OOE_VISIBLE;
 	quat operator /( const quat&, f32 ) OOE_VISIBLE;
 	quat operator *( const quat&, f32 ) OOE_VISIBLE;
-	quat operator *( const quat&, const quat& ) OOE_VISIBLE;
 	vec3 operator *( const quat&, const vec3& ) OOE_VISIBLE;
+	quat operator *( const quat&, const quat& ) OOE_VISIBLE;
+	bool operator ==( const quat&, const quat& ) OOE_VISIBLE;
+	bool operator !=( const quat&, const quat& ) OOE_VISIBLE;
 
+	f32 dot( const quat&, const quat& ) OOE_VISIBLE;
 	f32 magnitude_squared( const quat& ) OOE_VISIBLE;
 	f32 magnitude( const quat& ) OOE_VISIBLE;
 	f32 sum( const quat& ) OOE_VISIBLE;
@@ -240,8 +256,7 @@ namespace ooe
 	quat conjugate( const quat& ) OOE_VISIBLE;
 	quat inverse( const quat& ) OOE_VISIBLE;
 	mat3 to_matrix( const quat& ) OOE_VISIBLE;
-	quat rotation( const vec3&, const vec3& ) OOE_VISIBLE;
-	f32 dot( const quat&, const quat& ) OOE_VISIBLE;
+	quat rotate( const vec3&, const vec3& ) OOE_VISIBLE;
 	quat slerp( f32, const quat&, const quat& ) OOE_VISIBLE;
 	quat squad( f32, const quat&, const quat&, const quat&, const quat& ) OOE_VISIBLE;
 
