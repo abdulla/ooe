@@ -3,6 +3,8 @@
 #include <cerrno>
 #include <csignal>
 
+#include <sys/wait.h>
+
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/guard.hpp"
