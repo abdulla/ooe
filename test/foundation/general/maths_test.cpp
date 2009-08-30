@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "foundation/general/maths.hpp"
-#include "foundation/utility/convert.hpp"
 #include "test/unit/assert.hpp"
 #include "test/unit/group.hpp"
 
