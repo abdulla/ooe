@@ -64,19 +64,12 @@ namespace ooe
 
 	mat4 camera::matrix( void ) const
 	{
-		mat4 r(
-			look.z.x, look.y.x, look.x.x, 0,
-			look.z.y, look.y.y, look.x.y, 0,
-			look.z.z, look.y.z, look.x.z, 0,
-			0, 0, 0, 1 );
+		mat3 rotation(
+			look.z.x, look.y.x, look.x.x,
+			look.z.y, look.y.y, look.x.y,
+			look.z.z, look.y.z, look.x.z );
 
-		mat4 t(
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			eye.x, eye.y, eye.z, 1 );
-
-		return limit.projection * r * t;
+		return limit.projection * ooe::translate( rotation, eye );
 	}
 
 	aabb camera::aabb( void ) const
