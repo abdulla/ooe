@@ -81,7 +81,7 @@ namespace
 			}
 
 			vector[ i->_0 ] = vector_tuple( passed, read_output( i->_1 ) );
-			list.erase( i );
+			i = --list.erase( i );
 		}
 	}
 
