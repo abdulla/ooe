@@ -5,6 +5,6 @@ build.Append( LIBS = Split( 'executable image io' ) )
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
 
-out = build.Program( '#binary/image_test', Glob( '*.cpp' ) )
+out = build.Program( '#binary/image_test_old', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )
-build.Clean( out, '#binary/image_test.log' )
+build.Clean( out, '#binary/image_test_old.log' )
