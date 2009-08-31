@@ -2,7 +2,7 @@ Import( Split( 'name root' ) )
 
 ### build ######################################################################
 build = root.Clone()
-build.Append( LIBS = Split( 'executable general unit' ) )
+build.Append( LIBS = Split( 'executable general io parallel unit' ) )
 
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
