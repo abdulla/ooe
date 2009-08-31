@@ -85,6 +85,29 @@ namespace
 		}
 	}
 
+	vector_type run_group( unit::group_base& group, time_t time_out )
+	{
+		list_type list;
+		up_t j = 0;
+
+		for ( unit::group_base::iterator_type i = group.begin(), end = group.end(); i != end; ++i )
+		{
+			executable::fork_io fork_io;
+
+			if ( !fork_io.is_child() )
+				list.push_back( list_tuple( j++, fork_io, timer() ) );
+			else
+				run_test( i );
+		}
+
+		vector_type vector( j );
+
+		while ( !list.empty() )
+			collect_tests( vector, list, time_out );
+
+		return vector;
+	}
+
 	void print_tests( const std::string& name, const vector_type& vector )
 	{
 		std::cout << "Group: " << name << '\n';
@@ -111,27 +134,15 @@ namespace
 		}
 	}
 
-	vector_type run_group( unit::group_base& group, time_t time_out )
+	bool is_successful( const vector_type& vector )
 	{
-		list_type list;
-		up_t j = 0;
-
-		for ( unit::group_base::iterator_type i = group.begin(), end = group.end(); i != end; ++i )
+		for ( vector_type::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
 		{
-			executable::fork_io fork_io;
-
-			if ( !fork_io.is_child() )
-				list.push_back( list_tuple( j++, fork_io, timer() ) );
-			else
-				run_test( i );
+			if ( !i->_0 )
+				return false;
 		}
 
-		vector_type vector( j );
-
-		while ( !list.empty() )
-			collect_tests( vector, list, time_out );
-
-		return vector;
+		return true;
 	}
 }
 
@@ -158,19 +169,31 @@ namespace ooe
 		map.insert( map_type::value_type( name, &group ) );
 	}
 
-	void unit::runner::run( time_t time_out ) const
+	bool unit::runner::run( time_t time_out ) const
 	{
+		bool success = true;
+
 		for ( map_type::const_iterator i = begin(), j = end(); i != j; ++i )
-			print_tests( i->first, run_group( *i->second, time_out ) );
+		{
+			vector_type vector = run_group( *i->second, time_out );
+			print_tests( i->first, vector );
+
+			if ( !is_successful( vector ) )
+				success = false;
+		}
+
+		return success;
 	}
 
-	void unit::runner::run( const std::string& name, time_t time_out ) const
+	bool unit::runner::run( const std::string& name, time_t time_out ) const
 	{
 		map_type::const_iterator i = map.find( name );
 
 		if ( i == map.end() )
 			throw error::runtime( "unit::runner: " ) << "Unable to find group \"" << name << '"';
 
-		print_tests( name, run_group( *i->second, time_out ) );
+		vector_type vector = run_group( *i->second, time_out );
+		print_tests( name, vector );
+		return is_successful( vector );
 	}
 }

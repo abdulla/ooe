@@ -29,8 +29,8 @@ namespace ooe
 		iterator_type begin( void ) const;
 		iterator_type end( void ) const;
 		void insert( const std::string&, group_base& );
-		void run( time_t = 60 ) const;
-		void run( const std::string&, time_t = 60 ) const;
+		bool run( time_t = 60 ) const;
+		bool run( const std::string&, time_t = 60 ) const;
 
 	private:
 		map_type map;
