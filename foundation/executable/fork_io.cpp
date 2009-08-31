@@ -118,17 +118,6 @@ namespace ooe
 	{
 	}
 
-	executable::fork_io::fork_io( const fork_io& copy )
-		: id( copy.id )
-	{
-	}
-
-	executable::fork_io& executable::fork_io::operator =( const fork_io& copy )
-	{
-		id = copy.id;
-		return *this;
-	}
-
 	up_t executable::fork_io::read( void* buffer, up_t bytes )
 	{
 		sp_t read_ = ::read( id->read, buffer, bytes );

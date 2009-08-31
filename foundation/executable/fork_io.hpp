@@ -27,9 +27,6 @@ namespace ooe
 		fork_io( void );
 		~fork_io( void );
 
-		fork_io( const fork_io& );
-		fork_io& operator =( const fork_io& );
-
 		up_t read( void*, up_t );
 		up_t write( const void*, up_t );
 		wait_type wait( bool = true ) const;
