@@ -14,8 +14,8 @@ namespace ooe
 	file::file( const descriptor& desc )
 		: descriptor( desc )
 	{
-		if ( type() != descriptor::file )
-			throw error::io( "file: " ) << "Descriptor is not a file";
+		if ( type() != descriptor::file && type() != descriptor::character )
+			throw error::io( "file: " ) << "Descriptor is not a file or character device";
 	}
 
 	void file::sync( void ) const
