@@ -78,7 +78,7 @@ namespace ooe
 	template< typename type >
 		void* to_pointer( type function )
 	{
-		return symbol< type >.pointer;
+		return symbol< type >( function ).pointer;
 	}
 
 //--- destroy ------------------------------------------------------------------
