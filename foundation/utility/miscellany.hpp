@@ -75,6 +75,12 @@ namespace ooe
 		}
 	};
 
+	template< typename type >
+		void* to_pointer( type function )
+	{
+		return symbol< type >.pointer;
+	}
+
 //--- destroy ------------------------------------------------------------------
 	template< typename type >
 		void destroy( void* object )

@@ -394,7 +394,7 @@ namespace ooe
 
 		static void push( stack& stack, value_type function )
 		{
-			stack.pushlightuserdata( symbol< value_type >( function ).pointer );
+			stack.pushlightuserdata( to_pointer( function ) );
 			stack.pushcclosure( lua::function_native< value_type >::dispatch, 1 );
 		}
 	};
