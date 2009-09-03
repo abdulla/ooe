@@ -1,3 +1,5 @@
+import sys
+
 ### flags ######################################################################
 flags_debug = Split( '-O0 -g2 -fno-inline -fstack-protector-all -D_FORTIFY_SOURCE=2' )
 
@@ -19,6 +21,17 @@ root = Environment( CPPPATH = '#', LIBPATH = '#library', CXXFLAGS = flags_cxx )
 #root.SetOption( 'silent', True )
 #root.SetOption( 'num_jobs', 4 )
 
+colour = { 'cyan': '\033[46m', 'green': '\033[42m', 'yellow': '\033[43m', 'none': '\033[0m' }
+
+if not sys.stdout.isatty():
+	for key in colour.iterkeys():
+		colour[ key ] = ''
+
+root.Replace( CXXCOMSTR = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] ) )
+root.Replace( SHCXXCOMSTR = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] ) )
+root.Replace( LINKCOMSTR = '\t%s[LD]%s $TARGET' % ( colour[ 'cyan' ], colour[ 'none' ] ) )
+root.Replace( SHLINKCOMSTR = '\t%s[LD]%s $TARGET' % ( colour[ 'yellow' ], colour[ 'none' ] ) )
+
 ### arguments ##################################################################
 vars = Variables()
 vars.Add( EnumVariable( 'build', 'build type', 'debug', ( 'debug', 'release' ) ) )
@@ -35,12 +48,13 @@ else:
 
 ### platform ###################################################################
 name = root[ 'PLATFORM' ]
-root.Replace( CXX = './script/compiler ' + name )
 
 if name == 'posix':
 	from platform.posix import *
+	root.Replace( CXX = ooe.compiler )
 	if build == 'release': root.Append( LINKFLAGS = Split( '-Wl,--strip-all -Wl,--gc-sections' ) )
 elif name == 'darwin':
+	root.Replace( CXX = ooe.compiler )
 	from platform.darwin import *
 else:
 	print 'Platform:', name, '->', 'unknown'

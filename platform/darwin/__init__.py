@@ -1,4 +1,5 @@
 class ooe:
+	compiler = 'g++-4.2'
 	include_path = [ '/sw/include' ]
 	library_path = [ '/sw/lib' ]
 	link_flags = [ '-Wl,-undefined,dynamic_lookup' ]

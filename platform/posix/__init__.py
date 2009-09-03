@@ -1,4 +1,5 @@
 class ooe:
+	compiler = 'g++'
 	include_path = []
 	library_path = []
 	link_flags = []
