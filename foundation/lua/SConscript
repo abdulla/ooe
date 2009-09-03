@@ -3,11 +3,14 @@ Import( Split( 'name ooe root' ) )
 ### configure ##################################################################
 build = root.Clone()
 build.Append( CPPPATH = ooe.lua.include_path )
-setup = Configure( build )
 
-if not setup.CheckLibWithHeader( ooe.lua.library, 'lauxlib.h', 'c' ): Exit( 1 )
+if not build.GetOption( 'clean' ):
+	setup = Configure( build )
 
-build = setup.Finish()
+	if not setup.CheckLibWithHeader( ooe.lua.library, 'lauxlib.h', 'c' ):
+		Exit( 1 )
+
+	build = setup.Finish()
 
 ### build ######################################################################
 if name == 'darwin':

@@ -27,10 +27,10 @@ if not sys.stdout.isatty():
 	for key in colour.iterkeys():
 		colour[ key ] = ''
 
-root.Replace( CXXCOMSTR = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] ) )
-root.Replace( SHCXXCOMSTR = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] ) )
-root.Replace( LINKCOMSTR = '\t%s[LD]%s $TARGET' % ( colour[ 'cyan' ], colour[ 'none' ] ) )
-root.Replace( SHLINKCOMSTR = '\t%s[LD]%s $TARGET' % ( colour[ 'yellow' ], colour[ 'none' ] ) )
+root[ 'CXXCOMSTR' ] = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] )
+root[ 'SHCXXCOMSTR' ] = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] )
+root[ 'LINKCOMSTR' ] = '\t%s[LD]%s $TARGET' % ( colour[ 'cyan' ], colour[ 'none' ] )
+root[ 'SHLINKCOMSTR' ] = '\t%s[LD]%s $TARGET' % ( colour[ 'yellow' ], colour[ 'none' ] )
 
 ### arguments ##################################################################
 vars = Variables()

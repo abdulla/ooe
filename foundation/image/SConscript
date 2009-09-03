@@ -3,20 +3,22 @@ Import( Split( 'name ooe root' ) )
 ### configure ##################################################################
 build = root.Clone()
 build.Append( CPPPATH = ooe.exr.include_path )
-setup = Configure( build )
 
-if not setup.CheckLibWithHeader( 'jpeg', Split( 'stdio.h jpeglib.h' ), 'c' ): Exit( 1 )
-if not setup.CheckLibWithHeader( 'openjpeg', 'openjpeg.h', 'c' ): Exit( 1 )
-if not setup.CheckLibWithHeader( 'png', 'png.h', 'c' ): Exit( 1 )
-if not setup.CheckLibWithHeader( 'squish', 'squish.h', 'c++' ): Exit( 1 )
-if not setup.CheckLib( 'Half', language = 'c++' ): Exit( 1 )
-if not setup.CheckLib( 'Iex', language = 'c++' ): Exit( 1 )
-if not setup.CheckLib( 'IlmImf', language = 'c++' ): Exit( 1 )
+if not build.GetOption( 'clean' ):
+	setup = Configure( build )
 
-if name == 'darwin':
-	if not setup.CheckLib( 'IlmThread', language = 'c++' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'jpeg', Split( 'stdio.h jpeglib.h' ), 'c' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'openjpeg', 'openjpeg.h', 'c' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'png', 'png.h', 'c' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'squish', 'squish.h', 'c++' ): Exit( 1 )
+	if not setup.CheckLib( 'Half', language = 'c++' ): Exit( 1 )
+	if not setup.CheckLib( 'Iex', language = 'c++' ): Exit( 1 )
+	if not setup.CheckLib( 'IlmImf', language = 'c++' ): Exit( 1 )
 
-build = setup.Finish()
+	if name == 'darwin':
+		if not setup.CheckLib( 'IlmThread', language = 'c++' ): Exit( 1 )
+
+	build = setup.Finish()
 
 ### build ######################################################################
 if name == 'darwin':

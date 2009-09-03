@@ -2,14 +2,16 @@ Import( Split( 'name root' ) )
 
 ### configure ##################################################################
 build = root.Clone()
-setup = Configure( build )
 
-if name == 'posix':
-	if not setup.CheckLibWithHeader( 'uuid', 'uuid/uuid.h', 'c' ): Exit( 1 )
-elif name == 'darwin':
-	if not setup.CheckCHeader( 'uuid/uuid.h' ): Exit( 1 )
+if not build.GetOption( 'clean' ):
+	setup = Configure( build )
 
-build = setup.Finish()
+	if name == 'posix':
+		if not setup.CheckLibWithHeader( 'uuid', 'uuid/uuid.h', 'c' ): Exit( 1 )
+	elif name == 'darwin':
+		if not setup.CheckCHeader( 'uuid/uuid.h' ): Exit( 1 )
+
+	build = setup.Finish()
 
 ### build ######################################################################
 build.Append( LIBS = [ 'executable' ] )

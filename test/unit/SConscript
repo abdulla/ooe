@@ -1,8 +1,12 @@
 Import( Split( 'name root' ) )
 
 ### configure ##################################################################
-setup = Configure( root.Clone() )
-build = setup.Finish()
+build = root.Clone()
+
+if not build.GetOption( 'clean' ):
+	setup = Configure( build )
+
+	build = setup.Finish()
 
 ### build ######################################################################
 if name == 'darwin':

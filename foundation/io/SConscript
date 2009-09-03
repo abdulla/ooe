@@ -1,12 +1,16 @@
 Import( Split( 'name platform root' ) )
 
 ### configure ##################################################################
-setup = Configure( root.Clone() )
+build = root.Clone()
 
-if name == 'posix':
-	if not setup.CheckFunc( 'splice', '#include <fcntl.h>' ): Exit( 1 )
+if not build.GetOption( 'clean' ):
+	setup = Configure( build )
 
-build = setup.Finish()
+	if name == 'posix':
+		if not setup.CheckFunc( 'splice', '#include <fcntl.h>' ):
+			Exit( 1 )
+
+	build = setup.Finish()
 
 ### build ######################################################################
 if name == 'darwin':
