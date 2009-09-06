@@ -1,7 +1,8 @@
 import sys
 
 ### flags ######################################################################
-flags_debug = Split( '-O0 -g2 -fno-inline -fstack-protector-all -D_FORTIFY_SOURCE=2' )
+defines_debug = Split( '_FORTIFY_SOURCE=2' )
+flags_debug = Split( '-O0 -g2 -fno-inline -fstack-protector-all' )
 
 flags_release = Split( '-O3 -g0 -fomit-frame-pointer -ffast-math -ftracer -fweb '
 	'-fvisibility=hidden -fvisibility-inlines-hidden' )
@@ -18,7 +19,6 @@ flags_cxx += Split( '-Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wnon-virtual-
 
 ### setup ######################################################################
 root = Environment( CPPPATH = '#', LIBPATH = '#library', CXXFLAGS = flags_cxx )
-#root.SetOption( 'silent', True )
 #root.SetOption( 'num_jobs', 4 )
 
 colour = { 'cyan': '\033[46m', 'green': '\033[42m', 'yellow': '\033[43m', 'none': '\033[0m' }
@@ -44,6 +44,7 @@ print 'Build:', build
 if build == 'release':
 	root.Append( CXXFLAGS = flags_release )
 else:
+	root.Append( CPPDEFINES = defines_debug )
 	root.Append( CXXFLAGS = flags_debug )
 
 ### platform ###################################################################
