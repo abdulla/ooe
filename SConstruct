@@ -68,6 +68,6 @@ root.Append( CPPPATH = [ platform ] + ooe.include_path )
 root.Append( LIBPATH = ooe.library_path )
 root.Append( SHLINKFLAGS = ooe.link_flags )
 
-### export #####################################################################
+### exports ####################################################################
 Export( Split( 'name ooe platform root' ) )
 SConscript( dirs = Split( 'component external foundation test' ) )
