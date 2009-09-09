@@ -109,8 +109,8 @@ namespace ooe
 			buffer_tuple tuple = header_adjust( transport.get() );
 
 			{
-				up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-					call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+				up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
+					call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 				write_buffer buffer( tuple, size );
 
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
@@ -144,8 +144,8 @@ namespace ooe
 			buffer_tuple tuple = header_adjust( transport.get() );
 
 			{
-				up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
-					call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+				up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
+					call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 				write_buffer buffer( tuple, size );
 
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
