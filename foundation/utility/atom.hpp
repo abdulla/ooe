@@ -7,12 +7,14 @@
 
 namespace ooe
 {
-#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
 	inline void memory_barrier( void )
 	{
+#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
 		__sync_synchronize();
-	}
+#else
+		__asm__ __volatile__( "" : : : "memory" );
 #endif
+	}
 
 	template< typename type >
 		class atom
@@ -90,34 +92,34 @@ namespace ooe
 	};
 
 //--- atom_ptr -----------------------------------------------------------------
-	template< typename type >
+	template< typename type, template< typename > class deleter = delete_ptr >
 		struct atom_ptr
-		: public shared_dereference< type, operator delete, atom< unsigned > >
+		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
 		atom_ptr( type* value = 0 )
-			: shared_dereference< type, operator delete, atom< unsigned > >( value )
+			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
 		{
 		}
 	};
 
 //--- atom_array ---------------------------------------------------------------
-	template< typename type >
+	template< typename type, template< typename > class deleter = delete_array >
 		struct atom_array
-		: public shared_dereference< type, operator delete[], atom< unsigned > >
+		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
 		atom_array( type* value = 0 )
-			: shared_dereference< type, operator delete[], atom< unsigned > >( value )
+			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
 		{
 		}
 	};
 
 //--- atom_free ----------------------------------------------------------------
-	template< typename type >
+	template< typename type, template< typename > class deleter = delete_free >
 		struct atom_free
-		: public shared_dereference< type, free, atom< unsigned > >
+		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
 		atom_free( type* value = 0 )
-			: shared_dereference< type, free, atom< unsigned > >( value )
+			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
 		{
 		}
 	};
