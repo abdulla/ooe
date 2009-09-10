@@ -1,0 +1,9 @@
+#!/bin/sh
+
+EXTENSION=`echo "$@" | awk -F ' ' '{ printf $NF }' | cut -d . -f 2`
+
+if [ "$EXTENSION" = 'mm' ]; then
+	exec g++-4.2 $@
+else
+	exec g++-4 $@
+fi

@@ -55,8 +55,8 @@ if name == 'posix':
 	root.Replace( CXX = ooe.compiler )
 	if build == 'release': root.Append( LINKFLAGS = Split( '-Wl,--strip-all -Wl,--gc-sections' ) )
 elif name == 'darwin':
-	root.Replace( CXX = ooe.compiler )
 	from platform.darwin import *
+	root.Replace( CXX = ooe.compiler )
 else:
 	print 'Platform:', name, '->', 'unknown'
 	Exit( 1 )
