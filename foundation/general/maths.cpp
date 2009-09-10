@@ -336,8 +336,10 @@ namespace ooe
 		for ( u8 i = 0; i != 3; ++i )
 		{
 			for ( u8 j = 0; j != 3; ++j )
-				o[ i ][ j ] = m[ i ][ 0 ] * n[ 0 ][ j ] + m[ i ][ 1 ] * n[ 1 ][ j ] +
-					m[ i ][ 2 ] * n[ 2 ][ j ];
+				o[ j ][ i ] =
+					m[ 0 ][ i ] * n[ j ][ 0 ] +
+					m[ 1 ][ i ] * n[ j ][ 1 ] +
+					m[ 2 ][ i ] * n[ j ][ 2 ];
 		}
 
 		return o;
@@ -602,8 +604,11 @@ namespace ooe
 		for ( u8 i = 0; i != 4; ++i )
 		{
 			for ( u8 j = 0; j != 4; ++j )
-				o[ i ][ j ] = m[ i ][ 0 ] * n[ 0 ][ j ] + m[ i ][ 1 ] * n[ 1 ][ j ] +
-					m[ i ][ 2 ] * n[ 2 ][ j ] + m[ i ][ 3 ] * n[ 3 ][ j ];
+				o[ j ][ i ] =
+					m[ 0 ][ i ] * n[ j ][ 0 ] +
+					m[ 1 ][ i ] * n[ j ][ 1 ] +
+					m[ 2 ][ i ] * n[ j ][ 2 ] +
+					m[ 3 ][ i ] * n[ j ][ 3 ];
 		}
 
 		return o;
