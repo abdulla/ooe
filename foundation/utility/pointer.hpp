@@ -13,9 +13,9 @@ extern "C" void free( void* ) __THROW;
 
 namespace ooe
 {
-//--- delete_ptr ---------------------------------------------------------------
+//--- deallocate_ptr -----------------------------------------------------------
 	template< typename type >
-		struct delete_ptr
+		struct deallocate_ptr
 	{
 		static void call( type* value )
 		{
@@ -23,9 +23,9 @@ namespace ooe
 		}
 	};
 
-//--- delete_array -------------------------------------------------------------
+//--- deallocate_array ---------------------------------------------------------
 	template< typename type >
-		struct delete_array
+		struct deallocate_array
 	{
 		static void call( type* value )
 		{
@@ -33,9 +33,9 @@ namespace ooe
 		}
 	};
 
-//--- delete_free --------------------------------------------------------------
+//--- deallocate_free ----------------------------------------------------------
 	template< typename type >
-		struct delete_free
+		struct deallocate_free
 	{
 		static void call( type* value )
 		{
@@ -130,7 +130,7 @@ namespace ooe
 	};
 
 //--- scoped_ptr ---------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_ptr >
+	template< typename type, template< typename > class deleter = deallocate_ptr >
 		struct scoped_ptr
 		: public scoped_dereference< type, deleter< type > >
 	{
@@ -141,7 +141,7 @@ namespace ooe
 	};
 
 //--- scoped_array -------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_array >
+	template< typename type, template< typename > class deleter = deallocate_array >
 		struct scoped_array
 		: public scoped_dereference< type, deleter< type > >
 	{
@@ -152,7 +152,7 @@ namespace ooe
 	};
 
 //--- scoped_free --------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_free >
+	template< typename type, template< typename > class deleter = deallocate_free >
 		struct scoped_free
 		: public scoped_dereference< type, deleter< type > >
 	{
@@ -288,7 +288,7 @@ namespace ooe
 	};
 
 //--- shared_ptr ---------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_ptr >
+	template< typename type, template< typename > class deleter = deallocate_ptr >
 		struct shared_ptr
 		: public shared_dereference< type, deleter< type >, unsigned >
 	{
@@ -299,7 +299,7 @@ namespace ooe
 	};
 
 //--- shared_array -------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_array >
+	template< typename type, template< typename > class deleter = deallocate_array >
 		struct shared_array
 		: public shared_dereference< type, deleter< type >, unsigned >
 	{
@@ -310,7 +310,7 @@ namespace ooe
 	};
 
 //--- shared_free --------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_free >
+	template< typename type, template< typename > class deleter = deallocate_free >
 		struct shared_free
 		: public shared_dereference< type, deleter< type >, unsigned >
 	{

@@ -1,0 +1,12 @@
+Import( Split( 'name root' ) )
+
+### build ######################################################################
+build = root.Clone()
+build.Append( LIBS = Split( 'executable unit' ) )
+
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
+
+out = build.Program( '#binary/utility_test', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
+build.Clean( out, '#binary/utility_test.log' )

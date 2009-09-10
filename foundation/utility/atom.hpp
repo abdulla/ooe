@@ -7,14 +7,12 @@
 
 namespace ooe
 {
+#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
 	inline void memory_barrier( void )
 	{
-#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
 		__sync_synchronize();
-#else
-		__asm__ __volatile__( "" : : : "memory" );
-#endif
 	}
+#endif
 
 	template< typename type >
 		class atom
@@ -92,7 +90,7 @@ namespace ooe
 	};
 
 //--- atom_ptr -----------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_ptr >
+	template< typename type, template< typename > class deleter = deallocate_ptr >
 		struct atom_ptr
 		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
@@ -103,7 +101,7 @@ namespace ooe
 	};
 
 //--- atom_array ---------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_array >
+	template< typename type, template< typename > class deleter = deallocate_array >
 		struct atom_array
 		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
@@ -114,7 +112,7 @@ namespace ooe
 	};
 
 //--- atom_free ----------------------------------------------------------------
-	template< typename type, template< typename > class deleter = delete_free >
+	template< typename type, template< typename > class deleter = deallocate_free >
 		struct atom_free
 		: public shared_dereference< type, deleter< type >, atom< unsigned > >
 	{
