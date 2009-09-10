@@ -51,16 +51,6 @@ namespace
 namespace ooe
 {
 //--- executable::fork_id ------------------------------------------------------
-	struct executable::fork_id
-	{
-		s32 read;
-		s32 write;
-		pid_t pid;
-
-		fork_id( void );
-		~fork_id( void );
-	};
-
 	executable::fork_id::fork_id( void )
 		: read(), write(), pid()
 	{

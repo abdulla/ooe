@@ -14,6 +14,18 @@ namespace ooe
 		class fork_io;
 	}
 
+//--- executable::fork_id ------------------------------------------------------
+	struct executable::fork_id
+	{
+		s32 read;
+		s32 write;
+		pid_t pid;
+
+		fork_id( void );
+		~fork_id( void );
+	};
+
+//--- executable::fork_io ------------------------------------------------------
 	class executable::fork_io
 	{
 	public:
