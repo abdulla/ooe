@@ -5,3 +5,6 @@ make text node
 modify chunked async_tasks to query chunk state for operation
 	- instead of explicitly request load/unload, send in function that'll query state and proceed
 	- this should help remove strain with fast movement and consecutive load/unload on chunks
+
+look at using openctm for models
+	- this would save a lot of trouble with custom model formats
