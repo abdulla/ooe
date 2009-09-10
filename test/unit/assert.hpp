@@ -5,6 +5,10 @@
 
 #include "foundation/utility/string.hpp"
 
+#ifdef assert
+#undef assert
+#endif
+
 namespace ooe
 {
 	namespace unit
