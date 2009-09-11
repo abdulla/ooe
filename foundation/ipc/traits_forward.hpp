@@ -191,7 +191,7 @@ namespace ooe
 		{
 			const c8* string = string_data< t >::call( value );
 			up_t size = ipc::size< t >::call( value );
-			std::copy( string, string + size, buffer );
+			std::memcpy( buffer, string, size );
 			return size;
 		}
 	};

@@ -81,17 +81,23 @@ namespace ooe
 				done = false;
 			}
 
+			bool do_splice = false;
 
-			lock lock( mutex );
-			map_type::iterator i = map.find( ++in );
+			{
+				lock lock( mutex );
+				map_type::iterator i = map.find( ++in );
 
-			if ( i != map.end() )
-				i->second = map_tuple( header_read( connect, size ), done );
-			else
-				splice( connect, size );	// data not needed, splice out of stream
+				if ( i != map.end() )
+					i->second = map_tuple( header_read( connect, size ), done );
+				else
+					do_splice = true;
+			}
 
 			if ( in == notify )
 				condition.notify_one();
+
+			if ( do_splice )
+				splice( connect, size );	// data not needed, splice out of stream
 		}
 
 		return 0;
