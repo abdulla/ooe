@@ -3,6 +3,8 @@
 #ifndef OOE_FOUNDATION_IPC_TRAITS_FORWARD_HPP
 #define OOE_FOUNDATION_IPC_TRAITS_FORWARD_HPP
 
+#include <cstring>
+
 #include <boost/static_assert.hpp>
 
 #include "foundation/utility/string.hpp"
