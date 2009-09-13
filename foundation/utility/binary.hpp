@@ -62,6 +62,25 @@ namespace ooe
 	}
 
 //------------------------------------------------------------------------------
+	inline u32 bit_count( u32 value )
+	{
+		value -= ( value >> 1 ) & 0x55555555;
+		value = ( ( value >> 2 ) & 0x33333333 ) + ( value & 0x33333333 );
+		value += ( value >> 4 ) & 0x0f0f0f0f;
+		return value * 0x01010101 >> 24;
+	}
+
+//------------------------------------------------------------------------------
+	inline u32 parity( u32 value )
+	{
+		value ^= value >> 16;
+		value ^= value >> 8;
+		value ^= value >> 4;
+		value &= 0x0f;
+		return ( 0x6996 >> value ) & 0x01;
+	}
+
+//------------------------------------------------------------------------------
 	// for use with generic code
 	inline u8 endian_swap( u8 value )
 	{
