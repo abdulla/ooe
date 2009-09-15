@@ -12,16 +12,6 @@
 namespace ooe
 {
 //--- ipc::semaphore_id --------------------------------------------------------
-	class ipc::semaphore_id
-	{
-	public:
-		semaphore_id( const std::string& );
-		~semaphore_id( void );
-
-	private:
-		std::string name;
-	};
-
 	ipc::semaphore_id::semaphore_id( const std::string& name_ )
 		: name( name_ )
 	{

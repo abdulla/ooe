@@ -18,6 +18,17 @@ namespace ooe
 		class process_lock;
 	}
 
+//--- ipc::semaphore_id --------------------------------------------------------
+	class ipc::semaphore_id
+	{
+	public:
+		semaphore_id( const std::string& );
+		~semaphore_id( void );
+
+	private:
+		std::string name;
+	};
+
 //--- ipc::semaphore -----------------------------------------------------------
 	class OOE_VISIBLE ipc::semaphore
 	{

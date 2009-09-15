@@ -29,14 +29,6 @@ namespace
 namespace ooe
 {
 //--- ipc::shared_memory_id ----------------------------------------------------
-	struct ipc::shared_memory_id
-	{
-		std::string name;
-
-		shared_memory_id( const std::string& );
-		~shared_memory_id( void );
-	};
-
 	ipc::shared_memory_id::shared_memory_id( const std::string& name_ )
 		: name( name_ )
 	{

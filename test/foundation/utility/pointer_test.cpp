@@ -13,25 +13,8 @@ namespace
 	class data
 	{
 	protected:
-		template< typename >
-			struct deallocate_test;
-
 		class destruct_test;
 	};
-
-	template< typename type >
-		struct data::deallocate_test
-	{
-		static bool state;
-
-		static void call( type* )
-		{
-			state = true;
-		}
-	};
-
-	template< typename type >
-		bool data::deallocate_test< type >::state;
 
 	class data::destruct_test
 	{
@@ -65,12 +48,6 @@ namespace ooe
 		{
 			std::cerr << "scoped_ptr\n";
 
-			deallocate_test< void >::state = false;
-			{
-				scoped_ptr< void, deallocate_test > ptr( 0 );
-			}
-			assert( "deallocate_test::call()", deallocate_test< void >::state );
-
 			bool did_destruct = false;
 			{
 				scoped_ptr< destruct_test > ptr( new destruct_test( did_destruct ) );
@@ -102,12 +79,6 @@ namespace ooe
 			void fixture_type::test< 1 >( void )
 		{
 			std::cerr << "shared_ptr\n";
-
-			deallocate_test< void >::state = false;
-			{
-				shared_ptr< void, deallocate_test > ptr( 0 );
-			}
-			assert( "deallocate_test::call()", deallocate_test< void >::state );
 
 			bool did_destruct = false;
 			{

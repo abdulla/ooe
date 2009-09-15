@@ -90,34 +90,34 @@ namespace ooe
 	};
 
 //--- atom_ptr -----------------------------------------------------------------
-	template< typename type, template< typename > class deleter = deallocate_ptr >
+	template< typename type >
 		struct atom_ptr
-		: public shared_dereference< type, deleter< type >, atom< unsigned > >
+		: public shared_dereference< type, deallocate_ptr< type >, atom< unsigned > >
 	{
 		atom_ptr( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
+			: shared_dereference< type, deallocate_ptr< type >, atom< unsigned > >( value )
 		{
 		}
 	};
 
 //--- atom_array ---------------------------------------------------------------
-	template< typename type, template< typename > class deleter = deallocate_array >
+	template< typename type >
 		struct atom_array
-		: public shared_dereference< type, deleter< type >, atom< unsigned > >
+		: public shared_dereference< type, deallocate_array< type >, atom< unsigned > >
 	{
 		atom_array( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
+			: shared_dereference< type, deallocate_array< type >, atom< unsigned > >( value )
 		{
 		}
 	};
 
 //--- atom_free ----------------------------------------------------------------
-	template< typename type, template< typename > class deleter = deallocate_free >
+	template< typename type >
 		struct atom_free
-		: public shared_dereference< type, deleter< type >, atom< unsigned > >
+		: public shared_dereference< type, deallocate_free< type >, atom< unsigned > >
 	{
 		atom_free( type* value = 0 )
-			: shared_dereference< type, deleter< type >, atom< unsigned > >( value )
+			: shared_dereference< type, deallocate_free< type >, atom< unsigned > >( value )
 		{
 		}
 	};
