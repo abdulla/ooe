@@ -4,6 +4,7 @@
 
 #include "foundation/parallel/lock.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/utility/guard.hpp"
 
 namespace ooe
 {
@@ -11,7 +12,26 @@ namespace ooe
 	mutex::mutex( void )
 		: pthread_mutex()
 	{
-		s32 status = pthread_mutex_init( &pthread_mutex, 0 );
+		pthread_mutexattr_t attributes;
+		s32 status = pthread_mutexattr_init( &attributes );
+
+		if ( status )
+			throw error::runtime( "mutex: " ) << "Unable to create mutex attributes: " <<
+				error::number( status );
+
+		guard< int ( pthread_mutexattr_t* ) > guard( pthread_mutexattr_destroy, &attributes );
+#ifdef __OPTIMIZE__
+		s32 type = PTHREAD_MUTEX_NORMAL;
+#else
+		s32 type = PTHREAD_MUTEX_ERRORCHECK;
+#endif
+		status = pthread_mutexattr_settype( &attributes, type );
+
+		if ( status )
+			throw error::runtime( "mutex: " ) << "Unable to set mutex type: " <<
+				error::number( status );
+
+		status = pthread_mutex_init( &pthread_mutex, &attributes );
 
 		if ( status )
 			throw error::runtime( "mutex: " ) << "Unable to create mutex: " <<
