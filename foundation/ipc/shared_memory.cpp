@@ -34,15 +34,14 @@ namespace ooe
 	{
 		if ( shm_unlink( name.c_str() ) && errno != OOE_NOEXIST )
 			throw error::runtime( "ipc::shared_memory: " ) <<
-				"Unable to unlink shared memory: \"" << name << "\": " <<
-				error::number( errno ) << '\n';
+				"Unable to unlink shared memory \"" << name << "\": " << error::number( errno );
 	}
 
 	ipc::shared_memory_id::~shared_memory_id( void )
 	{
 		if ( shm_unlink( name.c_str() ) && errno != OOE_NOEXIST )
-			OOE_WARNING( "ipc::shared_memory", "Unable to unlink shared memory \"" <<
-				name << "\": " << error::number( errno ) );
+			OOE_WARNING( "ipc::shared_memory",
+				"Unable to unlink shared memory \"" << name << "\": " << error::number( errno ) );
 	}
 
 //--- ipc::shared_memory_base --------------------------------------------------
@@ -74,5 +73,37 @@ namespace ooe
 	void ipc::shared_memory::unlink( void )
 	{
 		delete shared_memory_base::id.release();
+	}
+
+//--- ipc::locked_memory -------------------------------------------------------
+	ipc::locked_memory::locked_memory( const std::string& name_, type mode, up_t size_ )
+		: shared_memory( name_, mode, size_ )
+	{
+		if ( mlock( get(), size() ) )
+			throw error::runtime( "ipc::locked_memory: " ) <<
+				"Unable to lock shared memory \"" << name_ << "\": " << error::number( errno );
+	}
+
+	ipc::locked_memory::~locked_memory( void )
+	{
+		if ( munlock( get(), size() ) )
+			OOE_WARNING( "ipc::locked_memory",
+				"Unable to unlock shared memory \"" << name() << "\": " << error::number( errno ) );
+	}
+
+//--- ipc::memory_lock ---------------------------------------------------------
+	ipc::memory_lock::memory_lock( shared_memory& memory_ )
+		: memory( memory_ )
+	{
+		if ( mlock( memory.get(), memory.size() ) )
+			throw error::runtime( "ipc::memory_lock: " ) << "Unable to lock shared memory \"" <<
+				memory.name() << "\": " << error::number( errno );
+	}
+
+	ipc::memory_lock::~memory_lock( void )
+	{
+		if ( munlock( memory.get(), memory.size() ) )
+			OOE_WARNING( "ipc::memory_lock", "Unable to unlock shared memory \"" <<
+				memory.name() << "\": " << error::number( errno ) );
 	}
 }
