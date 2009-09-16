@@ -28,7 +28,7 @@ namespace ooe
 			if ( internal )
 				unshared = tuple._0;
 			else
-				shared = new locked_memory( unique_name(), locked_memory::create, size );
+				shared = new shared_memory( unique_name(), shared_memory::create, size );
 		}
 
 		write_buffer( const std::string& name_, u8* data )
@@ -37,7 +37,7 @@ namespace ooe
 			if ( internal )
 				unshared = data;
 			else
-				shared = new locked_memory( name_ );
+				shared = new shared_memory( name_ );
 		}
 
 		~write_buffer( void )
@@ -77,7 +77,7 @@ namespace ooe
 		union
 		{
 			u8* unshared;
-			locked_memory* shared;
+			shared_memory* shared;
 		};
 	};
 }

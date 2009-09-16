@@ -29,12 +29,12 @@ namespace
 
 	private:
 		ipc::semaphore semaphore;
-		ipc::locked_memory memory;
+		ipc::shared_memory memory;
 	};
 
 	transport_spinlock::transport_spinlock( const std::string& name, transport::type mode )
 		: semaphore( name, ipc::semaphore::type( mode ), 0 ),
-		memory( name, ipc::locked_memory::type( mode ), executable::static_page_size )
+		memory( name, ipc::shared_memory::type( mode ), executable::static_page_size )
 	{
 	}
 
@@ -100,13 +100,13 @@ namespace
 	private:
 		ipc::semaphore semaphore_in;
 		ipc::semaphore semaphore_out;
-		ipc::locked_memory memory;
+		ipc::shared_memory memory;
 	};
 
 	transport_semaphore::transport_semaphore( const std::string& name, transport::type mode )
 		: semaphore_in( name + ".i", ipc::semaphore::type( mode ), 0 ),
 		semaphore_out( name + ".o", ipc::semaphore::type( mode ), 0 ),
-		memory( name, ipc::locked_memory::type( mode ), executable::static_page_size )
+		memory( name, ipc::shared_memory::type( mode ), executable::static_page_size )
 	{
 	}
 
