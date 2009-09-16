@@ -10,7 +10,7 @@
 #include "foundation/io/file.hpp"
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/guard.hpp"
+#include "foundation/utility/scoped.hpp"
 
 namespace
 {
@@ -82,7 +82,7 @@ namespace ooe
 		if ( !read_info )
 			throw error::runtime( "jpeg2000: " ) << "Unable to create decompression info";
 
-		guard< void ( opj_dinfo_t* ) > guard_read( opj_destroy_decompress, read_info );
+		scoped< void ( opj_dinfo_t* ) > scoped_read( opj_destroy_decompress, read_info );
 		opj_common_struct_t* common_info = reinterpret_cast< opj_common_struct_t* >( read_info );
 
 		opj_event_mgr_t events = { jpeg2000_warning, jpeg2000_warning, 0 };
@@ -93,13 +93,13 @@ namespace ooe
 		if ( !io_info )
 			throw error::runtime( "jpeg2000: " ) << "Unable to create input-output info";
 
-		guard< void ( opj_cio_t* ) > guard_io( opj_cio_close, io_info );
+		scoped< void ( opj_cio_t* ) > scoped_io( opj_cio_close, io_info );
 		opj_image_t* image = opj_decode( read_info, io_info );
 
 		if ( !image )
 			throw error::runtime( "jpeg2000: " ) << "Unable to decode image";
 
-		guard< void ( opj_image_t* ) > guard_image( opj_image_destroy, image );
+		scoped< void ( opj_image_t* ) > scoped_image( opj_image_destroy, image );
 		u32 width = image->x1 - image->x0;
 		u32 height = image->y1 - image->y0;
 		u32 length = width * height;
@@ -143,7 +143,7 @@ namespace ooe
 		if ( !image )
 			throw error::runtime( "jpeg2000: " ) << "Unable to create image";
 
-		guard< void ( opj_image_t* ) > guard_image( opj_image_destroy, image );
+		scoped< void ( opj_image_t* ) > scoped_image( opj_image_destroy, image );
 		image->x0 = 0;
 		image->y0 = 0;
 		image->x1 = in.width;
@@ -166,7 +166,7 @@ namespace ooe
 		if ( !write_info )
 			throw error::runtime( "jpeg2000: " ) << "Unable to create compression info";
 
-		guard< void ( opj_cinfo_t* ) > guard_write( opj_destroy_compress, write_info );
+		scoped< void ( opj_cinfo_t* ) > scoped_write( opj_destroy_compress, write_info );
 		opj_common_struct_t* common_info = reinterpret_cast< opj_common_struct_t* >( write_info );
 
 		opj_event_mgr_t events = { jpeg2000_warning, jpeg2000_warning, 0 };
@@ -177,7 +177,7 @@ namespace ooe
 		if ( !io_info )
 			throw error::runtime( "jpeg2000: " ) << "Unable to create input-output info";
 
-		guard< void ( opj_cio_t* ) > guard_io( opj_cio_close, io_info );
+		scoped< void ( opj_cio_t* ) > scoped_io( opj_cio_close, io_info );
 
 		if ( !opj_encode( write_info, io_info, image, 0 ) )
 			throw error::runtime( "jpeg2000: " ) << "Unable to encode image";

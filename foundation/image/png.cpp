@@ -10,8 +10,8 @@
 #include "foundation/io/file.hpp"
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/guard.hpp"
 #include "foundation/utility/miscellany.hpp"
+#include "foundation/utility/scoped.hpp"
 
 namespace
 {
@@ -116,9 +116,9 @@ namespace ooe
 		if ( !read_struct )
 			throw error::runtime( "png: " ) << "Unable to create read structure";
 
-		guard< void ( png_struct**, png_info**, png_info** ) >
-			guard_read( png_destroy_read_struct, &read_struct, 0, 0 );
-		guard< void ( uncompressed_image* ) > guard_image;
+		scoped< void ( png_struct**, png_info**, png_info** ) >
+			scoped_read( png_destroy_read_struct, &read_struct, 0, 0 );
+		scoped< void ( uncompressed_image* ) > scoped_image;
 
 		if ( setjmp( png_jmpbuf( read_struct ) ) )
 			throw error::runtime( "png: " ) << "Error: " << string;
@@ -129,7 +129,7 @@ namespace ooe
 			throw error::runtime( "png: " ) << "Unable to create info structure";
 
 		tuple_type tuple( static_cast< const u8* >( data ), size );
-		guard_read.assign( png_destroy_read_struct, &read_struct, &info_struct, 0 );
+		scoped_read.assign( png_destroy_read_struct, &read_struct, &info_struct, 0 );
 		png_set_read_fn( read_struct, &tuple, png_read );
 		png_read_info( read_struct, info_struct );
 
@@ -143,10 +143,10 @@ namespace ooe
 		uncompressed_image image( png_get_image_width( read_struct, info_struct ),
 			png_get_image_height( read_struct, info_struct ),
 			png_image_type( png_get_color_type( read_struct, info_struct ) ) );
-		guard_image.assign( destruct< uncompressed_image >, &image );
+		scoped_image.assign( destruct< uncompressed_image >, &image );
 
 		png_destroy_info_struct( read_struct, &info_struct );
-		guard_read.assign( png_destroy_read_struct, &read_struct, 0, 0 );
+		scoped_read.assign( png_destroy_read_struct, &read_struct, 0, 0 );
 
 		u8* pointer = image.as< u8 >();
 		up_t row_size = image.row_size();
@@ -155,7 +155,7 @@ namespace ooe
 			png_read_row( read_struct, pointer, 0 );
 
 		png_read_end( read_struct, 0 );
-		guard_image.clear();
+		scoped_image.clear();
 		return image;
 	}
 
@@ -168,8 +168,8 @@ namespace ooe
 		if ( !write_struct )
 			throw error::runtime( "png: " ) << "Unable to create write structure";
 
-		guard< void ( png_struct**, png_info** ) >
-			guard( png_destroy_write_struct, &write_struct, 0 );
+		scoped< void ( png_struct**, png_info** ) >
+			scoped( png_destroy_write_struct, &write_struct, 0 );
 		file file( desc );
 
 		if ( setjmp( png_jmpbuf( write_struct ) ) )
@@ -180,7 +180,7 @@ namespace ooe
 		if ( !info_struct )
 			throw error::runtime( "png: " ) << "Unable to create info structure";
 
-		guard.assign( png_destroy_write_struct, &write_struct, &info_struct );
+		scoped.assign( png_destroy_write_struct, &write_struct, &info_struct );
 		u8 colour_type = png_colour_type( write_struct, image.format );
 		png_set_IHDR( write_struct, info_struct, image.width, image.height, 8, colour_type,
 			PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
@@ -188,7 +188,7 @@ namespace ooe
 		png_set_write_fn( write_struct, &file, png_write, png_sync );
 		png_write_info( write_struct, info_struct );
 		png_destroy_info_struct( write_struct, &info_struct );
-		guard.assign( png_destroy_write_struct, &write_struct, 0 );
+		scoped.assign( png_destroy_write_struct, &write_struct, 0 );
 
 		png_set_compression_level( write_struct, Z_BEST_COMPRESSION );
 		u8* pointer = image.as< u8 >();

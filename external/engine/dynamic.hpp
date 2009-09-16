@@ -9,8 +9,8 @@
 #include <vector>
 
 #include "foundation/executable/library.hpp"
-#include "foundation/utility/guard.hpp"
 #include "foundation/utility/pointer.hpp"
+#include "foundation/utility/scoped.hpp"
 
 namespace ooe
 {
@@ -56,9 +56,9 @@ namespace ooe
 				reinterpret_cast< function_type >( library.find( symbol ).function );
 			close_type close = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 
-			guard< void ( void* ) > guard( close._1, close._0 );
+			scoped< void ( void* ) > scoped( close._1, close._0 );
 			vector.push_back( close );
-			guard.clear();
+			scoped.clear();
 
 			return *static_cast< type* >( close._0 );
 		}

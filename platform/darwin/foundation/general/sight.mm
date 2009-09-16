@@ -5,7 +5,7 @@
 
 #include "foundation/general/sight.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/guard.hpp"
+#include "foundation/utility/scoped.hpp"
 
 using namespace ooe;
 
@@ -29,8 +29,8 @@ OOE_HIDDEN
 		throw error::runtime( "sight: " ) << "Unable to initialise super";
 
 	typedef id ( send_type )( id, SEL );
-	guard< send_type >
-		guard( reinterpret_cast< send_type* >( objc_msgSend ), self, @selector( release ) );
+	scoped< send_type >
+		scoped( reinterpret_cast< send_type* >( objc_msgSend ), self, @selector( release ) );
 
 	call = call_;
 	session = [ [ QTCaptureSession alloc ] init ];
@@ -81,7 +81,7 @@ OOE_HIDDEN
 			error.localizedDescription.UTF8String;
 
 	[ session startRunning ];
-	guard.clear();
+	scoped.clear();
 	return self;
 }
 

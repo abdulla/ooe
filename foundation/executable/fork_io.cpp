@@ -7,7 +7,7 @@
 
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/guard.hpp"
+#include "foundation/utility/scoped.hpp"
 
 namespace
 {
@@ -21,14 +21,14 @@ namespace
 			throw error::runtime( "executable::fork_io: " ) <<
 				"Unable to duplicate fd " << STDIN_FILENO << ": " << error::number( errno );
 
-		guard< int ( int ) > guard_in( close, in );
+		scoped< int ( int ) > scoped_in( close, in );
 		s32 out = dup( STDERR_FILENO );
 
 		if ( out == -1 )
 			throw error::runtime( "executable::fork_io: " ) <<
 				"Unable to duplicate fd " << STDERR_FILENO << ": " << error::number( errno );
 
-		guard< int ( int ) > guard_out( close, out );
+		scoped< int ( int ) > scoped_out( close, out );
 
 		if ( dup2( read, STDIN_FILENO ) == -1 )
 			throw error::runtime( "executable::fork_io: " ) <<
@@ -43,8 +43,8 @@ namespace
 
 		read = in;
 		write = out;
-		guard_in.clear();
-		guard_out.clear();
+		scoped_in.clear();
+		scoped_out.clear();
 	}
 }
 
@@ -60,16 +60,16 @@ namespace ooe
 			throw error::runtime( "executable::fork_io: " ) <<
 				"Unable to create 1st pipe: " << error::number( errno );
 
-		guard< int ( int ) > guard_1a( close, pipe_1[ 0 ] );
-		guard< int ( int ) > guard_1b( close, pipe_1[ 1 ] );
+		scoped< int ( int ) > scoped_1a( close, pipe_1[ 0 ] );
+		scoped< int ( int ) > scoped_1b( close, pipe_1[ 1 ] );
 		s32 pipe_2[ 2 ];
 
 		if ( pipe( pipe_2 ) )
 			throw error::runtime( "executable::fork_io: " ) <<
 				"Unable to create 2nd pipe: " << error::number( errno );
 
-		guard< int ( int ) > guard_2a( close, pipe_2[ 0 ] );
-		guard< int ( int ) > guard_2b( close, pipe_2[ 1 ] );
+		scoped< int ( int ) > scoped_2a( close, pipe_2[ 0 ] );
+		scoped< int ( int ) > scoped_2b( close, pipe_2[ 1 ] );
 		pid = fork();
 
 		if ( pid == -1 )
@@ -77,15 +77,15 @@ namespace ooe
 				"Unable to fork process: " << error::number( errno );
 		else if ( pid )
 		{
-			guard_1a.clear();
-			guard_2b.clear();
+			scoped_1a.clear();
+			scoped_2b.clear();
 			read = pipe_1[ 0 ];
 			write = pipe_2[ 1 ];
 		}
 		else
 		{
-			guard_1b.clear();
-			guard_2a.clear();
+			scoped_1b.clear();
+			scoped_2a.clear();
 			read = pipe_2[ 0 ];
 			write = pipe_1[ 1 ];
 			swap_io( read, write );

@@ -101,7 +101,7 @@ namespace
 			return false;
 
 		timer timer;
-		guard< void ( ooe::timer& ) > guard_timer( timer_unload, timer );
+		scoped< void ( ooe::timer& ) > scoped_timer( timer_unload, timer );
 
 		vfs vfs;
 		setup_vfs( vfs, path );
@@ -134,7 +134,7 @@ namespace
 		dynamic.load( path.runtime, "ooe_open", core, set, service );
 
 		inform( path, set, scheduler, timer );
-		guard< void ( ooe::dynamic& ) > guard_dynamic( dynamic_unload, dynamic );
+		scoped< void ( ooe::dynamic& ) > scoped_dynamic( dynamic_unload, dynamic );
 		std::time_t epoch = timer.get()._0;
 
 		while ( !executable::signal() )

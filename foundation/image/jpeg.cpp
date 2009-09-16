@@ -11,8 +11,8 @@
 #include "foundation/io/file.hpp"
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/guard.hpp"
 #include "foundation/utility/miscellany.hpp"
+#include "foundation/utility/scoped.hpp"
 
 namespace
 {
@@ -180,9 +180,9 @@ namespace ooe
 		read_struct.client_data = &tuple;
 
 		jpeg_create_decompress( &read_struct );
-		guard< void ( jpeg_decompress_struct* ) >
-			guard_read( jpeg_destroy_decompress, &read_struct );
-		guard< void ( uncompressed_image* ) > guard_image;
+		scoped< void ( jpeg_decompress_struct* ) >
+			scoped_read( jpeg_destroy_decompress, &read_struct );
+		scoped< void ( uncompressed_image* ) > scoped_image;
 
 		if ( setjmp( tuple._0 ) )
 			throw error::runtime( "jpeg: " ) << "Error: " << tuple._1;
@@ -200,7 +200,7 @@ namespace ooe
 
 		uncompressed_image::type type = jpeg_image_type( read_struct.out_color_space );
 		uncompressed_image image( read_struct.output_width, read_struct.output_height, type );
-		guard_image.assign( destruct< uncompressed_image >, &image );
+		scoped_image.assign( destruct< uncompressed_image >, &image );
 
 		u8* pointer = image.as< u8 >();
 		up_t row_size = image.row_size();
@@ -209,7 +209,7 @@ namespace ooe
 			jpeg_read_scanlines( &read_struct, &pointer, 1 );
 
 		jpeg_finish_decompress( &read_struct );
-		guard_image.clear();
+		scoped_image.clear();
 		return image;
 	}
 
@@ -229,7 +229,7 @@ namespace ooe
 
 		const uncompressed_image image = jpeg_swap_br( in );
 		jpeg_create_compress( &write_struct );
-		guard< void ( jpeg_compress_struct* ) > guard( jpeg_destroy_compress, &write_struct );
+		scoped< void ( jpeg_compress_struct* ) > scoped( jpeg_destroy_compress, &write_struct );
 
 		if ( setjmp( tuple._0 ) )
 			throw error::runtime( "jpeg: " ) << "Error: " << tuple._1;
