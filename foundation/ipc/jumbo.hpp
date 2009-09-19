@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
-#define OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
+#ifndef OOE_FOUNDATION_IPC_JUMBO_HPP
+#define OOE_FOUNDATION_IPC_JUMBO_HPP
 
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/shared_memory.hpp"
@@ -125,4 +125,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
+#endif	// OOE_FOUNDATION_IPC_JUMBO_HPP
