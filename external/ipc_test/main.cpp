@@ -10,6 +10,7 @@
 #include "foundation/executable/timer.hpp"
 #include "foundation/ipc/allocator.hpp"
 #include "foundation/ipc/jumbo.hpp"
+#include "foundation/ipc/string.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/server.hpp"
@@ -114,7 +115,7 @@ namespace
 	{
 	}
 
-	void null_inline( const c8* )
+	void null_inline( const ipc::string& )
 	{
 	}
 
@@ -423,14 +424,13 @@ namespace
 	{
 		ipc::memory::client client( type, "/ooe" );
 		ipc::memory::find find( client );
-		u32 value = find( "null_inline", typeid( null_inline ).name() );
-		ipc::memory::rpc< void ( const c8* ) > rpc( client, value );
+		ipc::memory::call< void ( const ipc::string& ) > rpc( client, "null_inline" );
 
 		std::string string( size - 1, 'i' );
 		timer timer;
 
 		for ( up_t i = 0; i != iteration_limit; ++i )
-			rpc( string.c_str() );
+			rpc( string );
 
 		return timer.elapsed();
 	}
@@ -439,16 +439,15 @@ namespace
 	{
 		ipc::socket::client client( address );
 		ipc::socket::find find( client );
-		u32 value = find( "null_inline", typeid( null_inline ).name() )();
-		ipc::socket::rpc< void ( const c8* ) > rpc( client, value );
+		ipc::socket::call< void ( const ipc::string& ) > rpc( client, "null_inline" );
 
 		std::string string( size - 1, 'n' );
 		timer timer;
 
 		for ( up_t i = 1; i != iteration_limit; ++i )
-			rpc( string.c_str() );
+			rpc( string );
 
-		rpc( string.c_str() )();
+		rpc( string )();
 		return timer.elapsed();
 	}
 
