@@ -13,10 +13,10 @@ namespace ooe
 	namespace ipc
 	{
 		template< typename >
-			struct is_jumbo;
+			class jumbo;
 
 		template< typename >
-			class jumbo;
+			struct is_jumbo;
 
 		template< typename type >
 			struct size< type, typename enable_if< is_jumbo< type > >::type >;
@@ -27,25 +27,6 @@ namespace ooe
 		template< typename type >
 			struct write< type, typename enable_if< is_jumbo< type > >::type >;
 	}
-
-//--- ipc::is_jumbo ------------------------------------------------------------
-	template< typename type >
-		struct ipc::is_jumbo
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename t >
-			struct apply< jumbo< t > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< type >::type >::value;
-	};
 
 //--- ipc::jumbo ---------------------------------------------------------------
 	template< typename type >
@@ -89,6 +70,25 @@ namespace ooe
 
 	private:
 		shared_ptr< shared_memory > memory;
+	};
+
+//--- ipc::is_jumbo ------------------------------------------------------------
+	template< typename type >
+		struct ipc::is_jumbo
+	{
+		template< typename >
+			struct apply
+			: public false_type
+		{
+		};
+
+		template< typename t >
+			struct apply< jumbo< t > >
+			: public true_type
+		{
+		};
+
+		static const bool value = apply< typename no_ref< type >::type >::value;
 	};
 
 //--- ipc::traits: jumbo -------------------------------------------------------
