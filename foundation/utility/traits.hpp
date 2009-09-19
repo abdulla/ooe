@@ -161,35 +161,34 @@ namespace ooe
 	};
 
 //--- is_stdcontainer ----------------------------------------------------------
-	template< typename >
+	template< typename t >
 		struct is_stdcontainer
-		: public false_type
 	{
-	};
+		template< typename >
+			struct apply
+			: public false_type
+		{
+		};
 
-	template< typename type, typename allocator >
-		struct is_stdcontainer< std::vector< type, allocator > >
-		: public true_type
-	{
-	};
+		template< typename type, typename allocator >
+			struct apply< std::vector< type, allocator > >
+			: public true_type
+		{
+		};
 
-	template< typename type, typename allocator >
-		struct is_stdcontainer< std::list< type, allocator > >
-		: public true_type
-	{
-	};
+		template< typename type, typename allocator >
+			struct apply< std::list< type, allocator > >
+			: public true_type
+		{
+		};
 
-	template< typename type, typename allocator >
-		struct is_stdcontainer< std::deque< type, allocator > >
-		: public true_type
-	{
-	};
+		template< typename type, typename allocator >
+			struct apply< std::deque< type, allocator > >
+			: public true_type
+		{
+		};
 
-//--- is_container -------------------------------------------------------------
-	template< typename type >
-		struct is_container
-		: public is_stdcontainer< typename no_ref< type >::type >
-	{
+		static const bool value = apply< typename no_ref< t >::type >::value;
 	};
 }
 

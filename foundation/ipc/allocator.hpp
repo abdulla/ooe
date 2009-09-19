@@ -28,19 +28,13 @@ namespace ooe
 			struct is_ipccontainer;
 
 		template< typename type >
-			struct is_ipccontainer< ipc::vector< type > >;
+			struct size< type, typename enable_if< ipc::is_ipccontainer< type > >::type >;
 
 		template< typename type >
-			struct is_container;
+			struct read< type, typename enable_if< ipc::is_ipccontainer< type > >::type >;
 
 		template< typename type >
-			struct size< type, typename enable_if< ipc::is_container< type > >::type >;
-
-		template< typename type >
-			struct read< type, typename enable_if< ipc::is_container< type > >::type >;
-
-		template< typename type >
-			struct write< type, typename enable_if< ipc::is_container< type > >::type >;
+			struct write< type, typename enable_if< ipc::is_ipccontainer< type > >::type >;
 
 		template< typename type >
 			bool operator ==( const allocator< type >& x, const allocator< type >& y );
@@ -196,28 +190,27 @@ namespace ooe
 	};
 
 //--- ipc::is_ipccontainer -----------------------------------------------------
-	template< typename type >
+	template< typename t >
 		struct ipc::is_ipccontainer
-		: public false_type
 	{
-	};
+		template< typename >
+			struct apply
+			: public false_type
+		{
+		};
 
-	template< typename type >
-		struct ipc::is_ipccontainer< ipc::vector< type > >
-		: public true_type
-	{
-	};
+		template< typename type >
+			struct apply< vector< type > >
+			: public true_type
+		{
+		};
 
-//--- ipc::is_container --------------------------------------------------------
-	template< typename type >
-		struct ipc::is_container
-		: public is_ipccontainer< typename no_ref< type >::type >
-	{
+		static const bool value = apply< typename no_ref< t >::type >::value;
 	};
 
 //--- ipc::traits: container ---------------------------------------------------
 	template< typename t >
-		struct ipc::size< t, typename enable_if< ipc::is_container< t > >::type >
+		struct ipc::size< t, typename enable_if< ipc::is_ipccontainer< t > >::type >
 	{
 		static up_t call( typename call_traits< t >::param_type value )
 		{
@@ -228,7 +221,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::read< t, typename enable_if< ipc::is_container< t > >::type >
+		struct ipc::read< t, typename enable_if< ipc::is_ipccontainer< t > >::type >
 	{
 		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
@@ -242,7 +235,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::write< t, typename enable_if< ipc::is_container< t > >::type >
+		struct ipc::write< t, typename enable_if< ipc::is_ipccontainer< t > >::type >
 	{
 		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
 		{

@@ -14,21 +14,21 @@ namespace ooe
 	{
 //--- ipc::size ----------------------------------------------------------------
 		template< typename t >
-			struct size< t, typename enable_if< ooe::is_container< t > >::type >;
+			struct size< t, typename enable_if< ooe::is_stdcontainer< t > >::type >;
 
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_size;
 
 //--- ipc::read ----------------------------------------------------------------
 		template< typename t >
-			struct read< t, typename enable_if< ooe::is_container< t > >::type >;
+			struct read< t, typename enable_if< ooe::is_stdcontainer< t > >::type >;
 
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_read;
 
 //--- ipc::write ---------------------------------------------------------------
 		template< typename t >
-			struct write< t, typename enable_if< ooe::is_container< t > >::type >;
+			struct write< t, typename enable_if< ooe::is_stdcontainer< t > >::type >;
 
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_write;
@@ -43,7 +43,7 @@ namespace ooe
 
 //--- ipc::traits: container ---------------------------------------------------
 	template< typename t >
-		struct ipc::size< t, typename enable_if< ooe::is_container< t > >::type >
+		struct ipc::size< t, typename enable_if< ooe::is_stdcontainer< t > >::type >
 	{
 		static up_t call( typename call_traits< t >::param_type value )
 		{
@@ -59,7 +59,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::read< t, typename enable_if< ooe::is_container< t > >::type >
+		struct ipc::read< t, typename enable_if< ooe::is_stdcontainer< t > >::type >
 	{
 		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
@@ -80,7 +80,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::write< t, typename enable_if< ooe::is_container< t > >::type >
+		struct ipc::write< t, typename enable_if< ooe::is_stdcontainer< t > >::type >
 	{
 		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
 		{
