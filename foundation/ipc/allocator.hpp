@@ -212,7 +212,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::size< t, typename enable_if< ipc::is_ipccontainer< t > >::type >
 	{
-		static up_t call( typename call_traits< t >::param_type value )
+		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
 			typedef tuple< std::string, up_t > tuple_type;
 			tuple_type tuple( value.get_allocator().name(), value.size() );

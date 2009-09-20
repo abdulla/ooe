@@ -7,6 +7,7 @@
 
 #include <boost/static_assert.hpp>
 
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/traits.hpp"
 
@@ -111,7 +112,7 @@ namespace ooe
 	template< typename NO_SPECIALISATION_DEFINED, typename >
 		struct ipc::size
 	{
-		static up_t call( NO_SPECIALISATION_DEFINED )
+		static up_t call( NO_SPECIALISATION_DEFINED ) OOE_CONST
 		{
 			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 			return 0;
@@ -121,7 +122,7 @@ namespace ooe
 	template< typename NO_SPECIALISATION_DEFINED, typename >
 		struct ipc::read
 	{
-		static up_t call( const u8*, NO_SPECIALISATION_DEFINED )
+		static up_t call( const u8*, NO_SPECIALISATION_DEFINED ) OOE_CONST
 		{
 			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 			return 0;
@@ -131,7 +132,7 @@ namespace ooe
 	template< typename NO_SPECIALISATION_DEFINED, typename >
 		struct ipc::write
 	{
-		static up_t call( u8*, NO_SPECIALISATION_DEFINED )
+		static up_t call( u8*, NO_SPECIALISATION_DEFINED ) OOE_CONST
 		{
 			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 			return 0;
@@ -142,7 +143,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::size< t, typename enable_if< ipc::is_empty< t > >::type >
 	{
-		static up_t call( t )
+		static up_t call( t ) OOE_CONST
 		{
 			return 0;
 		}
@@ -151,7 +152,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::read< t, typename enable_if< ipc::is_empty< t > >::type >
 	{
-		static up_t call( const u8*, t )
+		static up_t call( const u8*, t ) OOE_CONST
 		{
 			return 0;
 		}
@@ -160,7 +161,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::write< t, typename enable_if< ipc::is_empty< t > >::type >
 	{
-		static up_t call( u8*, t )
+		static up_t call( u8*, t ) OOE_CONST
 		{
 			return 0;
 		}
@@ -170,7 +171,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::size< t, typename enable_if< is_string< t > >::type >
 	{
-		static up_t call( typename call_traits< t >::param_type value )
+		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
 			return string_size< t >::call( value ) + 1;
 		}
@@ -202,7 +203,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::size< t, typename enable_if< ipc::is_pod< t > >::type >
 	{
-		static up_t call( t )
+		static up_t call( t ) OOE_PURE
 		{
 			return sizeof( t );
 		}
@@ -232,7 +233,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::size< t, typename enable_if< ipc::is_array< t > >::type >
 	{
-		static up_t call( typename call_traits< t >::param_type value )
+		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
 			typedef typename remove_extent< typename no_ref< t >::type >::type type;
 

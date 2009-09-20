@@ -45,7 +45,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::size< t, typename enable_if< ooe::is_stdcontainer< t > >::type >
 	{
-		static up_t call( typename call_traits< t >::param_type value )
+		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
 			typedef typename no_ref< t >::type type;
 			up_t sum = sizeof( up_t );
@@ -182,6 +182,7 @@ namespace ooe
 		struct ipc::size< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 	{
 		static up_t call( typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, value ) )
+			OOE_PURE
 		{
 			return 0 BOOST_PP_REPEAT( LIMIT, TUPLE_SIZE, _ );
 		}
@@ -221,6 +222,7 @@ namespace ooe
 	{
 		static up_t
 			call( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) )
+			OOE_PURE
 		{
 			return 0 BOOST_PP_REPEAT( LIMIT, SIZE, _ );
 		}

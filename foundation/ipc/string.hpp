@@ -118,7 +118,7 @@ namespace ooe
 	template< typename type >
 		struct ipc::size< type, typename enable_if< ipc::is_ipcstring< type > >::type >
 	{
-		static up_t call( const ipc::string& string )
+		static up_t call( const ipc::string& string ) OOE_PURE
 		{
 			return string.size() + 1;
 		}

@@ -95,7 +95,7 @@ namespace ooe
 	template< typename t >
 		struct ipc::size< t, typename enable_if< ipc::is_jumbo< t > >::type >
 	{
-		static up_t call( typename call_traits< t >::param_type value )
+		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
 			return size< std::string >::call( value.name() );
 		}
