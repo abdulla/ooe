@@ -4,7 +4,6 @@
 #define OOE_FOUNDATION_IPC_MEMORY_JUMBO_HPP
 
 #include "foundation/ipc/traits.hpp"
-#include "foundation/utility/error.hpp"
 
 namespace ooe
 {
@@ -23,17 +22,30 @@ namespace ooe
 
 		template< typename type >
 			struct write< type, typename enable_if< is_ipcstring< type > >::type >;
+
+		namespace memory
+		{
+			template< typename >
+				struct invoke_function;
+
+			template< typename, typename >
+				struct invoke_member;
+		}
+
+		namespace socket
+		{
+			template< typename >
+				struct invoke_function;
+
+			template< typename, typename >
+				struct invoke_member;
+		}
 	}
 
 //--- ipc::string --------------------------------------------------------------
 	class ipc::string
 	{
 	public:
-		string( void )
-			: cstring( 0 ), size_( 0 )
-		{
-		}
-
 		string( const std::string& stdstring_ )
 			: stdstring( &stdstring_ ), size_( -1 )
 		{
@@ -60,17 +72,11 @@ namespace ooe
 
 		const c8* c_str( void ) const
 		{
-			if ( !cstring )
-				throw error::runtime( "ipc::string: " ) << "Uninitialised string";
-
 			return size_ == up_t( -1 ) ? stdstring->c_str() : cstring;
 		}
 
 		up_t size( void ) const
 		{
-			if ( !cstring )
-				throw error::runtime( "ipc::string: " ) << "Uninitialised string";
-
 			return size_ == up_t( -1 ) ? stdstring->size() : size_;
 		}
 
@@ -82,6 +88,23 @@ namespace ooe
 		};
 
 		up_t size_;
+
+		string( void )
+			: cstring( 0 ), size_( 0 )
+		{
+		}
+
+		template< typename >
+			friend struct memory::invoke_function;
+
+		template< typename, typename >
+			friend struct memory::invoke_member;
+
+		template< typename >
+			friend struct socket::invoke_function;
+
+		template< typename, typename >
+			friend struct socket::invoke_member;
 	};
 
 //--- ipc::is_ipcstring --------------------------------------------------------

@@ -28,7 +28,7 @@ namespace ooe
 		link_listen( const std::string& );
 		~link_listen( void );
 
-		socket accept( void ) const;
+		ooe::socket accept( void ) const;
 
 	private:
 		mutable std::string path;
