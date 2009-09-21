@@ -15,8 +15,10 @@ namespace ooe
 	struct OOE_VISIBLE error::socket_rpc
 		: virtual public runtime
 	{
-		socket_rpc( void )
-			: runtime( "ipc::socket::rpc: " )
+		const bool executed;
+
+		socket_rpc( bool executed_ )
+			: runtime( "ipc::socket::rpc: " ), executed( executed_ )
 		{
 		}
 

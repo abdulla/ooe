@@ -53,13 +53,14 @@ namespace ooe
 			throw error::connection();
 
 		case error::exception:
+			bool executed;
 			const c8* what;
 			const c8* where;
-			stream_read< const c8*, const c8* >::call( data, what, where );
-			throw error::memory_rpc() << what << "\n\nServer stack trace:" << where;
+			stream_read< bool, const c8*, const c8* >::call( data, executed, what, where );
+			throw error::memory_rpc( executed ) << what << "\n\nServer stack trace:" << where;
 
 		default:
-			throw error::memory_rpc() << "Unknown error code: " << type;
+			throw error::memory_rpc( false ) << "Unknown error code: " << type;
 		}
 	}
 }

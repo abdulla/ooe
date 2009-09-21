@@ -15,14 +15,15 @@ namespace
 		ipc::socket::return_write( tuple, socket );
 	}
 
-	void error_write( const ipc::socket::buffer_tuple& tuple, socket& socket, const c8* what,
-		const c8* where )
+	void error_write( const ipc::socket::buffer_tuple& tuple, socket& socket, bool executed,
+		const c8* what, const c8* where )
 	{
-		up_t size = ipc::stream_size< const c8*, const c8* >::call( what, where );
+		up_t size = ipc::stream_size< bool, const c8*, const c8* >::call( executed, what, where );
 		up_t total = size + sizeof( u32 ) * 2;
 		ipc::socket::write_buffer buffer( tuple, total );
 		u8* data = buffer.get();
-		ipc::stream_write< u32, u32, const c8*, const c8* >::call( data, -1, size, what, where );
+		ipc::stream_write< u32, u32, bool, const c8*, const c8* >::
+			call( data, -1, size, executed, what, where );
 
 		if ( socket.send( data, total ) != total )
 			throw error::runtime( "ipc::socket::switchboard: " ) << "Unable to write data";
@@ -42,6 +43,7 @@ namespace ooe
 	{
 		u8 buffer[ executable::static_page_size ];
 		buffer_tuple tuple( buffer, sizeof( buffer ) );
+		bool executed = false;
 
 		try
 		{
@@ -53,19 +55,20 @@ namespace ooe
 					"Unable to execute function, index " << index << " out of range";
 
 			const vector_tuple& args = vector[ index ];
+			executed = true;
 			args._0( args._1, data, tuple, socket, pool );
 		}
 		catch ( error::runtime& error )
 		{
-			error_write( tuple, socket, error.what(), error.where() );
+			error_write( tuple, socket, executed, error.what(), error.where() );
 		}
 		catch ( std::exception& error )
 		{
-			error_write( tuple, socket, error.what(), "\nNo stack trace available" );
+			error_write( tuple, socket, executed, error.what(), "\nNo stack trace available" );
 		}
 		catch ( ... )
 		{
-			error_write( tuple, socket,
+			error_write( tuple, socket, executed,
 				"An unknown exception was thrown", "\nNo stack trace available" );
 		}
 	}
