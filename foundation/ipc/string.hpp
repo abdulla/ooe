@@ -30,6 +30,9 @@ namespace ooe
 
 			template< typename, typename >
 				struct invoke_member;
+
+			template< typename >
+				struct rpc;
 		}
 
 		namespace socket
@@ -39,6 +42,9 @@ namespace ooe
 
 			template< typename, typename >
 				struct invoke_member;
+
+			template< typename >
+				struct rpc;
 		}
 	}
 
@@ -101,10 +107,16 @@ namespace ooe
 			friend struct memory::invoke_member;
 
 		template< typename >
+			friend struct memory::rpc;
+
+		template< typename >
 			friend struct socket::invoke_function;
 
 		template< typename, typename >
 			friend struct socket::invoke_member;
+
+		template< typename >
+			friend struct socket::rpc;
 	};
 
 //--- ipc::is_ipcstring --------------------------------------------------------
