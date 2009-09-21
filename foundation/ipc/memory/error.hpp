@@ -23,9 +23,12 @@ namespace ooe
 	struct OOE_VISIBLE error::memory_rpc
 		: virtual public runtime
 	{
-		memory_rpc( void )
-			: runtime( "ipc::memory::rpc: " )
+		const bool executed;
+
+		memory_rpc( bool executed_ )
+			: runtime( "ipc::memory::rpc: " ), executed( executed_ )
 		{
+			*this << "\nexecuted: " << executed << '\n';
 		}
 
 		virtual ~memory_rpc( void ) throw()

@@ -34,10 +34,11 @@ namespace ooe
 //--- ipc::socket --------------------------------------------------------------
 	inline void ipc::socket::except( const u8* buffer )
 	{
+		bool executed;
 		const c8* what;
 		const c8* where;
-		stream_read< const c8*, const c8* >::call( buffer, what, where );
-		throw error::socket_rpc() << what << "\n\nServer stack trace:" << where;
+		stream_read< bool, const c8*, const c8* >::call( buffer, executed, what, where );
+		throw error::socket_rpc( executed ) << what << "\n\nServer stack trace:" << where;
 	}
 
 //--- ipc::socket::result ------------------------------------------------------

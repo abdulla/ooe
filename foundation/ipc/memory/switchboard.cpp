@@ -13,11 +13,11 @@ namespace
 	}
 
 	void return_error( const ipc::memory::buffer_tuple& tuple, ipc::memory::write_buffer& buffer,
-		const c8* what, const c8* where )
+		bool executed, const c8* what, const c8* where )
 	{
-		up_t size = ipc::stream_size< const c8*, const c8* >::call( what, where );
+		up_t size = ipc::stream_size< bool, const c8*, const c8* >::call( executed, what, where );
 		u8* data = return_write( tuple, buffer, size, error::exception );
-		ipc::stream_write< const c8*, const c8* >::call( data, what, where );
+		ipc::stream_write< bool, const c8*, const c8* >::call( data, executed, what, where );
 	}
 }
 
@@ -34,6 +34,7 @@ namespace ooe
 		execute( const buffer_tuple& adjust, write_buffer& buffer, pool& pool ) const
 	{
 		buffer_tuple tuple = header_adjust( adjust );
+		bool executed = false;
 
 		try
 		{
@@ -47,19 +48,20 @@ namespace ooe
 					"Unable to execute function, index " << index << " out of range";
 
 			const vector_tuple& args = vector[ index ];
+			executed = true;
 			args._0( args._1, tuple, buffer, pool );
 		}
 		catch ( error::runtime& error )
 		{
-			return_error( tuple, buffer, error.what(), error.where() );
+			return_error( tuple, buffer, executed, error.what(), error.where() );
 		}
 		catch ( std::exception& error )
 		{
-			return_error( tuple, buffer, error.what(), "\nNo stack trace available" );
+			return_error( tuple, buffer, executed, error.what(), "\nNo stack trace available" );
 		}
 		catch ( ... )
 		{
-			return_error( tuple, buffer, "An unknown exception was thrown",
+			return_error( tuple, buffer, executed, "An unknown exception was thrown",
 				"\nNo stack trace available" );
 		}
 
