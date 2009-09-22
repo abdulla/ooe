@@ -66,8 +66,8 @@ namespace ooe
 		return out << buffer;
 	}
 
-	template< typename type >
-		type& operator <<( type& out, const void* value )
+	template< typename t0, typename t1 >
+		t0& operator <<( t0& out, const t1* value )
 	{
 		c8 buffer[ 32 ];
 		u32 field_width = sizeof( void* ) * 2 + 2;
