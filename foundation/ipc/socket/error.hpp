@@ -20,7 +20,7 @@ namespace ooe
 		socket_rpc( bool executed_ )
 			: runtime( "ipc::socket::rpc: " ), executed( executed_ )
 		{
-			*this << "\nexecuted: " << executed << '\n';
+			*this << "Executed: " << ( executed ? "true" : "false" ) << '\n';
 		}
 
 		virtual ~socket_rpc( void ) throw()
