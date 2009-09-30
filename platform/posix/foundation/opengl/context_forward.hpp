@@ -9,7 +9,7 @@ namespace ooe
 {
 	namespace platform
 	{
-		typedef GLXContext context;
+		typedef GLXContext context_type;
 	}
 }
 

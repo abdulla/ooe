@@ -21,7 +21,7 @@ namespace
 		: private noncopyable, public ooe::video
 	{
 	public:
-		video( const view_data&, platform::context );
+		video( const view_data&, platform::context_type );
 		virtual ~video( void );
 
 		virtual void sync( bool );
@@ -51,7 +51,7 @@ namespace
 
 	private:
 		const view_data& view;
-		platform::context context;
+		platform::context_type context;
 
 		s32 units;
 		s32 lights;
@@ -65,7 +65,7 @@ namespace
 
 	typedef video video_type;
 
-	platform::context context_f( const view_data& );
+	platform::context_type context_f( const view_data& );
 	bool* array_f( u32, s32& );
 	u32 function_f( u8 );
 	u32 equation_f( u8 );
@@ -76,7 +76,7 @@ namespace
 	void unit_f( bool*, u32, bool );
 
 //--- video --------------------------------------------------------------------
-	video::video( const view_data& view_, platform::context context_ )
+	video::video( const view_data& view_, platform::context_type context_ )
 	try
 		: view( view_ ), context( context_ ), units(), lights(),
 		unit_array( array_f( MAX_TEXTURE_COORDS, units ) ),
@@ -395,9 +395,9 @@ namespace
 	}
 
 //--- utility ------------------------------------------------------------------
-	platform::context context_f( const view_data& view )
+	platform::context_type context_f( const view_data& view )
 	{
-		platform::context context = context_construct( view );
+		platform::context_type context = context_construct( view );
 		setup_context( view, context );
 		opengl::symbol();
 		return context;

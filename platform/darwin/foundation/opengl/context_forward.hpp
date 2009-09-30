@@ -13,7 +13,7 @@ namespace ooe
 {
 	namespace platform
 	{
-		typedef NSOpenGLContext* context;
+		typedef NSOpenGLContext* context_type;
 	}
 }
 

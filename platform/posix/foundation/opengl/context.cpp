@@ -14,9 +14,10 @@
 
 namespace ooe
 {
-	platform::context context_construct( const ooe::view_data& view )
+	platform::context_type context_construct( const ooe::view_data& view )
 	{
-		platform::context glx = glXCreateContext( view.queue.display, view.visual_info, 0, true );
+		platform::context_type glx =
+			glXCreateContext( view.queue.display, view.visual_info, 0, true );
 		XFree( view.visual_info );
 		view.visual_info = 0;
 
@@ -26,27 +27,27 @@ namespace ooe
 		return glx;
 	}
 
-	void context_destruct( const ooe::view_data& view, platform::context glx )
+	void context_destruct( const ooe::view_data& view, platform::context_type glx )
 	{
 		glXDestroyContext( view.queue.display, glx );
 	}
 
-	bool context_current( const ooe::view_data& view, platform::context glx )
+	bool context_current( const ooe::view_data& view, platform::context_type glx )
 	{
 		return glXMakeCurrent( view.queue.display, !glx ? 0 : view.window, glx );
 	}
 
-	bool context_sync( const ooe::view_data&, platform::context, bool vsync )
+	bool context_sync( const ooe::view_data&, platform::context_type, bool vsync )
 	{
 		return !glXSwapIntervalSGI( vsync );
 	}
 
-	void context_swap( const ooe::view_data& view, platform::context )
+	void context_swap( const ooe::view_data& view, platform::context_type )
 	{
 		glXSwapBuffers( view.queue.display, view.window );
 	}
 
-	void setup_context( const ooe::view_data& view, platform::context glx )
+	void setup_context( const ooe::view_data& view, platform::context_type glx )
 	{
 		if ( !context_current( view, glx ) )
 			throw error::runtime( "opengl: " ) << "Unable to capture context";

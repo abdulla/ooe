@@ -11,7 +11,7 @@ namespace
 {
 	using namespace ooe;
 
-	void context_multithread( platform::context nsgl, bool enable )
+	void context_multithread( platform::context_type nsgl, bool enable )
 	{
 		CGLError ( * cgl_set )( CGLContextObj, CGLContextEnable ) = enable ? CGLEnable : CGLDisable;
 		CGLContextObj cgl = static_cast< CGLContextObj >( nsgl.CGLContextObj );
@@ -23,7 +23,7 @@ namespace
 
 namespace ooe
 {
-	platform::context context_construct( const ooe::view_data& )
+	platform::context_type context_construct( const ooe::view_data& )
 	{
 		NSOpenGLPixelFormatAttribute attribute[] =
 		{
@@ -43,7 +43,7 @@ namespace ooe
 		if ( !format )
 			throw error::runtime( "opengl: " ) << "Unable to initialise pixel format";
 
-		platform::context nsgl =
+		platform::context_type nsgl =
 			[ [ NSOpenGLContext alloc ] initWithFormat: format shareContext: 0 ];
 		[ format release ];
 
@@ -53,18 +53,18 @@ namespace ooe
 		return nsgl;
 	}
 
-	void context_destruct( const ooe::view_data&, platform::context nsgl )
+	void context_destruct( const ooe::view_data&, platform::context_type nsgl )
 	{
 		[ nsgl release ];
 	}
 
-	bool context_current( const ooe::view_data&, platform::context nsgl )
+	bool context_current( const ooe::view_data&, platform::context_type nsgl )
 	{
 		[ nsgl makeCurrentContext ];
 		return true;
 	}
 
-	bool context_sync( const ooe::view_data&, platform::context nsgl, bool vsync )
+	bool context_sync( const ooe::view_data&, platform::context_type nsgl, bool vsync )
 	{
 		context_multithread( nsgl, !vsync );
 		const s32 value = vsync;
@@ -72,12 +72,12 @@ namespace ooe
 		return true;
 	}
 
-	void context_swap( const ooe::view_data&, platform::context nsgl )
+	void context_swap( const ooe::view_data&, platform::context_type nsgl )
 	{
 		[ nsgl flushBuffer ];
 	}
 
-	void setup_context( const ooe::view_data& view, platform::context nsgl )
+	void setup_context( const ooe::view_data& view, platform::context_type nsgl )
 	{
 		[ nsgl makeCurrentContext ];
 
