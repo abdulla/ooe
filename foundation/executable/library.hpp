@@ -36,7 +36,7 @@ namespace ooe
 		static ooe::symbol<> find( const std::string&, find_type );
 
 	private:
-		void* handle;
+		void* id;
 	};
 }
 

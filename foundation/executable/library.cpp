@@ -51,22 +51,22 @@ namespace ooe
 {
 //--- library ------------------------------------------------------------------
 	library::library( const std::string& name, type flag )
-		: handle( dlopen( name.c_str(), mode( flag ) ) )
+		: id( dlopen( name.c_str(), mode( flag ) ) )
 	{
-		if ( !handle )
+		if ( !id )
 			throw error::runtime( "library: " ) << "Unable to open \"" << name << "\": " <<
 				dlerror();
 	}
 
 	library::~library( void )
 	{
-		if ( dlclose( handle ) )
+		if ( dlclose( id ) )
 			OOE_WARNING( "library", "Unable to close: " << dlerror() );
 	}
 
 	ooe::symbol<> library::find( const std::string& name ) const
 	{
-		ooe::symbol<> symbol( dlsym( handle, name.c_str() ) );
+		ooe::symbol<> symbol( dlsym( id, name.c_str() ) );
 		const c8* error = dlerror();
 
 		if ( error )
