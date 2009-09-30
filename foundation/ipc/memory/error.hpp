@@ -28,7 +28,7 @@ namespace ooe
 		memory_rpc( bool executed_ )
 			: runtime( "ipc::memory::rpc: " ), executed( executed_ )
 		{
-			*this << "\nexecuted: " << executed << '\n';
+			*this << "Executed: " << ( executed ? "true" : "false" ) << '\n';
 		}
 
 		virtual ~memory_rpc( void ) throw()

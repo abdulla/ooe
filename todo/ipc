@@ -9,3 +9,7 @@ asynchronous rpc wrapper
 
 have way of replaying responses
 	- this could be used for unit testing
+
+modify error to return idempotency
+	- basically, it should return a value to indicate whether the function was called or not
+	- this can then be used to build idempotency at the application-level, in a cheap manner
