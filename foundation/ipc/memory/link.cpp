@@ -97,7 +97,7 @@ namespace ooe
 		if ( !active )
 			return 0;
 
-		stream_write< u32, u32 >::call( transport.get()._0, true, error::link );
+		stream_write< u32, u32 >::call( transport.get(), true, error::link );
 		transport.wake_notify();
 		active = false;
 		return 0;

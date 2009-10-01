@@ -12,13 +12,13 @@ namespace
 	typedef tuple< const ipc::memory::switchboard&, ipc::memory::write_buffer*, ipc::pool* >
 		tuple_type;
 
-	void ipc_decode( const ipc::memory::buffer_tuple& tuple, const void* pointer )
+	void ipc_decode( u8* buffer_ptr, up_t buffer_size, const void* pointer )
 	{
 		const tuple_type& args = *static_cast< const tuple_type* >( pointer );
-		args._0.execute( tuple, *args._1, *args._2 );
+		args._0.execute( buffer_ptr, buffer_size, *args._1, *args._2 );
 	}
 
-	void ipc_link( const any& any, const ipc::memory::buffer_tuple& tuple,
+	void ipc_link( const any& any, u8* buffer_ptr, up_t buffer_size,
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		pid_t pid;
@@ -26,17 +26,18 @@ namespace
 
 		u32 link = static_cast< ipc::memory::server* >( any.pointer )->link( pid );
 		up_t size = ipc::stream_size< u32 >::call( link );
-		ipc::stream_write< u32 >::call( return_write( tuple, buffer, size ), link );
+		u8* pointer = return_write( buffer_ptr, buffer_size, buffer, size );
+		ipc::stream_write< u32 >::call( pointer, link );
 	}
 
-	void ipc_unlink( const any& any, const ipc::memory::buffer_tuple& tuple,
+	void ipc_unlink( const any& any, u8* buffer_ptr, up_t buffer_size,
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		u32 link;
 		ipc::stream_read< u32 >::call( header_adjust( buffer ), link );
 
 		static_cast< ipc::memory::server* >( any.pointer )->unlink( link );
-		return_write( tuple, buffer );
+		return_write( buffer_ptr, buffer_size, buffer );
 	}
 }
 
@@ -59,14 +60,14 @@ namespace ooe
 			return;
 
 		active = false;
-		stream_write< u32, u32 >::call( transport->get()._0, true, 0 );
+		stream_write< u32, u32 >::call( transport->get(), true, 0 );
 		transport->wake_wait();
 		thread.join();
 	}
 
 	void* ipc::memory::servlet::call( void* pointer )
 	{
-		write_buffer buffer( transport->get(), 0 );
+		write_buffer buffer( transport->get(), 0, 0 );
 		pool pool;
 		tuple_type tuple( switchboard, &buffer, &pool );
 
@@ -101,7 +102,7 @@ namespace ooe
 
 	bool ipc::memory::server::decode( void )
 	{
-		write_buffer buffer( transport->get(), 0 );
+		write_buffer buffer( transport->get(), 0, 0 );
 		tuple_type tuple( internal, &buffer, 0 );
 		transport->wait( ipc_decode, &tuple );
 		return !servlets.empty();

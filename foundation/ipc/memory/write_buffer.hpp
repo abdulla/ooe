@@ -22,20 +22,20 @@ namespace ooe
 	class ipc::memory::write_buffer
 	{
 	public:
-		write_buffer( buffer_tuple tuple, up_t size )
-			: internal( tuple._1 >= size )
+		write_buffer( u8* buffer_ptr, up_t buffer_size, up_t size )
+			: internal( buffer_size >= size )
 		{
 			if ( internal )
-				unshared = tuple._0;
+				unshared = buffer_ptr;
 			else
 				shared = new shared_memory( unique_name(), shared_memory::create, size );
 		}
 
-		write_buffer( const std::string& name_, u8* data )
+		write_buffer( const std::string& name_, u8* buffer_ptr )
 			: internal( name_.empty() )
 		{
 			if ( internal )
-				unshared = data;
+				unshared = buffer_ptr;
 			else
 				shared = new shared_memory( name_ );
 		}

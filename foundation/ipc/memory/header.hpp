@@ -12,7 +12,8 @@ namespace ooe
 	{
 		namespace memory
 		{
-			inline buffer_tuple header_adjust( const buffer_tuple& );
+			inline u8* header_adjust( u8* );
+			inline up_t header_adjust( up_t );
 			inline u8* header_adjust( const write_buffer& );
 			inline void header_write( u8*, const write_buffer& );
 			inline std::string header_read( const u8* );
@@ -20,9 +21,14 @@ namespace ooe
 	}
 
 //--- ipc::memory --------------------------------------------------------------
-	inline ipc::memory::buffer_tuple ipc::memory::header_adjust( const buffer_tuple& tuple )
+	inline u8* ipc::memory::header_adjust( u8* buffer )
 	{
-		return buffer_tuple( tuple._0 + sizeof( u32 ), tuple._1 - sizeof( u32 ) );
+		return buffer + sizeof( u32 );
+	}
+
+	inline up_t ipc::memory::header_adjust( up_t size )
+	{
+		return size - sizeof( u32 );
 	}
 
 	inline u8* ipc::memory::header_adjust( const write_buffer& buffer )

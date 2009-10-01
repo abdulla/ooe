@@ -107,22 +107,23 @@ namespace ooe
 		result_type operator ()
 			( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) ) const
 		{
-			buffer_tuple tuple = header_adjust( transport.get() );
+			u8* buffer_ptr = header_adjust( transport.get() );
+			up_t buffer_size = header_adjust( transport.size() );
 
 			{
 				up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-				write_buffer buffer( tuple, size );
+				write_buffer buffer( buffer_ptr, buffer_size, size );
 
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-				header_write( tuple._0, buffer );
+				header_write( buffer_ptr, buffer );
 
 				transport.notify();
 			}
 
 			{
-				write_buffer buffer( header_read( tuple._0 ), tuple._0 );
+				write_buffer buffer( header_read( buffer_ptr ), buffer_ptr );
 				validate( buffer.get() );
 			}
 		}
@@ -142,22 +143,23 @@ namespace ooe
 		result_type operator ()
 			( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) ) const
 		{
-			buffer_tuple tuple = header_adjust( transport.get() );
+			u8* buffer_ptr = header_adjust( transport.get() );
+			up_t buffer_size = header_adjust( transport.size() );
 
 			{
 				up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-				write_buffer buffer( tuple, size );
+				write_buffer buffer( buffer_ptr, buffer_size, size );
 
 				stream_write< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 					call( buffer.get(), index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-				header_write( tuple._0, buffer );
+				header_write( buffer_ptr, buffer );
 
 				transport.notify();
 			}
 
 			{
-				write_buffer buffer( header_read( tuple._0 ), tuple._0 );
+				write_buffer buffer( header_read( buffer_ptr ), buffer_ptr );
 				const u8* data = validate( buffer.get() );
 
 				result_type value;

@@ -21,10 +21,11 @@ namespace
 
 		virtual void wait( wait_type, const void* );
 		virtual void notify( void );
-		virtual ipc::memory::buffer_tuple get( void ) const;
-
 		virtual void wake_wait( void );
 		virtual void wake_notify( void );
+
+		virtual u8* get( void ) const;
+		virtual up_t size( void ) const;
 		virtual void unlink( void );
 
 	private:
@@ -43,7 +44,7 @@ namespace
 		atom< u32 >& state = *memory.as< atom< u32 > >();
 
 		semaphore.down();
-		function( get(), pointer );
+		function( get(), size(), pointer );
 		state = false;
 		thread::yield();
 	}
@@ -57,12 +58,6 @@ namespace
 		while ( state ) {}
 	}
 
-	ipc::memory::buffer_tuple transport_spinlock::get( void ) const
-	{
-		up_t size = sizeof( atom< u32 > );
-		return ipc::memory::buffer_tuple( memory.as< u8 >() + size, memory.size() - size );
-	}
-
 	void transport_spinlock::wake_wait( void )
 	{
 		semaphore.up();
@@ -73,6 +68,16 @@ namespace
 		atom< u32 >& state = *memory.as< atom< u32 > >();
 		state = false;
 		thread::yield();
+	}
+
+	u8* transport_spinlock::get( void ) const
+	{
+		return memory.as< u8 >() + sizeof( atom< u32 > );
+	}
+
+	up_t transport_spinlock::size( void ) const
+	{
+		return memory.size() - sizeof( atom< u32 > );
 	}
 
 	void transport_spinlock::unlink( void )
@@ -91,57 +96,63 @@ namespace
 
 		virtual void wait( wait_type, const void* );
 		virtual void notify( void );
-		virtual ipc::memory::buffer_tuple get( void ) const;
-
 		virtual void wake_wait( void );
 		virtual void wake_notify( void );
+
+		virtual u8* get( void ) const;
+		virtual up_t size( void ) const;
 		virtual void unlink( void );
 
 	private:
-		ipc::semaphore semaphore_in;
-		ipc::semaphore semaphore_out;
+		ipc::semaphore in;
+		ipc::semaphore out;
 		ipc::shared_memory memory;
 	};
 
 	transport_semaphore::transport_semaphore( const std::string& name, transport::type mode )
-		: semaphore_in( name + ".i", ipc::semaphore::type( mode ), 0 ),
-		semaphore_out( name + ".o", ipc::semaphore::type( mode ), 0 ),
+		: in( name + ".i", ipc::semaphore::type( mode ), 0 ),
+		out( name + ".o", ipc::semaphore::type( mode ), 0 ),
 		memory( name, ipc::shared_memory::type( mode ), executable::static_page_size )
 	{
 	}
 
 	void transport_semaphore::wait( wait_type function, const void* pointer )
 	{
-		semaphore_in.down();
-		function( get(), pointer );
-		semaphore_out.up();
+		in.down();
+		function( get(), size(), pointer );
+		out.up();
 	}
 
 	void transport_semaphore::notify( void )
 	{
-		semaphore_in.up();
-		semaphore_out.down();
-	}
-
-	ipc::memory::buffer_tuple transport_semaphore::get( void ) const
-	{
-		return ipc::memory::buffer_tuple( memory.as< u8 >(), memory.size() );
+		in.up();
+		out.down();
 	}
 
 	void transport_semaphore::wake_wait( void )
 	{
-		semaphore_in.up();
+		in.up();
 	}
 
 	void transport_semaphore::wake_notify( void )
 	{
-		semaphore_out.up();
+		out.up();
+	}
+
+	u8* transport_semaphore::get( void ) const
+	{
+		return memory.as< u8 >();
+	}
+
+	up_t transport_semaphore::size( void ) const
+	{
+		return memory.size();
 	}
 
 	void transport_semaphore::unlink( void )
 	{
-		semaphore_in.unlink();
-		semaphore_out.unlink();
+		in.unlink();
+		out.unlink();
 		memory.unlink();
 	}
 }

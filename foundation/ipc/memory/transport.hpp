@@ -5,7 +5,6 @@
 
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/macro.hpp"
-#include "foundation/utility/tuple.hpp"
 
 namespace ooe
 {
@@ -13,7 +12,6 @@ namespace ooe
 	{
 		namespace memory
 		{
-			typedef tuple< u8*, up_t > buffer_tuple;
 			struct transport;
 		}
 	}
@@ -21,7 +19,7 @@ namespace ooe
 //--- ipc::memory::transport ---------------------------------------------------
 	struct ipc::memory::transport
 	{
-		typedef void ( * wait_type )( const buffer_tuple&, const void* );
+		typedef void ( * wait_type )( u8*, up_t, const void* );
 
 		enum type
 		{
@@ -30,12 +28,14 @@ namespace ooe
 		};
 
 		virtual ~transport( void ) {}
+
 		virtual void wait( wait_type, const void* ) = 0;
 		virtual void notify( void ) = 0;
-		virtual buffer_tuple get( void ) const = 0;
-
 		virtual void wake_wait( void ) = 0;
 		virtual void wake_notify( void ) = 0;
+
+		virtual u8* get( void ) const = 0;
+		virtual up_t size( void ) const = 0;
 		virtual void unlink( void ) = 0;
 	};
 
