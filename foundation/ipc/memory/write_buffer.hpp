@@ -13,7 +13,6 @@ namespace ooe
 	{
 		namespace memory
 		{
-			typedef tuple< u8*, up_t > buffer_tuple;
 			class write_buffer;
 		}
 	}

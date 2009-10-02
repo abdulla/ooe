@@ -45,12 +45,13 @@ namespace ooe
 		void erase( const iterator& );
 		iterator insert( void );
 
-		buffer_tuple get( void );
+		u8* get( void ) const;
+		up_t size( void ) const;
 		void write( const u8*, up_t );
 
 	private:
 		ooe::connect connect;
-		u8 buffer[ executable::static_page_size ];
+		mutable u8 buffer[ executable::static_page_size ];
 
 		map_type map;
 		u32 in;

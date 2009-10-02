@@ -153,7 +153,7 @@ namespace ooe
 		{
 			up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
 				call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-			write_buffer buffer( client.get(), size + sizeof( u32 ) );
+			write_buffer buffer( client.get(), client.size(), size + sizeof( u32 ) );
 			u8* data = buffer.get();
 
 			stream_write< u32, u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::

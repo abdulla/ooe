@@ -11,7 +11,6 @@ namespace ooe
 	{
 		namespace socket
 		{
-			typedef tuple< u8*, up_t > buffer_tuple;
 			class write_buffer;
 		}
 	}
@@ -20,8 +19,8 @@ namespace ooe
 	class ipc::socket::write_buffer
 	{
 	public:
-		write_buffer( buffer_tuple tuple, up_t size )
-			: internal( tuple._1 >= size ), pointer( internal ? tuple._0 : new u8[ size ] )
+		write_buffer( u8* buffer_ptr, up_t buffer_size, up_t size )
+			: internal( buffer_size >= size ), pointer( internal ? buffer_ptr : new u8[ size ] )
 		{
 		}
 

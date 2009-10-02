@@ -52,14 +52,19 @@ namespace ooe
 		return map.insert( map.end(), map_type::value_type( ++out, map_tuple() ) );
 	}
 
-	ipc::socket::buffer_tuple ipc::socket::client::get( void )
+	u8* ipc::socket::client::get( void ) const
 	{
-		return buffer_tuple( buffer, sizeof( buffer ) );
+		return buffer;
 	}
 
-	void ipc::socket::client::write( const u8* data, up_t size )
+	up_t ipc::socket::client::size( void ) const
 	{
-		if ( connect.send( data, size ) != size )
+		return sizeof( buffer );
+	}
+
+	void ipc::socket::client::write( const u8* data, up_t length )
+	{
+		if ( connect.send( data, length ) != length )
 			throw error::runtime( "ipc::socket::client: " ) << "Unable to write data";
 	}
 
@@ -68,14 +73,14 @@ namespace ooe
 		while ( true )
 		{
 			bool done = true;
-			u32 size;
+			u32 length;
 
-			if ( !header_size( connect, size ) )
+			if ( !header_size( connect, length ) )
 				break;
-			else if ( size == static_cast< u32 >( -1 ) )
+			else if ( length == static_cast< u32 >( -1 ) )
 			{
 				// an exception occurred, read exception
-				if ( !header_size( connect, size ) )
+				if ( !header_size( connect, length ) )
 					break;
 
 				done = false;
@@ -88,7 +93,7 @@ namespace ooe
 				map_type::iterator i = map.find( ++in );
 
 				if ( i != map.end() )
-					i->second = map_tuple( header_read( connect, size ), done );
+					i->second = map_tuple( header_read( connect, length ), done );
 				else
 					do_splice = true;
 			}
@@ -97,7 +102,7 @@ namespace ooe
 				condition.notify_one();
 
 			if ( do_splice )
-				splice( connect, size );	// data not needed, splice out of stream
+				splice( connect, length );	// data not needed, splice out of stream
 		}
 
 		return 0;

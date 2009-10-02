@@ -25,11 +25,10 @@ namespace ooe
 			template< typename, typename >
 				struct invoke_member;
 
-			inline void return_write( const buffer_tuple&, ooe::socket& );
+			inline void return_write( u8*, ooe::socket& );
 
 			template< typename r >
-				void return_write( const buffer_tuple&, ooe::socket&,
-				typename call_traits< r >::param_type );
+				void return_write( u8*, up_t, ooe::socket&, typename call_traits< r >::param_type );
 		}
 	}
 
@@ -37,8 +36,7 @@ namespace ooe
 	class ipc::socket::switchboard
 	{
 	public:
-		typedef void ( * call_type )
-			( const any&, const u8*, const buffer_tuple&, ooe::socket&, pool& );
+		typedef void ( * call_type )( const any&, const u8*, u8*, up_t, ooe::socket&, pool& );
 
 		switchboard( void ) OOE_VISIBLE;
 
@@ -70,21 +68,21 @@ namespace ooe
 	};
 
 //--- ipc::socket --------------------------------------------------------------
-	inline void ipc::socket::return_write( const buffer_tuple& tuple, ooe::socket& socket )
+	inline void ipc::socket::return_write( u8* buffer_ptr, ooe::socket& socket )
 	{
-		stream_write< u32 >::call( tuple._0, 0 );
+		stream_write< u32 >::call( buffer_ptr, 0 );
 
-		if ( socket.send( tuple._0, sizeof( u32 ) ) != sizeof( u32 ) )
+		if ( socket.send( buffer_ptr, sizeof( u32 ) ) != sizeof( u32 ) )
 			throw error::runtime( "ipc::socket::switchboard: " ) << "Unable to write data";
 	}
 
 	template< typename r >
-		void ipc::socket::return_write( const buffer_tuple& tuple, ooe::socket& socket,
+		void ipc::socket::return_write( u8* buffer_ptr, up_t buffer_size, ooe::socket& socket,
 		typename call_traits< r >::param_type value )
 	{
 		up_t size = stream_size< r >::call( value );
 		up_t total = size + sizeof( u32 );
-		write_buffer buffer( tuple, total );
+		write_buffer buffer( buffer_ptr, buffer_size, total );
 		u8* data = buffer.get();
 		stream_write< u32, r >::call( data, size, value );
 
@@ -135,8 +133,8 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			ooe::socket& socket, pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
+		static void call( const any& any, const u8* data, u8* buffer_ptr, up_t, ooe::socket& socket,
+			pool& BOOST_PP_EXPR_IF( LIMIT, pool ) )
 		{
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function = reinterpret_cast< function_type >( any.function );
@@ -147,14 +145,14 @@ namespace ooe
 
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ );
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-			return_write( tuple, socket );
+			return_write( buffer_ptr, socket );
 		}
 	};
 
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+		static void call( const any& any, const u8* data, u8* buffer_ptr, up_t buffer_size,
 			ooe::socket& socket, pool& pool )
 		{
 			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
@@ -167,7 +165,7 @@ namespace ooe
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 			verify< r >::call( pool, value, 0 );
-			return_write< r >( tuple, socket, value );
+			return_write< r >( buffer_ptr, buffer_size, socket, value );
 		}
 	};
 
@@ -176,8 +174,8 @@ namespace ooe
 	template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
-			ooe::socket& socket, pool& pool )
+		static void call( const any& any, const u8* data, u8* buffer_ptr, up_t, ooe::socket& socket,
+			pool& pool )
 		{
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member = reinterpret_cast< member_type >( any.member );
@@ -190,14 +188,14 @@ namespace ooe
 			verify< t0* >::call( pool, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
 			( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
-			return_write( tuple, socket );
+			return_write( buffer_ptr, socket );
 		}
 	};
 
 	template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static void call( const any& any, const u8* data, const buffer_tuple& tuple,
+		static void call( const any& any, const u8* data, u8* buffer_ptr, up_t buffer_size,
 			ooe::socket& socket, pool& pool )
 		{
 			typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
@@ -212,7 +210,7 @@ namespace ooe
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
 			r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 			verify< r >::call( pool, value, 0 );
-			return_write< r >( tuple, socket, value );
+			return_write< r >( buffer_ptr, buffer_size, socket, value );
 		}
 	};
 #endif
