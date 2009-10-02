@@ -767,10 +767,16 @@ namespace
 					"    -i <method> <size>     Start client (inline)\n"
 					"    -o <method> <size>     Start client (outline)\n"
 					"\n"
-					"    -x                     Test server\n"
-					"    -y                     Test client 1 (feature)\n"
-					"    -z                     Test client 2 (failure)\n"
-					"    -p                     Test client 3 (pointer)\n";
+					"    -u                     Test socket-based server\n"
+					"    -v                     Test socket-based client 1 (feature)\n"
+					"\n"
+					"    -x                     Test memory-based server\n"
+					"    -y                     Test memory-based client 1 (feature)\n"
+					"    -z                     Test memory-based client 2 (failure)\n"
+					"    -p                     Test memory-based client 3 (pointer)\n"
+					"\n"
+					"    -u                     Test socket-based server\n"
+					"    -v                     Test socket-based client\n";
 
 				return false;
 			}
