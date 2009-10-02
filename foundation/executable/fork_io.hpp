@@ -4,6 +4,7 @@
 #define OOE_FOUNDATION_EXECUTABLE_FORK_IO_HPP
 
 #include "foundation/utility/fundamental.hpp"
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/pointer.hpp"
 
 namespace ooe
@@ -26,7 +27,7 @@ namespace ooe
 	};
 
 //--- executable::fork_io ------------------------------------------------------
-	class executable::fork_io
+	class OOE_VISIBLE executable::fork_io
 	{
 	public:
 		enum wait_type

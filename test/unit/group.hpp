@@ -40,7 +40,7 @@ namespace ooe
 
 		iterator_type begin( void ) const;
 		iterator_type end( void ) const;
-		void push_back( function_type );
+		void push_back( function_type ) OOE_VISIBLE;
 
 	private:
 		vector_type vector;

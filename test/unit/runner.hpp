@@ -5,6 +5,7 @@
 
 #include <map>
 
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 
 namespace ooe
@@ -14,7 +15,7 @@ namespace ooe
 		class group_base;
 		class runner;
 
-		extern runner global_runner;
+		extern runner global_runner OOE_VISIBLE;
 	}
 
 //--- unit::runner -------------------------------------------------------------
@@ -28,7 +29,7 @@ namespace ooe
 
 		iterator_type begin( void ) const;
 		iterator_type end( void ) const;
-		void insert( const std::string&, group_base& );
+		void insert( const std::string&, group_base& ) OOE_VISIBLE;
 		bool run( time_t = 60 ) const;
 		bool run( const std::string&, time_t = 60 ) const;
 
