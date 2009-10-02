@@ -60,16 +60,6 @@ namespace
 		delete p;
 	}
 
-	ipc::construct_ptr< print > print_nconstruct( void )
-	{
-		return new print;
-	}
-
-	void print_ndestruct( ipc::destruct_ptr< print > p )
-	{
-		delete p;
-	}
-
 	typedef tuple< const c8*, const c8* > tuple_type;
 	typedef std::vector< std::string > vector_type;
 	typedef ipc::vector< c8 > ipc_vector;
@@ -284,17 +274,17 @@ namespace
 		OOE_PRINT( "\nCLIENT_FAIL", unknown()() );
 
 		ipc::socket::call< ipc::construct_ptr< print > ( void ) >
-			print_nconstruct( client, "print_nconstruct" );
+			print_construct( client, "print_construct" );
 
 		for ( up_t i = 0; i != iteration_limit; ++i )
-			print_nconstruct();
+			print_construct();
 	}
 
 	void server_ntest( void )
 	{
 		ipc::socket::nameservice nameservice;
-		nameservice.insert( "print_nconstruct", print_nconstruct );
-		nameservice.insert( "print_ndestruct", print_ndestruct );
+		nameservice.insert( "print_construct", print_construct );
+		nameservice.insert( "print_destruct", print_destruct );
 		nameservice.insert( "printer", &print::printer );
 		nameservice.insert( "unknown", unknown );
 
