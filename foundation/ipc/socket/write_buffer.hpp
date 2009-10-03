@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_SOCKET_WRITE_BUFFER_HPP
 #define OOE_FOUNDATION_IPC_SOCKET_WRITE_BUFFER_HPP
 
-#include "foundation/utility/tuple.hpp"
+#include "foundation/utility/fundamental.hpp"
 
 namespace ooe
 {
