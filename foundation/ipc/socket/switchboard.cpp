@@ -14,7 +14,7 @@ namespace
 		ipc::socket::return_write( buffer_ptr, socket );
 	}
 
-	void error_write( u8* buffer_ptr, up_t buffer_size, socket& socket, bool executed,
+	void return_error( u8* buffer_ptr, up_t buffer_size, socket& socket, bool executed,
 		const c8* what, const c8* where )
 	{
 		up_t size = ipc::stream_size< bool, const c8*, const c8* >::call( executed, what, where );
@@ -56,18 +56,22 @@ namespace ooe
 			executed = true;
 			args._0( args._1, data, buffer, sizeof( buffer ), socket, pool );
 		}
+		catch ( error::verification& error )
+		{
+			return_error( buffer, sizeof( buffer ), socket, false, error.what(), error.where() );
+		}
 		catch ( error::runtime& error )
 		{
-			error_write( buffer, sizeof( buffer ), socket, executed, error.what(), error.where() );
+			return_error( buffer, sizeof( buffer ), socket, executed, error.what(), error.where() );
 		}
 		catch ( std::exception& error )
 		{
-			error_write( buffer, sizeof( buffer ), socket, executed, error.what(),
+			return_error( buffer, sizeof( buffer ), socket, executed, error.what(),
 				"\nNo stack trace available" );
 		}
 		catch ( ... )
 		{
-			error_write( buffer, sizeof( buffer ), socket, executed,
+			return_error( buffer, sizeof( buffer ), socket, executed,
 				"An unknown exception was thrown", "\nNo stack trace available" );
 		}
 	}
