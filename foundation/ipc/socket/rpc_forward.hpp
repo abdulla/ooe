@@ -5,9 +5,9 @@
 	#ifndef OOE_FOUNDATION_IPC_SOCKET_RPC_FORWARD_HPP
 	#define OOE_FOUNDATION_IPC_SOCKET_RPC_FORWARD_HPP
 
+#include "foundation/ipc/error.hpp"
 #include "foundation/ipc/traits.hpp"
 #include "foundation/ipc/socket/client.hpp"
-#include "foundation/ipc/socket/error.hpp"
 #include "foundation/ipc/socket/write_buffer.hpp"
 
 namespace ooe
@@ -38,7 +38,7 @@ namespace ooe
 		const c8* what;
 		const c8* where;
 		stream_read< bool, const c8*, const c8* >::call( buffer, executed, what, where );
-		throw error::socket_rpc( executed ) << what << "\n\nServer stack trace:" << where;
+		throw error::rpc( executed ) << what << "\n\nServer stack trace:" << where;
 	}
 
 //--- ipc::socket::result ------------------------------------------------------

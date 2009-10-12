@@ -5,7 +5,7 @@
 	#ifndef OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 	#define OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 
-#include "foundation/ipc/memory/error.hpp"
+#include "foundation/ipc/error.hpp"
 #include "foundation/ipc/memory/header.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 
@@ -57,10 +57,10 @@ namespace ooe
 			const c8* what;
 			const c8* where;
 			stream_read< bool, const c8*, const c8* >::call( data, executed, what, where );
-			throw error::memory_rpc( executed ) << what << "\n\nServer stack trace:" << where;
+			throw error::rpc( executed ) << what << "\n\nServer stack trace:" << where;
 
 		default:
-			throw error::memory_rpc( false ) << "Unknown error code: " << type;
+			throw error::rpc( false ) << "Unknown error code: " << type;
 		}
 	}
 }

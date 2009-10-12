@@ -5,9 +5,8 @@
 
 #include <map>
 
+#include "foundation/ipc/error.hpp"
 #include "foundation/ipc/traits.hpp"
-#include "foundation/utility/error.hpp"
-#include "foundation/utility/macro.hpp"
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/noncopyable.hpp"
 
@@ -355,8 +354,7 @@ namespace ooe
 		{
 			// could speed up further by checking against known out-of-bounds ranges/values
 			if ( !pool.find( pointer ) )
-				throw error::runtime( "ipc::verify: " ) <<
-					"Invalid pointer " << pointer << " in argument " << index;
+				throw error::verification( pointer, index );
 		}
 	};
 
@@ -366,8 +364,7 @@ namespace ooe
 		static void call( pool& pool, t pointer, u8 index )
 		{
 			if ( pointer && !pool.find( pointer ) )
-				throw error::runtime( "ipc::verify: " ) <<
-					"Invalid pointer " << pointer << " in argument " << index;
+				throw error::verification( pointer, index );
 		}
 	};
 }

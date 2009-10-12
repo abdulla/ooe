@@ -4,7 +4,6 @@
 
 #include <cerrno>
 
-#include "foundation/ipc/memory/error.hpp"
 #include "foundation/ipc/memory/link.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/utility/convert.hpp"
