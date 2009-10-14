@@ -51,6 +51,7 @@ namespace ooe
 	typedef find_size< char_types, 4 >::type c32;
 
 	struct no_t;
+	struct empty_t {};
 }
 
 #endif	// OOE_FOUNDATION_UTILITY_FUNDAMENTAL_HPP
