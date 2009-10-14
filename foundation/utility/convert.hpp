@@ -66,21 +66,11 @@ namespace ooe
 		return out << buffer;
 	}
 
-	template< typename t0, typename t1 >
-		t0& operator <<( t0& out, const t1* value )
-	{
-		c8 buffer[ 32 ];
-		u32 field_width = sizeof( void* ) * 2 + 2;
-		up_t pointer = reinterpret_cast< up_t >( value );
-		std::snprintf( buffer, sizeof( buffer ), "%#0*lx", field_width, pointer );
-		return out << buffer;
-	}
-
-	template< typename type >
+	/*template< typename type >
 		type& operator <<( type& out, bool value )
 	{
 		return out << ( value ? "true" : "false" );
-	}
+	}*/
 
 //--- hexadecimal --------------------------------------------------------------
 	template< typename type >
@@ -88,7 +78,7 @@ namespace ooe
 	{
 		const type value;
 
-		hexadecimal( type value_ )
+		explicit hexadecimal( type value_ )
 			: value( value_ )
 		{
 		}
@@ -127,6 +117,31 @@ namespace ooe
 	{
 		c8 buffer[ 32 ];
 		std::snprintf( buffer, sizeof( buffer ), "%llx", hex.value );
+		return out << buffer;
+	}
+
+//--- pointer ------------------------------------------------------------------
+	struct pointer
+	{
+		const up_t value;
+
+		explicit pointer( const void* value_ )
+			: value( reinterpret_cast< up_t >( value_ ) )
+		{
+		}
+	};
+
+	inline pointer ptr( const void* value )
+	{
+		return pointer( value );
+	}
+
+	template< typename type >
+		type& operator <<( type& out, pointer ptr )
+	{
+		c8 buffer[ 32 ];
+		u32 field_width = sizeof( void* ) * 2 + 2;
+		std::snprintf( buffer, sizeof( buffer ), "%#0*lx", field_width, ptr.value );
 		return out << buffer;
 	}
 }

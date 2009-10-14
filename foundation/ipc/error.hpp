@@ -30,8 +30,7 @@ namespace ooe
 		rpc( bool executed_ )
 			: runtime( "ipc: " ), executed( executed_ )
 		{
-			using ooe::operator <<;
-			*this << "Executed: " << executed << '\n';
+			*this << "Executed: " << ( executed ? "true" : "false" ) << '\n';
 		}
 
 		virtual ~rpc( void ) throw()
@@ -56,11 +55,11 @@ namespace ooe
 	struct OOE_VISIBLE error::verification
 		: virtual public runtime
 	{
-		verification( const void* pointer, u8 index )
+		verification( const void* value, u8 index )
 			: runtime( "ipc: " )
 		{
 			using ooe::operator <<;
-			*this << "Invalid pointer " << pointer << " in argument " << index;
+			*this << "Invalid pointer " << ptr( value ) << " in argument " << index;
 		}
 
 		virtual ~verification( void ) throw()
