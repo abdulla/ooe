@@ -14,7 +14,7 @@ namespace ooe
 	{
 		class group_base;
 
-		template< typename, up_t >
+		template< typename, typename, up_t >
 			struct group;
 
 		template< typename >
@@ -47,14 +47,14 @@ namespace ooe
 	};
 
 //--- unit::group --------------------------------------------------------------
-	template< typename data, up_t size >
+	template< typename setup, typename data, up_t size >
 		struct unit::group
-		: public group_base
+		: public group_base, private setup
 	{
 		typedef fixture< data > fixture_type;
 
 		group( const std::string& name, runner& runner = global_runner )
-			: group_base()
+			: group_base(), setup()
 		{
 			insert_test< fixture_type, size >::call( *this );
 			runner.insert( name, *this );

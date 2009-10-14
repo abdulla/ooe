@@ -33,7 +33,7 @@ namespace
 		bool& state;
 	};
 
-	typedef unit::group< data, 2 > group_type;
+	typedef unit::group< empty_t, data, 2 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "pointer" );
 }

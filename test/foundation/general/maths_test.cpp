@@ -10,8 +10,7 @@ namespace
 {
 	using namespace ooe;
 
-	struct data {};
-	typedef unit::group< data, 7 > group_type;
+	typedef unit::group< empty_t, empty_t, 7 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "maths" );
 }

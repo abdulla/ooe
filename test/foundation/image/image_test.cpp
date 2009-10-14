@@ -21,7 +21,7 @@ namespace
 		}
 	};
 
-	typedef unit::group< data, 3 > group_type;
+	typedef unit::group< empty_t, data, 3 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "image" );
 }
