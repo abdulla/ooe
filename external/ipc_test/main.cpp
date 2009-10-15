@@ -740,10 +740,6 @@ namespace
 				client_ntest();
 				return true;
 
-			case 'p':
-				client_ptr();
-				return true;
-
 			case 'x':
 				server_test();
 				return true;
@@ -754,6 +750,10 @@ namespace
 
 			case 'z':
 				client_fail();
+				return true;
+
+			case 'p':
+				client_ptr();
 				return true;
 
 			default:
@@ -773,10 +773,7 @@ namespace
 					"    -x                     Test memory-based server\n"
 					"    -y                     Test memory-based client 1 (feature)\n"
 					"    -z                     Test memory-based client 2 (failure)\n"
-					"    -p                     Test memory-based client 3 (pointer)\n"
-					"\n"
-					"    -u                     Test socket-based server\n"
-					"    -v                     Test socket-based client\n";
+					"    -p                     Test memory-based client 3 (pointer)\n";
 
 				return false;
 			}
