@@ -4,7 +4,7 @@
 
 #include <paths.h>
 
-#include "foundation/io/memory.hpp"
+#include "foundation/io/file.hpp"
 #include "foundation/io/socket.hpp"
 #include "test/unit/assert.hpp"
 #include "test/unit/group.hpp"
@@ -18,19 +18,17 @@ namespace
 	{
 	protected:
 		setup( void )
-			: desc( _PATH_TMP "test-file", descriptor::read_write | descriptor::truncate ),
-			pair( make_pair() )
+			: pair( make_pair() )
 		{
-			desc.resize( sizeof( u32 ) );
-			memory memory( desc, memory::write );
-			*memory.as< u32 >() = 0xdeadbeef;
+			u32 value = 0xdeadbeef;
+			descriptor desc( _PATH_TMP "test-file", descriptor::read_write | descriptor::truncate );
+			file( desc ).write( &value, sizeof( value ) );
 
 			socket = &pair._1;
 			pair._0.send( desc );
 		}
 
 	private:
-		descriptor desc;
 		socket_pair pair;
 	};
 
@@ -49,10 +47,12 @@ namespace ooe
 		{
 			std::cerr << "send/receive descriptor\n";
 
-			descriptor desc = ::socket->receive();
-			memory memory( desc );
+			u32 value;
+			file file( ::socket->receive() );
+			file.seek( 0, file::begin );
+			file.read( &value, sizeof( value ) );
 
-			assert( "descriptor == 0xdeadbeef", *memory.as< u32 >() == 0xdeadbeef );
+			assert( "value == 0xdeadbeef", value == 0xdeadbeef );
 		}
 	}
 }
