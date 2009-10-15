@@ -158,7 +158,7 @@ namespace ooe
 
 		const u32 blank_size = width * height;
 		scoped_array< u8 > blank( new u8[ blank_size ] );
-		std::fill_n( blank.get(), blank_size, 0 );
+		std::memset( blank, 0, blank_size );
 
 		face.size( size );
 		font::bitmap bitmap;

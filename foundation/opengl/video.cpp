@@ -407,7 +407,7 @@ namespace
 	{
 		GetIntegerv( type, &size );
 		bool* array = new bool[ size ];
-		std::fill_n( array, sizeof( bool ) * size, false );
+		std::memset( array, 0, sizeof( bool ) * size );
 		return array;
 	}
 

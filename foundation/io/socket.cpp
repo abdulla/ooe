@@ -197,7 +197,7 @@ namespace ooe
 	address::address( up_t size_ )
 		: size( size_ ), data( new u8[ size ] )
 	{
-		std::fill_n( data.get(), size, 0 );
+		std::memset( data, 0, size );
 	}
 
 	u16 address::family( void ) const
