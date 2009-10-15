@@ -21,7 +21,7 @@ namespace ooe
 		using descriptor::splice;
 
 	protected:
-		socket( s32 );
+		socket( const descriptor& );
 
 		using descriptor::get;
 	};

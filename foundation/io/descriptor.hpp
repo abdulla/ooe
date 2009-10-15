@@ -63,6 +63,7 @@ namespace ooe
 		shared_ptr< const descriptor_id > id;
 
 		friend struct platform::descriptor;
+		friend struct socket;
 	};
 }
 

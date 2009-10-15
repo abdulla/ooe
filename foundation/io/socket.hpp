@@ -12,10 +12,9 @@ namespace ooe
 	struct address;
 
 //--- socket -------------------------------------------------------------------
-	class OOE_VISIBLE socket
+	struct OOE_VISIBLE socket
 		: public platform::socket
 	{
-	public:
 		enum poll_type
 		{
 			input,
@@ -30,6 +29,8 @@ namespace ooe
 			read_write
 		};
 
+		socket( const ooe::descriptor& );
+
 		up_t receive( void*, up_t );
 		up_t send( const void*, up_t );
 
@@ -37,11 +38,12 @@ namespace ooe
 		void shutdown( shutdown_type );
 		void option( u32, u32 );
 
-	protected:
-		socket( s32 ) OOE_HIDDEN;
-
-		socket create( s32 ) const OOE_HIDDEN;
+		ooe::descriptor receive( void );
+		void send( const ooe::descriptor& );
 	};
+
+	typedef tuple< socket, socket > socket_pair;
+	socket_pair make_pair( void );
 
 //--- listen -------------------------------------------------------------------
 	struct OOE_VISIBLE listen

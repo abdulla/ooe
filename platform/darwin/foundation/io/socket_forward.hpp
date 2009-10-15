@@ -18,7 +18,7 @@ namespace ooe
 		: private ooe::descriptor
 	{
 	protected:
-		socket( s32 );
+		socket( const descriptor& );
 
 		using descriptor::get;
 	};

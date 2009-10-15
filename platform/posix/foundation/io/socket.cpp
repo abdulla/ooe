@@ -5,7 +5,7 @@
 namespace ooe
 {
 //--- platform::socket ---------------------------------------------------------
-	platform::socket::socket( s32 fd )
+	platform::socket::socket( const descriptor& fd )
 		: descriptor( fd )
 	{
 	}

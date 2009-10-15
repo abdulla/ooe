@@ -15,6 +15,12 @@ namespace
 {
 	using namespace ooe;
 
+	struct control_message
+		: public cmsghdr
+	{
+		s32 fd;
+	};
+
 	hostent* lookup( const std::string& path, s32 family, const c8* name )
 	{
 		hostent* he = gethostbyname2( path.c_str(), family );
@@ -30,14 +36,9 @@ namespace
 namespace ooe
 {
 //--- socket -------------------------------------------------------------------
-	socket::socket( s32 fd )
-		: platform::socket( fd )
+	socket::socket( const ooe::descriptor& desc )
+		: platform::socket( desc )
 	{
-	}
-
-	socket socket::create( s32 fd ) const
-	{
-		return socket( fd );
 	}
 
 	up_t socket::receive( void* buffer, up_t bytes )
@@ -108,6 +109,68 @@ namespace ooe
 			throw error::io( "socket: " ) << "Unable to set option: " << error::number( errno );
 	}
 
+	descriptor socket::receive( void )
+	{
+		msghdr message;
+		iovec vector;
+		control_message payload;
+
+		memset( &message, 0, sizeof( message ) );
+		message.msg_iov = &vector;
+		message.msg_iovlen = 1;
+		message.msg_control = &payload;
+		message.msg_controllen = sizeof( payload );
+
+		u8 dummy;
+		vector.iov_base = &dummy;
+		vector.iov_len = 1;
+
+		if ( recvmsg( get(), &message, MSG_WAITALL ) == -1 )
+			throw error::io( "socket: " ) <<
+				"Unable to receive descriptor: " << error::number( errno );
+		else if ( payload.cmsg_type != SCM_RIGHTS )
+			throw error::io( "socket: " ) << "Received unknown type: " << payload.cmsg_type;
+
+		return payload.fd;
+	}
+
+	void socket::send( const ooe::descriptor& desc )
+	{
+		msghdr message;
+		iovec vector;
+		control_message payload;
+
+		memset( &message, 0, sizeof( message ) );
+		message.msg_iov = &vector;
+		message.msg_iovlen = 1;
+		message.msg_control = &payload;
+		message.msg_controllen = sizeof( payload );
+
+		u8 dummy;
+		vector.iov_base = &dummy;
+		vector.iov_len = 1;
+
+		memset( &payload, 0, sizeof( payload ) );
+		payload.cmsg_level = SOL_SOCKET;
+		payload.cmsg_type = SCM_RIGHTS;
+		payload.cmsg_len = sizeof( payload );
+		payload.fd = desc.get();
+
+		if ( sendmsg( get(), &message, 0 ) == -1 )
+			throw error::io( "socket: " ) <<
+				"Unable to send descriptor: " << error::number( errno );
+	}
+
+	socket_pair make_pair( void )
+	{
+		s32 fd[ 2 ];
+
+		if ( socketpair( AF_LOCAL, SOCK_STREAM, 0, fd ) )
+			throw error::runtime( "socket: " ) << "Unable to make pair: " << error::number( errno );
+
+		return socket_pair( descriptor( fd[ 0 ] ), descriptor( fd[ 1 ] ) );
+	}
+
 //--- listen -------------------------------------------------------------------
 	listen::listen( const address& address )
 		: socket( ::socket( address.family(), SOCK_STREAM, 0 ) )
@@ -120,7 +183,7 @@ namespace ooe
 
 	socket listen::accept( void ) const
 	{
-		return create( ::accept( get(), 0, 0 ) );
+		return ooe::descriptor( ::accept( get(), 0, 0 ) );
 	}
 
 //--- connect ------------------------------------------------------------------

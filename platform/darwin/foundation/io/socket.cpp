@@ -7,7 +7,7 @@
 namespace ooe
 {
 //--- platform::socket ---------------------------------------------------------
-	platform::socket::socket( s32 fd )
+	platform::socket::socket( const descriptor& fd )
 		: descriptor( fd )
 	{
 		static_cast< ooe::socket* >( this )->option( SO_NOSIGPIPE, true );
