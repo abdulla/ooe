@@ -95,8 +95,7 @@ namespace
 		std::cout << '\n';
 	}
 
-	void unknown( void ) OOE_NORETURN;
-	void unknown( void )
+	void OOE_NORETURN unknown( void )
 	{
 		throw 0;
 	}

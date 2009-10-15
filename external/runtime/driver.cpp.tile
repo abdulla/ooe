@@ -143,8 +143,8 @@ namespace
 	}
 }
 
-extern "C" close_type ooe_open( core_type&, const settings&, service& ) OOE_VISIBLE;
-extern "C" close_type ooe_open( core_type& core, const settings& set, service& service )
+extern "C" dynamic::close_type OOE_VISIBLE ooe_open( core_type& core, const settings& set,
+	service& service )
 {
-	return close_type( new driver( core, set, service ), close );
+	return dynamic::close_type( new driver( core, set, service ), close );
 }

@@ -23,11 +23,8 @@ namespace
 	typedef tuple< std::jmp_buf, std::string, buffer_type, file* > write_tuple;
 
 	//--- error manager functions ----------------------------------------------
-	template< typename >
-		void jpeg_error( jpeg_common_struct* ) OOE_NORETURN;
-
 	template< typename type >
-		void jpeg_error( jpeg_common_struct* common )
+		void OOE_NORETURN jpeg_error( jpeg_common_struct* common )
 	{
 		c8 string[ JMSG_LENGTH_MAX ];
 		common->err->format_message( common, string );

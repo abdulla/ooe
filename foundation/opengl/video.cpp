@@ -642,8 +642,7 @@ namespace
 	}
 }
 
-extern "C" dynamic::close_type ooe_open( const view_data& ) OOE_VISIBLE;
-extern "C" dynamic::close_type ooe_open( const view_data& view )
+extern "C" dynamic::close_type OOE_VISIBLE ooe_open( const view_data& view )
 {
 	return dynamic::close_type( new video_type( view, context_f( view ) ), close );
 }

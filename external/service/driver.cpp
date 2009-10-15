@@ -26,7 +26,9 @@ namespace
 		if ( !set.service.sight )
 			return 0;
 
-		scoped_ptr< sight_provider > sight( new sight_provider( set.sight.width, set.sight.height ) );
+		scoped_ptr< sight_provider >
+			sight( new sight_provider( set.sight.width, set.sight.height ) );
+
 		sight_register( reg.service, *sight );
 		return sight.release();
 	}
@@ -48,8 +50,7 @@ namespace
 	}
 }
 
-extern "C" dynamic::close_type ooe_open( const settings&, register_type& ) OOE_VISIBLE;
-extern "C" dynamic::close_type ooe_open( const settings& set, register_type& reg )
+extern "C" dynamic::close_type OOE_VISIBLE ooe_open( const settings& set, register_type& reg )
 {
 	return dynamic::close_type( new provider( set, reg ), close );
 }

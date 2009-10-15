@@ -54,8 +54,7 @@ namespace ooe
 	}
 }
 
-extern "C" void ooe_opengl_choose( const ooe::view_data& ) OOE_VISIBLE;
-extern "C" void ooe_opengl_choose( const ooe::view_data& view )
+extern "C" void OOE_VISIBLE ooe_opengl_choose( const ooe::view_data& view )
 {
 	ooe::s32 attributes[] =
 	{

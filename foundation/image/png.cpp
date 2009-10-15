@@ -19,8 +19,7 @@ namespace
 
 	typedef tuple< const u8*, up_t > tuple_type;
 
-	void png_error_( png_struct*, const c8* ) OOE_NORETURN;
-	void png_error_( png_struct* png_struct, const c8* string )
+	void OOE_NORETURN png_error_( png_struct* png_struct, const c8* string )
 	{
 		*static_cast< std::string* >( png_get_error_ptr( png_struct ) ) = string;
 		std::longjmp( png_jmpbuf( png_struct ), 1 );

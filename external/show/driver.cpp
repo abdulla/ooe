@@ -241,8 +241,8 @@ namespace
 	}
 }
 
-extern "C" dynamic::close_type ooe_open( core_type&, const settings&, service& ) OOE_VISIBLE;
-extern "C" dynamic::close_type ooe_open( core_type& core, const settings& set, service& service )
+extern "C" dynamic::close_type OOE_VISIBLE ooe_open( core_type& core, const settings& set,
+	service& service )
 {
 	resource< image_decode_t > resource;
 	resource.insert( "dds", compressed_decode< dds::decode > );
