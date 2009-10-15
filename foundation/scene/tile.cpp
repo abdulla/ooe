@@ -1,5 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include <cstring>
+
 #include "foundation/image/png.hpp"
 #include "foundation/scene/tile.hpp"
 #include "foundation/utility/miscellany.hpp"
