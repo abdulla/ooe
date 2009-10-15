@@ -41,7 +41,7 @@ namespace
 					++hit;
 			}
 
-			std::copy( frame, frame + byte_size, pointer );
+			std::memcpy( pointer, frame, byte_size );
 
 			if ( hit > byte_size * percent / 100 )
 				write();

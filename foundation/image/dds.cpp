@@ -146,9 +146,8 @@ namespace ooe
 			throw error::runtime( "dds: " ) <<
 				"Linear size " << header.linear_size << " is greater than file size " << size;
 
-		const u8* begin = add< u8 >( &header, sizeof( dds_header ) );
-		const u8* end = add< u8 >( begin, byte_size );
-		std::copy( begin, end, image.as< u8 >() );
+		const u8* pointer = add< u8 >( &header, sizeof( dds_header ) );
+		std::memcpy( image.get(), pointer, byte_size );
 		return image;
 	}
 

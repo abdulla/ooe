@@ -1,5 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include <cstring>
+
 #include "external/service/sight.hpp"
 
 namespace ooe
@@ -23,7 +25,7 @@ namespace ooe
 
 	void sight_provider::call( const u8* data )
 	{
-		std::copy( data, data + size, frame.get() );
+		std::memcpy( frame, data, size );
 		state_ = true;
 	}
 

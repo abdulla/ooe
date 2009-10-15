@@ -35,7 +35,7 @@ namespace
 	{
 		tuple_type& tuple = *static_cast< tuple_type* >( png_get_io_ptr( read_struct ) );
 		up_t min = std::min( size, tuple._1 );
-		std::copy( tuple._0, tuple._0 + min, buffer );
+		std::memcpy( buffer, tuple._0, min );
 
 		tuple._0 += min;
 		tuple._1 -= min;

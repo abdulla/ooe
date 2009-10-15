@@ -20,7 +20,7 @@ namespace
 
 		for ( u32 i = 0; i != xyab[ 1 ]; ++i )
 		{
-			std::copy( source, source + xyab[ 0 ], target );
+			std::memcpy( target, source, xyab[ 0 ] );
 			target += width;
 			source += xyab[ 0 ];
 		}

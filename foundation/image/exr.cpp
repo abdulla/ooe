@@ -65,7 +65,7 @@ namespace
 			throw error::runtime( "exr: " ) << "Reading past end of file";
 
 		c8* offset = data + position;
-		std::copy( offset, offset + length, buffer );
+		std::memcpy( buffer, offset, length );
 		position += length;
 		return position < size;
 	}

@@ -216,8 +216,7 @@ namespace ooe
 	{
 		sockaddr_un& sa = *data.as< sockaddr_un >();
 		sa.sun_family = AF_LOCAL;
-		const c8* in = path.c_str();
-		std::copy( in, in + path.size() + 1, sa.sun_path );
+		std::memcpy( sa.sun_path, path.c_str(), path.size() + 1 );
 	}
 
 //--- internet -----------------------------------------------------------------

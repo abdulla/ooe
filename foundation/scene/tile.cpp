@@ -32,7 +32,7 @@ namespace ooe
 		uncompressed_image image = png::decode( cache.vfs[ "terrain/map.png" ] );
 		const u8* buffer_u8 = image.as< u8 >();
 		scoped_array< f32 > buffer_f32( new f32[ image.width * image.height ] );
-		std::copy( buffer_u8, buffer_u8 + image.width * image.height, buffer_f32.get() );
+		std::memcpy( buffer_f32, buffer_u8, image.width * image.height );
 
 		height->bind();
 		height->load( buffer_f32, image.width, image.height, uncompressed_image::y_f32 );
