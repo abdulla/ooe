@@ -22,7 +22,7 @@ namespace ooe
 
 //--- view ---------------------------------------------------------------------
 	struct OOE_VISIBLE view
-		: public view_data, public platform::view
+		: public view_data, private platform::view
 	{
 		view( const event_queue&, u16, u16, bool );
 		~view( void );

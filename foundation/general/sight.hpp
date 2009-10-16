@@ -10,7 +10,7 @@
 namespace ooe
 {
 	struct OOE_VISIBLE sight
-		: private noncopyable, public platform::sight
+		: private noncopyable, private platform::sight
 	{
 		using platform::sight::call_type;
 
