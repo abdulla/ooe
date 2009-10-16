@@ -43,7 +43,7 @@ namespace ooe
 
 //--- module_external ----------------------------------------------------------
 	module_external::module_external( const std::string& path )
-		: client( ipc::memory::create_semaphore, path )
+		: client( path )
 	{
 	}
 
@@ -70,7 +70,7 @@ namespace ooe
 
 //--- registry -----------------------------------------------------------------
 	registry::registry( void )
-		: client( ipc::memory::create_semaphore, "/ooe.registry" )
+		: client( "/ooe.registry" )
 	{
 	}
 

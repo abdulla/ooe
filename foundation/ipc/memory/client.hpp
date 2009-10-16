@@ -19,17 +19,16 @@ namespace ooe
 	class OOE_VISIBLE ipc::memory::client
 	{
 	public:
-		client( transport_type, const std::string& );
+		client( const std::string& );
 		~client( void );
 
 		operator memory::transport&( void );
 
 	private:
-		transport_type type;
 		const std::string name;
 		const u32 link_id;
 
-		const scoped_ptr< memory::transport > transport;
+		memory::transport transport;
 		link_client link;
 	};
 }

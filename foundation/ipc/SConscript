@@ -7,6 +7,7 @@ if name == 'darwin':
 
 files = Glob( '*.cpp' ) + Glob( 'memory/*.cpp' ) + Glob( 'socket/*.cpp' )
 files += Glob( platform + '/foundation/ipc/*.cpp' )
+files += Glob( platform + '/foundation/ipc/memory/*.cpp' )
 files += Glob( platform + '/foundation/ipc/socket/*.cpp' )
 out = build.SharedLibrary( '#library/libipc', files )
 build.SideEffect( Glob( '*.rpo' ), out )

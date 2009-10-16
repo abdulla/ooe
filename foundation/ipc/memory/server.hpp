@@ -24,12 +24,12 @@ namespace ooe
 	class ipc::memory::servlet
 	{
 	public:
-		servlet( pid_t, u32, transport_type, const memory::switchboard&, server& );
+		servlet( pid_t, u32, const memory::switchboard&, server& );
 		~servlet( void );
 
 	private:
 		const u32 link_id;
-		const scoped_ptr< memory::transport > transport;
+		memory::transport transport;
 		const memory::switchboard& switchboard;
 
 		scoped_ptr< const link_listen > listen;
@@ -43,8 +43,7 @@ namespace ooe
 	class ipc::memory::server
 	{
 	public:
-		server( transport_type, const std::string&, const switchboard& ) OOE_VISIBLE;
-		~server( void ) OOE_VISIBLE;
+		server( const std::string&, const switchboard& ) OOE_VISIBLE;
 
 		bool decode( void ) OOE_VISIBLE;
 
@@ -57,8 +56,7 @@ namespace ooe
 		ipc::semaphore semaphore;
 		memory::switchboard internal;
 		const memory::switchboard& external;
-		const transport_type type;
-		const scoped_ptr< memory::transport > transport;
+		memory::transport transport;
 
 		u32 seed;
 		servlet_map servlets;

@@ -62,7 +62,7 @@ namespace
 		switchboard.insert( insert );
 		switchboard.insert( find );
 
-		ipc::memory::server server( ipc::memory::create_semaphore, "/ooe.registry", switchboard );
+		ipc::memory::server server( "/ooe.registry", switchboard );
 
 		while ( !executable::signal() )
 			server.decode();
@@ -72,7 +72,7 @@ namespace
 	void surrogate( const std::string& path, const std::string& /*module_name*/ )
 	{
 		ipc::memory::switchboard switchboard;
-		ipc::memory::server server( ipc::memory::create_semaphore, path, switchboard );
+		ipc::memory::server server( path, switchboard );
 
 		{
 			std::string gate = path + ".g";

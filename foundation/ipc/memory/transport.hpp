@@ -3,8 +3,8 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
 
-#include "foundation/utility/fundamental.hpp"
-#include "foundation/utility/macro.hpp"
+#include "foundation/ipc/shared_memory.hpp"
+#include "foundation/ipc/memory/transport_forward.hpp"
 
 namespace ooe
 {
@@ -12,13 +12,15 @@ namespace ooe
 	{
 		namespace memory
 		{
-			struct transport;
+			class transport;
 		}
 	}
 
 //--- ipc::memory::transport ---------------------------------------------------
-	struct ipc::memory::transport
+	class OOE_VISIBLE ipc::memory::transport
+		: private platform::ipc::memory::transport
 	{
+	public:
 		typedef void ( * wait_type )( u8*, up_t, const void* );
 
 		enum type
@@ -27,29 +29,21 @@ namespace ooe
 			create
 		};
 
-		virtual ~transport( void ) {}
+		transport( const std::string&, type );
+		~transport( void );
 
-		virtual void wait( wait_type, const void* ) = 0;
-		virtual void notify( void ) = 0;
-		virtual void wake_wait( void ) = 0;
-		virtual void wake_notify( void ) = 0;
+		void wait( wait_type, const void* );
+		void notify( void );
+		void wake_wait( void );
+		void wake_notify( void );
 
-		virtual u8* get( void ) const = 0;
-		virtual up_t size( void ) const = 0;
-		virtual void unlink( void ) = 0;
+		u8* get( void ) const;
+		up_t size( void ) const;
+		void unlink( void );
+
+	private:
+		shared_memory memory;
 	};
-
-	namespace ipc
-	{
-		namespace memory
-		{
-//--- ipc::memory --------------------------------------------------------------
-			typedef transport* ( * transport_type )( const std::string&, transport::type );
-
-			transport* create_spinlock( const std::string&, transport::type ) OOE_VISIBLE;
-			transport* create_semaphore( const std::string&, transport::type ) OOE_VISIBLE;
-		}
-	}
 }
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP

@@ -44,9 +44,9 @@ namespace
 namespace ooe
 {
 //--- ipc::memory::servlet -------------------------------------------------------------
-	ipc::memory::servlet::servlet( pid_t pid, u32 link_id_, transport_type type,
-		const memory::switchboard& switchboard_, server& server )
-		: link_id( link_id_ ), transport( type( link_name( pid, link_id ), transport::create ) ),
+	ipc::memory::servlet::servlet( pid_t pid, u32 link_id_, const memory::switchboard& switchboard_,
+		server& server )
+		: link_id( link_id_ ), transport( link_name( pid, link_id ), transport::create ),
 		switchboard( switchboard_ ), listen( new link_listen( link_name( pid, link_id ) ) ),
 		active( true ), thread( make_function( *this, &servlet::call ), &server )
 	{
@@ -60,33 +60,32 @@ namespace ooe
 			return;
 
 		active = false;
-		stream_write< u32, u32 >::call( transport->get(), true, 0 );
-		transport->wake_wait();
+		stream_write< u32, u32 >::call( transport.get(), true, 0 );
+		transport.wake_wait();
 		thread.join();
 	}
 
 	void* ipc::memory::servlet::call( void* pointer )
 	{
-		write_buffer buffer( transport->get(), 0, 0 );
+		write_buffer buffer( transport.get(), 0, 0 );
 		pool pool;
 		tuple_type tuple( switchboard, &buffer, &pool );
 
 		memory::server& server = *static_cast< memory::server* >( pointer );
 		link_server link( listen->accept(), link_id, server );
 		delete listen.release();
-		transport->unlink();
+		transport.unlink();
 
 		while ( active )
-			transport->wait( ipc_decode, &tuple );
+			transport.wait( ipc_decode, &tuple );
 
 		return 0;
 	}
 
 //--- ipc::memory::server --------------------------------------------------------------
-	ipc::memory::server::
-		server( transport_type type_, const std::string& name, const switchboard& external_ )
+	ipc::memory::server::server( const std::string& name, const switchboard& external_ )
 		: semaphore( name + ".s", semaphore::create ), internal(), external( external_ ),
-		type( type_ ), transport( type( name, transport::create ) ), seed(), servlets()
+		transport( name, transport::create ), seed(), servlets()
 	{
 		if ( internal.insert_direct( ipc_link, this ) != 1 )
 			throw error::runtime( "ipc::server: " ) << "\"link\" not at index 1";
@@ -95,16 +94,11 @@ namespace ooe
 			throw error::runtime( "ipc::server: " ) << "\"unlink\" not at index 2";
 	}
 
-	// note: so that ~servlet() does not need to be visible
-	ipc::memory::server::~server( void )
-	{
-	}
-
 	bool ipc::memory::server::decode( void )
 	{
-		write_buffer buffer( transport->get(), 0, 0 );
+		write_buffer buffer( transport.get(), 0, 0 );
 		tuple_type tuple( internal, &buffer, 0 );
-		transport->wait( ipc_decode, &tuple );
+		transport.wait( ipc_decode, &tuple );
 		return !servlets.empty();
 	}
 
@@ -112,8 +106,7 @@ namespace ooe
 	u32 ipc::memory::server::link( pid_t pid )
 	{
 		u32 link_id = seed++;
-		servlet_map::value_type
-			value( link_id, new servlet( pid, link_id, type, external, *this ) );
+		servlet_map::value_type value( link_id, new servlet( pid, link_id, external, *this ) );
 		servlets.insert( servlets.end(), value );
 		return link_id;
 	}
