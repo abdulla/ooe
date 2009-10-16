@@ -21,7 +21,7 @@ namespace ooe
 	class platform::ipc::memory::transport
 	{
 	protected:
-		const u8 mode;
+		u8 mode;
 		ooe::ipc::unnamed_semaphore* in;
 		ooe::ipc::unnamed_semaphore* out;
 

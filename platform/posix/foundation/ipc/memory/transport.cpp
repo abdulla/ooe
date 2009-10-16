@@ -89,4 +89,10 @@ namespace ooe
 	{
 		memory.unlink();
 	}
+
+	void ipc::memory::transport::migrate( ooe::socket& socket )
+	{
+		socket.send( memory.desc() );
+		mode = open;
+	}
 }

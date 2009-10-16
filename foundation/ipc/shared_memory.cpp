@@ -75,6 +75,12 @@ namespace ooe
 		delete shared_memory_base::id.release();
 	}
 
+	const descriptor& ipc::shared_memory::desc( void ) const
+	{
+		const void* p = static_cast< const ooe::memory* >( this );
+		return *reinterpret_cast< const ooe::descriptor* >( p );
+	}
+
 //--- ipc::locked_memory -------------------------------------------------------
 	ipc::locked_memory::locked_memory( const std::string& name_, type mode, up_t size_ )
 		: shared_memory( name_, mode, size_ )

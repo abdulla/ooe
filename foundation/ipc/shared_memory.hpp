@@ -52,6 +52,7 @@ namespace ooe
 
 		std::string name( void ) const;
 		void unlink( void );
+		const ooe::descriptor& desc( void ) const;
 
 		using memory::as;
 		using memory::get;

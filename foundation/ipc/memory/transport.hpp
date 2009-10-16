@@ -3,6 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
 
+#include "foundation/io/socket.hpp"
 #include "foundation/ipc/shared_memory.hpp"
 #include "foundation/ipc/memory/transport_forward.hpp"
 
@@ -40,6 +41,7 @@ namespace ooe
 		u8* get( void ) const;
 		up_t size( void ) const;
 		void unlink( void );
+		void migrate( ooe::socket& );
 
 	private:
 		shared_memory memory;
