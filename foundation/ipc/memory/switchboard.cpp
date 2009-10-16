@@ -51,6 +51,10 @@ namespace ooe
 			executed = true;
 			args._0( args._1, buffer_ptr, buffer_size, buffer, pool );
 		}
+		catch ( ipc::migration& )
+		{
+			throw;
+		}
 		catch ( error::verification& error )
 		{
 			return_error( buffer_ptr, buffer_size, buffer, false, error.what(), error.where() );

@@ -3,6 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_ERROR_HPP
 #define OOE_FOUNDATION_IPC_ERROR_HPP
 
+#include "foundation/io/socket.hpp"
 #include "foundation/ipc/error_forward.hpp"
 #include "foundation/utility/error.hpp"
 
@@ -20,6 +21,11 @@ namespace ooe
 		struct rpc;
 		struct connection;
 		struct verification;
+	}
+
+	namespace ipc
+	{
+		class migration;
 	}
 
 	struct OOE_VISIBLE error::rpc
@@ -65,6 +71,23 @@ namespace ooe
 		virtual ~verification( void ) throw()
 		{
 		}
+	};
+
+	class OOE_VISIBLE ipc::migration
+	{
+	public:
+		migration( const ooe::address& in )
+			: address_( in )
+		{
+		}
+
+		ooe::address address( void ) const
+		{
+			return address_;
+		}
+
+	private:
+		ooe::address address_;
 	};
 }
 

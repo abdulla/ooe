@@ -76,8 +76,16 @@ namespace ooe
 		delete listen.release();
 		transport.unlink();
 
-		while ( active )
-			transport.wait( ipc_decode, &tuple );
+		try
+		{
+			while ( active )
+				transport.wait( ipc_decode, &tuple );
+		}
+		catch ( ipc::migration& migration )
+		{
+			connect connect( migration.address() );
+			transport.migrate( connect );
+		}
 
 		return 0;
 	}
