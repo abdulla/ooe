@@ -3,8 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
 
-#include <semaphore.h>
-
+#include "foundation/ipc/semaphore_forward.hpp"
 #include "foundation/utility/noncopyable.hpp"
 #include "foundation/utility/pointer.hpp"
 #include "foundation/utility/string.hpp"

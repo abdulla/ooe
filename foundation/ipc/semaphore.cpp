@@ -16,15 +16,15 @@ namespace ooe
 		: name( name_ )
 	{
 		if ( sem_unlink( name.c_str() ) && errno != OOE_NOEXIST )
-			throw error::runtime( "semaphore: " ) << "Unable to unlink semaphore \"" << name <<
-				"\": " << error::number( errno );
+			throw error::runtime( "semaphore: " ) <<
+				"Unable to unlink semaphore \"" << name << "\": " << error::number( errno );
 	}
 
 	ipc::semaphore_id::~semaphore_id( void )
 	{
 		if ( sem_unlink( name.c_str() ) && errno != OOE_NOEXIST )
-			OOE_WARNING( "semaphore", "Unable to unlink semaphore \"" << name <<
-				"\": " << error::number( errno ) );
+			OOE_WARNING( "semaphore",
+				"Unable to unlink semaphore \"" << name << "\": " << error::number( errno ) );
 	}
 
 //--- ipc::semaphore -----------------------------------------------------------
@@ -33,8 +33,8 @@ namespace ooe
 		sem( sem_open( name.c_str(), mode == open ? 0 : O_CREAT | O_EXCL, 0600, value ) )
 	{
 		if ( sem == SEM_FAILED )
-			throw error::runtime( "semaphore: " ) << "Unable to open semaphore \"" << name <<
-				"\": " << error::number( errno );
+			throw error::runtime( "semaphore: " ) <<
+				"Unable to open semaphore \"" << name << "\": " << error::number( errno );
 	}
 
 	ipc::semaphore::~semaphore( void )
@@ -46,15 +46,15 @@ namespace ooe
 	void ipc::semaphore::up( void )
 	{
 		if ( sem_post( sem ) )
-			throw error::runtime( "semaphore: " ) << "Unable to increment semaphore: " <<
-				error::number( errno );
+			throw error::runtime( "semaphore: " ) <<
+				"Unable to increment semaphore: " << error::number( errno );
 	}
 
 	void ipc::semaphore::down( void )
 	{
 		if ( sem_wait( sem ) )
-			throw error::runtime( "semaphore: " ) << "Unable to decrement semaphore: " <<
-				error::number( errno );
+			throw error::runtime( "semaphore: " ) <<
+				"Unable to decrement semaphore: " << error::number( errno );
 	}
 
 	void ipc::semaphore::unlink( void )
