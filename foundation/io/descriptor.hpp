@@ -56,14 +56,14 @@ namespace ooe
 		void resize( up_t );
 		void control( u32, void* );
 
+		template< bool >
+			s32 illegal_access( void ) const;
+
 	protected:
 		s32 get( void ) const OOE_HIDDEN;
 
 	private:
 		shared_ptr< const descriptor_id > id;
-
-		friend struct platform::descriptor;
-		friend struct socket;
 	};
 }
 

@@ -35,6 +35,13 @@ namespace
 
 namespace ooe
 {
+//--- descriptor ---------------------------------------------------------------
+	template<>
+		s32 descriptor::illegal_access< true >( void ) const
+	{
+		return get();
+	}
+
 //--- socket -------------------------------------------------------------------
 	socket::socket( const ooe::descriptor& desc )
 		: platform::socket( desc )
@@ -154,7 +161,7 @@ namespace ooe
 		payload.cmsg_level = SOL_SOCKET;
 		payload.cmsg_type = SCM_RIGHTS;
 		payload.cmsg_len = sizeof( payload );
-		payload.fd = desc.get();
+		payload.fd = desc.illegal_access< true >();
 
 		if ( sendmsg( get(), &message, 0 ) == -1 )
 			throw error::io( "socket: " ) <<
