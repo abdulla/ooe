@@ -10,6 +10,8 @@
 
 namespace ooe
 {
+	class descriptor;
+
 	namespace ipc
 	{
 		class semaphore_id;
@@ -45,6 +47,11 @@ namespace ooe
 		void down( void );
 
 		void unlink( void );
+
+#ifdef __APPLE__
+		semaphore( const descriptor& );
+		ooe::descriptor desc( void ) const;
+#endif
 
 	private:
 		scoped_ptr< semaphore_id > id;

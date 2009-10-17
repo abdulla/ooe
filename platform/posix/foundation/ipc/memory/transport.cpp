@@ -41,6 +41,11 @@ namespace ooe
 		}
 	}
 
+	ipc::memory::transport::transport( ooe::socket& socket )
+		: plaform::ipc::memory::transport( shared_memory::open ), memory( socket.receive() )
+	{
+	}
+
 	ipc::memory::transport::~transport( void )
 	{
 		unnamed_semaphore* pointer = memory.as< unnamed_semaphore >();

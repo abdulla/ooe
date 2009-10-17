@@ -45,13 +45,23 @@ namespace ooe
 	}
 
 //--- ipc::shared_memory_base --------------------------------------------------
-	ipc::shared_memory_base::shared_memory_base( const std::string& name, bool open )
-		: id( open ? 0 : new shared_memory_id( name ) )
+	ipc::shared_memory_base::shared_memory_base( const std::string& name_, bool open )
+		: id( open ? 0 : new shared_memory_id( name_ ) )
 	{
 	}
 
 	ipc::shared_memory_base::~shared_memory_base( void )
 	{
+	}
+
+	std::string ipc::shared_memory_base::name( void ) const
+	{
+		return id ? id->name : std::string();
+	}
+
+	void ipc::shared_memory_base::unlink( void )
+	{
+		delete id.release();
 	}
 
 //--- ipc::shared_memory -------------------------------------------------------
@@ -61,18 +71,13 @@ namespace ooe
 	{
 	}
 
+	ipc::shared_memory::shared_memory( const ooe::descriptor& desc_ )
+		: shared_memory_base( std::string(), true ), memory( desc_ )
+	{
+	}
+
 	ipc::shared_memory::~shared_memory( void )
 	{
-	}
-
-	std::string ipc::shared_memory::name( void ) const
-	{
-		return shared_memory_base::id ? shared_memory_base::id->name : std::string();
-	}
-
-	void ipc::shared_memory::unlink( void )
-	{
-		delete shared_memory_base::id.release();
 	}
 
 	const descriptor& ipc::shared_memory::desc( void ) const

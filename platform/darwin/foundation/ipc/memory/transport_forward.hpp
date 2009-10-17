@@ -25,6 +25,7 @@ namespace ooe
 		ooe::ipc::semaphore out;
 
 		transport( const std::string&, u8 );
+		transport( ooe::socket& );
 	};
 }
 

@@ -3,12 +3,13 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
 
-#include "foundation/io/socket.hpp"
 #include "foundation/ipc/shared_memory.hpp"
 #include "foundation/ipc/memory/transport_forward.hpp"
 
 namespace ooe
 {
+	struct socket;
+
 	namespace ipc
 	{
 		namespace memory

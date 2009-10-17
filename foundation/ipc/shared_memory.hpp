@@ -20,7 +20,7 @@ namespace ooe
 //--- ipc::shared_memory_id ----------------------------------------------------
 	struct ipc::shared_memory_id
 	{
-		std::string name;
+		const std::string name;
 
 		shared_memory_id( const std::string& );
 		~shared_memory_id( void );
@@ -30,16 +30,19 @@ namespace ooe
 	class ipc::shared_memory_base
 	{
 	public:
-		shared_memory_base( const std::string&, bool );
-		~shared_memory_base( void );
+		std::string name( void ) const;
+		void unlink( void );
 
 	protected:
 		scoped_ptr< shared_memory_id > id;
+
+		shared_memory_base( const std::string&, bool );
+		~shared_memory_base( void );
 	};
 
 //--- ipc::shared_memory -------------------------------------------------------
 	struct OOE_VISIBLE ipc::shared_memory
-		: private shared_memory_base, private ooe::memory
+		: public shared_memory_base, private ooe::memory
 	{
 		enum type
 		{
@@ -48,10 +51,9 @@ namespace ooe
 		};
 
 		shared_memory( const std::string&, type = open, up_t = 0 );
+		shared_memory( const ooe::descriptor& );
 		~shared_memory( void );
 
-		std::string name( void ) const;
-		void unlink( void );
 		const ooe::descriptor& desc( void ) const;
 
 		using memory::as;

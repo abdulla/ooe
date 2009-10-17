@@ -1,6 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/environment.hpp"
+#include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 
 namespace
@@ -28,10 +29,20 @@ namespace ooe
 	{
 	}
 
+	platform::ipc::memory::transport::transport( ooe::socket& socket )
+		: in( socket.receive() ), out( socket.receive() )
+	{
+	}
+
 //--- ipc::memory::transport ---------------------------------------------------
 	ipc::memory::transport::transport( const std::string& name, transport::type mode )
 		: platform::ipc::memory::transport( name, mode ),
 		memory( name, cast_shm( mode ), executable::static_page_size )
+	{
+	}
+
+	ipc::memory::transport::transport( ooe::socket& socket )
+		: platform::ipc::memory::transport( socket ), memory( socket.receive() )
 	{
 	}
 
@@ -77,5 +88,12 @@ namespace ooe
 		in.unlink();
 		out.unlink();
 		memory.unlink();
+	}
+
+	void ipc::memory::transport::migrate( ooe::socket& socket )
+	{
+		socket.send( in.desc() );
+		socket.send( out.desc() );
+		socket.send( memory.desc() );
 	}
 }
