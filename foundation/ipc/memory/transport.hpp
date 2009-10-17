@@ -31,6 +31,7 @@ namespace ooe
 		};
 
 		transport( const std::string&, type );
+		transport( ooe::socket& );
 		~transport( void );
 
 		void wait( wait_type, const void* );

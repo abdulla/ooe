@@ -21,11 +21,10 @@ namespace ooe
 	class platform::ipc::memory::transport
 	{
 	protected:
-		u8 mode;
-		ooe::ipc::unnamed_semaphore* in;
-		ooe::ipc::unnamed_semaphore* out;
+		ooe::ipc::semaphore in;
+		ooe::ipc::semaphore out;
 
-		transport( u8 mode );
+		transport( const std::string&, u8 );
 	};
 }
 

@@ -85,6 +85,7 @@ namespace ooe
 		{
 			connect connect( migration.address() );
 			transport.migrate( connect );
+			transport.wake_notify();
 		}
 
 		return 0;

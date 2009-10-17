@@ -44,6 +44,7 @@ namespace ooe
 	{
 	public:
 		server( const std::string&, const switchboard& ) OOE_VISIBLE;
+		~server( void ) {}
 
 		bool decode( void ) OOE_VISIBLE;
 
