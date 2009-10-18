@@ -9,13 +9,6 @@
 
 namespace ooe
 {
-//--- descriptor ---------------------------------------------------------------
-	template<>
-		s32 descriptor::illegal_acces< true >( void ) const
-	{
-		return get();
-	}
-
 //--- platform::descriptor -----------------------------------------------------
 	up_t platform::descriptor::splice( const ooe::descriptor& desc, up_t bytes )
 	{

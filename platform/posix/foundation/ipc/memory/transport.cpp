@@ -1,6 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/environment.hpp"
+#include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 
 namespace
@@ -42,7 +43,7 @@ namespace ooe
 	}
 
 	ipc::memory::transport::transport( ooe::socket& socket )
-		: plaform::ipc::memory::transport( shared_memory::open ), memory( socket.receive() )
+		: platform::ipc::memory::transport( shared_memory::open ), memory( socket.receive() )
 	{
 	}
 

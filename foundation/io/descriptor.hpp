@@ -57,7 +57,7 @@ namespace ooe
 		void control( u32, void* );
 
 		template< bool >
-			s32 illegal_access( void ) const;
+			s32 illegal_access( void ) const OOE_HIDDEN;
 
 	protected:
 		s32 get( void ) const OOE_HIDDEN;
