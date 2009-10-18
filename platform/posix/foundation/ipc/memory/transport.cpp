@@ -31,7 +31,7 @@ namespace ooe
 		memory( name, cast( mode ), executable::static_page_size )
 	{
 		BOOST_STATIC_ASSERT(
-			executable::static_page_size > sizeof( unnamed_semaphore ) * 2 + private_size )
+			executable::static_page_size > sizeof( unnamed_semaphore ) * 2 + private_size );
 		unnamed_semaphore* pointer = memory.as< unnamed_semaphore >();
 
 		if ( mode == create )
