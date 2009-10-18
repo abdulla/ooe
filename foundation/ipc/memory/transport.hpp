@@ -23,13 +23,14 @@ namespace ooe
 		: private platform::ipc::memory::transport
 	{
 	public:
-		typedef void ( * wait_type )( u8*, up_t, const void* );
-
 		enum type
 		{
 			open,
 			create
 		};
+
+		typedef void ( * wait_type )( u8*, up_t, const void* );
+		static const up_t private_size = 32;
 
 		transport( const std::string&, type );
 		transport( ooe::socket& );
@@ -42,6 +43,8 @@ namespace ooe
 
 		u8* get( void ) const;
 		up_t size( void ) const;
+		void* private_data( void ) const;
+
 		void unlink( void );
 		void migrate( ooe::socket& );
 

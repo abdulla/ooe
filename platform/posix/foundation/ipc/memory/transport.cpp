@@ -1,5 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include <boost/static_assert.hpp>
+
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"
@@ -28,6 +30,8 @@ namespace ooe
 		: platform::ipc::memory::transport( mode_ ),
 		memory( name, cast( mode ), executable::static_page_size )
 	{
+		BOOST_STATIC_ASSERT(
+			executable::static_page_size > sizeof( unnamed_semaphore ) * 2 + private_size )
 		unnamed_semaphore* pointer = memory.as< unnamed_semaphore >();
 
 		if ( mode == create )
@@ -88,7 +92,12 @@ namespace ooe
 
 	up_t ipc::memory::transport::size( void ) const
 	{
-		return memory.size() - sizeof( unnamed_semaphore ) * 2;
+		return memory.size() - sizeof( unnamed_semaphore ) * 2 - private_size;
+	}
+
+	void* ipc::memory::transport::private_data( void ) const
+	{
+		return get() + size();
 	}
 
 	void ipc::memory::transport::unlink( void )
