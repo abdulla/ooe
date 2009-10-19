@@ -82,8 +82,7 @@ namespace ooe
 
 	const descriptor& ipc::shared_memory::desc( void ) const
 	{
-		const void* p = static_cast< const ooe::memory* >( this );
-		return *reinterpret_cast< const ooe::descriptor* >( p );
+		return *this;
 	}
 
 //--- ipc::locked_memory -------------------------------------------------------
