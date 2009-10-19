@@ -15,7 +15,7 @@ namespace ooe
 	}
 
 	class platform::socket
-		: private ooe::descriptor
+		: protected ooe::descriptor
 	{
 	public:
 		using descriptor::splice;
