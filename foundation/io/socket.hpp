@@ -18,7 +18,7 @@ namespace ooe
 		enum poll_type
 		{
 			input,
-			hang_up,
+			disconnect,
 			error
 		};
 
@@ -40,6 +40,8 @@ namespace ooe
 
 		ooe::descriptor receive( void );
 		void send( const ooe::descriptor& );
+
+		const ooe::descriptor& desc( void ) const;
 	};
 
 	typedef tuple< socket, socket > socket_pair;

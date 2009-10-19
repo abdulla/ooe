@@ -43,8 +43,8 @@ namespace ooe
 	}
 
 //--- socket -------------------------------------------------------------------
-	socket::socket( const ooe::descriptor& desc )
-		: platform::socket( desc )
+	socket::socket( const ooe::descriptor& desc_ )
+		: platform::socket( desc_ )
 	{
 	}
 
@@ -77,7 +77,7 @@ namespace ooe
 		else if ( event.revents & POLLIN )
 			return input;
 		else if ( event.revents & POLLHUP )
-			return hang_up;
+			return disconnect;
 		else if ( event.revents & POLLERR )
 			return error;
 		else
@@ -141,7 +141,7 @@ namespace ooe
 		return payload.fd;
 	}
 
-	void socket::send( const ooe::descriptor& desc )
+	void socket::send( const ooe::descriptor& desc_ )
 	{
 		msghdr message;
 		iovec vector;
@@ -161,11 +161,16 @@ namespace ooe
 		payload.cmsg_level = SOL_SOCKET;
 		payload.cmsg_type = SCM_RIGHTS;
 		payload.cmsg_len = sizeof( payload );
-		payload.fd = desc.illegal_access< true >();
+		payload.fd = desc_.illegal_access< true >();
 
 		if ( sendmsg( get(), &message, 0 ) == -1 )
 			throw error::io( "socket: " ) <<
 				"Unable to send descriptor: " << error::number( errno );
+	}
+
+	const ooe::descriptor& socket::desc( void ) const
+	{
+		return *this;
 	}
 
 	socket_pair make_pair( void )

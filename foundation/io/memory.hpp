@@ -17,7 +17,7 @@ namespace ooe
 	};
 
 	class OOE_VISIBLE memory
-		: private descriptor
+		: protected descriptor
 	{
 	public:
 		enum

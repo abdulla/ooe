@@ -24,9 +24,6 @@ namespace ooe
 	public:
 		directory( const descriptor& );
 
-		directory( const directory& );
-		directory& operator =( const directory& );
-
 		bool operator ++( void );
 		std::string operator *( void ) const;
 

@@ -60,18 +60,6 @@ namespace ooe
 			throw error::io( "directory: " ) << "Descriptor is not a directory";
 	}
 
-	directory::directory( const directory& copy )
-		: descriptor( copy ), id( copy.id )
-	{
-	}
-
-	directory& directory::operator =( const directory& copy )
-	{
-		static_cast< directory& >( *this ) = copy;
-		id = copy.id;
-		return *this;
-	}
-
 	bool directory::operator ++( void )
 	{
 		id->last = id->next;
