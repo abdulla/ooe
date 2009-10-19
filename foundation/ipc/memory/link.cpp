@@ -53,6 +53,14 @@ namespace ooe
 		thread.join();
 	}
 
+	void ipc::memory::link_server::migrate( ooe::socket& migrate_socket )
+	{
+		active = false;
+		u8 dummy;
+		socket.send( &dummy, sizeof( dummy ) );
+		migrate_socket.send( socket.desc() );
+	}
+
 	void* ipc::memory::link_server::call( void* pointer )
 	{
 		memory::server& server = *static_cast< memory::server* >( pointer );
@@ -91,7 +99,13 @@ namespace ooe
 	void* ipc::memory::link_client::call( void* pointer )
 	{
 		memory::transport& transport = *static_cast< memory::transport* >( pointer );
-		connect.poll();
+		u8 dummy;
+
+		while ( connect.poll() == socket::input )
+		{
+			connect.receive( &dummy, sizeof( dummy ) );
+			connect.send( &dummy, sizeof( dummy ) );
+		}
 
 		if ( !active )
 			return 0;

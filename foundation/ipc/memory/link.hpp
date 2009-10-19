@@ -42,6 +42,8 @@ namespace ooe
 		link_server( const ooe::socket&, u32, server& );
 		~link_server( void );
 
+		void migrate( ooe::socket& );
+
 	private:
 		ooe::socket socket;
 		const u32 link_id;
