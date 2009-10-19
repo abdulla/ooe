@@ -25,10 +25,7 @@ namespace ooe
 		operator memory::transport&( void );
 
 	private:
-		const std::string name;
-		const u32 link_id;
-
-		memory::transport transport;
+		scoped_ptr< memory::transport > transport;
 		link_client link;
 	};
 }
