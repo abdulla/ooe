@@ -9,6 +9,8 @@ namespace
 {
 	using namespace ooe;
 
+	tls< ipc::memory::servlet* > servlet_tls;
+
 	typedef tuple< const ipc::memory::switchboard&, ipc::memory::write_buffer*, ipc::pool* >
 		tuple_type;
 
@@ -48,20 +50,19 @@ namespace ooe
 		server& server )
 		: link_id( link_id_ ), transport( link_name( pid, link_id ), transport::create ),
 		switchboard( switchboard_ ), listen( new link_listen( link_name( pid, link_id ) ) ),
-		active( true ), thread( make_function( *this, &servlet::call ), &server )
+		state( work ), thread( make_function( *this, &servlet::call ), &server )
 	{
 	}
 
 	ipc::memory::servlet::~servlet( void )
 	{
-		ooe::thread self;
+		if ( state != move )
+		{
+			state = idle;
+			stream_write< u32, u32 >::call( transport.get(), true, 0 );
+			transport.wake_wait();
+		}
 
-		if ( thread == self )
-			return;
-
-		active = false;
-		stream_write< u32, u32 >::call( transport.get(), true, 0 );
-		transport.wake_wait();
 		thread.join();
 	}
 
@@ -75,20 +76,18 @@ namespace ooe
 		link_server link( listen->accept(), link_id, server );
 		delete listen.release();
 		transport.unlink();
+		servlet_tls = this;
 
-		try
-		{
-			while ( active )
-				transport.wait( ipc_decode, &tuple );
-		}
-		catch ( ipc::migration& migration )
-		{
-			connect connect( migration.address() );
-			transport.migrate( connect );
-			transport.wake_notify();
-		}
+		while ( state == work )
+			transport.wait( ipc_decode, &tuple );
 
 		return 0;
+	}
+
+	void ipc::memory::servlet::migrate( ooe::socket& socket )
+	{
+		transport.migrate( socket );
+		state = move;
 	}
 
 //--- ipc::memory::server --------------------------------------------------------------
@@ -97,10 +96,10 @@ namespace ooe
 		transport( name, transport::create ), seed(), servlets()
 	{
 		if ( internal.insert_direct( ipc_link, this ) != 1 )
-			throw error::runtime( "ipc::server: " ) << "\"link\" not at index 1";
+			throw error::runtime( "ipc::memory::server: " ) << "\"link\" not at index 1";
 
 		if ( internal.insert_direct( ipc_unlink, this ) != 2 )
-			throw error::runtime( "ipc::server: " ) << "\"unlink\" not at index 2";
+			throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
 	}
 
 	bool ipc::memory::server::decode( void )
@@ -123,5 +122,10 @@ namespace ooe
 	void ipc::memory::server::unlink( u32 link_id )
 	{
 		servlets.erase( link_id );
+	}
+
+	void ipc::memory::server::migrate( ooe::socket& socket )
+	{
+		( *servlet_tls ).migrate( socket );
 	}
 }
