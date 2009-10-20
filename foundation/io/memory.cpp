@@ -9,6 +9,19 @@
 #include "foundation/io/error.hpp"
 #include "foundation/io/memory.hpp"
 
+namespace
+{
+	using namespace ooe;
+
+	const descriptor& validate( const descriptor& desc )
+	{
+		if ( desc.type() != descriptor::file && desc.type() != descriptor::character )
+			throw error::io( "file: " ) << "Descriptor is not a file or character device";
+
+		return desc;
+	}
+}
+
 namespace ooe
 {
 //--- memory_id ----------------------------------------------------------------
@@ -27,7 +40,7 @@ namespace ooe
 
 //--- memory -------------------------------------------------------------------
 	memory::memory( const descriptor& desc, u8 flags, up_t size_ )
-		: descriptor( desc ),
+		: descriptor( validate( desc ) ),
 		internal( new memory_id( flags, size_ ? size_ : descriptor::size(), descriptor::get() ) )
 	{
 	}

@@ -40,6 +40,14 @@ namespace
 
 		return true;
 	}
+
+	const descriptor& validate( const descriptor& desc )
+	{
+		if ( desc.type() != descriptor::directory )
+			throw error::io( "directory: " ) << "Descriptor is not a directory";
+
+		return desc;
+	}
 }
 
 namespace ooe
@@ -52,12 +60,8 @@ namespace ooe
 
 //--- directory ----------------------------------------------------------------
 	directory::directory( const descriptor& desc )
-		: descriptor( desc ), id()
+		: descriptor( validate( desc ) ), id( new directory_id )
 	{
-		if ( type() == descriptor::directory )
-			id = new directory_id;
-		else
-			throw error::io( "directory: " ) << "Descriptor is not a directory";
 	}
 
 	bool directory::operator ++( void )

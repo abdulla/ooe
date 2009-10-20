@@ -31,6 +31,14 @@ namespace
 
 		return he;
 	}
+
+	const descriptor& validate( const descriptor& desc )
+	{
+		if ( desc.type() != descriptor::socket )
+			throw error::io( "socket: " ) << "Descriptor is not a socket";
+
+		return desc;
+	}
 }
 
 namespace ooe
@@ -44,7 +52,7 @@ namespace ooe
 
 //--- socket -------------------------------------------------------------------
 	socket::socket( const ooe::descriptor& desc_ )
-		: platform::socket( desc_ )
+		: platform::socket( validate( desc_ ) )
 	{
 	}
 

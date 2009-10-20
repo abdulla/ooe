@@ -8,14 +8,25 @@
 #include "foundation/io/error.hpp"
 #include "foundation/io/file.hpp"
 
+namespace
+{
+	using namespace ooe;
+
+	const descriptor& validate( const descriptor& desc )
+	{
+		if ( desc.type() != descriptor::file && desc.type() != descriptor::character )
+			throw error::io( "file: " ) << "Descriptor is not a file or character device";
+
+		return desc;
+	}
+}
+
 namespace ooe
 {
 //--- file ---------------------------------------------------------------------
 	file::file( const descriptor& desc )
-		: descriptor( desc )
+		: descriptor( validate( desc ) )
 	{
-		if ( type() != descriptor::file && type() != descriptor::character )
-			throw error::io( "file: " ) << "Descriptor is not a file or character device";
 	}
 
 	void file::sync( void ) const
