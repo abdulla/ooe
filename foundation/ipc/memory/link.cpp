@@ -4,6 +4,7 @@
 
 #include <cerrno>
 
+#include "foundation/io/poll.hpp"
 #include "foundation/ipc/memory/link.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/utility/convert.hpp"
@@ -38,7 +39,7 @@ namespace ooe
 //--- ipc::memory::link_server -------------------------------------------------
 	ipc::memory::link_server::
 		link_server( const ooe::socket& socket_, u32 link_id_, server& server )
-		: socket( socket_ ), link_id( link_id_ ), active( true ),
+		: socket( socket_ ), migrate_pair( make_pair() ), link_id( link_id_ ), active( true ),
 		thread( make_function( *this, &link_server::call ), &server )
 	{
 	}
@@ -56,15 +57,18 @@ namespace ooe
 	void ipc::memory::link_server::migrate( ooe::socket& migrate_socket )
 	{
 		active = false;
-		u8 dummy;
-		socket.send( &dummy, sizeof( dummy ) );
 		migrate_socket.send( socket.desc() );
+		migrate_pair._1.shutdown( socket::read );
 	}
 
 	void* ipc::memory::link_server::call( void* pointer )
 	{
 		memory::server& server = *static_cast< memory::server* >( pointer );
-		socket.poll();
+
+		poll poll;
+		poll.insert( socket.desc() );
+		poll.insert( migrate_pair._0.desc() );
+		poll.wait();
 
 		if ( !active )
 			return 0;
@@ -99,13 +103,10 @@ namespace ooe
 	void* ipc::memory::link_client::call( void* pointer )
 	{
 		memory::transport& transport = *static_cast< memory::transport* >( pointer );
-		u8 dummy;
 
-		while ( connect.poll() == socket::input )
-		{
-			connect.receive( &dummy, sizeof( dummy ) );
-			connect.send( &dummy, sizeof( dummy ) );
-		}
+		poll poll;
+		poll.insert( connect.desc() );
+		poll.wait();
 
 		if ( !active )
 			return 0;

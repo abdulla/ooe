@@ -15,13 +15,6 @@ namespace ooe
 	struct OOE_VISIBLE socket
 		: public platform::socket
 	{
-		enum poll_type
-		{
-			input,
-			disconnect,
-			error
-		};
-
 		enum shutdown_type
 		{
 			read,
@@ -34,7 +27,6 @@ namespace ooe
 		up_t receive( void*, up_t );
 		up_t send( const void*, up_t );
 
-		poll_type poll( void ) const;
 		void shutdown( shutdown_type );
 		void option( u32, u32 );
 

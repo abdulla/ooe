@@ -76,22 +76,6 @@ namespace ooe
 		return sent;
 	}
 
-	socket::poll_type socket::poll( void ) const
-	{
-		struct pollfd event = { get(), POLLIN, 0 };
-
-		if ( ::poll( &event, 1, -1 ) == -1 )
-			throw error::io( "socket: " ) << "Unable to poll: " << error::number( errno );
-		else if ( event.revents & POLLIN )
-			return input;
-		else if ( event.revents & POLLHUP )
-			return disconnect;
-		else if ( event.revents & POLLERR )
-			return error;
-		else
-			throw error::io( "socket: " ) << "Unknown poll event";
-	}
-
 	void socket::shutdown( shutdown_type type_ )
 	{
 		s32 how;
