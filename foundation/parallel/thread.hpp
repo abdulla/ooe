@@ -54,6 +54,7 @@ namespace ooe
 		~tls_base( void );
 
 		void* get( void ) const;
+		void set( const void* );
 		void clear( destroy_type );
 
 	private:
@@ -64,7 +65,7 @@ namespace ooe
 //--- tls ----------------------------------------------------------------------
 	template< typename type >
 		struct tls
-		: public tls_base
+		: private tls_base
 	{
 		tls( void )
 			: tls_base( ooe::create< type >, destroy< type > )
@@ -85,6 +86,32 @@ namespace ooe
 		void clear( void )
 		{
 			tls_base::clear( destroy< type > );
+		}
+	};
+
+	template< typename type >
+		struct tls< type* >
+		: private tls_base
+	{
+		tls( void )
+			: tls_base( 0, 0 )
+		{
+		}
+
+		operator type*( void ) const
+		{
+			return static_cast< type* >( this->get() );
+		}
+
+		tls& operator =( const type* value )
+		{
+			this->set( value );
+			return *this;
+		}
+
+		void clear( void )
+		{
+			this->set( 0 );
 		}
 	};
 }
