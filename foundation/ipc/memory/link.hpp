@@ -47,6 +47,7 @@ namespace ooe
 	private:
 		ooe::socket socket;
 		socket_pair migrate_pair;
+
 		const u32 link_id;
 		atom< u32 > active;
 		ooe::thread thread;

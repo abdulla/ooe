@@ -32,6 +32,7 @@ namespace ooe
 		};
 
 		servlet( pid_t, u32, const memory::switchboard&, server& );
+		servlet( ooe::socket&, u32, const memory::switchboard&, server& );
 		~servlet( void );
 
 		void migrate( ooe::socket& );
@@ -42,6 +43,7 @@ namespace ooe
 		const memory::switchboard& switchboard;
 
 		scoped_ptr< const link_listen > listen;
+		scoped_ptr< link_server > link;
 		atom< type > state;
 		ooe::thread thread;
 
@@ -56,11 +58,13 @@ namespace ooe
 		~server( void ) {}
 
 		bool decode( void ) OOE_VISIBLE;
+		std::string name( void ) const;
 
 		u32 link( pid_t );
 		void unlink( u32 );
 
-		void migrate( ooe::socket& );
+		void relink( ooe::socket& ) OOE_VISIBLE;
+		void migrate( ooe::socket& ) OOE_VISIBLE;
 
 	private:
 		typedef std::map< u32, shared_ptr< servlet > > servlet_map;

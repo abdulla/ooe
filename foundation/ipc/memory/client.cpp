@@ -31,15 +31,9 @@ namespace
 		unlink( link );
 	}
 
-	struct client_data
-	{
-		u32 link_id;
-		c8 name[ ipc::memory::transport::private_size - sizeof( u32 ) ];
-	} OOE_PACKED;
-
 	ipc::memory::transport* create_transport( const std::string& name )
 	{
-		if ( name.size() + 1 > sizeof( client_data ) - sizeof( u32 ) )
+		if ( name.size() + 1 > sizeof( ipc::memory::shared_data ) - sizeof( u32 ) )
 			throw error::runtime( "ipc::memory::client: " ) << '"' << name << "\" is too long";
 
 		u32 link_id = ipc_connect( name );
@@ -47,7 +41,8 @@ namespace
 		scoped_ptr< ipc::memory::transport >
 			transport( new ipc::memory::transport( link_name, ipc::memory::transport::open ) );
 
-		client_data& data = *static_cast< client_data* >( transport->private_data() );
+		ipc::memory::shared_data& data =
+			*static_cast< ipc::memory::shared_data* >( transport->private_data() );
 		data.link_id = link_id;
 		std::memcpy( data.name, name.c_str(), name.size() + 1 );
 
@@ -56,7 +51,7 @@ namespace
 
 	std::string create_link( const ipc::memory::transport& transport )
 	{
-		u32 link_id = static_cast< client_data* >( transport.private_data() )->link_id;
+		u32 link_id = static_cast< ipc::memory::shared_data* >( transport.private_data() )->link_id;
 		return ipc::link_name( getpid(), link_id );
 	}
 }
@@ -73,7 +68,7 @@ namespace ooe
 	{
 		if ( link )
 		{
-			client_data& data = *static_cast< client_data* >( transport->private_data() );
+			shared_data& data = *static_cast< shared_data* >( transport->private_data() );
 			OOE_PRINT( "ipc::memory::client", ipc_disconnect( data.name, data.link_id ) );
 		}
 	}

@@ -26,9 +26,9 @@ namespace ooe
 	}
 
 //--- ipc::memory::transport ---------------------------------------------------
-	ipc::memory::transport::transport( const std::string& name, transport::type mode_ )
+	ipc::memory::transport::transport( const std::string& name_, transport::type mode_ )
 		: platform::ipc::memory::transport( mode_ ),
-		memory( name, cast( mode ), executable::static_page_size )
+		memory( name_, cast( mode ), executable::static_page_size )
 	{
 		BOOST_STATIC_ASSERT(
 			executable::static_page_size > sizeof( unnamed_semaphore ) * 2 + private_size );
@@ -98,6 +98,11 @@ namespace ooe
 	void* ipc::memory::transport::private_data( void ) const
 	{
 		return get() + size();
+	}
+
+	std::string ipc::memory::transport::name( void ) const
+	{
+		return memory.name();
 	}
 
 	void ipc::memory::transport::unlink( void )

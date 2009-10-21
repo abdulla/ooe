@@ -26,8 +26,8 @@ namespace
 namespace ooe
 {
 //--- platform::ipc::memory::transport -----------------------------------------
-	platform::ipc::memory::transport::transport( const std::string& name, u8 mode )
-		: in( name + ".i", cast_sem( mode ), 0 ), out( name + ".o", cast_sem( mode ), 0 )
+	platform::ipc::memory::transport::transport( const std::string& name_, u8 mode )
+		: in( name_ + ".i", cast_sem( mode ), 0 ), out( name_ + ".o", cast_sem( mode ), 0 )
 	{
 	}
 
@@ -37,9 +37,9 @@ namespace ooe
 	}
 
 //--- ipc::memory::transport ---------------------------------------------------
-	ipc::memory::transport::transport( const std::string& name, transport::type mode )
-		: platform::ipc::memory::transport( name, mode ),
-		memory( name, cast_shm( mode ), executable::static_page_size )
+	ipc::memory::transport::transport( const std::string& name_, transport::type mode )
+		: platform::ipc::memory::transport( name_, mode ),
+		memory( name_, cast_shm( mode ), executable::static_page_size )
 	{
 		BOOST_STATIC_ASSERT( executable::static_page_size > private_size );
 	}
@@ -89,6 +89,11 @@ namespace ooe
 	void* ipc::memory::transport::private_data( void ) const
 	{
 		return get() + size();
+	}
+
+	std::string ipc::memory::transport::name( void ) const
+	{
+		return memory.name();
 	}
 
 	void ipc::memory::transport::unlink( void )
