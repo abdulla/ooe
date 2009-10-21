@@ -80,11 +80,6 @@ namespace ooe
 	{
 	}
 
-	const descriptor& ipc::shared_memory::desc( void ) const
-	{
-		return *this;
-	}
-
 //--- ipc::locked_memory -------------------------------------------------------
 	ipc::locked_memory::locked_memory( const std::string& name_, type mode, up_t size_ )
 		: shared_memory( name_, mode, size_ )

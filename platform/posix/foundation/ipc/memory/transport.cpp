@@ -112,7 +112,7 @@ namespace ooe
 
 	void ipc::memory::transport::migrate( ooe::socket& socket )
 	{
-		socket.send( memory.desc() );
+		socket.send( memory );
 		mode = open;
 	}
 }

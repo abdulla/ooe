@@ -8,12 +8,12 @@
 
 namespace ooe
 {
+	class descriptor;
+
 	namespace platform
 	{
 		struct descriptor;
 	}
-
-	class descriptor;
 
 	struct OOE_VISIBLE platform::descriptor
 	{

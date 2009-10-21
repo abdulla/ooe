@@ -56,11 +56,9 @@ namespace ooe
 		void resize( up_t );
 		void control( u32, void* );
 
-		template< bool >
-			s32 illegal_access( void ) const OOE_HIDDEN;
+		s32 get( void ) const;
 
 	protected:
-		s32 get( void ) const OOE_HIDDEN;
 
 	private:
 		shared_ptr< const descriptor_id > id;

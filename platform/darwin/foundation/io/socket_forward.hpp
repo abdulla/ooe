@@ -15,12 +15,10 @@ namespace ooe
 	}
 
 	class platform::socket
-		: protected ooe::descriptor
+		: public ooe::descriptor
 	{
 	protected:
 		socket( const descriptor& );
-
-		using descriptor::get;
 	};
 }
 

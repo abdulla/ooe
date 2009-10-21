@@ -57,7 +57,7 @@ namespace ooe
 	void ipc::memory::link_server::migrate( ooe::socket& migrate_socket )
 	{
 		active = false;
-		migrate_socket.send( socket.desc() );
+		migrate_socket.send( socket );
 		migrate_pair._1.shutdown( socket::read );
 	}
 
@@ -66,8 +66,8 @@ namespace ooe
 		memory::server& server = *static_cast< memory::server* >( pointer );
 
 		poll poll;
-		poll.insert( socket.desc() );
-		poll.insert( migrate_pair._0.desc() );
+		poll.insert( socket );
+		poll.insert( migrate_pair._0 );
 		poll.wait();
 
 		if ( !active )
@@ -105,7 +105,7 @@ namespace ooe
 		memory::transport& transport = *static_cast< memory::transport* >( pointer );
 
 		poll poll;
-		poll.insert( connect.desc() );
+		poll.insert( connect );
 		poll.wait();
 
 		if ( !active )

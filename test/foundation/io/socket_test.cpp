@@ -28,7 +28,7 @@ namespace
 
 			socket = &pair._1;
 			pair._0.send( desc );
-			pair._0.send( poll._1.desc() );
+			pair._0.send( poll._1 );
 		}
 
 	private:
@@ -70,7 +70,7 @@ namespace ooe
 				task( make_function( poll_socket, &socket::shutdown ), socket::read );
 
 			poll poll;
-			poll.insert( poll_socket.desc() );
+			poll.insert( poll_socket );
 			poll.wait();
 		}
 	}

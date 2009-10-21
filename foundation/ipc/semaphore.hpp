@@ -50,7 +50,7 @@ namespace ooe
 
 #ifdef __APPLE__
 		semaphore( const descriptor& );
-		ooe::descriptor desc( void ) const;
+		operator descriptor( void ) const;
 #endif
 
 	private:
