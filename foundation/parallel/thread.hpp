@@ -108,11 +108,6 @@ namespace ooe
 			this->set( value );
 			return *this;
 		}
-
-		void clear( void )
-		{
-			this->set( 0 );
-		}
 	};
 }
 
