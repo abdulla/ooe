@@ -5,6 +5,7 @@
 	#ifndef OOE_FOUNDATION_UTILITY_FUNCTION_HPP
 	#define OOE_FOUNDATION_UTILITY_FUNCTION_HPP
 
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/miscellany.hpp"
 
 namespace ooe
@@ -128,7 +129,7 @@ namespace ooe
 		struct invoke_n< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static r call( const bound_any& BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type BOOST_PP_INTERCEPT ) )
+			( LIMIT, typename call_traits< t, >::param_type BOOST_PP_INTERCEPT ) ) OOE_CONST
 		{
 			return r();
 		}
