@@ -104,13 +104,18 @@ namespace ooe
 	{
 		void* value = pthread_getspecific( pthread_key );
 
-		if ( !value )
+		if ( create && !value )
 		{
 			value = create();
 			specify( pthread_key, value );
 		}
 
 		return value;
+	}
+
+	void tls_base::set( const void* value )
+	{
+		specify( pthread_key, value );
 	}
 
 	void tls_base::clear( destroy_type destroy )

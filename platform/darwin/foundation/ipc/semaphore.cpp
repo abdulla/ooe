@@ -5,20 +5,13 @@
 
 namespace ooe
 {
-//--- descriptor ---------------------------------------------------------------
-	template<>
-		s32 descriptor::illegal_access< true >( void ) const
-	{
-		return id->fd;
-	}
-
 //--- ipc::semaphore -----------------------------------------------------------
-	ipc::semaphore::semaphore( const descriptor& desc_ )
-		: id( 0 ), sem( reinterpret_cast< sem_t* >( desc_.illegal_access< true >() ) )
+	ipc::semaphore::semaphore( const descriptor& desc )
+		: id( 0 ), sem( reinterpret_cast< sem_t* >( desc.get() ) )
 	{
 	}
 
-	descriptor ipc::semaphore::desc( void ) const
+	ipc::semaphore::operator descriptor( void ) const
 	{
 		return reinterpret_cast< up_t >( sem );
 	}

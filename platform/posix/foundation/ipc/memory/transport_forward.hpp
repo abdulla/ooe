@@ -22,8 +22,8 @@ namespace ooe
 	{
 	protected:
 		u8 mode;
-		ooe::ipc::unnamed_semaphore* in;
-		ooe::ipc::unnamed_semaphore* out;
+		unnamed_semaphore* in;
+		unnamed_semaphore* out;
 
 		transport( u8 mode );
 	};

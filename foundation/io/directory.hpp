@@ -19,7 +19,7 @@ namespace ooe
 	};
 
 	class OOE_VISIBLE directory
-		: private descriptor
+		: public descriptor
 	{
 	public:
 		directory( const descriptor& );

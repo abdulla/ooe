@@ -10,7 +10,7 @@ namespace ooe
 	void poll::insert( const descriptor& desc, const function_type& function )
 	{
 		data.push_back( datum_tuple( &desc, function ) );
-		pollfd event = { desc.illegal_access< true >(), POLLIN, 0 };
+		pollfd event = { desc.get(), POLLIN, 0 };
 		fds.push_back( event );
 	}
 

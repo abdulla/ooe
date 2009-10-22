@@ -10,13 +10,16 @@
 
 namespace ooe
 {
-	namespace ipc
+	namespace platform
 	{
-		class unnamed_semaphore;
+		namespace ipc
+		{
+			class unnamed_semaphore;
+		}
 	}
 
-//--- ipc::unnamed_semaphore ---------------------------------------------------
-	class OOE_VISIBLE ipc::unnamed_semaphore
+//--- platform::ipc::unnamed_semaphore -----------------------------------------
+	class platform::ipc::unnamed_semaphore
 	{
 	public:
 		unnamed_semaphore( u32 );

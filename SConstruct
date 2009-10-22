@@ -9,7 +9,7 @@ flags_release = Split( '-O3 -g0 -fomit-frame-pointer -ffast-math -ftracer -fweb 
 	# visibility is set in release build, otherwise backtrace() won't work in debug build
 
 flags_cxx = Split( '-pipe -ansi -pedantic-errors -fno-enforce-eh-specs -fuse-cxa-atexit '
-	' -funit-at-a-time -fstrict-aliasing -mfpmath=sse -msse3' )
+	' -funit-at-a-time -fstrict-aliasing -march=native -mfpmath=sse' )
 	# -frepo
 
 flags_cxx += Split( '-Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wnon-virtual-dtor -Wcast-align '

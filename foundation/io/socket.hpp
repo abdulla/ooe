@@ -32,8 +32,6 @@ namespace ooe
 
 		ooe::descriptor receive( void );
 		void send( const ooe::descriptor& );
-
-		const ooe::descriptor& desc( void ) const;
 	};
 
 	typedef tuple< socket, socket > socket_pair;

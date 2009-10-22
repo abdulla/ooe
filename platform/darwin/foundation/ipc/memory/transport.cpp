@@ -95,8 +95,8 @@ namespace ooe
 
 	void ipc::memory::transport::migrate( ooe::socket& socket )
 	{
-		socket.send( in.desc() );
-		socket.send( out.desc() );
-		socket.send( memory.desc() );
+		socket.send( in );
+		socket.send( out );
+		socket.send( memory );
 	}
 }

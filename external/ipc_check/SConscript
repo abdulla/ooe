@@ -5,6 +5,6 @@ build.Append( LIBS = Split( 'executable io ipc parallel' ) )
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
 
-out = build.Program( '#binary/ipc_test', Glob( '*.cpp' ) )
+out = build.Program( '#binary/ipc_check', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )
-build.Clean( out, '#binary/ipc_test.log' )
+build.Clean( out, '#binary/ipc_check.log' )

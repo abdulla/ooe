@@ -12,6 +12,8 @@ namespace ooe
 		namespace memory
 		{
 			class client;
+			struct shared_data;
+			void disconnect( const std::string&, u32 );
 		}
 	}
 
@@ -28,6 +30,13 @@ namespace ooe
 		scoped_ptr< memory::transport > transport;
 		link_client link;
 	};
+
+//--- ipc::memory::shared_data -------------------------------------------------
+	struct ipc::memory::shared_data
+	{
+		u32 link_id;
+		c8 name[ ipc::memory::transport::private_size - sizeof( u32 ) ];
+	} OOE_PACKED;
 }
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP

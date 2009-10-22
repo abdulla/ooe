@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "foundation/ipc/name.hpp"
+#include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/utility/scoped.hpp"
 
@@ -66,9 +67,13 @@ namespace ooe
 		link( new link_server( socket, link_id, server ) ), state( work ),
 		thread( make_function( *this, &servlet::call ), &server )
 	{
-		// rewrite connection data in transport
 		ipc::memory::shared_data& data =
 			*static_cast< ipc::memory::shared_data* >( transport.private_data() );
+
+		// disconnect from former server
+		disconnect( data.name, data.link_id );
+
+		// rewrite connection data in transport
 		data.link_id = link_id;
 		const std::string& name = server.name();
 		std::memcpy( data.name, name.c_str(), name.size() + 1 );

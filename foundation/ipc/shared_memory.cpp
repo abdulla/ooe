@@ -71,18 +71,13 @@ namespace ooe
 	{
 	}
 
-	ipc::shared_memory::shared_memory( const ooe::descriptor& desc_ )
-		: shared_memory_base( std::string(), true ), memory( desc_ )
+	ipc::shared_memory::shared_memory( const ooe::descriptor& desc )
+		: shared_memory_base( std::string(), true ), memory( desc, memory::read_write )
 	{
 	}
 
 	ipc::shared_memory::~shared_memory( void )
 	{
-	}
-
-	const descriptor& ipc::shared_memory::desc( void ) const
-	{
-		return *this;
 	}
 
 //--- ipc::locked_memory -------------------------------------------------------

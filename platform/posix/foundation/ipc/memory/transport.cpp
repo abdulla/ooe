@@ -30,14 +30,14 @@ namespace ooe
 		: platform::ipc::memory::transport( mode_ ),
 		memory( name_, cast( mode ), executable::static_page_size )
 	{
-		BOOST_STATIC_ASSERT(
-			executable::static_page_size > sizeof( unnamed_semaphore ) * 2 + private_size );
-		unnamed_semaphore* pointer = memory.as< unnamed_semaphore >();
+		BOOST_STATIC_ASSERT( executable::static_page_size >
+			sizeof( platform::ipc::unnamed_semaphore ) * 2 + private_size );
+		platform::ipc::unnamed_semaphore* pointer = memory.as< platform::ipc::unnamed_semaphore >();
 
 		if ( mode == create )
 		{
-			in = new( pointer + 0 ) unnamed_semaphore( 0 );
-			out = new( pointer + 1 ) unnamed_semaphore( 0 );
+			in = new( pointer + 0 ) platform::ipc::unnamed_semaphore( 0 );
+			out = new( pointer + 1 ) platform::ipc::unnamed_semaphore( 0 );
 		}
 		else
 		{
@@ -49,16 +49,17 @@ namespace ooe
 	ipc::memory::transport::transport( ooe::socket& socket )
 		: platform::ipc::memory::transport( shared_memory::open ), memory( socket.receive() )
 	{
+		platform::ipc::unnamed_semaphore* pointer = memory.as< platform::ipc::unnamed_semaphore >();
+		in = pointer + 0;
+		out = pointer + 1;
 	}
 
 	ipc::memory::transport::~transport( void )
 	{
-		unnamed_semaphore* pointer = memory.as< unnamed_semaphore >();
-
 		if ( mode == create )
 		{
-			( pointer + 0 )->~unnamed_semaphore();
-			( pointer + 1 )->~unnamed_semaphore();
+			out->~unnamed_semaphore();
+			in->~unnamed_semaphore();
 		}
 	}
 
@@ -87,12 +88,12 @@ namespace ooe
 
 	u8* ipc::memory::transport::get( void ) const
 	{
-		return memory.as< u8 >() + sizeof( unnamed_semaphore ) * 2;
+		return memory.as< u8 >() + sizeof( platform::ipc::unnamed_semaphore ) * 2;
 	}
 
 	up_t ipc::memory::transport::size( void ) const
 	{
-		return memory.size() - sizeof( unnamed_semaphore ) * 2 - private_size;
+		return memory.size() - sizeof( platform::ipc::unnamed_semaphore ) * 2 - private_size;
 	}
 
 	void ipc::memory::transport::unlink( void )
@@ -102,7 +103,7 @@ namespace ooe
 
 	void ipc::memory::transport::migrate( ooe::socket& socket )
 	{
-		socket.send( memory.desc() );
+		socket.send( memory );
 		mode = open;
 	}
 }

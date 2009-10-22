@@ -8,7 +8,7 @@
 namespace ooe
 {
 	struct OOE_VISIBLE file
-		: private descriptor
+		: public descriptor
 	{
 		enum seek_type
 		{
@@ -26,9 +26,6 @@ namespace ooe
 
 		void seek( sp_t, seek_type = current );
 		up_t tell( void ) const;
-
-		using descriptor::size;
-		using descriptor::resize;
 	};
 }
 

@@ -26,9 +26,11 @@ namespace
 			descriptor desc( _PATH_TMP "test-file", descriptor::read_write | descriptor::truncate );
 			file( desc ).write( &value, sizeof( value ) );
 
+			// possible race in the tests as to who gets which descriptor,
+			// validation of descriptors will make this case obvious
 			socket = &pair._1;
 			pair._0.send( desc );
-			pair._0.send( poll._1.desc() );
+			pair._0.send( poll._1 );
 		}
 
 	private:
@@ -70,7 +72,7 @@ namespace ooe
 				task( make_function( poll_socket, &socket::shutdown ), socket::read );
 
 			poll poll;
-			poll.insert( poll_socket.desc() );
+			poll.insert( poll_socket );
 			poll.wait();
 		}
 	}

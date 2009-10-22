@@ -43,16 +43,9 @@ namespace
 
 namespace ooe
 {
-//--- descriptor ---------------------------------------------------------------
-	template<>
-		s32 descriptor::illegal_access< true >( void ) const
-	{
-		return get();
-	}
-
 //--- socket -------------------------------------------------------------------
-	socket::socket( const ooe::descriptor& desc_ )
-		: platform::socket( validate( desc_ ) )
+	socket::socket( const ooe::descriptor& desc )
+		: platform::socket( validate( desc ) )
 	{
 	}
 
@@ -133,7 +126,7 @@ namespace ooe
 		return payload.fd;
 	}
 
-	void socket::send( const ooe::descriptor& desc_ )
+	void socket::send( const ooe::descriptor& desc )
 	{
 		msghdr message;
 		iovec vector;
@@ -153,16 +146,11 @@ namespace ooe
 		payload.cmsg_level = SOL_SOCKET;
 		payload.cmsg_type = SCM_RIGHTS;
 		payload.cmsg_len = sizeof( payload );
-		payload.fd = desc_.illegal_access< true >();
+		payload.fd = desc.get();
 
 		if ( sendmsg( get(), &message, 0 ) == -1 )
 			throw error::io( "socket: " ) <<
 				"Unable to send descriptor: " << error::number( errno );
-	}
-
-	const ooe::descriptor& socket::desc( void ) const
-	{
-		return *this;
 	}
 
 	socket_pair make_pair( void )

@@ -42,7 +42,7 @@ namespace ooe
 
 //--- ipc::shared_memory -------------------------------------------------------
 	struct OOE_VISIBLE ipc::shared_memory
-		: public shared_memory_base, private ooe::memory
+		: public shared_memory_base, public ooe::memory
 	{
 		enum type
 		{
@@ -53,12 +53,6 @@ namespace ooe
 		shared_memory( const std::string&, type = open, up_t = 0 );
 		shared_memory( const ooe::descriptor& );
 		~shared_memory( void );
-
-		const ooe::descriptor& desc( void ) const;
-
-		using memory::as;
-		using memory::get;
-		using memory::size;
 	};
 
 //--- ipc::locked_memory ---------------------------------------------------------

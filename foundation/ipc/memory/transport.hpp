@@ -15,7 +15,6 @@ namespace ooe
 		namespace memory
 		{
 			class transport;
-			struct shared_data;
 		}
 	}
 
@@ -53,13 +52,6 @@ namespace ooe
 	private:
 		shared_memory memory;
 	};
-
-//--- ipc::memory::shared_data -------------------------------------------------
-	struct ipc::memory::shared_data
-	{
-		u32 link_id;
-		c8 name[ ipc::memory::transport::private_size - sizeof( u32 ) ];
-	} OOE_PACKED;
 }
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_HPP
