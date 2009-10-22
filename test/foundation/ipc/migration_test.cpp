@@ -73,8 +73,8 @@ namespace
 
 		~setup( void )
 		{
-			fork1->signal( SIGINT );
-			fork0->signal( SIGINT );
+			fork1->signal( SIGTERM );
+			fork0->signal( SIGTERM );
 		}
 
 	private:
