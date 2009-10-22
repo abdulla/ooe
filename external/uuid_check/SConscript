@@ -19,6 +19,6 @@ build.Append( LIBS = [ 'executable' ] )
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
 
-out = build.Program( '#binary/uuid_test', Glob( '*.cpp' ) )
+out = build.Program( '#binary/uuid_check', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )
-build.Clean( out, '#binary/uuid_test.log' )
+build.Clean( out, '#binary/uuid_check.log' )
