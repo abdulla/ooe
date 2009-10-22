@@ -18,7 +18,7 @@
 namespace
 {
 	using namespace ooe;
-	typedef tuple< up_t, executable::fork_io, timer > list_tuple;
+	typedef tuple< up_t, fork_io, timer > list_tuple;
 	typedef std::list< list_tuple > list_type;
 	typedef tuple< bool, std::string > vector_tuple;
 	typedef std::vector< vector_tuple > vector_type;
@@ -28,7 +28,7 @@ namespace
 		try
 		{
 			( *i )();
-			executable::fork_io::exit( true );
+			fork_io::exit( true );
 		}
 		catch ( error::runtime& error )
 		{
@@ -43,10 +43,10 @@ namespace
 			std::cerr << "Unknown exception\n";
 		}
 
-		executable::fork_io::exit( false );
+		fork_io::exit( false );
 	}
 
-	std::string read_output( executable::fork_io& fork_io )
+	std::string read_output( fork_io& fork_io )
 	{
 		std::string string;
 		c8 buffer[ executable::static_page_size ];
@@ -68,11 +68,11 @@ namespace
 		for ( list_type::iterator i = list.begin(), end = list.end(); i != end; ++i )
 		{
 			bool passed = false;
-			executable::fork_io::wait_type status = i->_1.wait( false );
+			fork_io::wait_type status = i->_1.wait( false );
 
-			if ( status == executable::fork_io::success )
+			if ( status == fork_io::success )
 				passed = true;
-			else if ( status == executable::fork_io::waiting )
+			else if ( status == fork_io::waiting )
 			{
 				if ( i->_2.elapsed() < time_out )
 					continue;
@@ -92,7 +92,7 @@ namespace
 
 		for ( unit::group_base::iterator_type i = group.begin(), end = group.end(); i != end; ++i )
 		{
-			executable::fork_io fork_io;
+			fork_io fork_io;
 
 			if ( !fork_io.is_child() )
 				list.push_back( list_tuple( j++, fork_io, timer() ) );

@@ -9,14 +9,8 @@
 
 namespace ooe
 {
-	namespace executable
-	{
-		struct fork_id;
-		class fork_io;
-	}
-
-//--- executable::fork_id ------------------------------------------------------
-	struct executable::fork_id
+//--- fork_id ------------------------------------------------------------------
+	struct fork_id
 	{
 		s32 read;
 		s32 write;
@@ -26,8 +20,8 @@ namespace ooe
 		~fork_id( void );
 	};
 
-//--- executable::fork_io ------------------------------------------------------
-	class OOE_VISIBLE executable::fork_io
+//--- fork_io ------------------------------------------------------------------
+	class OOE_VISIBLE fork_io
 	{
 	public:
 		enum wait_type

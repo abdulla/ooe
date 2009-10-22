@@ -18,26 +18,26 @@ namespace
 		s32 in = dup( STDIN_FILENO );
 
 		if ( in == -1 )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to duplicate fd " << STDIN_FILENO << ": " << error::number( errno );
 
 		scoped< int ( int ) > scoped_in( close, in );
 		s32 out = dup( STDERR_FILENO );
 
 		if ( out == -1 )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to duplicate fd " << STDERR_FILENO << ": " << error::number( errno );
 
 		scoped< int ( int ) > scoped_out( close, out );
 
 		if ( dup2( read, STDIN_FILENO ) == -1 )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to duplicate fd " << read << ": " << error::number( errno );
 		else if ( dup2( write, STDERR_FILENO ) == -1 )
 		{
 			// attempt to restore stdin
 			dup2( in, STDIN_FILENO );
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to duplicate fd " << write << ": " << error::number( errno );
 		}
 
@@ -50,14 +50,14 @@ namespace
 
 namespace ooe
 {
-//--- executable::fork_id ------------------------------------------------------
-	executable::fork_id::fork_id( void )
+//--- fork_id ------------------------------------------------------------------
+	fork_id::fork_id( void )
 		: read(), write(), pid()
 	{
 		s32 pipe_1[ 2 ];
 
 		if ( pipe( pipe_1 ) )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to create 1st pipe: " << error::number( errno );
 
 		scoped< int ( int ) > scoped_1a( close, pipe_1[ 0 ] );
@@ -65,7 +65,7 @@ namespace ooe
 		s32 pipe_2[ 2 ];
 
 		if ( pipe( pipe_2 ) )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to create 2nd pipe: " << error::number( errno );
 
 		scoped< int ( int ) > scoped_2a( close, pipe_2[ 0 ] );
@@ -73,7 +73,7 @@ namespace ooe
 		pid = fork();
 
 		if ( pid == -1 )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to fork process: " << error::number( errno );
 		else if ( pid )
 		{
@@ -92,45 +92,45 @@ namespace ooe
 		}
 	}
 
-	executable::fork_id::~fork_id( void )
+	fork_id::~fork_id( void )
 	{
 		close( write );
 		close( read );
 	}
 
-//--- executable::fork_io ------------------------------------------------------
-	executable::fork_io::fork_io( void )
+//--- fork_io ------------------------------------------------------
+	fork_io::fork_io( void )
 		: id( new fork_id )
 	{
 	}
 
-	executable::fork_io::~fork_io( void )
+	fork_io::~fork_io( void )
 	{
 	}
 
-	up_t executable::fork_io::read( void* buffer, up_t bytes )
+	up_t fork_io::read( void* buffer, up_t bytes )
 	{
 		sp_t read_ = ::read( id->read, buffer, bytes );
 
 		if ( read_ == -1 )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to read from process " << id->pid << ": " << error::number( errno );
 
 		return read_;
 	}
 
-	up_t executable::fork_io::write( const void* buffer, up_t bytes )
+	up_t fork_io::write( const void* buffer, up_t bytes )
 	{
 		sp_t wrote = ::write( id->write, buffer, bytes );
 
 		if ( wrote == -1 )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to write to process " << id->pid << ": " << error::number( errno );
 
 		return wrote;
 	}
 
-	executable::fork_io::wait_type executable::fork_io::wait( bool block ) const
+	fork_io::wait_type fork_io::wait( bool block ) const
 	{
 		s32 status;
 		s32 pid = waitpid( id->pid, &status, block ? 0 : WNOHANG );
@@ -140,23 +140,23 @@ namespace ooe
 		else if ( !pid )
 			return waiting;
 		else
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to wait for process " << id->pid << ": " << error::number( errno );
 	}
 
-	void executable::fork_io::signal( s32 number ) const
+	void fork_io::signal( s32 number ) const
 	{
 		if ( kill( id->pid, number ) == -1 )
-			throw error::runtime( "executable::fork_io: " ) <<
+			throw error::runtime( "fork_io: " ) <<
 				"Unable to signal process " << id->pid << ": " << error::number( errno );
 	}
 
-	bool executable::fork_io::is_child( void ) const
+	bool fork_io::is_child( void ) const
 	{
 		return !id->pid;
 	}
 
-	void executable::fork_io::exit( bool success )
+	void fork_io::exit( bool success )
 	{
 		_exit( success ? EXIT_SUCCESS : EXIT_FAILURE );
 	}
