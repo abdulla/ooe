@@ -1,0 +1,12 @@
+Import( Split( 'name root' ) )
+
+### build ######################################################################
+build = root.Clone()
+build.Append( LIBS = Split( 'executable io ipc parallel unit' ) )
+
+if name == 'posix':
+	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
+
+out = build.Program( '#binary/ipc_test', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
+build.Clean( out, '#binary/ipc_test.log' )

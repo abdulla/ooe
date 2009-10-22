@@ -49,16 +49,17 @@ namespace ooe
 	ipc::memory::transport::transport( ooe::socket& socket )
 		: platform::ipc::memory::transport( shared_memory::open ), memory( socket.receive() )
 	{
+		platform::ipc::unnamed_semaphore* pointer = memory.as< platform::ipc::unnamed_semaphore >();
+		in = pointer + 0;
+		out = pointer + 1;
 	}
 
 	ipc::memory::transport::~transport( void )
 	{
-		platform::ipc::unnamed_semaphore* pointer = memory.as< platform::ipc::unnamed_semaphore >();
-
 		if ( mode == create )
 		{
-			( pointer + 0 )->~unnamed_semaphore();
-			( pointer + 1 )->~unnamed_semaphore();
+			out->~unnamed_semaphore();
+			in->~unnamed_semaphore();
 		}
 	}
 

@@ -77,4 +77,9 @@ namespace ooe
 	{
 		return *transport;
 	}
+
+	void ipc::memory::disconnect( const std::string& name, u32 link_id )
+	{
+		ipc_disconnect( name, link_id );
+	}
 }
