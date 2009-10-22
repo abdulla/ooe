@@ -24,8 +24,9 @@ namespace
 		server_ptr->migrate( pair_ptr->_0 );
 	}
 
-	void null( void )
+	pid_t server_pid( void )
 	{
+		return getpid();
 	}
 
 	struct setup
@@ -34,7 +35,7 @@ namespace
 		{
 			ipc::memory::nameservice nameservice;
 			nameservice.insert( "migrate", migrate );
-			nameservice.insert( "null", null );
+			nameservice.insert( "server_pid", server_pid );
 
 			socket_pair pair = make_pair();
 			pair_ptr = &pair;
@@ -84,10 +85,13 @@ namespace ooe
 
 			ipc::memory::client client( "/ooe.test.migration.0" );
 			ipc::memory::call< void ( void ) > migrate( client, "migrate" );
-			ipc::memory::call< void ( void ) > null( client, "null" );
+			ipc::memory::call< pid_t ( void ) > server_pid( client, "server_pid" );
 
+			pid_t migrate_pid0 = server_pid();
 			migrate();
-			null();
+			pid_t migrate_pid1 = server_pid();
+
+			assert( "migrate_pid0 != migrate_pid1", migrate_pid0 != migrate_pid1 );
 		}
 	}
 }
