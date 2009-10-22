@@ -18,12 +18,12 @@
 namespace
 {
 	using namespace ooe;
-	socket_pair* pair_ptr;
+	socket* socket_ptr;
 	ipc::memory::server* server_ptr;
 
 	void migrate( void )
 	{
-		server_ptr->migrate( pair_ptr->_0 );
+		server_ptr->migrate( *socket_ptr );
 	}
 
 	pid_t server_pid( void )
@@ -33,7 +33,7 @@ namespace
 
 	class setup
 	{
-	public:
+	protected:
 		setup( void )
 			: fork0( 0 ), fork1( 0 )
 		{
@@ -42,7 +42,7 @@ namespace
 			nameservice.insert( "server_pid", server_pid );
 
 			socket_pair pair = make_pair();
-			pair_ptr = &pair;
+			socket_ptr = &pair._0;
 
 			fork_ptr( new fork_io ).swap( fork0 );
 
