@@ -7,6 +7,8 @@
 
 namespace ooe
 {
+	struct socket;
+
 	namespace platform
 	{
 		namespace ipc

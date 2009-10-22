@@ -95,16 +95,6 @@ namespace ooe
 		return memory.size() - sizeof( unnamed_semaphore ) * 2 - private_size;
 	}
 
-	void* ipc::memory::transport::private_data( void ) const
-	{
-		return get() + size();
-	}
-
-	std::string ipc::memory::transport::name( void ) const
-	{
-		return memory.name();
-	}
-
 	void ipc::memory::transport::unlink( void )
 	{
 		memory.unlink();

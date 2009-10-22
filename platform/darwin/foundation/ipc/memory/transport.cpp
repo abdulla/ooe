@@ -86,16 +86,6 @@ namespace ooe
 		return memory.size() - private_size;
 	}
 
-	void* ipc::memory::transport::private_data( void ) const
-	{
-		return get() + size();
-	}
-
-	std::string ipc::memory::transport::name( void ) const
-	{
-		return memory.name();
-	}
-
 	void ipc::memory::transport::unlink( void )
 	{
 		in.unlink();
