@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <csignal>
+
 #include <paths.h>
 
 #include "foundation/executable/fork_io.hpp"
@@ -29,9 +31,11 @@ namespace
 		return getpid();
 	}
 
-	struct setup
+	class setup
 	{
+	public:
 		setup( void )
+			: fork0( 0 ), fork1( 0 )
 		{
 			ipc::memory::nameservice nameservice;
 			nameservice.insert( "migrate", migrate );
@@ -40,9 +44,9 @@ namespace
 			socket_pair pair = make_pair();
 			pair_ptr = &pair;
 
-			fork_io fork0;
+			fork_ptr( new fork_io ).swap( fork0 );
 
-			if ( fork0.is_child() )
+			if ( fork0->is_child() )
 			{
 				ipc::memory::server server( "/ooe.test.migration.0", nameservice );
 				server_ptr = &server;
@@ -53,9 +57,9 @@ namespace
 				fork_io::exit( true );
 			}
 
-			fork_io fork1;
+			fork_ptr( new fork_io ).swap( fork1 );
 
-			if ( fork1.is_child() )
+			if ( fork1->is_child() )
 			{
 				ipc::memory::server server( "/ooe.test.migration.1", nameservice );
 				server.relink( pair._1 );
@@ -66,6 +70,18 @@ namespace
 				fork_io::exit( true );
 			}
 		}
+
+		~setup( void )
+		{
+			fork1->signal( SIGINT );
+			fork0->signal( SIGINT );
+		}
+
+	private:
+		typedef scoped_ptr< fork_io > fork_ptr;
+
+		fork_ptr fork0;
+		fork_ptr fork1;
 	};
 
 	typedef unit::group< setup, empty_t, 1 > group_type;
