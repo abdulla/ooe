@@ -1,10 +1,15 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include <cerrno>
+
 #include "foundation/io/descriptor.hpp"
 #include "foundation/ipc/semaphore.hpp"
+#include "foundation/utility/error.hpp"
 
 namespace
 {
+	using namespace ooe;
+
 	sem_t* create_semaphore( const descriptor& desc )
 	{
 		s32 fd = dup( desc.get() );
@@ -12,7 +17,7 @@ namespace
 		if ( fd == -1 )
 			throw error::runtime( "semaphore: " ) <<
 				"Unable to duplicate descriptor: " << error::number( errno );
-		else if ( fcntl( outfd, F_SETFD, FD_CLOEXEC ) )
+		else if ( fcntl( fd, F_SETFD, FD_CLOEXEC ) )
 			throw error::runtime( "semaphore: " ) <<
 				"Unable to set close-on-exec: " << error::number( errno );
 
