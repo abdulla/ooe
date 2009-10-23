@@ -58,8 +58,6 @@ namespace ooe
 
 		s32 get( void ) const;
 
-	protected:
-
 	private:
 		shared_ptr< const descriptor_id > id;
 	};
