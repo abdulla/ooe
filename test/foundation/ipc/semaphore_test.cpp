@@ -1,5 +1,6 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#ifdef __APPLE__
 #include <iostream>
 
 #include "foundation/io/socket.hpp"
@@ -47,3 +48,4 @@ namespace ooe
 		}
 	}
 }
+#endif
