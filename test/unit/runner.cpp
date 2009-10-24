@@ -7,9 +7,7 @@
 #include <csignal>
 #include <cstdlib>
 
-#include "foundation/executable/environment.hpp"
 #include "foundation/executable/fork_io.hpp"
-#include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
 #include "foundation/utility/error.hpp"
 #include "test/unit/group.hpp"
@@ -46,23 +44,6 @@ namespace
 		fork_io::exit( false );
 	}
 
-	std::string read_output( fork_io& fork_io )
-	{
-		std::string string;
-		c8 buffer[ executable::static_page_size ];
-		up_t read;
-
-		do
-		{
-			read = fork_io.read( buffer, sizeof( buffer ) );
-			buffer[ read ] = 0;
-			string += buffer;
-		}
-		while ( read == sizeof( buffer ) );
-
-		return string;
-	}
-
 	void collect_tests( vector_type& vector, list_type& list, time_t time_out )
 	{
 		for ( list_type::iterator i = list.begin(), end = list.end(); i != end; ++i )
@@ -80,7 +61,7 @@ namespace
 					i->_1.signal( SIGKILL );
 			}
 
-			vector[ i->_0 ] = vector_tuple( passed, read_output( i->_1 ) );
+			vector[ i->_0 ] = vector_tuple( passed, read( i->_1 ) );
 			i = --list.erase( i );
 		}
 	}

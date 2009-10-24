@@ -6,6 +6,7 @@
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/pointer.hpp"
+#include "foundation/utility/string.hpp"
 
 namespace ooe
 {
@@ -32,7 +33,6 @@ namespace ooe
 		};
 
 		fork_io( void );
-		~fork_io( void );
 
 		up_t read( void*, up_t );
 		up_t write( const void*, up_t );
@@ -45,6 +45,10 @@ namespace ooe
 	private:
 		shared_ptr< const fork_id > id;
 	};
+
+	std::string read( fork_io& ) OOE_VISIBLE;
+	fork_io& operator <<( fork_io&, const c8* ) OOE_VISIBLE;
+	fork_io& operator <<( fork_io&, const std::string& ) OOE_VISIBLE;
 }
 
 #endif	// OOE_FOUNDATION_EXECUTABLE_FORK_IO_HPP

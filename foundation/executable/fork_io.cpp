@@ -1,10 +1,13 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include <iostream>
+
 #include <cerrno>
 #include <csignal>
 
 #include <sys/wait.h>
 
+#include "foundation/executable/environment.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
@@ -35,8 +38,9 @@ namespace
 				"Unable to duplicate fd " << read << ": " << error::number( errno );
 		else if ( dup2( write, STDERR_FILENO ) == -1 )
 		{
-			// attempt to restore stdin
-			dup2( in, STDIN_FILENO );
+			if ( dup2( in, STDIN_FILENO ) == -1 )
+				OOE_WARNING( "fork_io", "Unable to restore standard input" );
+
 			throw error::runtime( "fork_io: " ) <<
 				"Unable to duplicate fd " << write << ": " << error::number( errno );
 		}
@@ -104,10 +108,6 @@ namespace ooe
 	{
 	}
 
-	fork_io::~fork_io( void )
-	{
-	}
-
 	up_t fork_io::read( void* buffer, up_t bytes )
 	{
 		sp_t read_ = ::read( id->read, buffer, bytes );
@@ -159,5 +159,34 @@ namespace ooe
 	void fork_io::exit( bool success )
 	{
 		_exit( success ? EXIT_SUCCESS : EXIT_FAILURE );
+	}
+
+	std::string read( fork_io& in )
+	{
+		std::string string;
+		c8 buffer[ executable::static_page_size ];
+		up_t read;
+
+		do
+		{
+			read = in.read( buffer, sizeof( buffer ) );
+			buffer[ read ] = 0;
+			string += buffer;
+		}
+		while ( read == sizeof( buffer ) );
+
+		return string;
+	}
+
+	fork_io& operator <<( fork_io& out, const c8* value )
+	{
+		out.write( value, std::strlen( value ) + 1 );
+		return out;
+	}
+
+	fork_io& operator <<( fork_io& out, const std::string& value )
+	{
+		out.write( value.c_str(), value.size() + 1 );
+		return out;
 	}
 }
