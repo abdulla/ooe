@@ -23,10 +23,10 @@ namespace ooe
 		template< typename, up_t >
 			struct insert_test;
 
-		template< typename type >
-			struct insert_test< type, 0 >;
+		template< typename fixture >
+			struct insert_test< fixture, 0 >;
 
-		template< typename type, void ( type::* )( void ) >
+		template< typename fixture, void ( fixture::* )( void ) >
 			void invoke_test( void );
 	}
 
@@ -49,7 +49,7 @@ namespace ooe
 //--- unit::group --------------------------------------------------------------
 	template< typename setup, typename data, up_t size >
 		struct unit::group
-		: public group_base, private setup
+		: public group_base, public setup
 	{
 		typedef fixture< data > fixture_type;
 
@@ -73,18 +73,18 @@ namespace ooe
 	};
 
 //--- unit::insert_test --------------------------------------------------------
-	template< typename type, up_t i >
+	template< typename fixture, up_t i >
 		struct unit::insert_test
 	{
 		static void call( group_base& group )
 		{
-			insert_test< type, i - 1 >::call( group );
-			group.push_back( invoke_test< type, &type::template test< i - 1 > > );
+			insert_test< fixture, i - 1 >::call( group );
+			group.push_back( invoke_test< fixture, &fixture::template test< i - 1 > > );
 		}
 	};
 
-	template< typename type >
-		struct unit::insert_test< type, 0 >
+	template< typename fixture >
+		struct unit::insert_test< fixture, 0 >
 	{
 		static void call( group_base& )
 		{
@@ -92,10 +92,10 @@ namespace ooe
 	};
 
 //--- unit::invoke_test --------------------------------------------------------
-	template< typename type, void ( type::* member )( void ) >
+	template< typename fixture, void ( fixture::* member )( void ) >
 		void unit::invoke_test( void )
 	{
-		type instance;
+		fixture instance;
 		( instance.*member )();
 	}
 }

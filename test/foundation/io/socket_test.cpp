@@ -14,10 +14,15 @@
 namespace
 {
 	using namespace ooe;
-	ooe::socket* socket;
 
 	class setup
 	{
+	public:
+		socket& get( void )
+		{
+			return pair._1;
+		}
+
 	protected:
 		setup( void )
 			: pair( make_pair() ), poll( make_pair() )
@@ -28,7 +33,6 @@ namespace
 
 			// possible race in the tests as to who gets which descriptor,
 			// validation of descriptors will make this case obvious
-			socket = &pair._1;
 			pair._0.send( desc );
 			pair._0.send( poll._1 );
 		}
@@ -54,7 +58,7 @@ namespace ooe
 			std::cerr << "send/receive descriptor\n";
 
 			u32 value;
-			file file( ::socket->receive() );
+			file file( ::group.get().receive() );
 			file.seek( 0, file::begin );
 			file.read( &value, sizeof( value ) );
 
@@ -67,7 +71,7 @@ namespace ooe
 		{
 			std::cerr << "poll on shutdown\n";
 
-			socket poll_socket( ::socket->receive() );
+			socket poll_socket( ::group.get().receive() );
 			unique_task< void ( socket::shutdown_type ) >
 				task( make_function( poll_socket, &socket::shutdown ), socket::read );
 

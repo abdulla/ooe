@@ -11,17 +11,20 @@
 namespace
 {
 	using namespace ooe;
-	ooe::socket* socket;
 
 	class setup
 	{
+	public:
+		socket& get( void )
+		{
+			return pair._1;
+		}
+
 	protected:
 		setup( void )
 			: pair( make_pair() )
 		{
 			ipc::semaphore semaphore( "ooe.test.semaphore", ipc::semaphore::create );
-
-			socket = &pair._1;
 			pair._0.send( semaphore );
 		}
 
@@ -44,7 +47,7 @@ namespace ooe
 		{
 			std::cerr << "send/receive semaphore\n";
 
-			ipc::semaphore semapore( ::socket->receive() );
+			ipc::semaphore semapore( ::group.get().receive() );
 		}
 	}
 }

@@ -18,31 +18,17 @@
 namespace
 {
 	using namespace ooe;
-	socket* socket_ptr;
-	ipc::memory::server* server_ptr;
-
-	void migrate( void )
-	{
-		server_ptr->migrate( *socket_ptr );
-	}
-
-	pid_t server_pid( void )
-	{
-		return getpid();
-	}
 
 	class setup
 	{
 	protected:
 		setup( void )
-			: fork0( 0 ), fork1( 0 )
+			: fork0( 0 ), fork1( 0 ), server_ptr(), socket_ptr()
 		{
 			ipc::memory::nameservice nameservice;
-			nameservice.insert( "migrate", migrate );
-			nameservice.insert( "server_pid", server_pid );
-
+			nameservice.insert< setup, &setup::migrate >( "migrate", *this );
+			nameservice.insert< pid_t, setup, &setup::server_pid >( "server_pid", *this );
 			socket_pair pair = make_pair();
-			socket_ptr = &pair._0;
 
 			fork_ptr( new fork_io ).swap( fork0 );
 
@@ -50,6 +36,7 @@ namespace
 			{
 				ipc::memory::server server( "/ooe.test.migration.0", nameservice );
 				server_ptr = &server;
+				socket_ptr = &pair._0;
 
 				while ( !executable::signal() )
 					server.decode();
@@ -82,6 +69,18 @@ namespace
 
 		fork_ptr fork0;
 		fork_ptr fork1;
+		ipc::memory::server* server_ptr;
+		socket* socket_ptr;
+
+		void migrate( void )
+		{
+			server_ptr->migrate( *socket_ptr );
+		}
+
+		pid_t server_pid( void )
+		{
+			return getpid();
+		}
 	};
 
 	typedef unit::group< setup, empty_t, 1 > group_type;
