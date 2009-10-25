@@ -11,7 +11,7 @@ namespace
 {
 	using namespace ooe;
 
-	tls< ipc::memory::servlet* > servlet_tls;
+	OOE_TLS( ipc::memory::servlet* ) servlet_tls;
 
 	typedef tuple< const ipc::memory::switchboard&, ipc::memory::write_buffer*, ipc::pool* >
 		tuple_type;
