@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "foundation/utility/pointer.hpp"
 #include "test/unit/assert.hpp"
 #include "test/unit/group.hpp"
 

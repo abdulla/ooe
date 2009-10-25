@@ -15,17 +15,16 @@ namespace
 	class setup
 	{
 	public:
-		socket& get( void )
-		{
-			return pair._1;
-		}
-
-	protected:
 		setup( void )
 			: pair( make_pair() )
 		{
 			ipc::semaphore semaphore( "ooe.test.semaphore", ipc::semaphore::create );
 			pair._0.send( semaphore );
+		}
+
+		socket& get( void )
+		{
+			return pair._1;
 		}
 
 	private:
@@ -47,7 +46,7 @@ namespace ooe
 		{
 			std::cerr << "send/receive semaphore\n";
 
-			ipc::semaphore semapore( ::group.get().receive() );
+			ipc::semaphore semapore( ::group->get().receive() );
 		}
 	}
 }

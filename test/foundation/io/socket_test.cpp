@@ -18,12 +18,6 @@ namespace
 	class setup
 	{
 	public:
-		socket& get( void )
-		{
-			return pair._1;
-		}
-
-	protected:
 		setup( void )
 			: pair( make_pair() ), poll( make_pair() )
 		{
@@ -35,6 +29,11 @@ namespace
 			// validation of descriptors will make this case obvious
 			pair._0.send( desc );
 			pair._0.send( poll._1 );
+		}
+
+		socket& get( void )
+		{
+			return pair._1;
 		}
 
 	private:
@@ -58,7 +57,7 @@ namespace ooe
 			std::cerr << "send/receive descriptor\n";
 
 			u32 value;
-			file file( ::group.get().receive() );
+			file file( ::group->get().receive() );
 			file.seek( 0, file::begin );
 			file.read( &value, sizeof( value ) );
 
@@ -71,7 +70,7 @@ namespace ooe
 		{
 			std::cerr << "poll on shutdown\n";
 
-			socket poll_socket( ::group.get().receive() );
+			socket poll_socket( ::group->get().receive() );
 			unique_task< void ( socket::shutdown_type ) >
 				task( make_function( poll_socket, &socket::shutdown ), socket::read );
 

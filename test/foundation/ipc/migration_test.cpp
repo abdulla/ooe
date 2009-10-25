@@ -21,7 +21,7 @@ namespace
 
 	class setup
 	{
-	protected:
+	public:
 		setup( void )
 			: fork0( 0 ), fork1( 0 ), server_ptr(), socket_ptr()
 		{
@@ -34,12 +34,15 @@ namespace
 
 			if ( fork0->is_child() )
 			{
-				ipc::memory::server server( "/ooe.test.migration.0", nameservice );
-				server_ptr = &server;
-				socket_ptr = &pair._0;
+				OOE_IGNORE
+				(
+					ipc::memory::server server( "/ooe.test.migration.0", nameservice );
+					server_ptr = &server;
+					socket_ptr = &pair._0;
 
-				while ( !executable::signal() )
-					server.decode();
+					while ( !executable::signal() )
+						server.decode();
+				);
 
 				fork_io::exit( true );
 			}
@@ -48,11 +51,14 @@ namespace
 
 			if ( fork1->is_child() )
 			{
-				ipc::memory::server server( "/ooe.test.migration.1", nameservice );
-				server.relink( pair._1 );
+				OOE_IGNORE
+				(
+					ipc::memory::server server( "/ooe.test.migration.1", nameservice );
+					server.relink( pair._1 );
 
-				while ( !executable::signal() )
-					server.decode();
+					while ( !executable::signal() )
+						server.decode();
+				);
 
 				fork_io::exit( true );
 			}
