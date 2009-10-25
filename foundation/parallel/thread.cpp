@@ -117,10 +117,4 @@ namespace ooe
 	{
 		specify( pthread_key, value );
 	}
-
-	void tls_base::clear( destroy_type destroy )
-	{
-		destroy( pthread_getspecific( pthread_key ) );
-		specify( pthread_key, 0 );
-	}
 }

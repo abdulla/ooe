@@ -5,6 +5,7 @@
 
 #include <pthread.h>
 
+#include "foundation/parallel/thread_forward.hpp"
 #include "foundation/utility/function.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/miscellany.hpp"
@@ -55,7 +56,6 @@ namespace ooe
 
 		void* get( void ) const;
 		void set( const void* );
-		void clear( destroy_type );
 
 	private:
 		pthread_key_t pthread_key;
@@ -81,11 +81,6 @@ namespace ooe
 		{
 			*static_cast< type* >( this->get() ) = value;
 			return *this;
-		}
-
-		void clear( void )
-		{
-			tls_base::clear( destroy< type > );
 		}
 	};
 
