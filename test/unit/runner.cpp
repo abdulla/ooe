@@ -68,6 +68,7 @@ namespace
 
 	vector_type run_group( unit::group_base& group, time_t time_out )
 	{
+		group.create_setup();
 		list_type list;
 		up_t j = 0;
 
@@ -125,6 +126,36 @@ namespace
 
 		return true;
 	}
+
+	bool safe_run( const unit::runner::map_type::const_iterator i, time_t time_out )
+	{
+		std::string output;
+
+		try
+		{
+			vector_type vector = run_group( *i->second, time_out );
+			print_tests( i->first, vector );
+			return is_successful( vector );
+		}
+		catch ( error::runtime& error )
+		{
+			output << error.what() << "\n\n    Stack trace:" << error.where();
+		}
+		catch ( std::exception& error )
+		{
+			output << error.what();
+		}
+		catch ( ... )
+		{
+			output << "Unknown";
+		}
+
+		std::cout <<
+			"Group: " << i->first << "\n"
+			"    Failed setup:\n" << output << '\n';
+
+		return false;
+	}
 }
 
 namespace ooe
@@ -155,13 +186,7 @@ namespace ooe
 		bool success = true;
 
 		for ( map_type::const_iterator i = begin(), j = end(); i != j; ++i )
-		{
-			vector_type vector = run_group( *i->second, time_out );
-			print_tests( i->first, vector );
-
-			if ( !is_successful( vector ) )
-				success = false;
-		}
+			success = safe_run( i, time_out );
 
 		return success;
 	}
@@ -173,8 +198,6 @@ namespace ooe
 		if ( i == map.end() )
 			throw error::runtime( "unit::runner: " ) << "Unable to find group \"" << name << '"';
 
-		vector_type vector = run_group( *i->second, time_out );
-		print_tests( name, vector );
-		return is_successful( vector );
+		return safe_run( i, time_out );
 	}
 }

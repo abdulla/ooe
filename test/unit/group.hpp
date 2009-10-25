@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "foundation/utility/pointer.hpp"
 #include "foundation/utility/tuple.hpp"
 #include "test/unit/runner.hpp"
 
@@ -15,7 +16,7 @@ namespace ooe
 		class group_base;
 
 		template< typename, typename, up_t >
-			struct group;
+			class group;
 
 		template< typename >
 			struct fixture;
@@ -38,6 +39,9 @@ namespace ooe
 		typedef std::vector< function_type > vector_type;
 		typedef vector_type::const_iterator iterator_type;
 
+		virtual ~group_base( void ) {}
+		virtual void create_setup( void ) = 0;
+
 		iterator_type begin( void ) const;
 		iterator_type end( void ) const;
 		void push_back( function_type ) OOE_VISIBLE;
@@ -48,16 +52,31 @@ namespace ooe
 
 //--- unit::group --------------------------------------------------------------
 	template< typename setup, typename data, up_t size >
-		struct unit::group
-		: public group_base, public setup
+		class unit::group
+		: public group_base
 	{
+	public:
 		typedef fixture< data > fixture_type;
 
 		group( const std::string& name, runner& runner = global_runner )
-			: group_base(), setup()
+			: group_base(), setup_ptr( 0 )
 		{
 			insert_test< fixture_type, size >::call( *this );
 			runner.insert( name, *this );
+		}
+
+		setup* operator ->( void ) const
+		{
+			return setup_ptr;
+		}
+
+	private:
+		typedef scoped_ptr< setup > setup_type;
+		setup_type setup_ptr;
+
+		virtual void create_setup( void )
+		{
+			setup_type( new setup ).swap( setup_ptr );
 		}
 	};
 
