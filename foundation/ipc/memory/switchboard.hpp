@@ -18,6 +18,12 @@ namespace ooe
 		{
 			class switchboard;
 
+			template< typename t, void ( t::* member )( void ) >
+				void invoke_pointer( const any&, u8*, up_t, write_buffer&, pool& );
+
+			template< typename r, typename t, r ( t::* member )( void ) >
+				void invoke_pointer( const any&, u8*, up_t, write_buffer&, pool& );
+
 			template< typename >
 				struct invoke_function;
 
@@ -64,6 +70,24 @@ namespace ooe
 	};
 
 //--- ipc::memory --------------------------------------------------------------
+	template< typename t, void ( t::* member )( void ) >
+		void ipc::memory::invoke_pointer
+		( const any& any, u8* buffer_ptr, up_t buffer_size, write_buffer& buffer, pool& )
+	{
+		( static_cast< t* >( any.pointer )->*member )();
+		return_write( buffer_ptr, buffer_size, buffer );
+	}
+
+	template< typename r, typename t, r ( t::* member )( void ) >
+		void ipc::memory::invoke_pointer
+		( const any& any, u8* buffer_ptr, up_t buffer_size, write_buffer& buffer, pool& pool )
+	{
+		r value = ( static_cast< t* >( any.pointer )->*member )();
+		verify< r >::call( pool, value, 0 );
+		up_t size = stream_size< r >::call( value );
+		stream_write< r >::call( return_write( buffer_ptr, buffer_size, buffer, size ), value );
+	}
+
 	inline u8* ipc::memory::return_write
 		( u8* buffer_ptr, up_t buffer_size, write_buffer& buffer, up_t size, error::ipc error )
 	{

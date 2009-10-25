@@ -30,6 +30,20 @@ namespace ooe
 		list_type list( void ) const;
 		void insert_direct( const std::string&, const std::string&, u32 ) OOE_VISIBLE;
 
+		template< typename t, void ( t::* member )( void ) >
+			void insert( const std::string& name, t& instance )
+		{
+			u32 index = switchboard.insert_direct( invoke_pointer< t, member >, &instance );
+			insert_direct( name, typeid( void ( void ) ).name(), index );
+		}
+
+		template< typename r, typename t, r ( t::* member )( void ) >
+			void insert( const std::string& name, t& instance )
+		{
+			u32 index = switchboard.insert_direct( invoke_pointer< r, t, member >, &instance );
+			insert_direct( name, typeid( r ( void ) ).name(), index );
+		}
+
 		template< typename type >
 			void insert( const std::string& name, type function,
 			typename enable_if< is_function_pointer< type > >::type* = 0 )
