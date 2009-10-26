@@ -39,8 +39,8 @@ namespace
 			{
 				OOE_IGNORE
 				(
-				 	semaphore.up();
 					ipc::memory::server server( "/ooe.test.migration.0", nameservice );
+				 	semaphore.up();
 					server_ptr = &server;
 					socket_ptr = &pair._0;
 
@@ -58,8 +58,8 @@ namespace
 			{
 				OOE_IGNORE
 				(
-				 	semaphore.up();
 					ipc::memory::server server( "/ooe.test.migration.1", nameservice );
+				 	semaphore.up();
 					server.relink( pair._1 );
 
 					while ( !executable::signal() )
@@ -75,7 +75,9 @@ namespace
 		~setup( void )
 		{
 			fork1->signal( SIGTERM );
+			fork1->wait();
 			fork0->signal( SIGTERM );
+			fork0->wait();
 		}
 
 	private:
