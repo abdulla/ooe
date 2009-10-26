@@ -8,6 +8,8 @@
 
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/ipc/name.hpp"
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
@@ -29,6 +31,7 @@ namespace
 			nameservice.insert< setup, &setup::migrate >( "migrate", *this );
 			nameservice.insert< pid_t, setup, &setup::server_pid >( "server_pid", *this );
 			socket_pair pair = make_pair();
+			ipc::semaphore semaphore( ipc::unique_name(), ipc::semaphore::create, 0 );
 
 			fork_ptr( new fork_io ).swap( fork0 );
 
@@ -36,6 +39,7 @@ namespace
 			{
 				OOE_IGNORE
 				(
+				 	semaphore.up();
 					ipc::memory::server server( "/ooe.test.migration.0", nameservice );
 					server_ptr = &server;
 					socket_ptr = &pair._0;
@@ -47,12 +51,14 @@ namespace
 				fork_io::exit( true );
 			}
 
+		 	semaphore.down();
 			fork_ptr( new fork_io ).swap( fork1 );
 
 			if ( fork1->is_child() )
 			{
 				OOE_IGNORE
 				(
+				 	semaphore.up();
 					ipc::memory::server server( "/ooe.test.migration.1", nameservice );
 					server.relink( pair._1 );
 
@@ -62,6 +68,8 @@ namespace
 
 				fork_io::exit( true );
 			}
+
+		 	semaphore.down();
 		}
 
 		~setup( void )
