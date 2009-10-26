@@ -29,7 +29,7 @@ namespace ooe
 		void wait( void ) const;
 
 	private:
-		typedef tuple< const descriptor*, function_type > datum_tuple;
+		typedef tuple< descriptor, function_type > datum_tuple;
 		typedef std::vector< datum_tuple > datum_vector;
 		typedef std::vector< pollfd > fd_vector;
 

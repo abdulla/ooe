@@ -9,7 +9,7 @@ namespace ooe
 {
 	void poll::insert( const descriptor& desc, const function_type& function )
 	{
-		data.push_back( datum_tuple( &desc, function ) );
+		data.push_back( datum_tuple( desc, function ) );
 		pollfd event = { desc.get(), POLLIN, 0 };
 		fds.push_back( event );
 	}
@@ -27,13 +27,14 @@ namespace ooe
 			if ( !returned )
 				continue;
 			else if ( returned & POLLERR )
-				datum._1( *datum._0, error );
+				datum._1( datum._0, error );
 			else if ( returned & POLLHUP )
-				datum._1( *datum._0, disconnect );
+				datum._1( datum._0, disconnect );
 			else if ( returned & POLLIN )
-				datum._1( *datum._0, input );
+				datum._1( datum._0, input );
 			else
-				throw error::io( "poll: " ) << "Unknown poll event on descriptor " << fds[ i ].fd;
+				throw error::io( "poll: " ) <<
+					"Unknown poll event 0x" << hex( returned ) << " on descriptor " << fds[ i ].fd;
 		}
 	}
 }
