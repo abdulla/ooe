@@ -83,24 +83,24 @@ namespace ooe
 
 //--- ipc::memory::link_client -------------------------------------------------
 	ipc::memory::link_client::link_client( const std::string& name, transport& transport )
-		: connect( local( local_name( name ) ) ), active( true ),
+		: connect( local( local_name( name ) ) ), state( true ),
 		thread( make_function( *this, &link_client::call ), &transport )
 	{
 	}
 
 	ipc::memory::link_client::~link_client( void )
 	{
-		if ( !active )
+		if ( !state )
 			return;
 
-		active = false;
+		state = false;
 		connect.shutdown( socket::read );
 		thread.join();
 	}
 
 	ipc::memory::link_client::operator bool( void ) const
 	{
-		return active;
+		return state;
 	}
 
 	void* ipc::memory::link_client::call( void* pointer )
@@ -111,12 +111,12 @@ namespace ooe
 		poll.insert( connect );
 		poll.wait();
 
-		if ( !active )
+		if ( !state )
 			return 0;
 
 		stream_write< u32, u32 >::call( transport.get(), true, error::link );
 		transport.wake_notify();
-		active = false;
+		state = false;
 		return 0;
 	}
 }

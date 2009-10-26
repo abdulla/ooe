@@ -9,7 +9,7 @@
 namespace
 {
 	using namespace ooe;
-	atom< u32 > value( 0 );
+	atom< u32 > seed( 0 );
 }
 
 namespace ooe
@@ -29,6 +29,6 @@ namespace ooe
 	std::string ipc::unique_name( void )
 	{
 		std::string name( "/ooe." );
-		return name << hex( getpid() ) << 'r' << hex( value++ );
+		return name << hex( getpid() ) << 'r' << hex( seed++ );
 	}
 }

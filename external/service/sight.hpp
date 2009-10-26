@@ -30,7 +30,7 @@ namespace ooe
 		const up_t size;
 		const scoped_array< u8 > frame;
 
-		atom< u32 > state_;
+		atom< bool > state_;
 		ooe::sight sight_;
 
 		void call( const u8* );

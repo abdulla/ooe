@@ -16,7 +16,7 @@ namespace
 	using namespace ooe;
 
 	const up_t limit = 1000000;
-	atom< u32 > value( 0 );
+	atom< u32 > seed( 0 );
 
 	f32 getpid_atom_test( void )
 	{
@@ -25,7 +25,7 @@ namespace
 		for ( up_t i = 0; i != limit; ++i )
 		{
 			getpid();
-			value++;
+			seed++;
 		}
 
 		return timer.elapsed();

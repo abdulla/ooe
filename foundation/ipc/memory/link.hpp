@@ -73,7 +73,7 @@ namespace ooe
 
 	private:
 		ooe::connect connect;
-		atom< u32 > active;
+		atom< bool > state;
 		ooe::thread thread;
 
 		void* call( void* );
