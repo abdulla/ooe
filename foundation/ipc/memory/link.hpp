@@ -39,6 +39,13 @@ namespace ooe
 	class ipc::memory::link_server
 	{
 	public:
+		enum type
+		{
+			idle,
+			work,
+			move
+		};
+
 		link_server( const ooe::socket&, u32, server& );
 		~link_server( void );
 
@@ -49,7 +56,7 @@ namespace ooe
 		socket_pair migrate_pair;
 
 		const u32 link_id;
-		atom< u32 > active;
+		atom< u32 > state;
 		ooe::thread thread;
 
 		void* call( void* );

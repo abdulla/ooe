@@ -39,26 +39,29 @@ namespace ooe
 //--- ipc::memory::link_server -------------------------------------------------
 	ipc::memory::link_server::
 		link_server( const ooe::socket& socket_, u32 link_id_, server& server )
-		: socket( socket_ ), migrate_pair( make_pair() ), link_id( link_id_ ), active( true ),
+		: socket( socket_ ), migrate_pair( make_pair() ), link_id( link_id_ ), state( work ),
 		thread( make_function( *this, &link_server::call ), &server )
 	{
 	}
 
 	ipc::memory::link_server::~link_server( void )
 	{
-		if ( !active )
+		if ( state == idle )
 			return;
+		else if ( state == work )
+		{
+			state = idle;
+			socket.shutdown( socket::read );
+		}
 
-		active = false;
-		socket.shutdown( socket::read );
 		thread.join();
 	}
 
 	void ipc::memory::link_server::migrate( ooe::socket& migrate_socket )
 	{
-		active = false;
+		state = move;
 		migrate_socket.send( socket );
-		migrate_pair._1.shutdown( socket::read );
+		migrate_pair._1.shutdown( socket::write );
 	}
 
 	void* ipc::memory::link_server::call( void* pointer )
@@ -70,10 +73,10 @@ namespace ooe
 		poll.insert( migrate_pair._0 );
 		poll.wait();
 
-		if ( !active )
+		if ( state != work )
 			return 0;
 
-		active = false;
+		state = idle;
 		server.unlink( link_id );
 		return 0;
 	}
