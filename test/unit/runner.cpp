@@ -10,6 +10,7 @@
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/timer.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/utility/scoped.hpp"
 #include "test/unit/group.hpp"
 #include "test/unit/runner.hpp"
 
@@ -21,11 +22,11 @@ namespace
 	typedef tuple< bool, std::string > vector_tuple;
 	typedef std::vector< vector_tuple > vector_type;
 
-	void run_test( const unit::group_base::iterator_type& i )
+	void run_test( const unit::group_base::iterator_type& i, void* pointer )
 	{
 		try
 		{
-			( *i )();
+			( *i )( pointer );
 			fork_io::exit( true );
 		}
 		catch ( error::runtime& error )
@@ -68,7 +69,8 @@ namespace
 
 	vector_type run_group( unit::group_base& group, time_t time_out )
 	{
-		group.create_setup();
+		unit::group_base::setup_tuple tuple = group.create_setup();
+		scoped< void ( void* ) > scoped_setup( tuple._1, tuple._0 );
 		list_type list;
 		up_t j = 0;
 
@@ -79,7 +81,7 @@ namespace
 			if ( !fork_io.is_child() )
 				list.push_back( list_tuple( j++, fork_io, timer() ) );
 			else
-				run_test( i );
+				run_test( i, tuple._0 );
 		}
 
 		vector_type vector( j );
