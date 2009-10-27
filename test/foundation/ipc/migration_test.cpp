@@ -25,11 +25,11 @@ namespace
 	{
 	public:
 		setup( void )
-			: fork0( 0 ), fork1( 0 ), server_ptr(), socket_ptr()
+			: fork0( 0 ), fork1( 0 )
 		{
 			ipc::memory::nameservice nameservice;
-			nameservice.insert< setup, &setup::migrate >( "migrate", *this );
-			nameservice.insert< pid_t, setup, &setup::server_pid >( "server_pid", *this );
+			nameservice.insert( "migrate", migrate );
+			nameservice.insert( "server_pid", server_pid );
 			socket_pair pair = make_pair();
 			ipc::semaphore semaphore( ipc::unique_name(), ipc::semaphore::create, 0 );
 
@@ -85,19 +85,23 @@ namespace
 
 		fork_ptr fork0;
 		fork_ptr fork1;
-		ipc::memory::server* server_ptr;
-		socket* socket_ptr;
 
-		void migrate( void )
+		static ipc::memory::server* server_ptr;
+		static socket* socket_ptr;
+
+		static void migrate( void )
 		{
 			server_ptr->migrate( *socket_ptr );
 		}
 
-		pid_t server_pid( void )
+		static pid_t server_pid( void )
 		{
 			return getpid();
 		}
 	};
+
+	ipc::memory::server* setup::server_ptr = 0;
+	socket* setup::socket_ptr = 0;
 
 	typedef unit::group< setup, empty_t, 1 > group_type;
 	typedef group_type::fixture_type fixture_type;
