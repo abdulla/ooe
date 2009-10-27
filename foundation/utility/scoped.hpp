@@ -30,6 +30,7 @@ namespace ooe
 //--- scoped -------------------------------------------------------------------
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		class scoped< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		: private noncopyable
 	{
 	public:
 		typedef ooe::partial< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > partial_type;
