@@ -32,7 +32,7 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( void )
+			void fixture_type::test< 0 >( empty_t& )
 		{
 			std::cerr << "uncompressed_image\n";
 
@@ -50,7 +50,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 1 >( void )
+			void fixture_type::test< 1 >( empty_t& )
 		{
 			std::cerr << "dxt\n";
 
@@ -64,7 +64,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 2 >( void )
+			void fixture_type::test< 2 >( empty_t& )
 		{
 			std::cerr << "dds\n";
 

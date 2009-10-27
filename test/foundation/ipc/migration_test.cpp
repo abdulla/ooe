@@ -39,7 +39,7 @@ namespace
 			{
 				OOE_IGNORE
 				(
-					ipc::memory::server server( "/ooe.test.migration.0", nameservice );
+					ipc::memory::server server( "/ooe.test.migration", nameservice );
 				 	semaphore.up();
 					server_ptr = &server;
 					socket_ptr = &pair._0;
@@ -58,7 +58,7 @@ namespace
 			{
 				OOE_IGNORE
 				(
-					ipc::memory::server server( "/ooe.test.migration.1", nameservice );
+					ipc::memory::server server( ipc::unique_name(), nameservice );
 				 	semaphore.up();
 					server.relink( pair._1 );
 
@@ -110,11 +110,11 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( void )
+			void fixture_type::test< 0 >( setup& )
 		{
 			std::cerr << "migrate between servers\n";
 
-			ipc::memory::client client( "/ooe.test.migration.0" );
+			ipc::memory::client client( "/ooe.test.migration" );
 			ipc::memory::call< void ( void ) > migrate( client, "migrate" );
 			ipc::memory::call< pid_t ( void ) > server_pid( client, "server_pid" );
 

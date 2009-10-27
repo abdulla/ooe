@@ -43,7 +43,7 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( void )
+			void fixture_type::test< 0 >( empty_t& )
 		{
 			std::cerr << "scoped_ptr\n";
 
@@ -75,7 +75,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 1 >( void )
+			void fixture_type::test< 1 >( empty_t& )
 		{
 			std::cerr << "shared_ptr\n";
 

@@ -22,9 +22,9 @@ namespace
 			pair._0.send( semaphore );
 		}
 
-		socket& get( void )
+		descriptor receive( void )
 		{
-			return pair._1;
+			return pair._1.receive();
 		}
 
 	private:
@@ -42,11 +42,11 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( void )
+			void fixture_type::test< 0 >( setup& setup )
 		{
 			std::cerr << "send/receive semaphore\n";
 
-			ipc::semaphore semapore( ::group->get().receive() );
+			ipc::semaphore semapore( setup.receive() );
 		}
 	}
 }

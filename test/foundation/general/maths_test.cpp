@@ -21,7 +21,7 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( void )
+			void fixture_type::test< 0 >( empty_t& )
 		{
 			std::cerr << "is_equal\n";
 
@@ -31,7 +31,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 1 >( void )
+			void fixture_type::test< 1 >( empty_t& )
 		{
 			std::cerr << "radian\n";
 
@@ -41,7 +41,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 2 >( void )
+			void fixture_type::test< 2 >( empty_t& )
 		{
 			std::cerr << "degree\n";
 
@@ -51,7 +51,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 3 >( void )
+			void fixture_type::test< 3 >( empty_t& )
 		{
 			std::cerr << "vector< 3 >\n";
 
@@ -110,7 +110,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 4 >( void )
+			void fixture_type::test< 4 >( empty_t& )
 		{
 			std::cerr << "matrix< 3 >\n";
 
@@ -202,7 +202,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 5 >( void )
+			void fixture_type::test< 5 >( empty_t& )
 		{
 			std::cerr << "matrix< 4 >\n";
 
@@ -311,7 +311,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 6 >( void )
+			void fixture_type::test< 6 >( empty_t& )
 		{
 			std::cerr << "quaternion\n";
 

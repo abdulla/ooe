@@ -31,9 +31,9 @@ namespace
 			pair._0.send( poll._1 );
 		}
 
-		socket& get( void )
+		descriptor receive( void )
 		{
-			return pair._1;
+			return pair._1.receive();
 		}
 
 	private:
@@ -52,12 +52,12 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( void )
+			void fixture_type::test< 0 >( setup& setup )
 		{
 			std::cerr << "send/receive descriptor\n";
 
 			u32 value;
-			file file( ::group->get().receive() );
+			file file( setup.receive() );
 			file.seek( 0, file::begin );
 			file.read( &value, sizeof( value ) );
 
@@ -66,11 +66,11 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 1 >( void )
+			void fixture_type::test< 1 >( setup& setup )
 		{
 			std::cerr << "poll on shutdown\n";
 
-			socket poll_socket( ::group->get().receive() );
+			socket poll_socket( setup.receive() );
 			unique_task< void ( socket::shutdown_type ) >
 				task( make_function( poll_socket, &socket::shutdown ), socket::read );
 
