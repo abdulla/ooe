@@ -12,45 +12,50 @@ namespace
 {
 	using namespace ooe;
 
-	//--- typedefs -------------------------------------------------------------
-	typedef tuple< std::string, module::type > module_tuple;
-	typedef std::map< std::string, module::type > module_map;
-
-	//--- globals --------------------------------------------------------------
-	atom< u32 > seed;
+	//--------------------------------------------------------------------------
+	typedef std::multimap< module::name_tuple, module::info_tuple > module_map;
 	std::string self;
 	module_map modules;
 
-	//--- rpc functions --------------------------------------------------------
-	void insert( const std::string& path, module::type type )
+	void insert( const module::info_tuple& info, const module::name_vector& names )
 	{
-		modules.insert( module_map::value_type( path, type ) );
+		typedef module::name_vector::const_iterator iterator_type;
+
+		for ( iterator_type i = names.begin(), end = names.end(); i != end; ++i )
+			modules.insert( module_map::value_type( *i, info ) );
 	}
 
-	module_tuple find( const std::string& name, module::type type )
+	registry::info_vector find( const interface::name_vector& names )
 	{
-		module_map::const_iterator i = modules.find( name );
+		typedef interface::name_vector::const_iterator name_iterator;
+		typedef std::map< module::info_tuple, up_t > histogram_map;
+		histogram_map histogram;
 
-		if ( i == modules.end() )
-			throw error::runtime( "registry: " ) << "Unable to find module \"" << name << '\"';
-		else if ( type == module::either || type == i->second )
-			return i->second != module::either ? module_tuple( *i ) :
-				module_tuple( i->first, module::internal );	// prefer internal loading
-		else if ( type != module::external || i->second != module::either )
-			throw error::runtime( "registry: " ) <<
-				"Unable to find module \"" << name << "\" with type " << type;
-
-		std::string path;
-		path << "/ooe.surrogate." << hex( getpid() ) << '.' << hex( seed++ );
-
+		for ( name_iterator i = names.begin(), end = names.end(); i != end; ++i )
 		{
-			std::string gate = path + ".g";
-			ipc::semaphore semaphore( gate.c_str(), ipc::semaphore::create, 0 );
-			executable::spawn( self, "-p", path.c_str(), "-m", i->first.c_str(), 0 );
-			semaphore.down();
+			module_map::const_iterator j = modules.find( *i );
+
+			if ( j == modules.end() )
+				continue;
+
+			histogram_map::iterator k = histogram.find( j->second );
+
+			if ( k == histogram.end() )
+				histogram.insert( histogram_map::value_type( k->first, 1 ) );
+			else
+				++k->second;
 		}
 
-		return module_tuple( path, module::external );
+		typedef histogram_map::const_iterator histogram_iterator;
+		registry::info_vector vector;
+
+		for ( histogram_iterator i = histogram.begin(), end = histogram.end(); i != end; ++i )
+		{
+			if ( i->second == names.size() )
+				vector.push_back( i->first );
+		}
+
+		return vector;
 	}
 
 	//--- registry -------------------------------------------------------------
@@ -84,33 +89,9 @@ namespace
 	}
 
 	//--- launch ---------------------------------------------------------------
-	bool launch( const std::string& root, const std::string& name, s32 argc, c8** argv )
+	bool launch( const std::string& root, const std::string& name, s32 /*argc*/, c8** /*argv*/ )
 	{
-		const c8* path = 0;
-		const c8* module = 0;
-
-		for ( s32 option; ( option = getopt( argc, argv, "p:m:" ) ) != -1; )
-		{
-			switch ( option )
-			{
-			case 'p':
-				path = optarg;
-				break;
-
-			case 'm':
-				module = optarg;
-				break;
-
-			default:
-				return false;
-			}
-		}
-
-		if ( path && module )
-			surrogate( path, module );
-		else
-			registry( root, name );
-
+		registry( root, name );
 		return true;
 	}
 }
