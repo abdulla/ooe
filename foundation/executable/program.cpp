@@ -43,23 +43,6 @@ namespace
 			break;
 		}
 	}
-
-	bool self( std::string& root, std::string& name )
-	{
-		c8 path[ PATH_MAX ];
-
-		if ( !executable::path( path, sizeof( path ) ) )
-			return false;
-
-		c8* point = std::strrchr( path, '/' );
-
-		if ( !point++ )
-			return false;
-
-		root = std::string( path, point );
-		name = std::string( point );
-		return true;
-	}
 }
 
 namespace ooe
@@ -102,15 +85,6 @@ namespace ooe
 
 	s32 executable::launch( launch_type launch, s32 argc, c8** argv )
 	{
-		std::string root;
-		std::string name;
-
-		if ( !self( root, name ) )
-		{
-			std::cout << "Unable to find executable path\n";
-			return EXIT_FAILURE;
-		}
-
 		std::set_terminate( __gnu_cxx::__verbose_terminate_handler );
 		struct sigaction action;
 		executable::signal( action, SIG_IGN, SIGCHLD );
@@ -127,13 +101,14 @@ namespace ooe
 				throw error::runtime( "executable::launch: " ) <<
 					"Unable to close standard error: " << error::number( errno );
 
-			std::string path = root + name + ".log";
+			path_tuple path = executable::path();
+			std::string log = path._0 + path._1 + ".log";
 
-			if ( open( path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600 ) != STDERR_FILENO )
+			if ( open( log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600 ) != STDERR_FILENO )
 				throw error::runtime( "executable::launch: " ) <<
 					"Unable to override standard error: " << error::number( errno );
 
-			if ( platform::launch( launch, root, name, argc, argv ) )
+			if ( platform::launch( launch, path._0, path._1, argc, argv ) )
 				status = EXIT_SUCCESS;
 		}
 		catch ( error::runtime& error )
@@ -189,5 +164,20 @@ namespace ooe
 		}
 
 		_exit( EXIT_FAILURE );
+	}
+
+	executable::path_tuple executable::path( void )
+	{
+		c8 path[ PATH_MAX ];
+
+		if ( !executable::path( path, sizeof( path ) ) )
+			throw error::runtime( "executable::path: " ) << "Unable to find executable path\n";
+
+		c8* point = std::strrchr( path, '/' );
+
+		if ( !point++ )
+			throw error::runtime( "executable::path: " ) << "Unable to find executable path\n";
+
+		return path_tuple( std::string( path, point ), point );
 	}
 }

@@ -16,6 +16,7 @@ namespace ooe
 		typedef void ( * signal_handler_type )( s32 );
 		typedef void ( * emergency_handler_type )( void );
 		typedef bool ( * launch_type )( const std::string&, const std::string&, s32, c8** );
+		typedef tuple< std::string, std::string > path_tuple;
 
 		signal_handler_type signal( struct sigaction&, signal_handler_type, s32 ) OOE_VISIBLE;
 		s32 signal( void ) OOE_VISIBLE;
@@ -25,6 +26,7 @@ namespace ooe
 		s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
 		pid_t spawn( const std::string&, ... ) OOE_VISIBLE;
 
+		path_tuple path( void ) OOE_VISIBLE;
 		bool path( c8*, up_t );
 	}
 
