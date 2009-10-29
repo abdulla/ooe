@@ -124,7 +124,7 @@ namespace ooe
 
 //--- ipc::memory::server --------------------------------------------------------------
 	ipc::memory::server::server( const std::string& name_, const switchboard& external_ )
-		: semaphore( name_ + ".s", semaphore::create ), internal(), external( external_ ),
+		: semaphore( name_, semaphore::create ), internal(), external( external_ ),
 		transport( name_, transport::create ), seed(), servlets()
 	{
 		if ( internal.insert_direct( ipc_link, this ) != 1 )

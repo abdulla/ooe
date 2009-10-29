@@ -14,7 +14,7 @@ namespace
 	u32 ipc_connect( const std::string& name )
 	{
 		ipc::memory::transport transport( name, ipc::memory::transport::open );
-		ipc::semaphore semaphore( name + ".s", ipc::semaphore::open );
+		ipc::semaphore semaphore( name, ipc::semaphore::open );
 		ipc::process_lock lock( semaphore );
 
 		ipc::memory::rpc< u32 ( pid_t ) > link( transport, 1 );
@@ -24,7 +24,7 @@ namespace
 	void ipc_disconnect( const std::string& name, u32 link )
 	{
 		ipc::memory::transport transport( name, ipc::memory::transport::open );
-		ipc::semaphore semaphore( name + ".s", ipc::semaphore::open );
+		ipc::semaphore semaphore( name, ipc::semaphore::open );
 		ipc::process_lock lock( semaphore );
 
 		ipc::memory::rpc< void ( u32 ) > unlink( transport, 2 );
