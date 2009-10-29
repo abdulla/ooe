@@ -17,8 +17,8 @@ namespace ooe
 
 		registry( void );
 
-		void insert( const module& );
 		info_vector find( const interface& );
+		void insert( const module& );
 
 	private:
 		mutable ipc::memory::client client;

@@ -58,14 +58,23 @@ namespace
 		return vector;
 	}
 
+	void up( const std::string& name )
+	{
+		ipc::semaphore( name ).up();
+	}
+
 	//--- registry -------------------------------------------------------------
 	void registry( const std::string& root, const std::string& name )
 	{
 		self = root + name;
 
 		ipc::memory::switchboard switchboard;
-		switchboard.insert( insert );
-		switchboard.insert( find );
+
+		if ( switchboard.insert( find ) != 1 )
+			throw error::runtime( "registry: " ) << "\"find\" not at index 1";
+
+		if ( switchboard.insert( insert ) != 2 )
+			throw error::runtime( "registry: " ) << "\"insert\" not at index 2";
 
 		ipc::memory::server server( "/ooe.registry", switchboard );
 
@@ -89,8 +98,22 @@ namespace
 	}
 
 	//--- launch ---------------------------------------------------------------
-	bool launch( const std::string& root, const std::string& name, s32 /*argc*/, c8** /*argv*/ )
+	bool launch( const std::string& root, const std::string& name, s32 argc, c8** argv )
 	{
+
+		for ( s32 option; ( option = getopt( argc, argv, "u:" ) ) != -1; )
+		{
+			switch ( option )
+			{
+			case 'u':
+				up( optarg );
+				break;
+
+			default:
+				return false;
+			}
+		}
+
 		registry( root, name );
 		return true;
 	}

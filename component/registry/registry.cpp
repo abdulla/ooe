@@ -11,17 +11,17 @@ namespace ooe
 	{
 	}
 
-	void registry::insert( const module& module )
-	{
-		ipc::memory::rpc< void ( module::info_tuple, const module::name_vector& ) >
-			registry_insert( client, 0 );
-		registry_insert( module.info(), module.names() );
-	}
-
 	registry::info_vector registry::find( const interface& interface )
 	{
 		ipc::memory::rpc< info_vector ( const interface::name_vector& ) >
 			registry_find( client, 1 );
 		return registry_find( interface.names() );
+	}
+
+	void registry::insert( const module& module )
+	{
+		ipc::memory::rpc< void ( module::info_tuple, const module::name_vector& ) >
+			registry_insert( client, 2 );
+		registry_insert( module.info(), module.names() );
 	}
 }
