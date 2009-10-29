@@ -137,7 +137,7 @@ namespace ooe
 		message.msg_control = &payload;
 		message.msg_controllen = sizeof( payload );
 
-		u8 dummy;
+		u8 dummy = 0;
 		vector.iov_base = &dummy;
 		vector.iov_len = 1;
 
