@@ -1,9 +1,11 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include <iostream>
+#include <vector>
 
 #include <cerrno>
 #include <csignal>
+#include <cstdarg>
 
 #include <sys/wait.h>
 
@@ -154,6 +156,36 @@ namespace ooe
 	bool fork_io::is_child( void ) const
 	{
 		return !id->pid;
+	}
+
+	void fork_io::execute( const std::string& path, ... )
+	{
+		try
+		{
+			std::vector< const c8* > argument;
+			argument.push_back( path.c_str() );
+			const c8* string;
+
+			va_list list;
+			va_start( list, path );
+
+			do
+			{
+				string = va_arg( list, const c8* );
+				argument.push_back( string );
+			}
+			while ( string );
+
+			va_end( list );
+			execv( path.c_str(), const_cast< c8** >( &argument[ 0 ] ) );
+			OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error::number( errno ) );
+		}
+		catch ( std::exception& error )
+		{
+			OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error.what() );
+		}
+
+		exit( false );
 	}
 
 	void fork_io::exit( bool success )

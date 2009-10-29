@@ -24,8 +24,6 @@ namespace ooe
 		void emergency( emergency_handler_type ) OOE_VISIBLE;
 
 		s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
-		pid_t spawn( const std::string&, ... ) OOE_VISIBLE;
-
 		path_tuple path( void ) OOE_VISIBLE;
 		bool path( c8*, up_t );
 	}

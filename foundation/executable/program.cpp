@@ -1,13 +1,10 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include <iostream>
-#include <vector>
 
 #include <cerrno>
 #include <climits>
 #include <csignal>
-#include <cstdarg>
-#include <cstdlib>
 
 #include <fcntl.h>
 
@@ -126,44 +123,6 @@ namespace ooe
 		}
 
 		return status;
-	}
-
-	pid_t executable::spawn( const std::string& path, ... )
-	{
-		pid_t pid = fork();
-
-		if ( pid == -1 )
-			throw error::runtime( "executable::spawn: " ) <<
-				"Unable to fork process: " << error::number( errno );
-		else if ( pid )
-			return pid;
-
-		try
-		{
-			std::vector< const c8* > argument;
-			argument.push_back( path.c_str() );
-			const c8* string;
-
-			va_list list;
-			va_start( list, path );
-
-			do
-			{
-				string = va_arg( list, const c8* );
-				argument.push_back( string );
-			}
-			while ( string );
-
-			va_end( list );
-			execv( path.c_str(), const_cast< c8** >( &argument[ 0 ] ) );
-			OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error::number( errno ) );
-		}
-		catch ( std::exception& error )
-		{
-			OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error.what() );
-		}
-
-		_exit( EXIT_FAILURE );
 	}
 
 	executable::path_tuple executable::path( void )
