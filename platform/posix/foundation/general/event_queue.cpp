@@ -1,5 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include <iostream>
+
 #include <X11/Xutil.h>
 
 #include "foundation/utility/error.hpp"
@@ -12,7 +14,7 @@ namespace ooe
 {
 //--- platform::event_queue ----------------------------------------------------
 	platform::event_queue::event_queue( void )
-		: display( XOpenDisplay( 0 ) ), wm_delete(), configure(), x(), y()
+		: display( XOpenDisplay( 0 ) ), wm_delete(), x(), y(), grab(), warp()
 	{
 		if ( !display )
 			throw error::runtime( "view: " ) << "Display not opened";
@@ -39,8 +41,9 @@ namespace ooe
 			switch ( xevent.type )
 			{
 			case MotionNotify:
-				event.motion.x = xevent.xmotion.x + x;
-				event.motion.y = xevent.xmotion.y + y;
+				event.motion.x = xevent.xmotion.x - x;
+				event.motion.y = xevent.xmotion.y - y;
+				warp();
 				return event::motion_flag;
 
 			case KeyRelease:
@@ -70,9 +73,7 @@ namespace ooe
 					break;
 
 			case ConfigureNotify:
-				x = xevent.xconfigure.x;
-				y = xevent.xconfigure.y;
-				configure();
+				grab();
 				break;
 
 			default:

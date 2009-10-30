@@ -27,15 +27,18 @@ namespace ooe
 	{
 	public:
 		const event_queue& queue;
+		u16 width;
+		u16 height;
 		u32 window;
 		mutable XVisualInfo* visual_info;
 
 	protected:
-		view_data( const event_queue& );
+		view_data( const event_queue&, u16, u16 );
 		~view_data( void );
 
 	private:
-		void configure( void );
+		void grab( void );
+		void warp( void );
 	};
 
 	class platform::view

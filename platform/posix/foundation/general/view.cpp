@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include <X11/Xutil.h>
-#include <X11/extensions/xf86dga.h>
 #include <X11/extensions/Xrandr.h>
 
 #include "foundation/general/event_queue.hpp"
@@ -26,13 +25,10 @@ namespace
 	{
 		XGrabKeyboard( display, window, true, GrabModeAsync, GrabModeAsync, CurrentTime );
 		XGrabPointer( display, window, true, 0, GrabModeAsync, GrabModeAsync, 0, 0, CurrentTime );
-		XF86DGADirectVideo( display, DefaultScreen( display ), XF86DGADirectMouse );
-		XWarpPointer( display, 0, window, 0, 0, 0, 0, 0, 0 );
 	}
 
 	void ungrab( Display* display )
 	{
-		XF86DGADirectVideo( display, DefaultScreen( display ), 0 );
 		XUngrabPointer( display, CurrentTime );
 		XUngrabKeyboard( display, CurrentTime );
 	}
@@ -41,33 +37,38 @@ namespace
 namespace ooe
 {
 //--- platform::view_data ------------------------------------------------------
-	platform::view_data::view_data( const event_queue& queue_ )
-		: queue( queue_ ), window( 0 ), visual_info( 0 )
+	platform::view_data::view_data( const event_queue& queue_, u16 width_, u16 height_ )
+		: queue( queue_ ), width( width_ ), height( height_ ), window( 0 ), visual_info( 0 )
 	{
-		queue.configure = make_function( *this, &view_data::configure );
+		queue.grab = make_function( *this, &view_data::grab );
+		queue.warp = make_function( *this, &view_data::warp );
 		reinterpret_cast< choose_type >
 			( library::find( "ooe_opengl_choose", library::next ).function )( *this );
 	}
 
 	platform::view_data::~view_data( void )
 	{
-		if ( visual_info )	// XFree can not be called with null (see man page)
+		// XFree can not be called with null (see man page)
+		if ( visual_info )
 			XFree( visual_info );
 	}
 
-	void platform::view_data::configure( void )
+	void platform::view_data::grab( void )
 	{
-		ungrab( queue.display );
-		grab( queue.display, window );
+		::grab( queue.display, window );
+		warp();
+		queue.x = width / 2;
+		queue.y = height / 2;
+	}
 
-		// remove corresponding motion notify event
-		XEvent event;
-		XWindowEvent( queue.display, window, PointerMotionMask, &event );
+	void platform::view_data::warp( void )
+	{
+		XWarpPointer( queue.display, 0, window, 0, 0, 0, 0, width / 2, height / 2 );
 	}
 
 //--- view_data ----------------------------------------------------------------
-	view_data::view_data( const event_queue& queue_, u16 width, u16 height, bool full )
-		: platform::view_data( queue_ )
+	view_data::view_data( const event_queue& queue_, u16 width_, u16 height_, bool full )
+		: platform::view_data( queue_, width_, height_ )
 	{
 		u32 root = DefaultRootWindow( queue.display );
 		u32 mask = CWEventMask | CWColormap;
@@ -118,8 +119,8 @@ namespace ooe
 	}
 
 //--- view ---------------------------------------------------------------------
-	view::view( const event_queue& queue_, u16 width, u16 height, bool full )
-		: view_data( queue_, width, height, full ), platform::view( queue_, full )
+	view::view( const event_queue& queue_, u16 width_, u16 height_, bool full )
+		: view_data( queue_, width_, height_, full ), platform::view( queue_, full )
 	{
 		if ( !XMapRaised( queue.display, window ) )
 			throw error::runtime( "view: " ) << "Unable to map window";
@@ -144,7 +145,7 @@ namespace ooe
 
 	view::~view( void )
 	{
-		ungrab( queue.display );
+		::ungrab( queue.display );
 
 		if ( !config )
 			return;
