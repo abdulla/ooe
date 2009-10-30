@@ -12,8 +12,7 @@ if not build.GetOption( 'clean' ):
 		Exit( 1 )
 
 	if name == 'posix':
-		for i in ooe.x11.library:
-			if not setup.CheckLib( i ): Exit( 1 )
+		if not setup.CheckLib( ooe.x11.library ): Exit( 1 )
 
 	build = setup.Finish()
 

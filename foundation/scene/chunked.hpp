@@ -102,7 +102,7 @@ namespace ooe
 		const ooe::tqt tqt;
 		const ooe::memory memory;
 		const chunked_header& header;
-		chunk::array_type chunk;
+		ooe::chunk::array_type chunk;
 		f32 lod;
 
 		ooe::scheduler& scheduler;

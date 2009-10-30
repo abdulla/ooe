@@ -34,4 +34,4 @@ class ooe:
 		library = [ 'rt' ]
 
 	class x11:
-		library = [ 'Xrandr', 'Xxf86dga' ]
+		library = [ 'Xrandr' ]
