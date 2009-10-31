@@ -54,17 +54,21 @@ namespace ooe
 		return epoch_t( value.tv_sec, value.tv_usec * 1000 );
 	}
 
-	void timer::sleep( epoch_t& time )
+	epoch_t timer::sleep( const epoch_t& time )
 	{
-		if ( time._1 >= 1000000000 )
+		epoch_t period( time );
+
+		if ( period._1 >= 1000000000 )
 		{
-			time._0 += time._1 / 1000000000;
-			time._1 %= 1000000000;
+			period._0 += period._1 / 1000000000;
+			period._1 %= 1000000000;
 		}
 
-		timespec* spec = reinterpret_cast< timespec* >( &time );
+		timespec* spec = reinterpret_cast< timespec* >( &period );
 
 		if ( nanosleep( spec, spec ) )
 			throw error::runtime( "timer: " ) << "Unable to sleep: " << error::number( errno );
+
+		return period;
 	}
 }

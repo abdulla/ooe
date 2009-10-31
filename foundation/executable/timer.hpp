@@ -23,7 +23,7 @@ namespace ooe
 		epoch_t get( void ) const;
 
 		static epoch_t epoch( void );
-		static void sleep( epoch_t& );
+		static epoch_t sleep( const epoch_t& );
 
 	private:
 		epoch_t time;
