@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <climits>
 #include <csignal>
+#include <cstdlib>
 
 #include <fcntl.h>
 
