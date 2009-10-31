@@ -57,7 +57,6 @@ namespace ooe
 		memory memory( initialise( desc, width, height, offset ) );
 
 		u8 index = 0;
-		epoch_t sleep( 0, 15000000 );
 		video_mmap map = { index, height, width, VIDEO_PALETTE_RGB24 };
 
 		for ( ; state; index = 1 - index )
@@ -66,7 +65,7 @@ namespace ooe
 			desc.control( VIDIOCMCAPTURE, &map );
 			desc.control( VIDIOCSYNC, &index );
 			call( memory.as< u8 >() + offset[ index ] );
-			timer::sleep( sleep );
+			timer::sleep( epoch_t( 0, 15000000 ) );
 		}
 	}
 

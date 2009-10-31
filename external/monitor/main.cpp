@@ -117,8 +117,7 @@ namespace
 		event event;
 		while ( queue.next_event( event ) ) {}
 #else
-		epoch_t snooze( 1000000, 0 );
-		while ( true ) timer::sleep( snooze );
+		while ( true ) timer::sleep( epoch_t( 1000000000, 0 ) );
 #endif
 
 		return true;
