@@ -52,8 +52,7 @@ namespace ooe
 			library& library = load( name );
 
 			typedef close_type ( * function_type )( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, & a ) );
-			function_type function =
-				reinterpret_cast< function_type >( library.find( symbol ).function );
+			function_type function = library.find< function_type >( symbol ).function;
 			close_type close = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 
 			scoped< void ( void* ) > scoped( close._1, close._0 );
@@ -81,8 +80,7 @@ namespace ooe
 			library& library = load( name );
 
 			typedef void ( * function_type )( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, & a ) );
-			function_type function =
-				reinterpret_cast< function_type >( library.find( symbol ).function );
+			function_type function = library.find< function_type >( symbol ).function;
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 		}
 

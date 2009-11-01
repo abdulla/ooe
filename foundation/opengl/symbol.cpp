@@ -14,8 +14,7 @@ namespace
 		signature address( const c8* name )
 	{
 		signature function = 0;
-		OOE_IGNORE( function =
-			reinterpret_cast< signature >( library::find( name, library::all ).function ) );
+		OOE_IGNORE( function = library::find< signature >( name, library::all ).function );
 
 		if ( function )
 			return function;
