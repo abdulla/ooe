@@ -1,6 +1,5 @@
-Import( Split( 'name ooe platform root' ) )
+Import( Split( 'name platform root' ) )
 build = root.Clone()
-build.Append( LIBS = ooe.rt.library )
 
 if name == 'darwin':
 	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libipc.dylib' )

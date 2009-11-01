@@ -1,6 +1,6 @@
 Import( Split( 'name ooe platform root' ) )
 build = root.Clone()
-build.Append( LIBS = ooe.dl.library )
+build.Append( LIBS = ooe.dl.library + ooe.rt.library )
 
 if name == 'darwin':
 	build.Append( FRAMEWORKS = ooe.appkit.framework )
