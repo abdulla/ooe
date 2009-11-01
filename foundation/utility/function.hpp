@@ -11,22 +11,16 @@
 namespace ooe
 {
 	template< typename >
-		struct invoke_f;	// function
+		struct invoke_function;
 
 	template< typename, typename >
-		struct invoke_o;	// object
+		struct invoke_member;
 
 	template< typename, typename >
-		struct invoke_c;	// const object
-
-	template< typename, typename >
-		struct invoke_p;	// object + function
-
-	template< typename, typename >
-		struct invoke_d;	// const object + function
+		struct invoke_pointer;
 
 	template< typename >
-		struct invoke_n;	// null
+		struct invoke_null;
 
 	template< typename >
 		struct function;
@@ -59,9 +53,9 @@ namespace ooe
 
 namespace ooe
 {
-//--- invoke_f -----------------------------------------------------------------
+//--- invoke_function ----------------------------------------------------------
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct invoke_f< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static r call( const bound_any& any BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) )
@@ -71,9 +65,9 @@ namespace ooe
 		}
 	};
 
-//--- invoke_o -----------------------------------------------------------------
+//--- invoke_member ------------------------------------------------------------
 	template< typename type, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct invoke_o< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct invoke_member< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static r call( const bound_any& any BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) )
@@ -84,22 +78,9 @@ namespace ooe
 		}
 	};
 
-//--- invoke_c -----------------------------------------------------------------
+//--- invoke_pointer -----------------------------------------------------------
 	template< typename type, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct invoke_c< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-	{
-		static r call( const bound_any& any BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) )
-		{
-			return ( static_cast< const type* >( any.object.pointer )->*
-				reinterpret_cast< r ( type::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-				( any.object.member ) )( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-		}
-	};
-
-//--- invoke_p -----------------------------------------------------------------
-	template< typename type, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct invoke_p< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct invoke_pointer< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static r call( const bound_any& any BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) )
@@ -110,23 +91,9 @@ namespace ooe
 		}
 	};
 
-//--- invoke_d -----------------------------------------------------------------
-	template< typename type, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct invoke_d< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-	{
-		static r call( const bound_any& any BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) )
-		{
-			return reinterpret_cast< r ( * )
-				( const type& BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) ) >( any.object.function )
-				( *static_cast< const type* >( any.object.pointer )
-				BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-		}
-	};
-
-//--- invoke_n -----------------------------------------------------------------
+//--- invoke_null --------------------------------------------------------------
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct invoke_n< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+		struct invoke_null< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
 		static r call( const bound_any& BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type BOOST_PP_INTERCEPT ) ) OOE_CONST
@@ -141,41 +108,35 @@ namespace ooe
 	{
 	public:
 		function( void )
-			: call( invoke_n< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ), pointer( 0 )
+			: call( invoke_null< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ), pointer( 0 )
 		{
 		}
 
 		function( r ( * function_ )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) )
-			: call( invoke_f< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ), pointer( function_ )
+			: call( invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
+			pointer( function_ )
 		{
 		}
 
 		template< typename type >
 			function( type& object, r ( type::* member )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) )
-			: call( invoke_o< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
+			: call( invoke_member< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
 			pointer( bound_any( &object, member ) )
 		{
 		}
 
 		template< typename type >
 			function( type& object, r ( type::* member )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) const )
-			: call( invoke_o< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
+			: call( invoke_member< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
 			pointer( bound_any( &object,
 				reinterpret_cast< r ( type::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >( member ) ) )
 		{
 		}
 
 		template< typename type >
-			function( const type& object, r ( type::* member )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) )
-			: call( invoke_c< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
-			pointer( bound_any( &object, member ) )
-		{
-		}
-
-		template< typename type >
 			function( const type& object,
 			r ( type::* member )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) const )
-			: call( invoke_c< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
+			: call( invoke_member< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
 			pointer( bound_any( &object,
 				reinterpret_cast< r ( type::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >( member ) ) )
 		{
@@ -184,7 +145,7 @@ namespace ooe
 		template< typename type >
 			function( type& object,
 			r ( * function_ )( type& BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) ) )
-			: call( invoke_p< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
+			: call( invoke_pointer< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
 			pointer( bound_any( &object, function_ ) )
 		{
 		}
@@ -192,14 +153,14 @@ namespace ooe
 		template< typename type >
 			function( const type& object,
 			r ( * function_ )( const type& BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) ) )
-			: call( invoke_d< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
+			: call( invoke_pointer< type, r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call ),
 			pointer( bound_any( &object, function_ ) )
 		{
 		}
 
 		void clear( void )
 		{
-			this->call = invoke_n< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call;
+			this->call = invoke_null< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call;
 		}
 
 		r operator ()( BOOST_PP_ENUM_BINARY_PARAMS
