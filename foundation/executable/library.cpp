@@ -45,6 +45,19 @@ namespace
 			throw error::runtime( "library: " ) << "Unknown find type: " << flag;
 		}
 	}
+
+	void* find( void* id, const std::string& name )
+	{
+		void* symbol = dlsym( id, name.c_str() );
+		const c8* error = dlerror();
+
+		if ( error )
+			throw error::runtime( "library: " ) << "Unable to find \"" << name << "\": " << error;
+		else if ( !symbol )	// needed due to gcc visibility
+			throw error::runtime( "library: " ) << "Null symbol found";
+
+		return symbol;
+	}
 }
 
 namespace ooe
@@ -64,29 +77,13 @@ namespace ooe
 			OOE_WARNING( "library", "Unable to close: " << dlerror() );
 	}
 
-	ooe::symbol<> library::find( const std::string& name ) const
+	void* library::find( const std::string& name ) const
 	{
-		ooe::symbol<> symbol( dlsym( id, name.c_str() ) );
-		const c8* error = dlerror();
-
-		if ( error )
-			throw error::runtime( "library: " ) << "Unable to find \"" << name << "\": " << error;
-		else if ( !symbol.function )	// needed due to gcc visibility
-			throw error::runtime( "library: " ) << "Null symbol found";
-
-		return symbol;
+		return ::find( id, name );
 	}
 
-	ooe::symbol<> library::find( const std::string& name, find_type flag )
+	void* library::find( const std::string& name, find_type flag )
 	{
-		ooe::symbol<> symbol( dlsym( mode( flag ), name.c_str() ) );
-		const c8* error = dlerror();
-
-		if ( error )
-			throw error::runtime( "library: " ) << "Unable to find \"" << name << "\": " << error;
-		else if ( !symbol.function )	// needed due to gcc visibility
-			throw error::runtime( "library: " ) << "Null symbol found";
-
-		return symbol;
+		return ::find( mode( flag ), name );
 	}
 }

@@ -32,8 +32,20 @@ namespace ooe
 		library( const std::string&, type = local_lazy );
 		~library( void );
 
-		ooe::symbol<> find( const std::string& ) const;
-		static ooe::symbol<> find( const std::string&, find_type );
+		void* find( const std::string& ) const;
+		static void* find( const std::string&, find_type );
+
+		template< typename type >
+			symbol< type > find( const std::string& name ) const
+		{
+			return find( name );
+		}
+
+		template< typename type >
+			static symbol< type > find( const std::string& name, find_type flag )
+		{
+			return find( name, flag );
+		}
 
 	private:
 		void* id;
