@@ -13,7 +13,7 @@ namespace ooe
 	{
 		timespec value;
 
-		if ( clock_gettime( CLOCK_MONOTONIC_RAW, &value ) )
+		if ( clock_gettime( CLOCK_MONOTONIC, &value ) )
 			throw error::runtime( "timer: " ) << "Unable to get time: " << error::number( errno );
 
 		return epoch_t( value.tv_sec, value.tv_nsec );
