@@ -9,10 +9,10 @@ namespace
 {
 	using namespace ooe;
 
-	std::string validate_internal( const module::info_tuple& info )
+	const std::string& validate( const module::info_tuple& info, module::type type )
 	{
-		if ( info._0 != module::library )
-			throw error::runtime( "internal: " ) << "Info " << info << " does not name a library";
+		if ( info._0 != type )
+			throw error::runtime( "internal: " ) << "Info " << info << " does not name a " << type;
 
 		return info._1;
 	}
@@ -66,17 +66,36 @@ namespace ooe
 		module::name_vector::iterator i = std::lower_bound( names_.begin(), names_.end(), name );
 
 		if ( i != names_.end() && *i == name )
-			throw error::runtime( "module: " ) << "Function " << name << " exists";
+			throw error::runtime( "interface: " ) << "Function " << name << " exists";
 
 		names_.insert( i, name );
 	}
 
 //--- internal -----------------------------------------------------------------
 	internal::internal( const module::info_tuple& info )
-		: library( validate_internal( info ) ),
+		: library( validate( info, module::library ) ),
 		module( library.find< ooe::module ( * )( void ) >( "" ).function() )
 	{
 	}
 
+	any internal::search( const module::name_tuple& name ) const
+	{
+		const module::name_vector& names = module.names();
+		module::name_vector::const_iterator i =
+			std::lower_bound( names.begin(), names.end(), name );
+
+		if ( i == names.end() )
+			throw error::runtime( "internal: " ) << "Unable to find " << name;
+
+		const module::datum_vector& data = module.data();
+		module::datum_vector::const_iterator j = data.begin();
+		std::advance( j, std::distance( names.begin(), i ) );
+		return *j;
+	}
+
 //--- external -----------------------------------------------------------------
+	external::external( const module::info_tuple& info )
+		: client( validate( info, module::server ) )
+	{
+	}
 }

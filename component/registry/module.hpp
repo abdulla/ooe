@@ -8,6 +8,7 @@
 
 #include "foundation/executable/library.hpp"
 #include "foundation/ipc/memory/client.hpp"
+#include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/traits.hpp"
@@ -59,6 +60,22 @@ namespace ooe
 		datum_vector data_;
 	};
 
+	template< typename type >
+		type& operator <<( type& out, module::type value )
+	{
+		switch ( value )
+		{
+		case module::library:
+			return out << "library";
+
+		case module::server:
+			return out << "server";
+
+		default:
+			return out;
+		}
+	}
+
 //--- interface ----------------------------------------------------------------
 	class interface
 	{
@@ -91,20 +108,24 @@ namespace ooe
 	{
 	public:
 		internal( const module::info_tuple& ) OOE_VISIBLE;
-		any search( const module::name_tuple& ) OOE_VISIBLE;
+		any search( const module::name_tuple& ) const OOE_VISIBLE;
 
 		template< typename type >
-			type find( const module::name_tuple& name,
-			typename enable_if< is_function_pointer< type > >::type* = 0 )
+			type find( const std::string& name,
+			typename enable_if< is_function_pointer< type > >::type* = 0 ) const
 		{
-			return search( name );
+			typedef typename remove_pointer< type >::type function_type;
+			module::name_tuple tuple( name, typeid( function_type ).name() );
+			return reinterpret_cast< type >( search( tuple ).function );
 		}
 
 		template< typename type >
-			type find( const module::name_tuple& name,
-			typename enable_if< is_member_function_pointer< type > >::type* = 0 )
+			type find( const std::string& name,
+			typename enable_if< is_member_function_pointer< type > >::type* = 0 ) const
 		{
-			return search( name );
+			typedef typename function_of< type >::type signature_type;
+			module::name_tuple tuple( name, typeid( signature_type ).name() );
+			return reinterpret_cast< type >( search( tuple ).member );
 		}
 
 	private:
@@ -117,6 +138,12 @@ namespace ooe
 	{
 	public:
 		external( const module::info_tuple& );
+
+		template< typename type >
+			ipc::memory::rpc< type > find( const std::string& name )
+		{
+			return ipc::memory::call< type >( client, name );
+		}
 
 	private:
 		ipc::memory::client client;
