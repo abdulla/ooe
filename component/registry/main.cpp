@@ -25,9 +25,9 @@ namespace
 			modules.insert( module_map::value_type( *i, info ) );
 	}
 
-	registry::info_vector find( const interface::name_vector& names )
+	registry::info_vector find( const module::name_vector& names )
 	{
-		typedef interface::name_vector::const_iterator name_iterator;
+		typedef module::name_vector::const_iterator name_iterator;
 		typedef std::map< module::info_tuple, up_t > histogram_map;
 		histogram_map histogram;
 

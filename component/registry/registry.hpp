@@ -3,7 +3,6 @@
 #ifndef OOE_COMPONENT_REGISTRY_REGISTRY_HPP
 #define OOE_COMPONENT_REGISTRY_REGISTRY_HPP
 
-#include "component/registry/interface.hpp"
 #include "component/registry/module.hpp"
 #include "foundation/ipc/memory/client.hpp"
 

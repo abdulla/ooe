@@ -13,8 +13,7 @@ namespace ooe
 
 	registry::info_vector registry::find( const interface& interface )
 	{
-		ipc::memory::rpc< info_vector ( const interface::name_vector& ) >
-			registry_find( client, 1 );
+		ipc::memory::rpc< info_vector ( const module::name_vector& ) > registry_find( client, 1 );
 		return registry_find( interface.names() );
 	}
 
