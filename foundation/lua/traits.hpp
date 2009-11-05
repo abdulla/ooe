@@ -167,7 +167,7 @@ namespace ooe
 		r operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) )
 		{
 			stack.rawgeti( registry, ref );
-			BOOST_PP_REPEAT( LIMIT, PUSH, ~ );
+			BOOST_PP_REPEAT( LIMIT, PUSH, ~ )
 			stack.pcall( LIMIT, !is_same< r, void >::value );
 
 			return traits< r >::to( stack, -1 );

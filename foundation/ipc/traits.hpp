@@ -195,7 +195,7 @@ namespace ooe
 			typename call_traits< t >::reference BOOST_PP_EXPR_IF( LIMIT, value ) )
 		{
 			const u8* pointer = buffer;
-			BOOST_PP_REPEAT( LIMIT, TUPLE_READ, _ )
+			BOOST_PP_REPEAT( LIMIT, TUPLE_READ, ~ )
 			return pointer - buffer;
 		}
 	};
@@ -207,7 +207,7 @@ namespace ooe
 			typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, value ) )
 		{
 			u8* pointer = buffer;
-			BOOST_PP_REPEAT( LIMIT, TUPLE_WRITE, _ )
+			BOOST_PP_REPEAT( LIMIT, TUPLE_WRITE, ~ )
 			return pointer - buffer;
 		}
 	};
@@ -224,7 +224,7 @@ namespace ooe
 			call( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) )
 			OOE_PURE
 		{
-			return 0 BOOST_PP_REPEAT( LIMIT, SIZE, _ );
+			return 0 BOOST_PP_REPEAT( LIMIT, SIZE, ~ );
 		}
 	};
 
@@ -239,7 +239,7 @@ namespace ooe
 		static void call( const u8* BOOST_PP_EXPR_IF( LIMIT, buffer )
 			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, typename no_ref< t, >::type& a ) )
 		{
-			BOOST_PP_REPEAT( LIMIT, READ, _ )
+			BOOST_PP_REPEAT( LIMIT, READ, ~ )
 		}
 	};
 
@@ -254,7 +254,7 @@ namespace ooe
 		static void call( u8* BOOST_PP_EXPR_IF( LIMIT, buffer ) BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) )
 		{
-			BOOST_PP_REPEAT( LIMIT, WRITE, _ )
+			BOOST_PP_REPEAT( LIMIT, WRITE, ~ )
 		}
 	};
 }

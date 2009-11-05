@@ -143,7 +143,7 @@ namespace ooe
 			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
-			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ );
+			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 			return_write( buffer_ptr, socket );
 		}
