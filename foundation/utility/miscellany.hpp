@@ -83,9 +83,9 @@ namespace ooe
 
 //--- destroy ------------------------------------------------------------------
 	template< typename type >
-		void destroy( void* object )
+		void destroy( const void* object )
 	{
-		delete static_cast< type* >( object );
+		delete static_cast< const type* >( object );
 	}
 
 //--- destruct -----------------------------------------------------------------
