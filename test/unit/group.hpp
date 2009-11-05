@@ -39,7 +39,7 @@ namespace ooe
 		typedef void ( * function_type )( void* );
 		typedef std::vector< function_type > vector_type;
 		typedef vector_type::const_iterator iterator_type;
-		typedef tuple< void*, void ( * )( void* ) > setup_tuple;
+		typedef tuple< void*, void ( * )( const void* ) > setup_tuple;
 
 		virtual ~group_base( void ) {}
 		virtual setup_tuple create_setup( void ) = 0;

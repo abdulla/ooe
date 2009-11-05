@@ -83,16 +83,16 @@ namespace ooe
 		: private noncopyable
 	{
 	public:
-		typedef void ( * function_type )( void* );
+		typedef void ( * function_type )( const void* );
 
 		~pool( void );
 
-		void insert( void*, function_type ) OOE_VISIBLE;
-		void erase( void* ) OOE_VISIBLE;
-		bool find( void* ) const OOE_VISIBLE;
+		void insert( const void*, function_type ) OOE_VISIBLE;
+		void erase( const void* ) OOE_VISIBLE;
+		bool find( const void* ) const OOE_VISIBLE;
 
 	private:
-		typedef std::map< void*, function_type > map_type;
+		typedef std::map< const void*, function_type > map_type;
 
 		map_type map;
 	};

@@ -70,7 +70,7 @@ namespace
 	vector_type run_group( unit::group_base& group, time_t time_out )
 	{
 		unit::group_base::setup_tuple tuple = group.create_setup();
-		scoped< void ( void* ) > scoped_setup( tuple._1, tuple._0 );
+		scoped< void ( const void* ) > scoped_setup( tuple._1, tuple._0 );
 		list_type list;
 		up_t j = 0;
 
