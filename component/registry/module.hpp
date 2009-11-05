@@ -4,20 +4,32 @@
 #define OOE_COMPONENT_REGISTRY_MODULE_HPP
 
 #include <typeinfo>
+#include <map>
 #include <vector>
 
 #include "foundation/executable/library.hpp"
-#include "foundation/ipc/memory/client.hpp"
-#include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/utility/macro.hpp"
+#include "foundation/utility/pointer.hpp"
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/traits.hpp"
 #include "foundation/utility/tuple.hpp"
 
 namespace ooe
 {
+//--- facade_id ----------------------------------------------------------------
+	struct facade_id
+	{
+		typedef void ( * function_type )( const void* );
+
+		const void* pointer;
+		function_type function;
+
+		facade_id( const void*, function_type );
+		~facade_id( void );
+	};
+
 //--- module -------------------------------------------------------------------
-	class module
+	class OOE_VISIBLE module
 	{
 	public:
 		enum type
@@ -30,51 +42,31 @@ namespace ooe
 		typedef tuple< std::string, std::string > name_tuple;
 		typedef std::vector< name_tuple > name_vector;
 		typedef std::vector< any > datum_vector;
+		typedef shared_ptr< facade_id > facade_ptr;
+		typedef std::map< std::string, facade_ptr > facade_map;
 
-		module( type, const std::string& ) OOE_VISIBLE;
+		module( type, const std::string& );
 
-		const info_tuple& info( void ) const OOE_VISIBLE;
-		const name_vector& names( void ) const OOE_VISIBLE;
-		const datum_vector& data( void ) const OOE_VISIBLE;
-		void insert( const name_tuple&, any ) OOE_VISIBLE;
+		const info_tuple& info( void ) const;
+		const name_vector& names( void ) const;
+		const datum_vector& data( void ) const;
+		up_t insert( const name_tuple&, any );
 
-		template< typename type >
-			void insert( const std::string& name, type function,
-			typename enable_if< is_function_pointer< type > >::type* = 0 )
-		{
-			typedef typename remove_pointer< type >::type function_type;
-			insert( name_tuple( name, typeid( function_type ).name() ), function );
-		}
+		const void* facade( const std::string& ) const;
+		void insert( const std::string&, const facade_ptr& );
 
 		template< typename type >
-			void insert( const std::string& name, type member,
-			typename enable_if< is_member_function_pointer< type > >::type* = 0 )
+			void insert( const std::string& name, const type* pointer )
 		{
-			typedef typename function_of< type >::type signature_type;
-			insert( name_tuple( name, typeid( signature_type ).name() ), member );
+			insert( name, new facade_id( pointer, destroy< type > ) );
 		}
 
 	private:
 		info_tuple info_;
 		name_vector names_;
 		datum_vector data_;
+		facade_map facades;
 	};
-
-	template< typename type >
-		type& operator <<( type& out, module::type value )
-	{
-		switch ( value )
-		{
-		case module::library:
-			return out << "library";
-
-		case module::server:
-			return out << "server";
-
-		default:
-			return out;
-		}
-	}
 
 //--- interface ----------------------------------------------------------------
 	class interface
@@ -108,7 +100,7 @@ namespace ooe
 	{
 	public:
 		internal( const module::info_tuple& ) OOE_VISIBLE;
-		any search( const module::name_tuple& ) const OOE_VISIBLE;
+		any find( const module::name_tuple& ) const OOE_VISIBLE;
 
 		template< typename type >
 			type find( const std::string& name,
@@ -116,7 +108,7 @@ namespace ooe
 		{
 			typedef typename remove_pointer< type >::type function_type;
 			module::name_tuple tuple( name, typeid( function_type ).name() );
-			return reinterpret_cast< type >( search( tuple ).function );
+			return reinterpret_cast< type >( find( tuple ).function );
 		}
 
 		template< typename type >
@@ -125,28 +117,12 @@ namespace ooe
 		{
 			typedef typename function_of< type >::type signature_type;
 			module::name_tuple tuple( name, typeid( signature_type ).name() );
-			return reinterpret_cast< type >( search( tuple ).member );
+			return reinterpret_cast< type >( find( tuple ).member );
 		}
 
 	private:
 		ooe::library library;
 		ooe::module module;
-	};
-
-//--- external -----------------------------------------------------------------
-	class external
-	{
-	public:
-		external( const module::info_tuple& );
-
-		template< typename type >
-			ipc::memory::rpc< type > find( const std::string& name )
-		{
-			return ipc::memory::call< type >( client, name );
-		}
-
-	private:
-		ipc::memory::client client;
 	};
 }
 
