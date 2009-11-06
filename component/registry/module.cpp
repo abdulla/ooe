@@ -32,16 +32,6 @@ namespace ooe
 	}
 
 //--- module -------------------------------------------------------------------
-	module::module( type t, const std::string& s )
-		: info_( t, s ), names_(), data_(), facades()
-	{
-	}
-
-	const module::info_tuple& module::info( void ) const
-	{
-		return info_;
-	}
-
 	const module::name_vector& module::names( void ) const
 	{
 		return names_;
@@ -107,7 +97,7 @@ namespace ooe
 //--- internal -----------------------------------------------------------------
 	internal::internal( const module::info_tuple& info )
 		: library( validate( info ) ),
-		module( library.find< ooe::module ( * )( void ) >( "" ).function() )
+		module( library.find< ooe::module ( void ) >( "module_open" )() )
 	{
 	}
 

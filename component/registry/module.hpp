@@ -45,9 +45,6 @@ namespace ooe
 		typedef shared_ptr< facade_id > facade_ptr;
 		typedef std::map< std::string, facade_ptr > facade_map;
 
-		module( type, const std::string& );
-
-		const info_tuple& info( void ) const;
 		const name_vector& names( void ) const;
 		const datum_vector& data( void ) const;
 		up_t insert( const name_tuple&, any );
@@ -62,7 +59,6 @@ namespace ooe
 		}
 
 	private:
-		info_tuple info_;
 		name_vector names_;
 		datum_vector data_;
 		facade_map facades;

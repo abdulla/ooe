@@ -6,23 +6,59 @@
 #include "component/registry/registry.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/semaphore.hpp"
+#include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
+#include "foundation/parallel/lock.hpp"
 
 namespace
 {
 	using namespace ooe;
 
-	//--------------------------------------------------------------------------
+	//--- globals --------------------------------------------------------------
 	typedef std::multimap< module::name_tuple, module::info_tuple > module_map;
 	std::string self;
 	module_map modules;
+	read_write mutex;
 
-	void insert( const module::info_tuple& info, const module::name_vector& names )
+	//--------------------------------------------------------------------------
+	module::name_vector load_library( const std::string& path )
+	{
+		library library( path );
+		ooe::module module = library.find< ooe::module ( void ) >( "module_open" )();
+		return module.names();
+	}
+
+	module::name_vector load_server( const std::string& path )
+	{
+		ipc::memory::client client( path );
+		return ipc::memory::list( client )();
+	}
+
+	//--- ipc functions --------------------------------------------------------
+	void insert( const module::info_tuple& info )
 	{
 		typedef module::name_vector::const_iterator iterator_type;
+		module::name_vector names;
+
+		switch ( info._0 )
+		{
+		case module::library:
+			names = load_library( info._1 );
+			break;
+
+		case module::server:
+			names = load_server( info._1 );
+			break;
+
+		default:
+			throw error::runtime( "module: " ) << "Unknown module type: " << info._0;
+		}
 
 		for ( iterator_type i = names.begin(), end = names.end(); i != end; ++i )
+		{
+			write_lock lock( mutex );
 			modules.insert( module_map::value_type( *i, info ) );
+		}
 	}
 
 	registry::info_vector find( const module::name_vector& names )
@@ -30,15 +66,19 @@ namespace
 		typedef module::name_vector::const_iterator name_iterator;
 		typedef std::map< module::info_tuple, up_t > histogram_map;
 		histogram_map histogram;
+		histogram_map::iterator k;
 
 		for ( name_iterator i = names.begin(), end = names.end(); i != end; ++i )
 		{
-			module_map::const_iterator j = modules.find( *i );
+			{
+				read_lock lock( mutex );
+				module_map::const_iterator j = modules.find( *i );
 
-			if ( j == modules.end() )
-				continue;
+				if ( j == modules.end() )
+					continue;
 
-			histogram_map::iterator k = histogram.find( j->second );
+				k = histogram.find( j->second );
+			}
 
 			if ( k == histogram.end() )
 				histogram.insert( histogram_map::value_type( k->first, 1 ) );
@@ -56,11 +96,6 @@ namespace
 		}
 
 		return vector;
-	}
-
-	void up( const std::string& name )
-	{
-		ipc::semaphore( name ).up();
 	}
 
 	//--- registry -------------------------------------------------------------
@@ -106,7 +141,7 @@ namespace
 			switch ( option )
 			{
 			case 'u':
-				up( optarg );
+				{ ipc::semaphore( optarg ).up(); }
 				break;
 
 			default:

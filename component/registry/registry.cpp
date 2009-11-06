@@ -17,10 +17,9 @@ namespace ooe
 		return registry_find( interface.names() );
 	}
 
-	void registry::insert( const module& module )
+	void registry::insert( const module::info_tuple& info )
 	{
-		ipc::memory::rpc< void ( module::info_tuple, const module::name_vector& ) >
-			registry_insert( client, 2 );
-		registry_insert( module.info(), module.names() );
+		ipc::memory::rpc< void ( module::info_tuple ) > registry_insert( client, 2 );
+		registry_insert( info );
 	}
 }

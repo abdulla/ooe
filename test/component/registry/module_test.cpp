@@ -32,7 +32,7 @@ namespace ooe
 		{
 			std::cerr << "build module\n";
 
-			module module( module::server, "/ooe.module.test" );
+			module module;
 			scoped_ptr< facade::ipc > ipc_ptr( new facade::ipc );
 
 			builder< facade::ipc > builder( module, *ipc_ptr );
