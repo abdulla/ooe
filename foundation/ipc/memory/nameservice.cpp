@@ -60,11 +60,9 @@ namespace ooe
 	{
 		if ( switchboard.insert_direct( ipc_find, this ) != 1 )
 			throw error::runtime( "ipc::nameservice: " ) << "\"find\" not at index 1";
-
-		if ( switchboard.insert_direct( ipc_list, this ) != 2 )
+		else if ( switchboard.insert_direct( ipc_list, this ) != 2 )
 			throw error::runtime( "ipc::nameservice: " ) << "\"list\" not at index 2";
-
-		if ( switchboard.insert_direct( ipc_find_all, this ) != 3 )
+		else if ( switchboard.insert_direct( ipc_find_all, this ) != 3 )
 			throw error::runtime( "ipc::nameservice: " ) << "\"find_all\" not at index 3";
 	}
 

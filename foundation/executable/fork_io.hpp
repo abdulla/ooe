@@ -40,7 +40,7 @@ namespace ooe
 		void signal( s32 ) const;
 		bool is_child( void ) const;
 
-		static void execute( const std::string&, ... );
+		static void execute( const std::string&, ... ) OOE_NORETURN;
 		static void exit( bool ) OOE_NORETURN;
 
 	private:
