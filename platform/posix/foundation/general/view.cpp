@@ -42,7 +42,7 @@ namespace ooe
 	{
 		queue.grab = make_function( *this, &view_data::grab );
 		queue.warp = make_function( *this, &view_data::warp );
-		library::find< choose_type >( "ooe_opengl_choose", library::next ).function( *this );
+		library::find< choose_type >( "ooe_opengl_choose", library::next )( *this );
 	}
 
 	platform::view_data::~view_data( void )

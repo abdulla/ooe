@@ -11,10 +11,10 @@ namespace
 	using namespace ooe;
 
 	template< typename signature >
-		signature address( const c8* name )
+		signature* address( const c8* name )
 	{
-		signature function = 0;
-		OOE_IGNORE( function = library::find< signature >( name, library::all ).function );
+		signature* function = 0;
+		OOE_IGNORE( function = library::find< signature >( name, library::all ) );
 
 		if ( function )
 			return function;
@@ -129,103 +129,103 @@ namespace ooe
 
 //--- function pointers --------------------------------------------------------
 /*** gl *******************************/
-	opengl::GetString_t opengl::GetString;
+	opengl::GetString_t* opengl::GetString;
 
-	opengl::IsEnabled_t opengl::IsEnabled;
-	opengl::Enable_t opengl::Enable;
-	opengl::Disable_t opengl::Disable;
-	opengl::EnableClientState_t opengl::EnableClientState;
-	opengl::DisableClientState_t opengl::DisableClientState;
-	opengl::EnableVertexAttribArray_t opengl::EnableVertexAttribArray;
-	opengl::DisableVertexAttribArray_t opengl::DisableVertexAttribArray;
+	opengl::IsEnabled_t* opengl::IsEnabled;
+	opengl::Enable_t* opengl::Enable;
+	opengl::Disable_t* opengl::Disable;
+	opengl::EnableClientState_t* opengl::EnableClientState;
+	opengl::DisableClientState_t* opengl::DisableClientState;
+	opengl::EnableVertexAttribArray_t* opengl::EnableVertexAttribArray;
+	opengl::DisableVertexAttribArray_t* opengl::DisableVertexAttribArray;
 
-	opengl::Hint_t opengl::Hint;
-	opengl::GetIntegerv_t opengl::GetIntegerv;
+	opengl::Hint_t* opengl::Hint;
+	opengl::GetIntegerv_t* opengl::GetIntegerv;
 
-	opengl::Clear_t opengl::Clear;
-	opengl::ClearColor_t opengl::ClearColor;
-	opengl::ClearDepth_t opengl::ClearDepth;
+	opengl::Clear_t* opengl::Clear;
+	opengl::ClearColor_t* opengl::ClearColor;
+	opengl::ClearDepth_t* opengl::ClearDepth;
 
-	opengl::Viewport_t opengl::Viewport;
-	opengl::LineWidth_t opengl::LineWidth;
+	opengl::Viewport_t* opengl::Viewport;
+	opengl::LineWidth_t* opengl::LineWidth;
 
-	opengl::MatrixMode_t opengl::MatrixMode;
-	opengl::LoadIdentity_t opengl::LoadIdentity;
-	opengl::LoadMatrixf_t opengl::LoadMatrixf;
-	opengl::MultMatrixf_t opengl::MultMatrixf;
+	opengl::MatrixMode_t* opengl::MatrixMode;
+	opengl::LoadIdentity_t* opengl::LoadIdentity;
+	opengl::LoadMatrixf_t* opengl::LoadMatrixf;
+	opengl::MultMatrixf_t* opengl::MultMatrixf;
 
-	opengl::BlendEquation_t opengl::BlendEquation;
-	opengl::BlendFunc_t opengl::BlendFunc;
-	opengl::AlphaFunc_t opengl::AlphaFunc;
-	opengl::DepthFunc_t opengl::DepthFunc;
+	opengl::BlendEquation_t* opengl::BlendEquation;
+	opengl::BlendFunc_t* opengl::BlendFunc;
+	opengl::AlphaFunc_t* opengl::AlphaFunc;
+	opengl::DepthFunc_t* opengl::DepthFunc;
 
-	opengl::VertexPointer_t opengl::VertexPointer;
-	opengl::NormalPointer_t opengl::NormalPointer;
-	opengl::ColorPointer_t opengl::ColorPointer;
-	opengl::TexCoordPointer_t opengl::TexCoordPointer;
-	opengl::VertexAttribPointer_t opengl::VertexAttribPointer;
+	opengl::VertexPointer_t* opengl::VertexPointer;
+	opengl::NormalPointer_t* opengl::NormalPointer;
+	opengl::ColorPointer_t* opengl::ColorPointer;
+	opengl::TexCoordPointer_t* opengl::TexCoordPointer;
+	opengl::VertexAttribPointer_t* opengl::VertexAttribPointer;
 
-	opengl::DrawElements_t opengl::DrawElements;
-	opengl::DrawArrays_t opengl::DrawArrays;
+	opengl::DrawElements_t* opengl::DrawElements;
+	opengl::DrawArrays_t* opengl::DrawArrays;
 
 /*** language *************************/
-	opengl::DeleteShader_t opengl::DeleteShader;
-	opengl::DetachShader_t opengl::DetachShader;
-	opengl::CreateShader_t opengl::CreateShader;
-	opengl::ShaderSource_t opengl::ShaderSource;
-	opengl::CompileShader_t opengl::CompileShader;
+	opengl::DeleteShader_t* opengl::DeleteShader;
+	opengl::DetachShader_t* opengl::DetachShader;
+	opengl::CreateShader_t* opengl::CreateShader;
+	opengl::ShaderSource_t* opengl::ShaderSource;
+	opengl::CompileShader_t* opengl::CompileShader;
 
-	opengl::CreateProgram_t opengl::CreateProgram;
-	opengl::AttachShader_t opengl::AttachShader;
-	opengl::LinkProgram_t opengl::LinkProgram;
-	opengl::UseProgram_t opengl::UseProgram;
-	opengl::DeleteProgram_t opengl::DeleteProgram;
-	opengl::ValidateProgram_t opengl::ValidateProgram;
+	opengl::CreateProgram_t* opengl::CreateProgram;
+	opengl::AttachShader_t* opengl::AttachShader;
+	opengl::LinkProgram_t* opengl::LinkProgram;
+	opengl::UseProgram_t* opengl::UseProgram;
+	opengl::DeleteProgram_t* opengl::DeleteProgram;
+	opengl::ValidateProgram_t* opengl::ValidateProgram;
 
-	opengl::GetShaderiv_t opengl::GetShaderiv;
-	opengl::GetProgramiv_t opengl::GetProgramiv;
-	opengl::GetShaderInfoLog_t opengl::GetShaderInfoLog;
-	opengl::GetProgramInfoLog_t opengl::GetProgramInfoLog;
+	opengl::GetShaderiv_t* opengl::GetShaderiv;
+	opengl::GetProgramiv_t* opengl::GetProgramiv;
+	opengl::GetShaderInfoLog_t* opengl::GetShaderInfoLog;
+	opengl::GetProgramInfoLog_t* opengl::GetProgramInfoLog;
 
-	opengl::GetUniformLocation_t opengl::GetUniformLocation;
-	opengl::Uniform1fv_t opengl::Uniform1fv;
-	opengl::Uniform2fv_t opengl::Uniform2fv;
-	opengl::Uniform3fv_t opengl::Uniform3fv;
-	opengl::Uniform4fv_t opengl::Uniform4fv;
-	opengl::Uniform1iv_t opengl::Uniform1iv;
-	opengl::Uniform2iv_t opengl::Uniform2iv;
-	opengl::Uniform3iv_t opengl::Uniform3iv;
-	opengl::Uniform4iv_t opengl::Uniform4iv;
-	opengl::UniformMatrix2fv_t opengl::UniformMatrix2fv;
-	opengl::UniformMatrix3fv_t opengl::UniformMatrix3fv;
-	opengl::UniformMatrix4fv_t opengl::UniformMatrix4fv;
+	opengl::GetUniformLocation_t* opengl::GetUniformLocation;
+	opengl::Uniform1fv_t* opengl::Uniform1fv;
+	opengl::Uniform2fv_t* opengl::Uniform2fv;
+	opengl::Uniform3fv_t* opengl::Uniform3fv;
+	opengl::Uniform4fv_t* opengl::Uniform4fv;
+	opengl::Uniform1iv_t* opengl::Uniform1iv;
+	opengl::Uniform2iv_t* opengl::Uniform2iv;
+	opengl::Uniform3iv_t* opengl::Uniform3iv;
+	opengl::Uniform4iv_t* opengl::Uniform4iv;
+	opengl::UniformMatrix2fv_t* opengl::UniformMatrix2fv;
+	opengl::UniformMatrix3fv_t* opengl::UniformMatrix3fv;
+	opengl::UniformMatrix4fv_t* opengl::UniformMatrix4fv;
 
-	opengl::GetAttribLocation_t opengl::GetAttribLocation;
+	opengl::GetAttribLocation_t* opengl::GetAttribLocation;
 
 /*** buffer ***************************/
-	opengl::GenBuffers_t opengl::GenBuffers;
-	opengl::DeleteBuffers_t opengl::DeleteBuffers;
-	opengl::BindBuffer_t opengl::BindBuffer;
+	opengl::GenBuffers_t* opengl::GenBuffers;
+	opengl::DeleteBuffers_t* opengl::DeleteBuffers;
+	opengl::BindBuffer_t* opengl::BindBuffer;
 
-	opengl::BufferData_t opengl::BufferData;
-	opengl::BufferSubData_t opengl::BufferSubData;
-	opengl::MapBuffer_t opengl::MapBuffer;
-	opengl::UnmapBuffer_t opengl::UnmapBuffer;
+	opengl::BufferData_t* opengl::BufferData;
+	opengl::BufferSubData_t* opengl::BufferSubData;
+	opengl::MapBuffer_t* opengl::MapBuffer;
+	opengl::UnmapBuffer_t* opengl::UnmapBuffer;
 
 /*** texture **************************/
-	opengl::GenTextures_t opengl::GenTextures;
-	opengl::DeleteTextures_t opengl::DeleteTextures;
-	opengl::BindTexture_t opengl::BindTexture;
-	opengl::TexImage2D_t opengl::TexImage2D;
-	opengl::TexSubImage2D_t opengl::TexSubImage2D;
-	opengl::CompressedTexImage2D_t opengl::CompressedTexImage2D;
-	opengl::CompressedTexSubImage2D_t opengl::CompressedTexSubImage2D;
-	opengl::TexParameteri_t opengl::TexParameteri;
-	opengl::TexEnvi_t opengl::TexEnvi;
-	opengl::PixelStorei_t opengl::PixelStorei;
-	opengl::ActiveTexture_t opengl::ActiveTexture;
-	opengl::ClientActiveTexture_t opengl::ClientActiveTexture;
+	opengl::GenTextures_t* opengl::GenTextures;
+	opengl::DeleteTextures_t* opengl::DeleteTextures;
+	opengl::BindTexture_t* opengl::BindTexture;
+	opengl::TexImage2D_t* opengl::TexImage2D;
+	opengl::TexSubImage2D_t* opengl::TexSubImage2D;
+	opengl::CompressedTexImage2D_t* opengl::CompressedTexImage2D;
+	opengl::CompressedTexSubImage2D_t* opengl::CompressedTexSubImage2D;
+	opengl::TexParameteri_t* opengl::TexParameteri;
+	opengl::TexEnvi_t* opengl::TexEnvi;
+	opengl::PixelStorei_t* opengl::PixelStorei;
+	opengl::ActiveTexture_t* opengl::ActiveTexture;
+	opengl::ClientActiveTexture_t* opengl::ClientActiveTexture;
 
 /*** light ****************************/
-	opengl::Lightfv_t opengl::Lightfv;
+	opengl::Lightfv_t* opengl::Lightfv;
 }

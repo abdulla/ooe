@@ -190,197 +190,197 @@ namespace ooe
 
 //--- typedefs -----------------------------------------------------------------
 /*** gl *******************************/
-		typedef const c8* ( * GetString_t )( u32 );
-		typedef u8 ( * IsEnabled_t )( u32 );
-		typedef void ( * Enable_t )( u32 );
-		typedef void ( * Disable_t )( u32 );
-		typedef void ( * EnableClientState_t )( u32 );
-		typedef void ( * DisableClientState_t )( u32 );
-		typedef void ( * EnableVertexAttribArray_t )( u32 );
-		typedef void ( * DisableVertexAttribArray_t )( u32 );
-		typedef void ( * Hint_t )( u32, u32 );
-		typedef void ( * GetIntegerv_t )( u32, s32* );
-		typedef void ( * Clear_t )( u32 );
-		typedef void ( * ClearColor_t )( f32, f32, f32, f32 );
-		typedef void ( * ClearDepth_t )( f64 );
-		typedef void ( * Viewport_t )( s32, s32, s32, s32 );
-		typedef void ( * LineWidth_t )( f32 );
-		typedef void ( * PolygonMode_t )( u32, u32 );
-		typedef void ( * MatrixMode_t )( u32 );
-		typedef void ( * LoadIdentity_t )( void );
-		typedef void ( * LoadMatrixf_t )( const f32* );
-		typedef void ( * MultMatrixf_t )( const f32* );
-		typedef void ( * BlendEquation_t )( u32 );
-		typedef void ( * BlendFunc_t )( u32, u32 );
-		typedef void ( * AlphaFunc_t )( u32, f32 );
-		typedef void ( * DepthFunc_t )( u32 );
-		typedef void ( * VertexPointer_t )( s32, u32, s32, const void* );
-		typedef void ( * NormalPointer_t )( u32, s32, const void* );
-		typedef void ( * ColorPointer_t )( s32, u32, s32, const void* );
-		typedef void ( * TexCoordPointer_t )( s32, u32, s32, const void* );
-		typedef void ( * VertexAttribPointer_t )( u32, s32, u32, u8, s32, const void* );
-		typedef void ( * DrawElements_t )( u32, s32, u32, const void* );
-		typedef void ( * DrawArrays_t )( u32, s32, s32 );
+		typedef const c8* ( GetString_t )( u32 );
+		typedef u8 ( IsEnabled_t )( u32 );
+		typedef void ( Enable_t )( u32 );
+		typedef void ( Disable_t )( u32 );
+		typedef void ( EnableClientState_t )( u32 );
+		typedef void ( DisableClientState_t )( u32 );
+		typedef void ( EnableVertexAttribArray_t )( u32 );
+		typedef void ( DisableVertexAttribArray_t )( u32 );
+		typedef void ( Hint_t )( u32, u32 );
+		typedef void ( GetIntegerv_t )( u32, s32* );
+		typedef void ( Clear_t )( u32 );
+		typedef void ( ClearColor_t )( f32, f32, f32, f32 );
+		typedef void ( ClearDepth_t )( f64 );
+		typedef void ( Viewport_t )( s32, s32, s32, s32 );
+		typedef void ( LineWidth_t )( f32 );
+		typedef void ( PolygonMode_t )( u32, u32 );
+		typedef void ( MatrixMode_t )( u32 );
+		typedef void ( LoadIdentity_t )( void );
+		typedef void ( LoadMatrixf_t )( const f32* );
+		typedef void ( MultMatrixf_t )( const f32* );
+		typedef void ( BlendEquation_t )( u32 );
+		typedef void ( BlendFunc_t )( u32, u32 );
+		typedef void ( AlphaFunc_t )( u32, f32 );
+		typedef void ( DepthFunc_t )( u32 );
+		typedef void ( VertexPointer_t )( s32, u32, s32, const void* );
+		typedef void ( NormalPointer_t )( u32, s32, const void* );
+		typedef void ( ColorPointer_t )( s32, u32, s32, const void* );
+		typedef void ( TexCoordPointer_t )( s32, u32, s32, const void* );
+		typedef void ( VertexAttribPointer_t )( u32, s32, u32, u8, s32, const void* );
+		typedef void ( DrawElements_t )( u32, s32, u32, const void* );
+		typedef void ( DrawArrays_t )( u32, s32, s32 );
 
 /*** language *************************/
-		typedef void ( * DeleteShader_t )( u32 );
-		typedef void ( * DetachShader_t )( u32, u32 );
-		typedef u32 ( * CreateShader_t )( u32 );
-		typedef void ( * ShaderSource_t )( u32, s32, const c8**, const s32* );
-		typedef void ( * CompileShader_t )( u32 );
-		typedef u32 ( * CreateProgram_t )( void );
-		typedef void ( * AttachShader_t )( u32, u32 );
-		typedef void ( * LinkProgram_t )( u32 );
-		typedef void ( * UseProgram_t )( u32 );
-		typedef void ( * DeleteProgram_t )( u32 );
-		typedef void ( * ValidateProgram_t )( u32 );
-		typedef void ( * GetShaderiv_t )( u32, u32, s32* );
-		typedef void ( * GetProgramiv_t )( u32, u32, s32* );
-		typedef void ( * GetShaderInfoLog_t )( u32, s32, s32*, c8* );
-		typedef void ( * GetProgramInfoLog_t )( u32, s32, s32*, c8* );
-		typedef s32 ( * GetUniformLocation_t )( u32, const c8* );
-		typedef void ( * Uniform1fv_t )( s32, s32, const f32* );
-		typedef void ( * Uniform2fv_t )( s32, s32, const f32* );
-		typedef void ( * Uniform3fv_t )( s32, s32, const f32* );
-		typedef void ( * Uniform4fv_t )( s32, s32, const f32* );
-		typedef void ( * Uniform1iv_t )( s32, s32, const s32* );
-		typedef void ( * Uniform2iv_t )( s32, s32, const s32* );
-		typedef void ( * Uniform3iv_t )( s32, s32, const s32* );
-		typedef void ( * Uniform4iv_t )( s32, s32, const s32* );
-		typedef void ( * UniformMatrix2fv_t )( s32, s32, u8, const f32* );
-		typedef void ( * UniformMatrix3fv_t )( s32, s32, u8, const f32* );
-		typedef void ( * UniformMatrix4fv_t )( s32, s32, u8, const f32* );
-		typedef s32 ( * GetAttribLocation_t )( u32, const c8* );
+		typedef void ( DeleteShader_t )( u32 );
+		typedef void ( DetachShader_t )( u32, u32 );
+		typedef u32 ( CreateShader_t )( u32 );
+		typedef void ( ShaderSource_t )( u32, s32, const c8**, const s32* );
+		typedef void ( CompileShader_t )( u32 );
+		typedef u32 ( CreateProgram_t )( void );
+		typedef void ( AttachShader_t )( u32, u32 );
+		typedef void ( LinkProgram_t )( u32 );
+		typedef void ( UseProgram_t )( u32 );
+		typedef void ( DeleteProgram_t )( u32 );
+		typedef void ( ValidateProgram_t )( u32 );
+		typedef void ( GetShaderiv_t )( u32, u32, s32* );
+		typedef void ( GetProgramiv_t )( u32, u32, s32* );
+		typedef void ( GetShaderInfoLog_t )( u32, s32, s32*, c8* );
+		typedef void ( GetProgramInfoLog_t )( u32, s32, s32*, c8* );
+		typedef s32 ( GetUniformLocation_t )( u32, const c8* );
+		typedef void ( Uniform1fv_t )( s32, s32, const f32* );
+		typedef void ( Uniform2fv_t )( s32, s32, const f32* );
+		typedef void ( Uniform3fv_t )( s32, s32, const f32* );
+		typedef void ( Uniform4fv_t )( s32, s32, const f32* );
+		typedef void ( Uniform1iv_t )( s32, s32, const s32* );
+		typedef void ( Uniform2iv_t )( s32, s32, const s32* );
+		typedef void ( Uniform3iv_t )( s32, s32, const s32* );
+		typedef void ( Uniform4iv_t )( s32, s32, const s32* );
+		typedef void ( UniformMatrix2fv_t )( s32, s32, u8, const f32* );
+		typedef void ( UniformMatrix3fv_t )( s32, s32, u8, const f32* );
+		typedef void ( UniformMatrix4fv_t )( s32, s32, u8, const f32* );
+		typedef s32 ( GetAttribLocation_t )( u32, const c8* );
 
 /*** buffer ***************************/
-		typedef void ( * GenBuffers_t )( s32, u32* );
-		typedef void ( * DeleteBuffers_t )( s32, const u32* );
-		typedef void ( * BindBuffer_t )( u32, u32 );
-		typedef void ( * BufferData_t )( u32, up_t, const void*, u32 );
-		typedef void ( * BufferSubData_t )( u32, up_t, up_t, const void* );
-		typedef void* ( * MapBuffer_t )( u32, u32 );
-		typedef u8 ( * UnmapBuffer_t )( u32 );
+		typedef void ( GenBuffers_t )( s32, u32* );
+		typedef void ( DeleteBuffers_t )( s32, const u32* );
+		typedef void ( BindBuffer_t )( u32, u32 );
+		typedef void ( BufferData_t )( u32, up_t, const void*, u32 );
+		typedef void ( BufferSubData_t )( u32, up_t, up_t, const void* );
+		typedef void* ( MapBuffer_t )( u32, u32 );
+		typedef u8 ( UnmapBuffer_t )( u32 );
 
 /*** texture **************************/
-		typedef void ( * GenTextures_t )( s32, u32* );
-		typedef void ( * DeleteTextures_t )( s32, const u32* );
-		typedef void ( * BindTexture_t )( u32, u32 );
-		typedef void ( * TexImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
-		typedef void ( * TexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
-		typedef void ( * CompressedTexImage2D_t )( u32, s32, u32, s32, s32, s32, s32, const void* );
-		typedef void ( * CompressedTexSubImage2D_t )
+		typedef void ( GenTextures_t )( s32, u32* );
+		typedef void ( DeleteTextures_t )( s32, const u32* );
+		typedef void ( BindTexture_t )( u32, u32 );
+		typedef void ( TexImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
+		typedef void ( TexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
+		typedef void ( CompressedTexImage2D_t )( u32, s32, u32, s32, s32, s32, s32, const void* );
+		typedef void ( CompressedTexSubImage2D_t )
 			( u32, s32, s32, s32, s32, s32, u32, s32, const void* );
-		typedef void ( * TexParameteri_t )( u32, u32, s32 );
-		typedef void ( * TexEnvi_t )( u32, u32, s32 );
-		typedef void ( * PixelStorei_t )( u32, s32 );
-		typedef void ( * ActiveTexture_t )( u32 );
-		typedef void ( * ClientActiveTexture_t )( u32 );
+		typedef void ( TexParameteri_t )( u32, u32, s32 );
+		typedef void ( TexEnvi_t )( u32, u32, s32 );
+		typedef void ( PixelStorei_t )( u32, s32 );
+		typedef void ( ActiveTexture_t )( u32 );
+		typedef void ( ClientActiveTexture_t )( u32 );
 
 /*** light ****************************/
-		typedef void ( * Lightfv_t )( u32, u32, const f32* );
+		typedef void ( Lightfv_t )( u32, u32, const f32* );
 
 //--- function pointers --------------------------------------------------------
 /*** gl *******************************/
-		extern GetString_t GetString;
+		extern GetString_t* GetString;
 
-		extern IsEnabled_t IsEnabled;
-		extern Enable_t Enable;
-		extern Disable_t Disable;
-		extern EnableClientState_t EnableClientState;
-		extern DisableClientState_t DisableClientState;
-		extern EnableVertexAttribArray_t EnableVertexAttribArray;
-		extern DisableVertexAttribArray_t DisableVertexAttribArray;
+		extern IsEnabled_t* IsEnabled;
+		extern Enable_t* Enable;
+		extern Disable_t* Disable;
+		extern EnableClientState_t* EnableClientState;
+		extern DisableClientState_t* DisableClientState;
+		extern EnableVertexAttribArray_t* EnableVertexAttribArray;
+		extern DisableVertexAttribArray_t* DisableVertexAttribArray;
 
-		extern Hint_t Hint;
-		extern GetIntegerv_t GetIntegerv;
+		extern Hint_t* Hint;
+		extern GetIntegerv_t* GetIntegerv;
 
-		extern Clear_t Clear;
-		extern ClearColor_t ClearColor;
-		extern ClearDepth_t ClearDepth;
+		extern Clear_t* Clear;
+		extern ClearColor_t* ClearColor;
+		extern ClearDepth_t* ClearDepth;
 
-		extern Viewport_t Viewport;
-		extern LineWidth_t LineWidth;
-		extern PolygonMode_t PolygonMode;
+		extern Viewport_t* Viewport;
+		extern LineWidth_t* LineWidth;
+		extern PolygonMode_t* PolygonMode;
 
-		extern MatrixMode_t MatrixMode;
-		extern LoadIdentity_t LoadIdentity;
-		extern LoadMatrixf_t LoadMatrixf;
-		extern MultMatrixf_t MultMatrixf;
+		extern MatrixMode_t* MatrixMode;
+		extern LoadIdentity_t* LoadIdentity;
+		extern LoadMatrixf_t* LoadMatrixf;
+		extern MultMatrixf_t* MultMatrixf;
 
-		extern BlendEquation_t BlendEquation;
-		extern BlendFunc_t BlendFunc;
-		extern AlphaFunc_t AlphaFunc;
-		extern DepthFunc_t DepthFunc;
+		extern BlendEquation_t* BlendEquation;
+		extern BlendFunc_t* BlendFunc;
+		extern AlphaFunc_t* AlphaFunc;
+		extern DepthFunc_t* DepthFunc;
 
-		extern VertexPointer_t VertexPointer;
-		extern NormalPointer_t NormalPointer;
-		extern ColorPointer_t ColorPointer;
-		extern TexCoordPointer_t TexCoordPointer;
-		extern VertexAttribPointer_t VertexAttribPointer;
+		extern VertexPointer_t* VertexPointer;
+		extern NormalPointer_t* NormalPointer;
+		extern ColorPointer_t* ColorPointer;
+		extern TexCoordPointer_t* TexCoordPointer;
+		extern VertexAttribPointer_t* VertexAttribPointer;
 
-		extern DrawElements_t DrawElements;
-		extern DrawArrays_t DrawArrays;
+		extern DrawElements_t* DrawElements;
+		extern DrawArrays_t* DrawArrays;
 
 /*** language *************************/
-		extern DeleteShader_t DeleteShader;
-		extern DetachShader_t DetachShader;
-		extern CreateShader_t CreateShader;
-		extern ShaderSource_t ShaderSource;
-		extern CompileShader_t CompileShader;
+		extern DeleteShader_t* DeleteShader;
+		extern DetachShader_t* DetachShader;
+		extern CreateShader_t* CreateShader;
+		extern ShaderSource_t* ShaderSource;
+		extern CompileShader_t* CompileShader;
 
-		extern CreateProgram_t CreateProgram;
-		extern AttachShader_t AttachShader;
-		extern LinkProgram_t LinkProgram;
-		extern UseProgram_t UseProgram;
-		extern DeleteProgram_t DeleteProgram;
-		extern ValidateProgram_t ValidateProgram;
+		extern CreateProgram_t* CreateProgram;
+		extern AttachShader_t* AttachShader;
+		extern LinkProgram_t* LinkProgram;
+		extern UseProgram_t* UseProgram;
+		extern DeleteProgram_t* DeleteProgram;
+		extern ValidateProgram_t* ValidateProgram;
 
-		extern GetShaderiv_t GetShaderiv;
-		extern GetProgramiv_t GetProgramiv;
-		extern GetShaderInfoLog_t GetShaderInfoLog;
-		extern GetProgramInfoLog_t GetProgramInfoLog;
+		extern GetShaderiv_t* GetShaderiv;
+		extern GetProgramiv_t* GetProgramiv;
+		extern GetShaderInfoLog_t* GetShaderInfoLog;
+		extern GetProgramInfoLog_t* GetProgramInfoLog;
 
-		extern GetUniformLocation_t GetUniformLocation;
-		extern Uniform1fv_t Uniform1fv;
-		extern Uniform2fv_t Uniform2fv;
-		extern Uniform3fv_t Uniform3fv;
-		extern Uniform4fv_t Uniform4fv;
-		extern Uniform1iv_t Uniform1iv;
-		extern Uniform2iv_t Uniform2iv;
-		extern Uniform3iv_t Uniform3iv;
-		extern Uniform4iv_t Uniform4iv;
-		extern UniformMatrix2fv_t UniformMatrix2fv;
-		extern UniformMatrix3fv_t UniformMatrix3fv;
-		extern UniformMatrix4fv_t UniformMatrix4fv;
+		extern GetUniformLocation_t* GetUniformLocation;
+		extern Uniform1fv_t* Uniform1fv;
+		extern Uniform2fv_t* Uniform2fv;
+		extern Uniform3fv_t* Uniform3fv;
+		extern Uniform4fv_t* Uniform4fv;
+		extern Uniform1iv_t* Uniform1iv;
+		extern Uniform2iv_t* Uniform2iv;
+		extern Uniform3iv_t* Uniform3iv;
+		extern Uniform4iv_t* Uniform4iv;
+		extern UniformMatrix2fv_t* UniformMatrix2fv;
+		extern UniformMatrix3fv_t* UniformMatrix3fv;
+		extern UniformMatrix4fv_t* UniformMatrix4fv;
 
-		extern GetAttribLocation_t GetAttribLocation;
+		extern GetAttribLocation_t* GetAttribLocation;
 
 /*** buffer ***************************/
-		extern GenBuffers_t GenBuffers;
-		extern DeleteBuffers_t DeleteBuffers;
-		extern BindBuffer_t BindBuffer;
+		extern GenBuffers_t* GenBuffers;
+		extern DeleteBuffers_t* DeleteBuffers;
+		extern BindBuffer_t* BindBuffer;
 
-		extern BufferData_t BufferData;
-		extern BufferSubData_t BufferSubData;
-		extern MapBuffer_t MapBuffer;
-		extern UnmapBuffer_t UnmapBuffer;
+		extern BufferData_t* BufferData;
+		extern BufferSubData_t* BufferSubData;
+		extern MapBuffer_t* MapBuffer;
+		extern UnmapBuffer_t* UnmapBuffer;
 
 /*** texture **************************/
-		extern GenTextures_t GenTextures;
-		extern DeleteTextures_t DeleteTextures;
-		extern BindTexture_t BindTexture;
-		extern TexImage2D_t TexImage2D;
-		extern TexSubImage2D_t TexSubImage2D;
-		extern CompressedTexImage2D_t CompressedTexImage2D;
-		extern CompressedTexSubImage2D_t CompressedTexSubImage2D;
-		extern TexParameteri_t TexParameteri;
-		extern TexEnvi_t TexEnvi;
-		extern PixelStorei_t PixelStorei;
-		extern ActiveTexture_t ActiveTexture;
-		extern ClientActiveTexture_t ClientActiveTexture;
+		extern GenTextures_t* GenTextures;
+		extern DeleteTextures_t* DeleteTextures;
+		extern BindTexture_t* BindTexture;
+		extern TexImage2D_t* TexImage2D;
+		extern TexSubImage2D_t* TexSubImage2D;
+		extern CompressedTexImage2D_t* CompressedTexImage2D;
+		extern CompressedTexSubImage2D_t* CompressedTexSubImage2D;
+		extern TexParameteri_t* TexParameteri;
+		extern TexEnvi_t* TexEnvi;
+		extern PixelStorei_t* PixelStorei;
+		extern ActiveTexture_t* ActiveTexture;
+		extern ClientActiveTexture_t* ClientActiveTexture;
 
 /*** light ****************************/
-		extern Lightfv_t Lightfv;
+		extern Lightfv_t* Lightfv;
 	}
 }
 

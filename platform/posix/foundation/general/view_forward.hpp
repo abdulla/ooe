@@ -20,7 +20,7 @@ namespace ooe
 		class view_data;
 		class view;
 
-		typedef void ( * choose_type )( view_data& );
+		typedef void ( choose_type )( view_data& );
 	}
 
 	class platform::view_data
