@@ -53,9 +53,10 @@ namespace ooe
 		void insert( const std::string&, const facade_ptr& );
 
 		template< typename type >
-			void insert( const std::string& name, const type* pointer )
+			void insert( const std::string& name, scoped_ptr< type >& pointer )
 		{
 			insert( name, new facade_id( pointer, destroy< type > ) );
+			pointer.release();
 		}
 
 	private:

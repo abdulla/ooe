@@ -22,4 +22,16 @@ namespace ooe
 		ipc::memory::rpc< void ( module::info_tuple ) > registry_insert( client, 2 );
 		registry_insert( info );
 	}
+
+	void registry::scan( const std::string& path )
+	{
+		ipc::memory::rpc< void ( const std::string& ) > registry_scan( client, 3 );
+		registry_scan( path );
+	}
+
+	std::string registry::surrogate( const std::string& path )
+	{
+		ipc::memory::rpc< std::string ( const std::string& ) > registry_surrogate( client, 4 );
+		return registry_surrogate( path );
+	}
 }

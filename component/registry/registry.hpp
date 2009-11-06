@@ -18,6 +18,8 @@ namespace ooe
 
 		info_vector find( const interface& );
 		void insert( const module::info_tuple& );
+		void scan( const std::string& );
+		std::string surrogate( const std::string& );
 
 	private:
 		mutable ipc::memory::client client;

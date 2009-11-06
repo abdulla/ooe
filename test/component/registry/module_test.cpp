@@ -37,6 +37,8 @@ namespace ooe
 
 			builder< facade::ipc > builder( module, *ipc_ptr );
 			builder.insert( "callback", callback );
+
+			module.insert( "ipc", ipc_ptr );
 		}
 
 	}

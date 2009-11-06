@@ -4,7 +4,9 @@
 #include <map>
 
 #include "component/registry/registry.hpp"
+#include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/io/directory.hpp"
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
@@ -20,7 +22,7 @@ namespace
 	module_map modules;
 	read_write mutex;
 
-	//--------------------------------------------------------------------------
+	//--- load -----------------------------------------------------------------
 	module::name_vector load_library( const std::string& path )
 	{
 		library library( path );
@@ -34,7 +36,7 @@ namespace
 		return ipc::memory::list( client )();
 	}
 
-	//--- ipc functions --------------------------------------------------------
+	//--- ipc ------------------------------------------------------------------
 	void insert( const module::info_tuple& info )
 	{
 		typedef module::name_vector::const_iterator iterator_type;
@@ -98,18 +100,41 @@ namespace
 		return vector;
 	}
 
+	void scan( const std::string& path )
+	{
+		directory library( path );
+
+		while ( ++library )
+			insert( module::info_tuple( module::library, *library ) );
+	}
+
+	std::string surrogate( const std::string& path )
+	{
+		std::string name = ipc::unique_name();
+		ipc::semaphore semaphore( name, ipc::semaphore::create, 0 );
+		fork_io fork;
+
+		if ( fork.is_child() )
+			fork_io::execute( self, "-m", path.c_str(), "-s", name.c_str(), 0 );
+
+		semaphore.down();
+		return name;
+	}
+
 	//--- registry -------------------------------------------------------------
 	void registry( const std::string& root, const std::string& name )
 	{
 		self = root + name;
-
 		ipc::memory::switchboard switchboard;
 
 		if ( switchboard.insert( find ) != 1 )
 			throw error::runtime( "registry: " ) << "\"find\" not at index 1";
-
-		if ( switchboard.insert( insert ) != 2 )
+		else if ( switchboard.insert( insert ) != 2 )
 			throw error::runtime( "registry: " ) << "\"insert\" not at index 2";
+		else if ( switchboard.insert( scan ) != 3 )
+			throw error::runtime( "registry: " ) << "\"scan\" not at index 3";
+		else if ( switchboard.insert( surrogate ) != 4 )
+			throw error::runtime( "registry: " ) << "\"surrogate\" not at index 4";
 
 		ipc::memory::server server( "/ooe.registry", switchboard );
 
@@ -122,12 +147,7 @@ namespace
 	{
 		ipc::memory::switchboard switchboard;
 		ipc::memory::server server( path, switchboard );
-
-		{
-			std::string gate = path + ".g";
-			ipc::semaphore semaphore( gate.c_str() );
-			semaphore.up();
-		}
+		ipc::semaphore( path ).up();
 
 		while ( !executable::signal() && server.decode() ) {}
 	}
@@ -135,11 +155,21 @@ namespace
 	//--- launch ---------------------------------------------------------------
 	bool launch( const std::string& root, const std::string& name, s32 argc, c8** argv )
 	{
+		const c8* module_path = 0;
+		const c8* surrogate_path = 0;
 
-		for ( s32 option; ( option = getopt( argc, argv, "u:" ) ) != -1; )
+		for ( s32 option; ( option = getopt( argc, argv, "m:s:u:" ) ) != -1; )
 		{
 			switch ( option )
 			{
+			case 'm':
+				module_path = optarg;
+				break;
+
+			case 's':
+				surrogate_path = optarg;
+				break;
+
 			case 'u':
 				{ ipc::semaphore( optarg ).up(); }
 				break;
@@ -149,7 +179,11 @@ namespace
 			}
 		}
 
-		registry( root, name );
+		if ( module_path && surrogate_path )
+			surrogate( surrogate_path, module_path );
+		else
+			registry( root, name );
+
 		return true;
 	}
 }
