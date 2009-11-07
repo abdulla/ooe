@@ -14,7 +14,7 @@ if not build.GetOption( 'clean' ):
 
 ### build ######################################################################
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libio.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@rpath/libio.dylib' )
 
 files = Glob( '*.cpp' ) + Glob( platform + '/foundation/io/*.cpp' )
 out = build.SharedLibrary( '#library/libio', files )

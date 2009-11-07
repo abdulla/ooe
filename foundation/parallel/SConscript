@@ -3,7 +3,7 @@ build = root.Clone()
 build.Append( LIBS = ooe.pthread.library )
 
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libparallel.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@rpath/libparallel.dylib' )
 
 files = Glob( '*.cpp' ) + Glob( platform + '/foundation/parallel/*.cpp' )
 out = build.SharedLibrary( '#library/libparallel', files )
