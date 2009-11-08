@@ -1,8 +1,10 @@
 Import( Split( 'name platform root' ) )
+
+### build ######################################################################
 build = root.Clone()
 
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libipc.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@rpath/libipc.dylib' )
 
 files = Glob( '*.cpp' ) + Glob( 'memory/*.cpp' ) + Glob( 'socket/*.cpp' )
 files += Glob( platform + '/foundation/ipc/*.cpp' )

@@ -4,6 +4,8 @@ build.Append( LIBS = Split( 'executable general graph image io lua parallel' ) )
 
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
+elif name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-rpath,@executable_path/../library' )
 
 out = build.Program( '#binary/tools', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )

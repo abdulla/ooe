@@ -18,6 +18,8 @@ build.Append( LIBS = [ 'executable' ] )
 
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
+elif name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-rpath,@executable_path/../library' )
 
 out = build.Program( '#binary/uuid_check', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )

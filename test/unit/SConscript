@@ -10,7 +10,7 @@ if not build.GetOption( 'clean' ):
 
 ### build ######################################################################
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libunit.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@rpath/libunit.dylib' )
 
 out = build.SharedLibrary( '#library/libunit', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )

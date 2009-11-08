@@ -6,6 +6,8 @@ build.Append( LIBS = Split( 'executable io ipc parallel registry' ) )
 
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
+elif name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-rpath,@executable_path/../library' )
 
 out = build.Program( '#binary/registry', 'main.cpp' )
 build.SideEffect( 'main.rpo', out )
@@ -15,7 +17,7 @@ build.Clean( out, '#binary/registry.log' )
 build = root.Clone()
 
 if name == 'darwin':
-	build.Append( LINKFLAGS = '-Wl,-install_name,@executable_path/../library/libregistry.dylib' )
+	build.Append( LINKFLAGS = '-Wl,-install_name,@rpath/libregistry.dylib' )
 
 glob = Glob( '*.cpp', strings = True )
 glob.remove( 'main.cpp' )

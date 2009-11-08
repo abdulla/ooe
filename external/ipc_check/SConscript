@@ -4,6 +4,8 @@ build.Append( LIBS = Split( 'executable io ipc parallel' ) )
 
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
+elif name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-rpath,@executable_path/../library' )
 
 out = build.Program( '#binary/ipc_check', Glob( '*.cpp' ) )
 build.SideEffect( Glob( '*.rpo' ), out )
