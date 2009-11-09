@@ -22,7 +22,7 @@ namespace ooe
 	}
 
 //--- scene::text --------------------------------------------------------------
-	scene::text::text( const texture_type& texture_, const video_data& data_ )
+	scene::text::text( const texture_ptr& texture_, const video_data& data_ )
 		: node( true ), texture( texture_ ), data( data_ )
 	{
 	}

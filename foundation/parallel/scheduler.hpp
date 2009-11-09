@@ -15,8 +15,8 @@ namespace ooe
 {
 	class worker;
 
-	typedef shared_ptr< worker > worker_type;
-	typedef std::list< worker_type > worker_list_type;
+	typedef shared_ptr< worker > worker_ptr;
+	typedef std::list< worker_ptr > worker_list_type;
 	typedef atom_ptr< task_base > task_type;
 
 //--- result -------------------------------------------------------------------

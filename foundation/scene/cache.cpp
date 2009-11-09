@@ -51,7 +51,7 @@ namespace ooe
 			throw error::runtime( "cache: " ) << "Unknown image type \"" << image_type << '\"';
 
 		image image = j->second( vfs[ name ] );
-		texture_type pointer = video.texture();
+		texture_ptr pointer = video.texture();
 		pointer->bind();
 		pointer->load( image.get(), image.width, image.height, image.format );
 

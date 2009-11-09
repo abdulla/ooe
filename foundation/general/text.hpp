@@ -14,7 +14,7 @@ namespace ooe
 		: private noncopyable
 	{
 	public:
-		typedef tuple< texture_type, video_data > build_type;
+		typedef tuple< texture_ptr, video_data > build_type;
 		typedef tuple< s32 /*x-min*/, s32 /*x-max*/, s32 /*y-min*/, s32 /*y-max*/> bound_type;
 		typedef std::string::const_iterator iterator;
 
@@ -25,7 +25,7 @@ namespace ooe
 
 	private:
 		const ooe::video& video;
-		texture_type texture;
+		texture_ptr texture;
 		scoped_array< font::metric > metric;
 
 		const u32 size;

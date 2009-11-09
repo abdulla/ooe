@@ -33,13 +33,13 @@ namespace ooe
 		: public node
 	{
 	public:
-		text( const texture_type&, const video_data& );
+		text( const texture_ptr&, const video_data& );
 
 		virtual text* copy( void ) const;
 		virtual void draw( video& ) const;
 
 	private:
-		const texture_type texture;
+		const texture_ptr texture;
 		const video_data data;
 	};
 
@@ -69,8 +69,8 @@ namespace ooe
 		void update( const u8* );
 
 	private:
-		buffer_type buffer;
-		texture_type texture;
+		buffer_ptr buffer;
+		texture_ptr texture;
 		const video_data& data;
 		u16 width;
 		u16 height;

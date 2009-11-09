@@ -40,7 +40,7 @@ namespace ooe
 	}
 
 //--- variable -----------------------------------------------------------------
-	void variable::insert( const uniform_type& uniform, const void* pointer )
+	void variable::insert( const uniform_ptr& uniform, const void* pointer )
 	{
 		vector.push_back( tuple_type( uniform, pointer ) );
 	}

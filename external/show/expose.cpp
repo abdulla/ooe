@@ -56,7 +56,7 @@ namespace ooe
 		lua::inherit< scene::sight, scene::node >( stack )
 			.insert( "update", &scene::sight::update );
 
-		( lua::type< texture_type >( stack ) );
+		( lua::type< texture_ptr >( stack ) );
 		( lua::type< video_data >( stack ) );
 		( lua::inherit< scene::mesh, scene::node >( stack ) );
 		( lua::inherit< scene::text, scene::node >( stack ) );
@@ -69,7 +69,7 @@ namespace ooe
 		table_scene[ "mesh" ] =
 			lua::constructor< scene::mesh, texture&, const video_data& >( stack );
 		table_scene[ "text" ] =
-			lua::constructor< scene::text, const texture_type&, const video_data& >( stack );
+			lua::constructor< scene::text, const texture_ptr&, const video_data& >( stack );
 		table_scene[ "sight" ] =
 			lua::constructor< scene::sight, const video&, const video_data&, u16, u16 >( stack );
 

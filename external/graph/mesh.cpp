@@ -10,12 +10,12 @@ namespace
 {
 	using namespace ooe;
 
-	buffer_type buffer_f( const video& video, buffer::type type )
+	buffer_ptr buffer_f( const video& video, buffer::type type )
 	{
 		return video.buffer( type );
 	}
 
-	void load_f( const buffer_type& buffer, const lua::binary_string& binary )
+	void load_f( const buffer_ptr& buffer, const lua::binary_string& binary )
 	{
 		buffer->bind();
 		buffer->load( binary.string, binary.size, buffer::static_draw );
@@ -68,7 +68,7 @@ namespace ooe
 		lua::vm vm;
 		lua::stack stack = vm.stack();
 
-		lua::type< buffer_type >( stack )
+		lua::type< buffer_ptr >( stack )
 			.insert( "load", load_f );
 
 		lua::type< video >( stack )

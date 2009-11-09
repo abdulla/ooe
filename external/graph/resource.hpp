@@ -80,7 +80,7 @@ namespace ooe
 		void clear( void );
 
 	private:
-		typedef std::map< const std::string, texture_type > map_type;
+		typedef std::map< const std::string, texture_ptr > map_type;
 
 		const ooe::vfs& vfs;
 		const ooe::video& video;

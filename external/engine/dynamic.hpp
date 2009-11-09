@@ -30,8 +30,8 @@ namespace ooe
 	#undef BOOST_PP_ITERATION_LIMITS
 
 	private:
-		typedef shared_ptr< library > library_type;
-		typedef std::map< const std::string, const library_type > map_type;
+		typedef shared_ptr< library > library_ptr;
+		typedef std::map< const std::string, const library_ptr > map_type;
 		typedef std::vector< close_type > vector_type;
 
 		map_type map;

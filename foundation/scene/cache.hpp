@@ -27,7 +27,7 @@ namespace ooe
 		void insert( const std::string&, image_decode_t );
 
 	private:
-		typedef std::map< const std::string, const texture_type > texture_map;
+		typedef std::map< const std::string, const texture_ptr > texture_map;
 		typedef std::map< const std::string, const effect > program_map;
 		typedef std::map< const std::string, const image_decode_t > decoder_map;
 

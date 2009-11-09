@@ -52,7 +52,7 @@ namespace ooe
 		virtual void load( const void* ) = 0;
 	};
 
-	typedef shared_ptr< uniform > uniform_type;
+	typedef shared_ptr< uniform > uniform_ptr;
 
 //--- attribute ----------------------------------------------------------------
 	struct attribute
@@ -72,7 +72,7 @@ namespace ooe
 		virtual ~attribute( void ) {}
 	};
 
-	typedef shared_ptr< attribute > attribute_type;
+	typedef shared_ptr< attribute > attribute_ptr;
 
 //--- shader -------------------------------------------------------------------
 	struct shader
@@ -103,7 +103,7 @@ namespace ooe
 		virtual ooe::attribute* attribute( const c8*, attribute::type ) const = 0;
 	};
 
-	typedef shared_ptr< program > program_type;
+	typedef shared_ptr< program > program_ptr;
 
 //--- light --------------------------------------------------------------------
 	struct light
@@ -159,7 +159,7 @@ namespace ooe
 		virtual void load( const void*, u32, u32, u8, u8 = 0 ) = 0;
 	};
 
-	typedef shared_ptr< texture > texture_type;
+	typedef shared_ptr< texture > texture_ptr;
 
 //--- frame --------------------------------------------------------------------
 	struct frame
@@ -214,7 +214,7 @@ namespace ooe
 		virtual void load( const void*, up_t, load_type ) = 0;
 	};
 
-	typedef shared_ptr< buffer > buffer_type;
+	typedef shared_ptr< buffer > buffer_ptr;
 
 //--- video_data ---------------------------------------------------------------
 	struct video_data
@@ -248,10 +248,10 @@ namespace ooe
 		u32 length;	// number of points or indices
 		u32 size;	// size of array
 		shared_array< layout_type > layout;
-		shared_array< attribute_type > extra;
+		shared_array< attribute_ptr > extra;
 
-		buffer_type point;
-		buffer_type index;
+		buffer_ptr point;
+		buffer_ptr index;
 	};
 
 //--- video --------------------------------------------------------------------

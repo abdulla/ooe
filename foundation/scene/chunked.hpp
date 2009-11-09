@@ -52,7 +52,7 @@ namespace ooe
 
 		chunk( chunk_args&, chunk*, u16 );
 
-		void parallel_load( const tqt&, const attribute_type& );
+		void parallel_load( const tqt&, const attribute_ptr& );
 		void parallel_unload( void );
 		void serial_load( const video&, u32 );
 		void serial_unload( void );
@@ -72,8 +72,8 @@ namespace ooe
 		chunk* child[ 4 ];
 
 		const ooe::aabb box;
-		texture_type tex_1;
-		texture_type* tex_2;
+		texture_ptr tex_1;
+		texture_ptr* tex_2;
 		video_data data;
 		variable var;
 
@@ -108,7 +108,7 @@ namespace ooe
 		ooe::scheduler& scheduler;
 		const ooe::video& video;
 		ooe::program& program;
-		attribute_type delta;
+		attribute_ptr delta;
 
 		virtual bool insert( node&, graph::list_type& );
 	};

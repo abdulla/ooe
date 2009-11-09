@@ -54,7 +54,7 @@ namespace ooe
 
 		image image = resource[ name ]( vfs[ name ] );
 
-		texture_type pointer = video.texture();
+		texture_ptr pointer = video.texture();
 		pointer->bind();
 		pointer->load( image.get(), image.width, image.height, image.format, texture::reverse );
 

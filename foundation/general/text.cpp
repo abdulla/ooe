@@ -114,15 +114,15 @@ namespace
 	}
 
 	template< typename type >
-		text::build_type make_mesh( const video& video, const texture_type& texture,
+		text::build_type make_mesh( const video& video, const texture_ptr& texture,
 		scoped_array< f32 >& points, scoped_array< type >& indices, u32 point, u32 index )
 	{
-		buffer_type point_buffer( video.buffer( buffer::point ) );
+		buffer_ptr point_buffer( video.buffer( buffer::point ) );
 		point_buffer->bind();
 		point_buffer->load( points, point * sizeof( f32 ), buffer::static_draw );
 		delete[] points.release();
 
-		buffer_type index_buffer( video.buffer( buffer::index ) );
+		buffer_ptr index_buffer( video.buffer( buffer::index ) );
 		index_buffer->bind();
 		index_buffer->load( indices, index * sizeof( type ), buffer::static_draw );
 		delete[] indices.release();

@@ -123,11 +123,11 @@ namespace ooe
 			0, 4, 1, 5, 2, 6, 3, 7	// connecting lines
 		};
 
-		buffer_type point_buffer = video.buffer( buffer::point );
+		buffer_ptr point_buffer = video.buffer( buffer::point );
 		point_buffer->bind();
 		point_buffer->load( points, sizeof( points ), buffer::static_draw );
 
-		buffer_type index_buffer = video.buffer( buffer::index );
+		buffer_ptr index_buffer = video.buffer( buffer::index );
 		index_buffer->bind();
 		index_buffer->load( indices, sizeof( indices ), buffer::static_draw );
 

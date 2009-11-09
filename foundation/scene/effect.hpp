@@ -19,18 +19,18 @@ namespace ooe
 		ooe::program& get( void ) const;
 
 	private:
-		program_type program;
+		program_ptr program;
 	};
 
 //--- variable -----------------------------------------------------------------
 	class OOE_VISIBLE variable
 	{
 	public:
-		void insert( const uniform_type&, const void* );
+		void insert( const uniform_ptr&, const void* );
 		void apply( void ) const;
 
 	private:
-		typedef tuple< uniform_type, const void* > tuple_type;
+		typedef tuple< uniform_ptr, const void* > tuple_type;
 		typedef std::vector< tuple_type > vector_type;
 
 		vector_type vector;		// share vector between variables somehow?

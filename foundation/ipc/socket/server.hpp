@@ -19,9 +19,9 @@ namespace ooe
 			class servlet;
 			class server;
 
-			typedef shared_ptr< servlet > servlet_type;
-			typedef std::list< servlet_type > servlet_list;
-			typedef std::list< servlet_type >::iterator servlet_iterator;
+			typedef shared_ptr< servlet > servlet_ptr;
+			typedef std::list< servlet_ptr > servlet_list;
+			typedef std::list< servlet_ptr >::iterator servlet_iterator;
 		}
 	}
 

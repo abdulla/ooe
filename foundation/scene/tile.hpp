@@ -24,7 +24,7 @@ namespace ooe
 
 	private:
 		ooe::program& program;
-		texture_type height;
+		texture_ptr height;
 		video_data data;
 
 		virtual bool insert( node&, graph::list_type& );

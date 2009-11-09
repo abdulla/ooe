@@ -182,11 +182,11 @@ namespace ooe
 		}
 
 	private:
-		const uniform_type min_1;
-		const uniform_type max_1;
-		const uniform_type min_2;
-		const uniform_type max_2;
-		const uniform_type morph;
+		const uniform_ptr min_1;
+		const uniform_ptr max_1;
+		const uniform_ptr min_2;
+		const uniform_ptr max_2;
+		const uniform_ptr morph;
 	};
 
 //--- chunk_args ---------------------------------------------------------------
@@ -216,14 +216,14 @@ namespace ooe
 		ooe::scheduler& scheduler;
 		const ooe::video& video;
 		const ooe::tqt& tqt;
-		const attribute_type& delta;
+		const attribute_ptr& delta;
 		const vec3& eye;
 
 		const f32 max_lod;
 		const u16 tree_depth;
 
 		update_args( ooe::scheduler& scheduler_, const ooe::video& video_, const ooe::tqt& tqt_,
-			const attribute_type& delta_, const vec3& eye_, f32 max_lod_, u16 tree_depth_ )
+			const attribute_ptr& delta_, const vec3& eye_, f32 max_lod_, u16 tree_depth_ )
 			: scheduler( scheduler_ ), video( video_ ), tqt( tqt_ ), delta( delta_ ), eye( eye_ ),
 			max_lod( max_lod_ ), tree_depth( tree_depth_ )
 		{
@@ -243,8 +243,8 @@ namespace ooe
 		{
 		}
 
-		void enqueue( const video_data& data, const variable& var, const texture_type& tex_1,
-			const texture_type& tex_2 ) const
+		void enqueue( const video_data& data, const variable& var, const texture_ptr& tex_1,
+			const texture_ptr& tex_2 ) const
 		{
 			render_queue::insert_type value( mat4::identity, data, &var, &program, tex_1, tex_2 );
 			queue.insert( value );
@@ -317,7 +317,7 @@ namespace ooe
 		}
 	}
 
-	void chunk::parallel_load( const tqt& tqt, const attribute_type& delta )
+	void chunk::parallel_load( const tqt& tqt, const attribute_ptr& delta )
 	{
 		//--- load image data --------------------------------------------------
 		if ( header.level < tqt.depth() )
@@ -330,7 +330,7 @@ namespace ooe
 		data.length = ih.index_count;
 		data.size = 3;
 		data.layout = new video_data::layout_type[ data.size ];
-		data.extra = new attribute_type[ 1 ];
+		data.extra = new attribute_ptr[ 1 ];
 
 		data.layout[ 0 ] = video_data::vertex_3;
 		data.layout[ 1 ] = video_data::attribute;
@@ -457,7 +457,7 @@ namespace ooe
 			if ( leaf_state == none )
 			{
 				leaf.state = wait;
-				args.scheduler.push_back< void, const tqt&, const attribute_type& >
+				args.scheduler.push_back< void, const tqt&, const attribute_ptr& >
 					( make_function( leaf, &chunk::parallel_load ), args.tqt, args.delta );
 				split = false;
 				continue;
@@ -535,11 +535,11 @@ namespace ooe
 		chunk[ 0 ]->parallel_unload();
 
 		const s32 unit[] = { 0, 1 };
-		uniform_type scale = program.uniform( "scale", uniform::float_1 );
+		uniform_ptr scale = program.uniform( "scale", uniform::float_1 );
 		scale->load( &header.vertical_scale );
-		uniform_type tex_1 = program.uniform( "tex_1", uniform::int_1 );
+		uniform_ptr tex_1 = program.uniform( "tex_1", uniform::int_1 );
 		tex_1->load( unit + 0 );
-		uniform_type tex_2 = program.uniform( "tex_2", uniform::int_1 );
+		uniform_ptr tex_2 = program.uniform( "tex_2", uniform::int_1 );
 		tex_2->load( unit + 1 );
 	}
 
