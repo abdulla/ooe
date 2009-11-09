@@ -17,7 +17,7 @@ namespace ooe
 		if ( i != map.end() )
 			return *i->second;
 
-		library_type pointer = new library( name + OOE_EXTENSION, flag );
+		library_ptr pointer = new library( name + OOE_EXTENSION, flag );
 		map.insert( map_type::value_type( name, pointer ) );
 		return *pointer;
 	}
