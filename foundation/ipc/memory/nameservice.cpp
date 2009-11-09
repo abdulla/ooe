@@ -93,4 +93,10 @@ namespace ooe
 	{
 		map.insert( map_type::value_type( map_tuple( name, type ), index ) );
 	}
+
+	void ipc::memory::nameservice:: insert_direct
+		( const std::string& name, const std::string& type, switchboard::call_type call, any any )
+	{
+		insert_direct( name, type, switchboard.insert_direct( call, any ) );
+	}
 }

@@ -29,6 +29,8 @@ namespace ooe
 		u32 find( const std::string&, const std::string& ) const;
 		list_type list( void ) const;
 		void insert_direct( const std::string&, const std::string&, u32 ) OOE_VISIBLE;
+		void insert_direct( const std::string&, const std::string&, switchboard::call_type, any )
+			OOE_VISIBLE;
 
 		template< typename type >
 			void insert( const std::string& name, type function,
