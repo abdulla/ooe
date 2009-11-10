@@ -13,7 +13,7 @@ namespace ooe
 {
 //--- ipc::memory::link_listen -------------------------------------------------
 	ipc::memory::link_listen::link_listen( const std::string& name )
-		: path( local_name( name ) ), listen( local( path ) )
+		: path( local_name( name ) ), listen( local_address( path ) )
 	{
 	}
 
@@ -83,7 +83,7 @@ namespace ooe
 
 //--- ipc::memory::link_client -------------------------------------------------
 	ipc::memory::link_client::link_client( const std::string& name, transport& transport )
-		: connect( local( local_name( name ) ) ), state( true ),
+		: connect( local_address( local_name( name ) ) ), state( true ),
 		thread( make_function( *this, &link_client::call ), &transport )
 	{
 	}

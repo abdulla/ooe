@@ -68,25 +68,25 @@ namespace ooe
 		address( up_t );
 	};
 
-//--- local --------------------------------------------------------------------
-	struct local
+//--- local_address ------------------------------------------------------------
+	struct local_address
 		: public address
 	{
-		local( const std::string& ) OOE_VISIBLE;
+		local_address( const std::string& ) OOE_VISIBLE;
 	};
 
-//--- internet -----------------------------------------------------------------
-	struct internet
+//--- internet_address ---------------------------------------------------------
+	struct internet_address
 		: public address
 	{
-		internet( const std::string&, u16 ) OOE_VISIBLE;
+		internet_address( const std::string&, u16 ) OOE_VISIBLE;
 	};
 
-//--- internet6 ----------------------------------------------------------------
-	struct internet6
+//--- internet6_address --------------------------------------------------------
+	struct internet6_address
 		: public address
 	{
-		internet6( const std::string&, u16 ) OOE_VISIBLE;
+		internet6_address( const std::string&, u16 ) OOE_VISIBLE;
 	};
 }
 

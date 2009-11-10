@@ -201,8 +201,8 @@ namespace ooe
 		return data.as< sockaddr >();
 	}
 
-//--- local --------------------------------------------------------------------
-	local::local( const std::string& path )
+//--- local_address ------------------------------------------------------------
+	local_address::local_address( const std::string& path )
 		: address( sizeof( u16 ) + path.size() + 1 )
 	{
 		sockaddr_un& sa = *data.as< sockaddr_un >();
@@ -210,8 +210,8 @@ namespace ooe
 		std::memcpy( sa.sun_path, path.c_str(), path.size() + 1 );
 	}
 
-//--- internet -----------------------------------------------------------------
-	internet::internet( const std::string& path, u16 port )
+//--- internet_address ---------------------------------------------------------
+	internet_address::internet_address( const std::string& path, u16 port )
 		: address( sizeof( sockaddr_in ) )
 	{
 		hostent* he = lookup( path, AF_INET, "internet" );
@@ -222,8 +222,8 @@ namespace ooe
 		sa.sin_addr = *reinterpret_cast< in_addr* >( he->h_addr );
 	}
 
-//--- internet6 ----------------------------------------------------------------
-	internet6::internet6( const std::string& path, u16 port )
+//--- internet6_address --------------------------------------------------------
+	internet6_address::internet6_address( const std::string& path, u16 port )
 		: address( sizeof( sockaddr_in6 ) )
 	{
 		hostent* he = lookup( path, AF_INET6, "internet6" );
