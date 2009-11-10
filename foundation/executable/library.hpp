@@ -15,6 +15,8 @@ namespace ooe
 		: private noncopyable
 	{
 	public:
+		static const c8 suffix[];
+
 		enum type
 		{
 			local_lazy,
