@@ -1,0 +1,31 @@
+/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+
+#include <iostream>
+
+#include "component/registry/builder.hpp"
+#include "component/registry/local.hpp"
+#include "component/registry/remote.hpp"
+
+namespace
+{
+	using namespace ooe;
+
+	void hello_world( void )
+	{
+		std::cout << "hello world\n";
+	}
+}
+
+extern "C" ooe::module OOE_VISIBLE module_open( void )
+{
+	module module;
+	scoped_ptr< facade::local > local_ptr( new facade::local );
+	scoped_ptr< facade::remote > remote_ptr( new facade::remote );
+
+	builder< facade::remote > builder( module, *local_ptr, *remote_ptr );
+	builder.insert( "hello_world", hello_world );
+
+	module.insert( "local", local_ptr );
+	module.insert( "remote", remote_ptr );
+	return module;
+}

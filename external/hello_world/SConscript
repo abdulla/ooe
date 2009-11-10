@@ -1,0 +1,6 @@
+Import( Split( 'root' ) )
+
+### build ######################################################################
+build = root.Clone()
+out = build.SharedLibrary( '#library/hello_world', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
