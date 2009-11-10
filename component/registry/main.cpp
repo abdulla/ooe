@@ -3,11 +3,15 @@
 #include <iostream>
 #include <map>
 
+#include "component/registry/local.hpp"
+#include "component/registry/module.hpp"
 #include "component/registry/registry.hpp"
+#include "component/registry/remote.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/io/directory.hpp"
 #include "foundation/ipc/semaphore.hpp"
+#include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/parallel/lock.hpp"
@@ -16,57 +20,76 @@ namespace
 {
 	using namespace ooe;
 
-	//--- globals --------------------------------------------------------------
-	typedef std::multimap< module::name_tuple, module::info_tuple > module_map;
+	//--------------------------------------------------------------------------
+	typedef tuple< std::string, std::string > name_tuple;
+	typedef tuple< registry::type, std::string > info_tuple;
+	typedef std::multimap< name_tuple, info_tuple > module_map;
 	std::string self;
 	module_map modules;
 	read_write mutex;
 
-	//--- load -----------------------------------------------------------------
-	module::name_vector load_library( const std::string& path )
-	{
-		library library( path );
-		ooe::module module = library.find< ooe::module ( void ) >( "module_open" )();
-		return module.names();
-	}
-
-	module::name_vector load_server( const std::string& path )
+	module::vector_type load_server( const std::string& path )
 	{
 		ipc::memory::client client( path );
 		return ipc::memory::list( client )();
 	}
 
-	//--- ipc ------------------------------------------------------------------
-	void insert( const module::info_tuple& info )
+	module::vector_type load_library( const std::string& path )
 	{
-		typedef module::name_vector::const_iterator iterator_type;
-		module::name_vector names;
+		library library( path );
+		ooe::module module = library.find< ooe::module ( void ) >( "module_open" )();
+		return module.get();
+	}
 
-		switch ( info._0 )
+	void load_nameservice( ipc::memory::nameservice& nameservice, const module& module )
+	{
+		const module::vector_type& names = module.get();
+		const facade::remote::vector_type& remotes =
+			static_cast< const facade::remote* >( module.find( "remote" ) )->get();
+		const facade::local::vector_type& locals =
+			static_cast< const facade::local* >( module.find( "local" ) )->get();
+		up_t size = names.size();
+
+		if ( remotes.size() != size || locals.size() != size )
+			throw error::runtime( "surrogate: " ) << "Incorrect number of callbacks";
+
+		for ( up_t i = 0; i != size; ++i )
+			nameservice.insert_direct( names[ i ]._0, names[ i ]._1, remotes[ i ], locals[ i ] );
+	}
+
+	//--------------------------------------------------------------------------
+	void insert( registry::type type, const std::string& path )
+	{
+		module::vector_type vector;
+
+		switch ( type )
 		{
-		case module::library:
-			names = load_library( info._1 );
+		case registry::server:
+			vector = load_server( path );
 			break;
 
-		case module::server:
-			names = load_server( info._1 );
+		case registry::library:
+			vector = load_library( path );
 			break;
 
 		default:
-			throw error::runtime( "module: " ) << "Unknown module type: " << info._0;
+			throw error::runtime( "module: " ) << "Unknown module type: " << type;
 		}
 
-		for ( iterator_type i = names.begin(), end = names.end(); i != end; ++i )
+		typedef module::vector_type::const_iterator iterator_type;
+		info_tuple tuple( type, path );
+
+		for ( iterator_type i = vector.begin(), end = vector.end(); i != end; ++i )
 		{
 			write_lock lock( mutex );
-			modules.insert( module_map::value_type( *i, info ) );
+			modules.insert( module_map::value_type( *i, tuple ) );
 		}
 	}
 
-	registry::info_vector find( const module::name_vector& names )
+	registry::info_vector find( const interface::vector_type& names )
 	{
-		typedef module::name_vector::const_iterator name_iterator;
-		typedef std::map< module::info_tuple, up_t > histogram_map;
+		typedef interface::vector_type::const_iterator name_iterator;
+		typedef std::map< info_tuple, up_t > histogram_map;
 		histogram_map histogram;
 		histogram_map::iterator k;
 
@@ -102,10 +125,10 @@ namespace
 
 	void scan( const std::string& path )
 	{
-		directory library( path );
+		directory entry( path );
 
-		while ( ++library )
-			insert( module::info_tuple( module::library, *library ) );
+		while ( ++entry )
+			insert( registry::library, *entry );
 	}
 
 	std::string surrogate( const std::string& path )
@@ -121,7 +144,7 @@ namespace
 		return name;
 	}
 
-	//--- registry -------------------------------------------------------------
+	//--------------------------------------------------------------------------
 	void registry( const std::string& root, const std::string& name )
 	{
 		self = root + name;
@@ -142,12 +165,14 @@ namespace
 			server.decode();
 	}
 
-	//--- surrogate ------------------------------------------------------------
-	void surrogate( const std::string& path, const std::string& /*module_name*/ )
+	void surrogate( const std::string& surrogate_path, const std::string& module_path )
 	{
-		ipc::memory::switchboard switchboard;
-		ipc::memory::server server( path, switchboard );
-		ipc::semaphore( path ).up();
+		library library( module_path );
+		ipc::memory::nameservice nameservice;
+		load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
+
+		ipc::memory::server server( surrogate_path, nameservice );
+		ipc::semaphore( surrogate_path ).up();
 
 		while ( !executable::signal() && server.decode() ) {}
 	}

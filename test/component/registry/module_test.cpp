@@ -5,7 +5,8 @@
 #include <csignal>
 
 #include "component/registry/builder.hpp"
-#include "component/registry/ipc.hpp"
+#include "component/registry/local.hpp"
+#include "component/registry/remote.hpp"
 #include "test/unit/assert.hpp"
 #include "test/unit/group.hpp"
 
@@ -33,12 +34,14 @@ namespace ooe
 			std::cerr << "build module\n";
 
 			module module;
-			scoped_ptr< facade::ipc > ipc_ptr( new facade::ipc );
+			scoped_ptr< facade::local > local_ptr( new facade::local );
+			scoped_ptr< facade::remote > remote_ptr( new facade::remote );
 
-			builder< facade::ipc > builder( module, *ipc_ptr );
+			builder< facade::remote > builder( module, *local_ptr, *remote_ptr );
 			builder.insert( "callback", callback );
 
-			module.insert( "ipc", ipc_ptr );
+			module.insert( "local", local_ptr );
+			module.insert( "remote", remote_ptr );
 		}
 
 	}

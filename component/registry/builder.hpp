@@ -5,6 +5,7 @@
 	#ifndef OOE_COMPONENT_REGISTRY_BUILDER_HPP
 	#define OOE_COMPONENT_REGISTRY_BUILDER_HPP
 
+#include "component/registry/local.hpp"
 #include "component/registry/module.hpp"
 
 namespace ooe
@@ -38,9 +39,9 @@ namespace ooe
 #endif
 	{
 	public:
-		builder( ooe::module& module_ BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
+		builder( ooe::module& module_, facade::local& local_ BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::reference a ) )
-			: module( module_ ), tuple( BOOST_PP_ENUM_PARAMS( LIMIT, &a ) )
+			: module( module_ ), local( local_ ), tuple( BOOST_PP_ENUM_PARAMS( LIMIT, &a ) )
 		{
 		}
 
@@ -49,8 +50,8 @@ namespace ooe
 			typename enable_if< is_function_pointer< type > >::type* = 0 )
 		{
 			typedef typename remove_pointer< type >::type function_type;
-			up_t i = module.
-				insert( module::name_tuple( name, typeid( function_type ).name() ), function );
+			up_t i = module.insert( name, typeid( function_type ).name() );
+			local.insert( i, function );
 			BOOST_PP_REPEAT( LIMIT, INSERT, function_type )
 		}
 
@@ -59,13 +60,14 @@ namespace ooe
 			typename enable_if< is_member_function_pointer< type > >::type* = 0 )
 		{
 			typedef typename function_of< type >::type signature_type;
-			up_t i = module.
-				insert( module::name_tuple( name, typeid( signature_type ).name() ), member );
+			up_t i = module.insert( name, typeid( signature_type ).name() );
+			local.insert( i, member );
 			BOOST_PP_REPEAT( LIMIT, INSERT, signature_type )
 		}
 
 	private:
 		ooe::module& module;
+		facade::local& local;
 		ooe::tuple< BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, * BOOST_PP_INTERCEPT ) > tuple;
 	};
 }

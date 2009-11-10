@@ -3,7 +3,7 @@
 #ifndef OOE_COMPONENT_REGISTRY_REGISTRY_HPP
 #define OOE_COMPONENT_REGISTRY_REGISTRY_HPP
 
-#include "component/registry/module.hpp"
+#include "component/registry/interface.hpp"
 #include "foundation/ipc/memory/client.hpp"
 
 namespace ooe
@@ -12,12 +12,19 @@ namespace ooe
 	class OOE_VISIBLE registry
 	{
 	public:
-		typedef std::vector< module::info_tuple > info_vector;
+		enum type
+		{
+			server,
+			library
+		};
+
+		typedef tuple< type, std::string > info_tuple;
+		typedef std::vector< info_tuple > info_vector;
 
 		registry( void );
 
 		info_vector find( const interface& );
-		void insert( const module::info_tuple& );
+		void insert( type, const std::string& );
 		void scan( const std::string& );
 		std::string surrogate( const std::string& );
 

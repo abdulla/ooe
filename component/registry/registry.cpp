@@ -13,14 +13,15 @@ namespace ooe
 
 	registry::info_vector registry::find( const interface& interface )
 	{
-		ipc::memory::rpc< info_vector ( const module::name_vector& ) > registry_find( client, 1 );
-		return registry_find( interface.names() );
+		ipc::memory::rpc< info_vector ( const interface::vector_type& ) >
+			registry_find( client, 1 );
+		return registry_find( interface.get() );
 	}
 
-	void registry::insert( const module::info_tuple& info )
+	void registry::insert( type flag, const std::string& path )
 	{
-		ipc::memory::rpc< void ( module::info_tuple ) > registry_insert( client, 2 );
-		registry_insert( info );
+		ipc::memory::rpc< void ( type, const std::string& ) > registry_insert( client, 2 );
+		registry_insert( flag, path );
 	}
 
 	void registry::scan( const std::string& path )

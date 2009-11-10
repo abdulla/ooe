@@ -248,7 +248,7 @@ namespace
 
 	void client_ntest( void )
 	{
-		ipc::socket::client client( local( _PATH_TMP "ooe" ) );
+		ipc::socket::client client( local_address( _PATH_TMP "ooe" ) );
 
 		ipc::socket::rpc< void ( void ) > out_of_range( client, static_cast< u32 >( -1 ) );
 		OOE_PRINT( "CLIENT_FAIL", out_of_range()() );	// throw!
@@ -275,7 +275,7 @@ namespace
 		nameservice.insert( "unknown", unknown );
 
 		unlink( _PATH_TMP "ooe" );
-		ipc::socket::server server( local( _PATH_TMP "ooe" ) );
+		ipc::socket::server server( local_address( _PATH_TMP "ooe" ) );
 
 		while ( !executable::signal() )
 			server.accept( nameservice );
