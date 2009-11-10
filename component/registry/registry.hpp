@@ -25,7 +25,6 @@ namespace ooe
 
 		info_vector find( const interface& );
 		void insert( type, const std::string& );
-		void scan( const std::string& );
 		std::string surrogate( const std::string& );
 
 	private:

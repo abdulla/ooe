@@ -9,7 +9,6 @@
 #include "component/registry/remote.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/io/directory.hpp"
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
@@ -123,14 +122,6 @@ namespace
 		return vector;
 	}
 
-	void scan( const std::string& path )
-	{
-		directory entry( path );
-
-		while ( ++entry )
-			insert( registry::library, *entry );
-	}
-
 	std::string surrogate( const std::string& path )
 	{
 		std::string name = ipc::unique_name();
@@ -154,9 +145,7 @@ namespace
 			throw error::runtime( "registry: " ) << "\"find\" not at index 1";
 		else if ( switchboard.insert( insert ) != 2 )
 			throw error::runtime( "registry: " ) << "\"insert\" not at index 2";
-		else if ( switchboard.insert( scan ) != 3 )
-			throw error::runtime( "registry: " ) << "\"scan\" not at index 3";
-		else if ( switchboard.insert( surrogate ) != 4 )
+		else if ( switchboard.insert( surrogate ) != 3 )
 			throw error::runtime( "registry: " ) << "\"surrogate\" not at index 4";
 
 		ipc::memory::server server( "/ooe.registry", switchboard );
