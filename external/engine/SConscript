@@ -1,6 +1,5 @@
 Import( Split( 'name root' ) )
 build = root.Clone()
-build.Append( CPPDEFINES = 'OOE_EXTENSION=\\"' + build[ 'SHLIBSUFFIX' ] + '\\"' )
 build.Append( LIBS = Split( 'executable general image io lua parallel service' ) )
 
 if name == 'posix':
