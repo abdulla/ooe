@@ -7,7 +7,6 @@
 #include "component/registry/builder.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/remote.hpp"
-#include "test/unit/assert.hpp"
 #include "test/unit/group.hpp"
 
 namespace

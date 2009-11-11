@@ -5,7 +5,6 @@
 
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/semaphore.hpp"
-#include "test/unit/assert.hpp"
 #include "test/unit/group.hpp"
 
 namespace

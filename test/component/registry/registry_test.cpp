@@ -9,7 +9,6 @@
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/semaphore.hpp"
-#include "test/unit/assert.hpp"
 #include "test/unit/group.hpp"
 
 namespace

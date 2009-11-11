@@ -4,6 +4,9 @@
 
 namespace ooe
 {
+//--- unit ---------------------------------------------------------------------
+	bool unit::status;
+
 //--- unit::group_base ---------------------------------------------------------
 	unit::group_base::iterator_type unit::group_base::begin( void ) const
 	{

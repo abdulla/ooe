@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "test/unit/assert.hpp"
+#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
 namespace
@@ -51,26 +51,26 @@ namespace ooe
 			{
 				scoped_ptr< destruct_test > ptr( new destruct_test( did_destruct ) );
 			}
-			assert( "destruct_test::~destruct_test()", did_destruct );
+			check( "destruct_test::~destruct_test()", did_destruct );
 
 			up_t* value = new up_t( 7 );
 			scoped_ptr< up_t > ptr( value );
-			assert( "*ptr == *value", *ptr == *value );
-			assert( "ptr == value", ptr == value );
-			assert( "ptr.get() == value", ptr.get() == value );
-			assert( "ptr.operator ->() == value", ptr.operator ->() == value );
-			assert( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
+			check( "*ptr == *value", *ptr == *value );
+			check( "ptr == value", ptr == value );
+			check( "ptr.get() == value", ptr.get() == value );
+			check( "ptr.operator ->() == value", ptr.operator ->() == value );
+			check( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
 			scoped_ptr< up_t > other( value );
-			assert( "other.release() == value", other.release() == value );
+			check( "other.release() == value", other.release() == value );
 
 			ptr.swap( other );
-			assert( "ptr.get() == 0", ptr.get() == 0 );
-			assert( "other.get() == value", other.get() == value );
+			check( "ptr.get() == 0", ptr.get() == 0 );
+			check( "other.get() == value", other.get() == value );
 
 			other.swap( ptr );
-			assert( "ptr.get() == value", ptr.get() == value );
-			assert( "other.get() == 0", other.get() == 0 );
+			check( "ptr.get() == value", ptr.get() == value );
+			check( "other.get() == 0", other.get() == 0 );
 		}
 
 		template<>
@@ -83,30 +83,30 @@ namespace ooe
 			{
 				shared_ptr< destruct_test > ptr( new destruct_test( did_destruct ) );
 			}
-			assert( "destruct_test::~destruct_test()", did_destruct );
+			check( "destruct_test::~destruct_test()", did_destruct );
 
 			up_t* value = new up_t( 7 );
 			shared_ptr< up_t > ptr( value );
-			assert( "*ptr == *value", *ptr == *value );
-			assert( "ptr == value", ptr == value );
-			assert( "ptr.get() == value", ptr.get() == value );
-			assert( "ptr.operator ->() == value", ptr.operator ->() == value );
-			assert( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
+			check( "*ptr == *value", *ptr == *value );
+			check( "ptr == value", ptr == value );
+			check( "ptr.get() == value", ptr.get() == value );
+			check( "ptr.operator ->() == value", ptr.operator ->() == value );
+			check( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
 			shared_ptr< up_t > other( 0 );
 			ptr.swap( other );
-			assert( "ptr.get() == 0", ptr.get() == 0 );
-			assert( "other.get() == value", other.get() == value );
+			check( "ptr.get() == 0", ptr.get() == 0 );
+			check( "other.get() == value", other.get() == value );
 
 			other.swap( ptr );
-			assert( "ptr.get() == value", ptr.get() == value );
-			assert( "other.get() == 0", other.get() == 0 );
+			check( "ptr.get() == value", ptr.get() == value );
+			check( "other.get() == 0", other.get() == 0 );
 
 			{
 				shared_ptr< up_t > copy( ptr );
-				assert( "copy.get() == value", copy.get() == value );
+				check( "copy.get() == value", copy.get() == value );
 			}
-			assert( "copy: ptr.get() == value", ptr.get() == value );
+			check( "copy: ptr.get() == value", ptr.get() == value );
 		}
 	}
 }

@@ -26,8 +26,11 @@ namespace
 	{
 		try
 		{
+			unit::status = true;
 			( *i )( pointer );
-			fork_io::exit( true );
+
+			if ( unit::status )
+				fork_io::exit( true );
 		}
 		catch ( error::runtime& error )
 		{

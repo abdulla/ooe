@@ -14,6 +14,7 @@ namespace ooe
 {
 	namespace unit
 	{
+		extern bool status;
 		class group_base;
 
 		template< typename, typename, up_t >

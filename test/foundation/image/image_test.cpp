@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "foundation/image/dds.hpp"
-#include "test/unit/assert.hpp"
+#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
 namespace
@@ -36,16 +36,16 @@ namespace ooe
 		{
 			std::cerr << "uncompressed_image\n";
 
-			assert( "image.width == 16", image.width == 16 );
-			assert( "image.height == 16", image.height == 16 );
-			assert( "image.format == uncompressed_image::rgb_u8",
+			check( "image.width == 16", image.width == 16 );
+			check( "image.height == 16", image.height == 16 );
+			check( "image.format == uncompressed_image::rgb_u8",
 				image.format == uncompressed_image::rgb_u8 );
-			assert( "image.get()", image.get() );
-			assert( "image.channels() == 3", image.channels() == 3 );
-			assert( "image.channel_size() == 1", image.channel_size() == 1 );
-			assert( "image.pixel_size() == 3", image.pixel_size() == 3 );
-			assert( "image.row_size() == 48", image.row_size() == 48 );
-			assert( "image.byte_size() == 768", image.byte_size() == 768 );
+			check( "image.get()", image.get() );
+			check( "image.channels() == 3", image.channels() == 3 );
+			check( "image.channel_size() == 1", image.channel_size() == 1 );
+			check( "image.pixel_size() == 3", image.pixel_size() == 3 );
+			check( "image.row_size() == 48", image.row_size() == 48 );
+			check( "image.byte_size() == 768", image.byte_size() == 768 );
 		}
 
 		template<>

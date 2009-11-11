@@ -8,7 +8,7 @@
 #include "foundation/io/poll.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/parallel/task.hpp"
-#include "test/unit/assert.hpp"
+#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
 namespace
@@ -61,7 +61,7 @@ namespace ooe
 			file.seek( 0, file::begin );
 			file.read( &value, sizeof( value ) );
 
-			assert( "value == 0xdeadbeef", value == 0xdeadbeef );
+			check( "value == 0xdeadbeef", value == 0xdeadbeef );
 		}
 
 		template<>

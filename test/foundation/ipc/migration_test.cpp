@@ -14,7 +14,7 @@
 #include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
-#include "test/unit/assert.hpp"
+#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
 namespace
@@ -126,7 +126,7 @@ namespace ooe
 			migrate();
 			pid_t migrate_pid1 = server_pid();
 
-			assert( "migrate_pid0 != migrate_pid1", migrate_pid0 != migrate_pid1 );
+			check( "migrate_pid0 != migrate_pid1", migrate_pid0 != migrate_pid1 );
 		}
 	}
 }
