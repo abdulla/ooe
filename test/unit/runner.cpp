@@ -11,6 +11,7 @@
 #include "foundation/executable/timer.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
+#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 #include "test/unit/runner.hpp"
 
@@ -21,15 +22,16 @@ namespace
 	typedef std::list< list_tuple > list_type;
 	typedef tuple< bool, std::string > vector_tuple;
 	typedef std::vector< vector_tuple > vector_type;
+	bool test_status;
 
 	void run_test( const unit::group_base::iterator_type& i, void* pointer )
 	{
 		try
 		{
-			unit::status = true;
+			test_status = true;
 			( *i )( pointer );
 
-			if ( unit::status )
+			if ( test_status )
 				fork_io::exit( true );
 		}
 		catch ( error::runtime& error )
@@ -165,6 +167,12 @@ namespace
 
 namespace ooe
 {
+//--- unit ---------------------------------------------------------------------
+	void unit::fail( void )
+	{
+		test_status = false;
+	}
+
 //--- unit::runner -------------------------------------------------------------
 	unit::runner::runner( void )
 		: map()
