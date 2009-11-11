@@ -24,16 +24,17 @@ namespace
 			u32 value = 0xdeadbeef;
 			descriptor desc( _PATH_TMP "test-file", descriptor::read_write | descriptor::truncate );
 			file( desc ).write( &value, sizeof( value ) );
-
-			// possible race in the tests as to who gets which descriptor,
-			// validation of descriptors will make this case obvious
 			pair._0.send( desc );
-			pair._0.send( poll._1 );
 		}
 
 		descriptor receive( void )
 		{
 			return pair._1.receive();
+		}
+
+		socket get( void ) const
+		{
+			return poll._1;
 		}
 
 	private:
@@ -70,7 +71,7 @@ namespace ooe
 		{
 			std::cerr << "poll on shutdown\n";
 
-			socket poll_socket( setup.receive() );
+			socket poll_socket( setup.get() );
 			unique_task< void ( socket::shutdown_type ) >
 				task( make_function( poll_socket, &socket::shutdown ), socket::read );
 
