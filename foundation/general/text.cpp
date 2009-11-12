@@ -4,8 +4,8 @@
 
 #include <cctype>
 
-#include "foundation/general/maths.hpp"
 #include "foundation/general/text.hpp"
+#include "foundation/maths/maths.hpp"
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"

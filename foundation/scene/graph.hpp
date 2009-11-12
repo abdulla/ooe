@@ -5,7 +5,7 @@
 
 #include <list>
 
-#include "foundation/general/camera.hpp"
+#include "foundation/maths/camera.hpp"
 #include "foundation/scene/effect.hpp"
 
 namespace ooe

@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "foundation/general/maths.hpp"
+#include "foundation/maths/maths.hpp"
 
 namespace ooe
 {

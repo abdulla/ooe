@@ -1,9 +1,9 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_GENERAL_GEOMETRY_HPP
-#define OOE_FOUNDATION_GENERAL_GEOMETRY_HPP
+#ifndef OOE_FOUNDATION_MATHS_GEOMETRY_HPP
+#define OOE_FOUNDATION_MATHS_GEOMETRY_HPP
 
-#include "foundation/general/maths.hpp"
+#include "foundation/maths/maths.hpp"
 
 namespace ooe
 {
@@ -88,4 +88,4 @@ namespace ooe
 	geometry::intersection includes( const frustum&, const ooe::aabb& ) OOE_VISIBLE;
 }
 
-#endif	// OOE_FOUNDATION_GENERAL_GEOMETRY_HPP
+#endif	// OOE_FOUNDATION_MATHS_GEOMETRY_HPP

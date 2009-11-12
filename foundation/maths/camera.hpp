@@ -1,9 +1,9 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_GENERAL_CAMERA_HPP
-#define OOE_FOUNDATION_GENERAL_CAMERA_HPP
+#ifndef OOE_FOUNDATION_MATHS_CAMERA_HPP
+#define OOE_FOUNDATION_MATHS_CAMERA_HPP
 
-#include "foundation/general/geometry.hpp"
+#include "foundation/maths/geometry.hpp"
 
 namespace ooe
 {
@@ -56,4 +56,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_GENERAL_CAMERA_HPP
+#endif	// OOE_FOUNDATION_MATHS_CAMERA_HPP

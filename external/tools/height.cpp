@@ -1,6 +1,6 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/general/maths.hpp"
+#include "foundation/maths/maths.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"

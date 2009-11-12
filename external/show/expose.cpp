@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "foundation/general/maths.hpp"
 #include "foundation/general/text.hpp"
 #include "foundation/lua/table.hpp"
 #include "foundation/lua/type.hpp"
+#include "foundation/maths/maths.hpp"
 
 #include "external/graph/node.hpp"
 #include "external/show/expose.hpp"

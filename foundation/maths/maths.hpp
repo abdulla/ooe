@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_GENERAL_MATHS_HPP
-#define OOE_FOUNDATION_GENERAL_MATHS_HPP
+#ifndef OOE_FOUNDATION_MATHS_MATHS_HPP
+#define OOE_FOUNDATION_MATHS_MATHS_HPP
 
 #include <limits>
 
@@ -267,4 +267,4 @@ namespace ooe
 		quat euler_angle( const radian&, const radian&, const radian& ) OOE_VISIBLE;
 }
 
-#endif	// OOE_FOUNDATION_GENERAL_MATHS_HPP
+#endif	// OOE_FOUNDATION_MATHS_MATHS_HPP

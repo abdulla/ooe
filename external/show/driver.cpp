@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "foundation/executable/program.hpp"
-#include "foundation/general/camera.hpp"
 #include "foundation/general/text.hpp"
 #include "foundation/image/dds.hpp"
 #include "foundation/image/exr.hpp"
@@ -17,6 +16,7 @@
 #include "foundation/lua/table.hpp"
 #include "foundation/lua/type.hpp"
 #include "foundation/lua/vm.hpp"
+#include "foundation/maths/camera.hpp"
 #include "foundation/scene/effect.hpp"
 
 #include "external/engine/dynamic.hpp"

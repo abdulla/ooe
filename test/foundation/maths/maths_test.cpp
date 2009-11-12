@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "foundation/general/maths.hpp"
+#include "foundation/maths/maths.hpp"
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 

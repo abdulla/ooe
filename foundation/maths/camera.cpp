@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-#include "foundation/general/camera.hpp"
+#include "foundation/maths/camera.hpp"
 
 namespace ooe
 {

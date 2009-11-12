@@ -1,6 +1,6 @@
 Import( Split( 'name root' ) )
 build = root.Clone()
-build.Append( LIBS = Split( 'executable general graph image io lua parallel' ) )
+build.Append( LIBS = Split( 'executable graph image io lua maths parallel' ) )
 
 if name == 'posix':
 	build.Append( RPATH = "'$$$${ORIGIN}/../library'" )

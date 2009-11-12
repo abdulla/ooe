@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "foundation/general/camera.hpp"
+#include "foundation/maths/camera.hpp"
 
 #include "external/graph/scene.hpp"
 #include "external/graph/simple.hpp"

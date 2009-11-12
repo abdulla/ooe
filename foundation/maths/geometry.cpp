@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "foundation/general/geometry.hpp"
+#include "foundation/maths/geometry.hpp"
 
 namespace
 {

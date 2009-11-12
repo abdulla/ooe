@@ -3,8 +3,8 @@
 #ifndef OOE_EXTERNAL_GRAPH_SCENE_HPP
 #define OOE_EXTERNAL_GRAPH_SCENE_HPP
 
-#include "foundation/general/camera.hpp"
 #include "foundation/general/video.hpp"
+#include "foundation/maths/camera.hpp"
 
 namespace ooe
 {
