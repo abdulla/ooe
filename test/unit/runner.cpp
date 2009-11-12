@@ -7,6 +7,8 @@
 #include <csignal>
 #include <cstdlib>
 
+#include <fcntl.h>
+
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/timer.hpp"
 #include "foundation/utility/error.hpp"
@@ -24,10 +26,21 @@ namespace
 	typedef std::vector< vector_tuple > vector_type;
 	bool test_status;
 
-	void run_test( const unit::group_base::iterator_type& i, void* pointer )
+	void null_stdout( void )
+	{
+		if ( close( STDOUT_FILENO ) )
+			throw error::runtime( "unit::runner: " ) << "Unable to close stdout";
+		else if ( open( "/dev/null", O_WRONLY ) != STDOUT_FILENO )
+			throw error::runtime( "unit::runner: " ) << "Unable to replace stdout";
+	}
+
+	void run_test( const unit::group_base::iterator_type& i, void* pointer, bool no_stdout )
 	{
 		try
 		{
+			if ( no_stdout )
+				null_stdout();
+
 			test_status = true;
 			( *i )( pointer );
 
@@ -72,7 +85,7 @@ namespace
 		}
 	}
 
-	vector_type run_group( unit::group_base& group, time_t time_out )
+	vector_type run_group( unit::group_base& group, time_t time_out, bool no_stdout )
 	{
 		unit::group_base::setup_tuple tuple = group.create_setup();
 		scoped< void ( const void* ) > scoped_setup( tuple._1, tuple._0 );
@@ -86,7 +99,7 @@ namespace
 			if ( !fork_io.is_child() )
 				list.push_back( list_tuple( j++, fork_io, timer() ) );
 			else
-				run_test( i, tuple._0 );
+				run_test( i, tuple._0, no_stdout );
 		}
 
 		vector_type vector( j );
@@ -134,13 +147,13 @@ namespace
 		return true;
 	}
 
-	bool safe_run( const unit::runner::map_type::const_iterator i, time_t time_out )
+	bool safe_run( const unit::runner::map_type::const_iterator i, time_t time_out, bool no_stdout )
 	{
 		std::string output;
 
 		try
 		{
-			vector_type vector = run_group( *i->second, time_out );
+			vector_type vector = run_group( *i->second, time_out, no_stdout );
 			print_tests( i->first, vector );
 			return is_successful( vector );
 		}
@@ -194,23 +207,23 @@ namespace ooe
 		map.insert( map_type::value_type( name, &group ) );
 	}
 
-	bool unit::runner::run( time_t time_out ) const
+	bool unit::runner::run( time_t time_out, bool no_stdout ) const
 	{
 		bool success = true;
 
 		for ( map_type::const_iterator i = begin(), j = end(); i != j; ++i )
-			success = safe_run( i, time_out );
+			success = safe_run( i, time_out, no_stdout );
 
 		return success;
 	}
 
-	bool unit::runner::run( const std::string& name, time_t time_out ) const
+	bool unit::runner::run( const std::string& name, time_t time_out, bool no_stdout ) const
 	{
 		map_type::const_iterator i = map.find( name );
 
 		if ( i == map.end() )
 			throw error::runtime( "unit::runner: " ) << "Unable to find group \"" << name << '"';
 
-		return safe_run( i, time_out );
+		return safe_run( i, time_out, no_stdout );
 	}
 }

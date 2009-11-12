@@ -18,8 +18,9 @@ namespace
 		struct sigaction action;
 		executable::signal( action, SIG_DFL, SIGCHLD );
 		time_t time_out = 60;
+		bool no_stdout = true;
 
-		for ( s32 option; ( option = getopt( argc, argv, "lt:" ) ) != -1; )
+		for ( s32 option; ( option = getopt( argc, argv, "lst:" ) ) != -1; )
 		{
 			switch ( option )
 			{
@@ -32,6 +33,10 @@ namespace
 
 				return true;
 
+			case 's':
+				no_stdout = false;
+				break;
+
 			case 't':
 				time_out = std::strtoul( optarg, 0, 10 );
 				break;
@@ -43,6 +48,7 @@ namespace
 					"    " << name << " -l\n"
 					"\n"
 					"Options:\n"
+					"    -s             Enable stdout in tests\n"
 					"    -t <time_out>  Time out for each test\n"
 					"    -l             List all groups of tests\n";
 
