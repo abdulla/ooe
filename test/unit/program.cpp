@@ -57,13 +57,13 @@ namespace
 		}
 
 		if ( optind == argc )
-			return unit::global_runner.run( time_out );
+			return unit::global_runner.run( time_out, no_stdout );
 
 		bool success = true;
 
 		for ( s32 i = optind; i != argc; ++i )
 		{
-			if ( !unit::global_runner.run( argv[ i ], time_out ) )
+			if ( !unit::global_runner.run( argv[ i ], time_out, no_stdout ) )
 				success = false;
 		}
 
