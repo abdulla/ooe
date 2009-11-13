@@ -1,16 +1,5 @@
-make performance graphs of components over time
-	- lua/c++ bindings
-
 add translate/localisation functions
 	- use gettext or similar
-
-add optimisation framework
-	- use liboil or accelerate
-
-regression testing
-	- unit testing framework
-	- unit tests for each class/function/etc
-	- could use cxxtest and recipe for scons
 
 more use of exceptions
 	- wherever return values can be unchecked, ie boolean returns
@@ -29,9 +18,6 @@ extend setup_path
 	- use GetModuleFileName() under windows
 	- read /proc/curproc/file on freebsd
 	- would using realpath() help to resolve paths?
-
-extend atom
-	- Interlocked*() under windows
 
 scheduler layered on top of ipc
 	- useful for guaranteeing that no one process can hog processing

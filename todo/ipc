@@ -1,7 +1,3 @@
-remove support for multiple transports
-	- unify on a semaphore only
-	- possibly should wait until paper is complete
-
 asynchronous rpc wrapper
 	- have a similar set up to nipc, have a background thread pumping across the transport
 	- have an async_client, wraps a client with background thread
@@ -9,7 +5,3 @@ asynchronous rpc wrapper
 
 have way of replaying responses
 	- this could be used for unit testing
-
-modify error to return idempotency
-	- basically, it should return a value to indicate whether the function was called or not
-	- this can then be used to build idempotency at the application-level, in a cheap manner
