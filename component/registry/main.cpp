@@ -99,10 +99,11 @@ namespace
 		typedef interface::vector_type::const_iterator name_iterator;
 		typedef std::map< info_tuple, up_t > histogram_map;
 		histogram_map histogram;
-		histogram_map::iterator k;
 
 		for ( name_iterator i = names.begin(), end = names.end(); i != end; ++i )
 		{
+			info_tuple info;
+
 			{
 				read_lock lock( mutex );
 				module_map::const_iterator j = map.find( *i );
@@ -110,11 +111,13 @@ namespace
 				if ( j == map.end() )
 					continue;
 
-				k = histogram.find( j->second );
+				info = j->second;
 			}
 
+			histogram_map::iterator k = histogram.find( info );
+
 			if ( k == histogram.end() )
-				histogram.insert( histogram_map::value_type( k->first, 1 ) );
+				histogram.insert( histogram_map::value_type( info, 1 ) );
 			else
 				++k->second;
 		}
