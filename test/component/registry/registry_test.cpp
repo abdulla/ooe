@@ -52,7 +52,7 @@ namespace
 		fork_ptr fork;
 	};
 
-	typedef unit::group< setup, empty_t, 3 > group_type;
+	typedef unit::group< setup, empty_t, 2 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "registry" );
 }
@@ -65,15 +65,6 @@ namespace ooe
 		template<>
 			void fixture_type::test< 0 >( setup& )
 		{
-			std::cerr << "connect to registry\n";
-
-			registry registry;
-		}
-
-		template<>
-		template<>
-			void fixture_type::test< 1 >( setup& )
-		{
 			std::cerr << "search registry for an interface\n";
 
 			interface interface;
@@ -85,7 +76,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 2 >( setup& )
+			void fixture_type::test< 1 >( setup& )
 		{
 			std::cerr << "insert and load library module\n";
 
@@ -96,6 +87,7 @@ namespace ooe
 			registry.insert( registry::library, path );
 			std::string name = registry.surrogate( path );
 			remote remote( name );
+			remote.find< void ( void ) >( "hello" )();
 		}
 	}
 }

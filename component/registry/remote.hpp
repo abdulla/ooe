@@ -52,7 +52,7 @@ namespace ooe
 		remote( const std::string& );
 
 		template< typename type >
-			ipc::memory::rpc< type > find( const std::string& name )
+			ipc::memory::rpc< type > find( const c8* name )
 		{
 			return ipc::memory::call< type >( client, name );
 		}
