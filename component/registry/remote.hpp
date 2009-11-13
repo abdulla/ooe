@@ -45,11 +45,11 @@ namespace ooe
 		vector_type vector;
 	};
 
-//--- external -----------------------------------------------------------------
-	class external
+//--- remote -------------------------------------------------------------------
+	class remote
 	{
 	public:
-		external( const std::string& );
+		remote( const std::string& );
 
 		template< typename type >
 			ipc::memory::rpc< type > find( const std::string& name )

@@ -10,7 +10,7 @@ namespace
 {
 	using namespace ooe;
 
-	void hello_world( void )
+	void hello( void )
 	{
 		std::cout << "hello world\n";
 	}
@@ -23,7 +23,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 	scoped_ptr< facade::remote > remote_ptr( new facade::remote );
 
 	builder< facade::remote > builder( module, *local_ptr, *remote_ptr );
-	builder.insert( "hello_world", hello_world );
+	builder.insert( "hello", hello );
 
 	module.insert( "local", local_ptr );
 	module.insert( "remote", remote_ptr );

@@ -5,7 +5,9 @@
 #include <csignal>
 
 #include "component/registry/registry.hpp"
+#include "component/registry/remote.hpp"
 #include "foundation/executable/fork_io.hpp"
+#include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/semaphore.hpp"
@@ -29,8 +31,8 @@ namespace
 			{
 				OOE_IGNORE
 				(
-					executable::path_tuple path = executable::path();
-					fork_io::execute( path._0 + "registry", "-u", name.c_str(), 0 );
+					std::string root = executable::path()._0;
+					fork_io::execute( root + "registry", "-u", name.c_str(), 0 );
 				);
 
 				fork_io::exit( true );
@@ -50,7 +52,7 @@ namespace
 		fork_ptr fork;
 	};
 
-	typedef unit::group< setup, empty_t, 2 > group_type;
+	typedef unit::group< setup, empty_t, 3 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "registry" );
 }
@@ -75,10 +77,25 @@ namespace ooe
 			std::cerr << "search registry for an interface\n";
 
 			interface interface;
-			interface.insert< void ( const std::string& ) >( "find" );
+			interface.insert< void ( void ) >( "hello" );
 
 			registry registry;
 			registry.find( interface );
+		}
+
+		template<>
+		template<>
+			void fixture_type::test< 2 >( setup& )
+		{
+			std::cerr << "insert and load library module\n";
+
+			std::string root = executable::path()._0;
+			std::string path = root + "../library/libhello" + library::suffix;
+
+			registry registry;
+			registry.insert( registry::library, path );
+			std::string name = registry.surrogate( path );
+			remote remote( name );
 		}
 	}
 }

@@ -19,8 +19,8 @@ namespace ooe
 		vector.insert( i, call );
 	}
 
-//--- external -----------------------------------------------------------------
-	external::external( const std::string& path )
+//--- remote -------------------------------------------------------------------
+	remote::remote( const std::string& path )
 		: client( path )
 	{
 	}

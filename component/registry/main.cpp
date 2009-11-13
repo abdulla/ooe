@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 
 #include "component/registry/local.hpp"
 #include "component/registry/module.hpp"
@@ -23,8 +24,10 @@ namespace
 	typedef tuple< std::string, std::string > name_tuple;
 	typedef tuple< registry::type, std::string > info_tuple;
 	typedef std::multimap< name_tuple, info_tuple > module_map;
+	typedef std::set< info_tuple > module_set;
 	std::string self;
-	module_map modules;
+	module_map map;
+	module_set set;
 	read_write mutex;
 
 	module::vector_type load_server( const std::string& path )
@@ -59,6 +62,13 @@ namespace
 	//--------------------------------------------------------------------------
 	void insert( registry::type type, const std::string& path )
 	{
+		info_tuple info( type, path );
+
+		if ( set.find( info ) != set.end() )
+			throw error::runtime( "registry: " ) << "Module " << info << " exists";
+		else
+			set.insert( info );
+
 		module::vector_type vector;
 
 		switch ( type )
@@ -72,16 +82,15 @@ namespace
 			break;
 
 		default:
-			throw error::runtime( "module: " ) << "Unknown module type: " << type;
+			throw error::runtime( "registry: " ) << "Unknown module type: " << type;
 		}
 
 		typedef module::vector_type::const_iterator iterator_type;
-		info_tuple tuple( type, path );
 
 		for ( iterator_type i = vector.begin(), end = vector.end(); i != end; ++i )
 		{
 			write_lock lock( mutex );
-			modules.insert( module_map::value_type( *i, tuple ) );
+			map.insert( module_map::value_type( *i, info ) );
 		}
 	}
 
@@ -96,9 +105,9 @@ namespace
 		{
 			{
 				read_lock lock( mutex );
-				module_map::const_iterator j = modules.find( *i );
+				module_map::const_iterator j = map.find( *i );
 
-				if ( j == modules.end() )
+				if ( j == map.end() )
 					continue;
 
 				k = histogram.find( j->second );
@@ -125,7 +134,7 @@ namespace
 	std::string surrogate( const std::string& path )
 	{
 		std::string name = ipc::unique_name();
-		ipc::semaphore semaphore( name, ipc::semaphore::create, 0 );
+		ipc::semaphore semaphore( name + ".g", ipc::semaphore::create, 0 );
 		fork_io fork;
 
 		if ( fork.is_child() )
@@ -161,7 +170,7 @@ namespace
 		load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
 
 		ipc::memory::server server( surrogate_path, nameservice );
-		ipc::semaphore( surrogate_path ).up();
+		ipc::semaphore( surrogate_path + ".g" ).up();
 
 		while ( !executable::signal() && server.decode() ) {}
 	}
