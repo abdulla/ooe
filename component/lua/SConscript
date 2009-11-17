@@ -1,0 +1,20 @@
+Import( Split( 'name ooe root' ) )
+
+### configure ##################################################################
+build = root.Clone()
+build.Append( CPPPATH = ooe.lua.include_path )
+
+if not build.GetOption( 'clean' ):
+	setup = Configure( build )
+
+	if not setup.CheckLibWithHeader( ooe.lua.library, 'lauxlib.h', 'c' ):
+		Exit( 1 )
+
+	build = setup.Finish()
+
+### build ######################################################################
+if name == 'darwin':
+	build.Append( LINKFLAGS = '-Wl,-install_name,@rpath/liblua-component.dylib' )
+
+out = build.SharedLibrary( '#library/liblua-component', Glob( '*.cpp' ) )
+build.SideEffect( Glob( '*.rpo' ), out )
