@@ -1,7 +1,5 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include <boost/static_assert.hpp>
-
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"

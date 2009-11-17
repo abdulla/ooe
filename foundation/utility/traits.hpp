@@ -10,22 +10,14 @@
 	#include <boost/type_traits/function_traits.hpp>
 
 	namespace traits = std::tr1;
-	namespace ooe { using traits::is_empty; }
 #else
 	#include <boost/type_traits.hpp>
 
 	namespace traits = boost;
-	namespace ooe
-	{
-		template< typename type >
-			struct is_empty
-			: public boost::false_type
-		{
-		};
-	}
 #endif
 
 #include <boost/call_traits.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include "foundation/utility/preprocessor.hpp"
@@ -119,6 +111,13 @@ namespace ooe
 	template< typename t >
 		struct remove_callable
 		: public remove_pointer< typename remove_member< t >::type >
+	{
+	};
+
+//--- is_empty -----------------------------------------------------------------
+	template< typename t >
+		struct is_empty
+		: public traits::is_empty< typename no_ref< t >::type >
 	{
 	};
 

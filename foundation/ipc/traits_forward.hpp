@@ -5,8 +5,6 @@
 
 #include <cstring>
 
-#include <boost/static_assert.hpp>
-
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/traits.hpp"
@@ -16,16 +14,10 @@ namespace ooe
 	namespace ipc
 	{
 		template< typename >
-			struct is_empty;
-
-		template< typename >
 			struct is_pod;
 
 		template< typename >
 			struct is_array;
-
-		template< typename >
-			struct is_specialised;
 
 //--- ipc::size ----------------------------------------------------------------
 		template< typename, typename = void >
@@ -76,19 +68,11 @@ namespace ooe
 			struct write< t, typename enable_if< is_array< t > >::type >;
 	}
 
-//--- ipc::is_empty ------------------------------------------------------------
-	template< typename t >
-		struct ipc::is_empty
-		: public ooe::is_empty< typename no_ref< t >::type >
-	{
-	};
-
 //--- ipc::is_pod --------------------------------------------------------------
 	template< typename t >
 		struct ipc::is_pod
 	{
 		static const bool value = !is_cstring< t >::value &&
-			!is_specialised< typename no_ref< t >::type >::value &&
 			( ooe::is_pod< typename no_ref< t >::type >::value ||
 			has_trivial_copy< typename no_ref< t >::type >::value );
 	};
@@ -99,13 +83,6 @@ namespace ooe
 	{
 		static const bool value = !is_pod< t >::value &&
 			ooe::is_array< typename no_ref< t >::type >::value;
-	};
-
-//--- ipc::is_specialised ------------------------------------------------------
-	template< typename t >
-		struct ipc::is_specialised
-		: public false_type
-	{
 	};
 
 //--- ipc::traits: default -----------------------------------------------------
@@ -141,7 +118,7 @@ namespace ooe
 
 //--- ipc::traits: empty -------------------------------------------------------
 	template< typename t >
-		struct ipc::size< t, typename enable_if< ipc::is_empty< t > >::type >
+		struct ipc::size< t, typename enable_if< is_empty< t > >::type >
 	{
 		static up_t call( t ) OOE_CONST
 		{
@@ -150,7 +127,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::read< t, typename enable_if< ipc::is_empty< t > >::type >
+		struct ipc::read< t, typename enable_if< is_empty< t > >::type >
 	{
 		static up_t call( const u8*, t ) OOE_CONST
 		{
@@ -159,7 +136,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::write< t, typename enable_if< ipc::is_empty< t > >::type >
+		struct ipc::write< t, typename enable_if< is_empty< t > >::type >
 	{
 		static up_t call( u8*, t ) OOE_CONST
 		{
