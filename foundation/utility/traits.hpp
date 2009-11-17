@@ -46,7 +46,6 @@ namespace ooe
 	using traits::false_type;
 	using traits::has_trivial_copy;
 	using traits::is_arithmetic;
-	using traits::is_array;
 	using traits::is_class;
 	using traits::is_const;
 	using traits::is_enum;
@@ -114,6 +113,13 @@ namespace ooe
 	{
 	};
 
+//--- is_like ------------------------------------------------------------------
+	template< typename a, typename b >
+		struct is_like
+		: public is_same< typename no_ref< a >::type, typename no_ref< b >::type >
+	{
+	};
+
 //--- is_empty -----------------------------------------------------------------
 	template< typename t >
 		struct is_empty
@@ -121,10 +127,10 @@ namespace ooe
 	{
 	};
 
-//--- is_like ------------------------------------------------------------------
-	template< typename a, typename b >
-		struct is_like
-		: public is_same< typename no_ref< a >::type, typename no_ref< b >::type >
+//--- is_array -----------------------------------------------------------------
+	template< typename t >
+		struct is_array
+		: public traits::is_array< typename no_ref< t >::type >
 	{
 	};
 

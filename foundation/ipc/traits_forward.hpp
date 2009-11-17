@@ -16,9 +16,6 @@ namespace ooe
 		template< typename >
 			struct is_pod;
 
-		template< typename >
-			struct is_array;
-
 //--- ipc::size ----------------------------------------------------------------
 		template< typename, typename = void >
 			struct size;
@@ -27,10 +24,10 @@ namespace ooe
 			struct size< t, typename enable_if< is_empty< t > >::type >;
 
 		template< typename t >
-			struct size< t, typename enable_if< is_string< t > >::type >;
+			struct size< t, typename enable_if< is_pod< t > >::type >;
 
 		template< typename t >
-			struct size< t, typename enable_if< is_pod< t > >::type >;
+			struct size< t, typename enable_if< is_string< t > >::type >;
 
 		template< typename t >
 			struct size< t, typename enable_if< is_array< t > >::type >;
@@ -43,10 +40,10 @@ namespace ooe
 			struct read< t, typename enable_if< is_empty< t > >::type >;
 
 		template< typename t >
-			struct read< t, typename enable_if< is_string< t > >::type >;
+			struct read< t, typename enable_if< is_pod< t > >::type >;
 
 		template< typename t >
-			struct read< t, typename enable_if< is_pod< t > >::type >;
+			struct read< t, typename enable_if< is_string< t > >::type >;
 
 		template< typename t >
 			struct read< t, typename enable_if< is_array< t > >::type >;
@@ -59,10 +56,10 @@ namespace ooe
 			struct write< t, typename enable_if< is_empty< t > >::type >;
 
 		template< typename t >
-			struct write< t, typename enable_if< is_string< t > >::type >;
+			struct write< t, typename enable_if< is_pod< t > >::type >;
 
 		template< typename t >
-			struct write< t, typename enable_if< is_pod< t > >::type >;
+			struct write< t, typename enable_if< is_string< t > >::type >;
 
 		template< typename t >
 			struct write< t, typename enable_if< is_array< t > >::type >;
@@ -75,14 +72,6 @@ namespace ooe
 		static const bool value = !is_cstring< t >::value &&
 			( ooe::is_pod< typename no_ref< t >::type >::value ||
 			has_trivial_copy< typename no_ref< t >::type >::value );
-	};
-
-//--- ipc::is_array ------------------------------------------------------------
-	template< typename t >
-		struct ipc::is_array
-	{
-		static const bool value = !is_pod< t >::value &&
-			ooe::is_array< typename no_ref< t >::type >::value;
 	};
 
 //--- ipc::traits: default -----------------------------------------------------
@@ -144,6 +133,36 @@ namespace ooe
 		}
 	};
 
+//--- ipc::traits: pod ---------------------------------------------------------
+	template< typename t >
+		struct ipc::size< t, typename enable_if< ipc::is_pod< t > >::type >
+	{
+		static up_t call( t ) OOE_PURE
+		{
+			return sizeof( t );
+		}
+	};
+
+	template< typename t >
+		struct ipc::read< t, typename enable_if< ipc::is_pod< t > >::type >
+	{
+		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
+		{
+			value = *reinterpret_cast< const t* >( buffer );
+			return size< t >::call( value );
+		}
+	};
+
+	template< typename t >
+		struct ipc::write< t, typename enable_if< ipc::is_pod< t > >::type >
+	{
+		static up_t call( u8* buffer, t value )
+		{
+			*reinterpret_cast< t* >( buffer ) = value;
+			return size< t >::call( value );
+		}
+	};
+
 //--- ipc::traits: string ------------------------------------------------------
 	template< typename t >
 		struct ipc::size< t, typename enable_if< is_string< t > >::type >
@@ -176,39 +195,9 @@ namespace ooe
 		}
 	};
 
-//--- ipc::traits: pod ---------------------------------------------------------
-	template< typename t >
-		struct ipc::size< t, typename enable_if< ipc::is_pod< t > >::type >
-	{
-		static up_t call( t ) OOE_PURE
-		{
-			return sizeof( t );
-		}
-	};
-
-	template< typename t >
-		struct ipc::read< t, typename enable_if< ipc::is_pod< t > >::type >
-	{
-		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
-		{
-			value = *reinterpret_cast< const t* >( buffer );
-			return size< t >::call( value );
-		}
-	};
-
-	template< typename t >
-		struct ipc::write< t, typename enable_if< ipc::is_pod< t > >::type >
-	{
-		static up_t call( u8* buffer, t value )
-		{
-			*reinterpret_cast< t* >( buffer ) = value;
-			return size< t >::call( value );
-		}
-	};
-
 //--- ipc::traits: array -------------------------------------------------------
 	template< typename t >
-		struct ipc::size< t, typename enable_if< ipc::is_array< t > >::type >
+		struct ipc::size< t, typename enable_if< is_array< t > >::type >
 	{
 		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
@@ -224,7 +213,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::read< t, typename enable_if< ipc::is_array< t > >::type >
+		struct ipc::read< t, typename enable_if< is_array< t > >::type >
 	{
 		static up_t call( const u8* buffer, t value )
 		{
@@ -239,7 +228,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::write< t, typename enable_if< ipc::is_array< t > >::type >
+		struct ipc::write< t, typename enable_if< is_array< t > >::type >
 	{
 		static up_t call( u8* buffer, typename call_traits< t >::param_type value, up_t )
 		{
