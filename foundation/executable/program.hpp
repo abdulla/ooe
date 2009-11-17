@@ -24,6 +24,7 @@ namespace ooe
 		void emergency( emergency_handler_type ) OOE_VISIBLE;
 
 		s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
+		void null_fd( s32 ) OOE_VISIBLE;
 		path_tuple path( void ) OOE_VISIBLE;
 		bool path( c8*, up_t );
 	}

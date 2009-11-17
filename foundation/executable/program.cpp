@@ -11,6 +11,7 @@
 
 #include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/utility/scoped.hpp"
 
 namespace
 {
@@ -124,6 +125,24 @@ namespace ooe
 		}
 
 		return status;
+	}
+
+	void executable::null_fd( s32 fd )
+	{
+		s32 null = open( "/dev/null", O_RDWR );
+
+		if ( null == -1 )
+			throw error::runtime( "executable::null_fd: " ) <<
+				"Unable to open /dev/null: " << error::number( errno );
+
+		s32 result = dup2( null, fd );
+
+		if ( close( null ) )
+			OOE_WARNING( "executable::null_fd",
+				"Unable to close /dev/null" << error::number( errno ) );
+		else if ( result == -1 )
+			throw error::runtime( "executable::null_fd: " ) <<
+				"Unable to duplicate fd: " << error::number( errno );
 	}
 
 	executable::path_tuple executable::path( void )
