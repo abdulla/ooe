@@ -12,7 +12,7 @@ namespace
 
 	void hello( void )
 	{
-		std::cout << "hello world\n";
+		std::cout << "hello library\n";
 	}
 }
 
