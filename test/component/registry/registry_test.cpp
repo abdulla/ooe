@@ -11,6 +11,7 @@
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/semaphore.hpp"
+#include "foundation/utility/scoped.hpp"
 #include "test/unit/group.hpp"
 
 namespace
@@ -31,6 +32,7 @@ namespace
 			{
 				OOE_IGNORE
 				(
+					executable::null_fd( STDOUT_FILENO );
 					std::string root = executable::path()._0;
 					fork_io::execute( root + "registry", "-u", name.c_str(), 0 );
 				);
@@ -52,7 +54,7 @@ namespace
 		fork_ptr fork;
 	};
 
-	typedef unit::group< setup, empty_t, 2 > group_type;
+	typedef unit::group< setup, empty_t, 3 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "registry" );
 }
@@ -78,7 +80,7 @@ namespace ooe
 		template<>
 			void fixture_type::test< 1 >( setup& )
 		{
-			std::cerr << "insert and load library module\n";
+			std::cerr << "insert and load library as surrogate\n";
 
 			std::string root = executable::path()._0;
 			std::string path = root + "../library/libhello" + library::suffix;
@@ -87,6 +89,31 @@ namespace ooe
 			registry.insert( registry::library, path );
 			std::string name = registry.surrogate( path );
 			remote remote( name );
+			remote.find< void ( void ) >( "hello" )();
+		}
+
+		template<>
+		template<>
+			void fixture_type::test< 2 >( setup& )
+		{
+			std::cerr << "insert and load module from server\n";
+
+			std::string root = executable::path()._0;
+			std::string path = root + "hello";
+			std::string name = ipc::unique_name();
+
+			ipc::semaphore semaphore( name, ipc::semaphore::create, 0 );
+			fork_io fork;
+
+			if ( fork.is_child() )
+				fork_io::execute( path, "-u", name.c_str(), 0 );
+
+			scoped< void ( s32 ) >
+				scoped( function< void ( s32 ) >( fork, &fork_io::signal ), SIGKILL );
+			semaphore.down();
+			registry registry;
+			registry.insert( registry::server, "/ooe.hello" );
+			remote remote( "/ooe.hello" );
 			remote.find< void ( void ) >( "hello" )();
 		}
 	}

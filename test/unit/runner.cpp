@@ -10,6 +10,7 @@
 #include <fcntl.h>
 
 #include "foundation/executable/fork_io.hpp"
+#include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
@@ -26,20 +27,12 @@ namespace
 	typedef std::vector< vector_tuple > vector_type;
 	bool test_status;
 
-	void null_stdout( void )
-	{
-		if ( close( STDOUT_FILENO ) )
-			throw error::runtime( "unit::runner: " ) << "Unable to close stdout";
-		else if ( open( "/dev/null", O_WRONLY ) != STDOUT_FILENO )
-			throw error::runtime( "unit::runner: " ) << "Unable to replace stdout";
-	}
-
 	void run_test( const unit::group_base::iterator_type& i, void* pointer, bool no_stdout )
 	{
 		try
 		{
 			if ( no_stdout )
-				null_stdout();
+				executable::null_fd( STDOUT_FILENO );
 
 			test_status = true;
 			( *i )( pointer );
