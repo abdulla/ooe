@@ -45,47 +45,25 @@ namespace ooe
 		static const bool value = is_stdstring< type >::value || is_cstring< type >::value;
 	};
 
-	template< typename, typename = void >
-		struct string_size;
-
-	template< typename type >
-		struct string_size< type, typename enable_if< is_stdstring< type > >::type >
+	inline up_t string_size( const std::string& string )
 	{
-		static up_t call( const std::string& string )
-		{
-			return string.size();
-		}
-	};
+		return string.size();
+	}
 
-	template< typename type >
-		struct string_size< type, typename enable_if< is_cstring< type > >::type >
+	inline up_t string_size( const c8* string )
 	{
-		static up_t call( type string )
-		{
-			return std::char_traits< c8 >::length( string );
-		}
-	};
+		return std::char_traits< c8 >::length( string );
+	}
 
-	template< typename, typename = void >
-		struct string_data;
-
-	template< typename type >
-		struct string_data< type, typename enable_if< is_stdstring< type > >::type >
+	inline const c8* string_data( const std::string& string )
 	{
-		static const c8* call( const std::string& string )
-		{
-			return string.c_str();
-		}
-	};
+		return string.c_str();
+	}
 
-	template< typename type >
-		struct string_data< type, typename enable_if< is_cstring< type > >::type >
+	inline const c8* string_data( const c8* string )
 	{
-		static type call( type string )
-		{
-			return string;
-		}
-	};
+		return string;
+	}
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )

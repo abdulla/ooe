@@ -169,7 +169,7 @@ namespace ooe
 	{
 		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
-			return string_size< t >::call( value ) + 1;
+			return string_size( value ) + 1;
 		}
 	};
 
@@ -188,7 +188,7 @@ namespace ooe
 	{
 		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
 		{
-			const c8* string = string_data< t >::call( value );
+			const c8* string = string_data( value );
 			up_t size = ipc::size< t >::call( value );
 			std::memcpy( buffer, string, size );
 			return size;
