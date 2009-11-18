@@ -72,6 +72,8 @@ namespace ooe
 		void raw_set( s32 );
 		void raw_seti( s32, u32 );
 
+		void where( void );
+
 	private:
 		lua::state* state;
 	};

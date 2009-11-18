@@ -178,8 +178,10 @@ namespace ooe
 	{
 		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
-			value = reinterpret_cast< const c8* >( buffer );
-			return size< t >::call( value );
+			const c8* data = reinterpret_cast< const c8* >( buffer );
+			up_t size = string_size( data );
+			value = string_make< typename no_ref< t >::type >( data, size );
+			return size + 1;
 		}
 	};
 

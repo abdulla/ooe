@@ -64,6 +64,20 @@ namespace ooe
 	{
 		return string;
 	}
+
+	template< typename t >
+		typename no_ref< t >::type string_make( const c8* data, up_t size,
+		typename enable_if< is_stdstring< t > >::type* = 0 )
+	{
+		return std::string( data, size );
+	}
+
+	template< typename t >
+		typename no_ref< t >::type string_make( const c8* data, up_t,
+		typename enable_if< is_cstring< t > >::type* = 0 )
+	{
+		return data;
+	}
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )

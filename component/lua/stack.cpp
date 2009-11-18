@@ -104,4 +104,9 @@ namespace ooe
 	{
 		lua_rawseti( state, index, array_index );
 	}
+
+	void lua::stack::where( void )
+	{
+		luaL_where( state, 1 );
+	}
 }
