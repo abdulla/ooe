@@ -7,25 +7,21 @@
 	#define OOE_INLINE			__attribute__( ( __always_inline__ ) )
 	#define OOE_NOINLINE		__attribute__( ( __noinline__ ) )
 	#define OOE_NORETURN		__attribute__( ( __noreturn__ ) )
-	#define OOE_NONNULL			__attribute__( ( __nonnull__ )
+	#define OOE_NONNULL			__attribute__( ( __nonnull__ ) )
+	#define OOE_SENTINEL		__attribute__( ( __sentinel__ ) )
 	#define OOE_WARNUNUSED		__attribute__( ( __warn_unused_result__ ) )
 	#define OOE_PURE			__attribute__( ( __pure__ ) )
 	#define OOE_CONST			__attribute__( ( __const__ ) )
 	#define OOE_PACKED			__attribute__( ( __packed__ ) )
 	#define OOE_ALIGN( size )	__attribute__( ( __aligned__( size ) ) )
-
-	#if __GNUC__ >= 4
-		#define OOE_VISIBLE		__attribute__( ( __visibility__( "default" ) ) )
-		#define OOE_HIDDEN		__attribute__( ( __visibility__( "hidden" ) ) )
-	#else
-		#define OOE_VISIBLE
-		#define OOE_HIDDEN
-	#endif
+	#define OOE_VISIBLE			__attribute__( ( __visibility__( "default" ) ) )
+	#define OOE_HIDDEN			__attribute__( ( __visibility__( "hidden" ) ) )
 #else
 	#define OOE_INLINE
 	#define OOE_NOINLINE
 	#define OOE_NORETURN
 	#define OOE_NONNULL
+	#define OOE_SENTINEL
 	#define OOE_WARNUNUSED
 	#define OOE_PURE
 	#define OOE_CONST

@@ -141,7 +141,7 @@ namespace
 		fork_io fork;
 
 		if ( fork.is_child() )
-			fork_io::execute( self, "-m", path.c_str(), "-s", name.c_str(), 0 );
+			fork_io::execute( self, "-m", path.c_str(), "-s", name.c_str(), NULL );
 
 		semaphore.down();
 		return name;

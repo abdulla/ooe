@@ -34,7 +34,7 @@ namespace
 				(
 					executable::null_fd( STDOUT_FILENO );
 					std::string root = executable::path()._0;
-					fork_io::execute( root + "registry", "-u", name.c_str(), 0 );
+					fork_io::execute( root + "registry", "-u", name.c_str(), NULL );
 				);
 
 				fork_io::exit( true );
@@ -106,7 +106,7 @@ namespace ooe
 			fork_io fork;
 
 			if ( fork.is_child() )
-				fork_io::execute( path, "-u", name.c_str(), 0 );
+				fork_io::execute( path, "-u", name.c_str(), NULL );
 
 			scoped< void ( s32 ) >
 				scoped( function< void ( s32 ) >( fork, &fork_io::signal ), SIGKILL );
