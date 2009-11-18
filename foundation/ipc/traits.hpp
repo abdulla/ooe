@@ -14,36 +14,29 @@ namespace ooe
 	{
 //--- ipc::size ----------------------------------------------------------------
 		template< typename t >
-			struct size< t, typename enable_if< ooe::is_stdcontainer< t > >::type >;
+			struct size< t, typename enable_if< is_stdcontainer< t > >::type >;
 
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_size;
 
 //--- ipc::read ----------------------------------------------------------------
 		template< typename t >
-			struct read< t, typename enable_if< ooe::is_stdcontainer< t > >::type >;
+			struct read< t, typename enable_if< is_stdcontainer< t > >::type >;
 
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_read;
 
 //--- ipc::write ---------------------------------------------------------------
 		template< typename t >
-			struct write< t, typename enable_if< ooe::is_stdcontainer< t > >::type >;
+			struct write< t, typename enable_if< is_stdcontainer< t > >::type >;
 
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_write;
-
-//--- ipc::reserve -------------------------------------------------------------
-		template< typename >
-			struct reserve;
-
-		template< typename t >
-			struct reserve< std::vector< t, std::allocator< t > > >;
 	}
 
 //--- ipc::traits: container ---------------------------------------------------
 	template< typename t >
-		struct ipc::size< t, typename enable_if< ooe::is_stdcontainer< t > >::type >
+		struct ipc::size< t, typename enable_if< is_stdcontainer< t > >::type >
 	{
 		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
@@ -59,28 +52,30 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::read< t, typename enable_if< ooe::is_stdcontainer< t > >::type >
+		struct ipc::read< t, typename enable_if< is_stdcontainer< t > >::type >
 	{
 		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
 			typedef typename no_ref< t >::type type;
 			up_t size = *reinterpret_cast< const up_t* >( buffer );
-			reserve< type >::call( value, size );
+			type container;
+			reserve( container, size );
 			const u8* pointer = buffer + sizeof( up_t );
 
 			for ( up_t i = 0; i != size; ++i )
 			{
 				typename type::value_type element;
 				pointer += read< typename type::value_type >::call( pointer, element );
-				value.insert( value.end(), element );
+				container.insert( container.end(), element );
 			}
 
+			value.swap( container );
 			return pointer - buffer;
 		}
 	};
 
 	template< typename t >
-		struct ipc::write< t, typename enable_if< ooe::is_stdcontainer< t > >::type >
+		struct ipc::write< t, typename enable_if< is_stdcontainer< t > >::type >
 	{
 		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
 		{
@@ -93,24 +88,6 @@ namespace ooe
 				pointer += write< typename type::value_type >::call( pointer, *i );
 
 			return pointer - buffer;
-		}
-	};
-
-//--- ipc::reserve -------------------------------------------------------------
-	template< typename t >
-		struct ipc::reserve
-	{
-		static void call( typename call_traits< t >::param_type, up_t )
-		{
-		}
-	};
-
-	template< typename t >
-		struct ipc::reserve< std::vector< t, std::allocator< t > > >
-	{
-		static void call( std::vector< t, std::allocator< t > >& vector, up_t size )
-		{
-			vector.reserve( size );
 		}
 	};
 }

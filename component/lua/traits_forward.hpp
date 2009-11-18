@@ -1,7 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_COMPONENT_LUA_TRAITS_HPP
-#define OOE_COMPONENT_LUA_TRAITS_HPP
+#ifndef OOE_COMPONENT_LUA_TRAITS_FORWARD_HPP
+#define OOE_COMPONENT_LUA_TRAITS_FORWARD_HPP
 
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
@@ -19,6 +19,9 @@ namespace ooe
 
 		template< typename >
 			struct is_pointer;
+
+		template< typename >
+			struct is_pod;
 
 //--- lua::to ------------------------------------------------------------------
 		template< typename, typename >
@@ -39,6 +42,12 @@ namespace ooe
 		template< typename t >
 			struct to< t, typename enable_if< is_string< t > >::type >;
 
+		template< typename t >
+			struct to< t, typename enable_if< is_pod< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_array< t > >::type >;
+
 //--- lua::push ----------------------------------------------------------------
 		template< typename, typename >
 			struct push;
@@ -57,6 +66,12 @@ namespace ooe
 
 		template< typename t >
 			struct push< t, typename enable_if< is_string< t > >::type >;
+
+		template< typename t >
+			struct push< t, typename enable_if< is_pod< t > >::type >;
+
+		template< typename t >
+			struct push< t, typename enable_if< is_array< t > >::type >;
 
 //--- type_check ---------------------------------------------------------------
 		template< typename >
@@ -85,6 +100,16 @@ namespace ooe
 	{
 		static const bool value = !is_cstring< t >::value &&
 			ooe::is_pointer< typename no_ref< t >::type >::value;
+	};
+
+//--- lua::is_pod --------------------------------------------------------------
+	template< typename t >
+		struct lua::is_pod
+	{
+		static const bool value = // !is_cstring< t >::value &&
+			!is_pointer< t >::value &&
+			( ooe::is_pod< typename no_ref< t >::type >::value ||
+			has_trivial_copy< typename no_ref< t >::type >::value );
 	};
 
 //--- lua::traits: default -----------------------------------------------------
@@ -171,8 +196,8 @@ namespace ooe
 	{
 		static void call( stack& stack, call_traits< t >::reference pointer, s32 index )
 		{
-			type_check< typename no_ref< t >::type >( stack, index, type::number );
-			pointer = stack.to_pointer( index );
+			type_check< typename no_ref< t >::type >( stack, index, type::lightuserdata );
+			pointer = stack.to_userdata( index );
 		}
 	};
 
@@ -203,9 +228,74 @@ namespace ooe
 	template< typename t >
 		struct lua::push< t, typename enable_if< is_string< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::param_type string, s32 index )
+		static void call( stack& stack, call_traits< t >::param_type string )
 		{
 			stack.push_lstring( string_data( string ), string_size( string ) );
+		}
+	};
+
+//--- lua::traits: pod ---------------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< is_pod< t > >::type >
+	{
+		static void call( stack& stack, call_traits< t >::reference pod, s32 index )
+		{
+			typedef no_ref< t >::type type;
+			type_check< type >( stack, index, type::userdata );
+			std::memcpy( &pod, stack.to_userdata( index ), sizeof( type ) );
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< is_pod< t > >::type >
+	{
+		static void call( stack& stack, call_traits< t >::param_type pod )
+		{
+			typedef no_ref< t >::type type;
+			std::memcpy( stack.new_userdata( sizeof( type ) ), &pod, sizeof( type ) );
+		}
+	};
+
+//--- lua::traits: array -------------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< is_array< t > >::type >
+	{
+		static void call( stack& stack, call_traits< t >::reference array, s32 index )
+		{
+			typedef typename no_ref< t >::type value_type;
+			typedef typename remove_extent< value_type >::type type;
+			type_check< value_type >( stack, index, type::table );
+			up_t table_size = stack.objlen( index );
+			up_t array_size = extent< value_type >::value;
+
+			if ( table_size != array_size )
+				throw error::lua() <<
+					"Table is of size " << table_size << ", array is of size " << array_size;
+
+			for ( up_t i = 0; i != array_size; ++i )
+			{
+				stack.raw_geti( index, i + 1 );
+				to< type >::call( stack, array[ i ], -1 );
+				stack.pop( 1 );
+			}
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< is_array< t > >::type >
+	{
+		static void call( stack& stack, call_traits< t >::param_type array )
+		{
+			typedef typename no_ref< t >::type value_type;
+			typedef typename remove_extent< value_type >::type type;
+			up_t array_size = extent< value_type >::value;
+			stack.create_table( array_size, 0 );
+
+			for ( up_t i = 0; i != array_size; ++i )
+			{
+				push< type >::call( stack, array[ i ] );
+				stack.raw_seti( -2, i + 1 );
+			}
 		}
 	};
 
@@ -225,4 +315,4 @@ namespace ooe
 	}
 }
 
-#endif	// OOE_COMPONENT_LUA_TRAITS_HPP
+#endif	// OOE_COMPONENT_LUA_TRAITS_FORWARD_HPP

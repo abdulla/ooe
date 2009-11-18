@@ -56,6 +56,7 @@ namespace ooe
 		f64 to_number( s32 ) const;
 		bool to_boolean( s32 ) const;
 		const c8* to_lstring( s32, up_t* ) const;
+		up_t objlen( s32 ) const;
 		void* to_userdata( s32 ) const;
 
 		void push_nil( void );
@@ -68,6 +69,7 @@ namespace ooe
 		void raw_get( s32 );
 		void raw_geti( s32, u32 );
 		void create_table( u32, u32 );
+		void* new_userdata( up_t );
 
 		void raw_set( s32 );
 		void raw_seti( s32, u32 );

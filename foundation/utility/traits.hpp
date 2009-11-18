@@ -195,6 +195,18 @@ namespace ooe
 
 		static const bool value = apply< typename no_ref< t >::type >::value;
 	};
+
+//--- reserve ------------------------------------------------------------------
+	template< typename t >
+		void reserve( typename call_traits< t >::param_type, up_t )
+	{
+	}
+
+	template< typename t >
+		void reserve( std::vector< t, std::allocator< t > >& vector, up_t size )
+	{
+		vector.reserve( size );
+	}
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )

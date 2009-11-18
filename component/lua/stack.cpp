@@ -45,6 +45,11 @@ namespace ooe
 		return lua_tolstring( state, index, size );
 	}
 
+	up_t lua::stack::objlen( s32 index ) const
+	{
+		return lua_objlen( state, index );
+	}
+
 	void* lua::stack::to_userdata( s32 index ) const
 	{
 		return lua_touserdata( state, index );
@@ -93,6 +98,11 @@ namespace ooe
 	void lua::stack::create_table( u32 array_size, u32 table_size )
 	{
 		lua_createtable( state, array_size, table_size );
+	}
+
+	void* lua::stack::new_userdata( up_t size )
+	{
+		return lua_newuserdata( state, size );
 	}
 
 	void lua::stack::raw_set( s32 index )

@@ -203,11 +203,12 @@ namespace ooe
 	{
 		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
-			typedef typename remove_extent< typename no_ref< t >::type >::type type;
+			typedef typename no_ref< t >::type value_type;
+			typedef typename remove_extent< value_type >::type type;
 
 			up_t sum = 0;
 
-			for ( up_t i = 0; i != extent< type >::value; ++i )
+			for ( up_t i = 0; i != extent< value_type >::value; ++i )
 				sum += size< type >::call( value[ i ] );
 
 			return sum;
@@ -219,10 +220,11 @@ namespace ooe
 	{
 		static up_t call( const u8* buffer, t value )
 		{
-			typedef typename remove_extent< typename no_ref< t >::type >::type type;
+			typedef typename no_ref< t >::type value_type;
+			typedef typename remove_extent< value_type >::type type;
 			const u8* pointer = buffer;
 
-			for ( up_t i = 0; i != extent< type >::value; ++i )
+			for ( up_t i = 0; i != extent< value_type >::value; ++i )
 				pointer += read< type >::call( pointer, value[ i ] );
 
 			return pointer - buffer;
@@ -234,10 +236,11 @@ namespace ooe
 	{
 		static up_t call( u8* buffer, typename call_traits< t >::param_type value, up_t )
 		{
-			typedef typename remove_extent< typename no_ref< t >::type >::type type;
+			typedef typename no_ref< t >::type value_type;
+			typedef typename remove_extent< value_type >::type type;
 			u8* pointer = buffer;
 
-			for ( up_t i = 0; i != extent< type >::value; ++i )
+			for ( up_t i = 0; i != extent< value_type >::value; ++i )
 				pointer += write< type >::call( pointer, value[ i ] );
 
 			return pointer - buffer;
