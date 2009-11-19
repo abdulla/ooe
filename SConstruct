@@ -9,7 +9,7 @@ flags_release = Split( '-O3 -g0 -fomit-frame-pointer -ffast-math -ftracer -fweb 
 	# visibility is set in release build, otherwise backtrace() won't work in debug build
 
 flags_cxx = Split( '-pipe -ansi -pedantic-errors -fno-enforce-eh-specs -fuse-cxa-atexit '
-	' -funit-at-a-time -fstrict-aliasing -march=core2 -mfpmath=sse' )
+	' -funit-at-a-time -fstrict-aliasing -mfpmath=sse' )
 	# -frepo
 
 flags_cxx += Split( '-Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wnon-virtual-dtor -Wcast-align '
@@ -53,10 +53,12 @@ name = root[ 'PLATFORM' ]
 if name == 'posix':
 	from platform.posix import *
 	root.Replace( CXX = ooe.compiler )
+	root.Append( CXXFLAGS = Split( '-march=native' ) )
 	if build == 'release': root.Append( LINKFLAGS = Split( '-Wl,--strip-all -Wl,--gc-sections' ) )
 elif name == 'darwin':
 	from platform.darwin import *
 	root.Replace( CXX = ooe.compiler )
+	root.Append( CXXFLAGS = Split( '-march=core2' ) )
 else:
 	print 'Platform:', name, '->', 'unknown'
 	Exit( 1 )
