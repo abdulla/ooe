@@ -24,7 +24,7 @@ namespace ooe
 			struct is_pod;
 
 //--- lua::to ------------------------------------------------------------------
-		template< typename, typename >
+		template< typename, typename = void >
 			struct to;
 
 		template< typename t >
@@ -49,7 +49,7 @@ namespace ooe
 			struct to< t, typename enable_if< is_array< t > >::type >;
 
 //--- lua::push ----------------------------------------------------------------
-		template< typename, typename >
+		template< typename, typename = void >
 			struct push;
 
 		template< typename t >
@@ -135,16 +135,16 @@ namespace ooe
 	template< typename t >
 		struct lua::to< t, typename enable_if< is_empty< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::reference, s32 index )
+		static void call( stack& stack, typename call_traits< t >::reference, s32 index )
 		{
-			type_check< typename no_ref< t >::type >( stack, index, type::nil );
+			type_check< t >( stack, index, type::nil );
 		}
 	};
 
 	template< typename t >
 		struct lua::push< t, typename enable_if< is_empty< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::param_type )
+		static void call( stack& stack, typename call_traits< t >::param_type )
 		{
 			stack.push_nil();
 		}
@@ -174,9 +174,9 @@ namespace ooe
 	template< typename t >
 		struct lua::to< t, typename enable_if< lua::is_arithmetic< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::reference number, s32 index )
+		static void call( stack& stack, typename call_traits< t >::reference number, s32 index )
 		{
-			type_check< typename no_ref< t >::type >( stack, index, type::number );
+			type_check< t >( stack, index, type::number );
 			number = stack.to_number( index );
 		}
 	};
@@ -184,7 +184,7 @@ namespace ooe
 	template< typename t >
 		struct lua::push< t, typename enable_if< lua::is_arithmetic< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::param_type number )
+		static void call( stack& stack, typename call_traits< t >::param_type number )
 		{
 			stack.push_number( number );
 		}
@@ -194,9 +194,9 @@ namespace ooe
 	template< typename t >
 		struct lua::to< t, typename enable_if< lua::is_pointer< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::reference pointer, s32 index )
+		static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
 		{
-			type_check< typename no_ref< t >::type >( stack, index, type::lightuserdata );
+			type_check< t >( stack, index, type::lightuserdata );
 			pointer = stack.to_userdata( index );
 		}
 	};
@@ -204,7 +204,7 @@ namespace ooe
 	template< typename t >
 		struct lua::push< t, typename enable_if< lua::is_pointer< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::param_type pointer )
+		static void call( stack& stack, typename call_traits< t >::param_type pointer )
 		{
 			stack.push_lightuserdata( const_cast< typename no_qual< t >::type* >( pointer ) );
 		}
@@ -214,21 +214,19 @@ namespace ooe
 	template< typename t >
 		struct lua::to< t, typename enable_if< is_string< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::reference string, s32 index )
+		static void call( stack& stack, typename call_traits< t >::reference string, s32 index )
 		{
-			typedef typename no_ref< t >::type type;
-			type_check< type >( stack, index, type::string );
-
+			type_check< t >( stack, index, type::string );
 			up_t size;
 			const c8* data = stack.to_lstring( index, &size );
-			string = string_make< type >( data, size );
+			string = string_make< typename no_ref< t >::type >( data, size );
 		}
 	};
 
 	template< typename t >
 		struct lua::push< t, typename enable_if< is_string< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::param_type string )
+		static void call( stack& stack, typename call_traits< t >::param_type string )
 		{
 			stack.push_lstring( string_data( string ), string_size( string ) );
 		}
@@ -236,22 +234,21 @@ namespace ooe
 
 //--- lua::traits: pod ---------------------------------------------------------
 	template< typename t >
-		struct lua::to< t, typename enable_if< is_pod< t > >::type >
+		struct lua::to< t, typename enable_if< lua::is_pod< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::reference pod, s32 index )
+		static void call( stack& stack, typename call_traits< t >::reference pod, s32 index )
 		{
-			typedef no_ref< t >::type type;
-			type_check< type >( stack, index, type::userdata );
-			std::memcpy( &pod, stack.to_userdata( index ), sizeof( type ) );
+			type_check< t >( stack, index, type::userdata );
+			std::memcpy( &pod, stack.to_userdata( index ), sizeof( typename no_ref< t >::type ) );
 		}
 	};
 
 	template< typename t >
-		struct lua::push< t, typename enable_if< is_pod< t > >::type >
+		struct lua::push< t, typename enable_if< lua::is_pod< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::param_type pod )
+		static void call( stack& stack, typename call_traits< t >::param_type pod )
 		{
-			typedef no_ref< t >::type type;
+			typedef typename no_ref< t >::type type;
 			std::memcpy( stack.new_userdata( sizeof( type ) ), &pod, sizeof( type ) );
 		}
 	};
@@ -260,13 +257,12 @@ namespace ooe
 	template< typename t >
 		struct lua::to< t, typename enable_if< is_array< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::reference array, s32 index )
+		static void call( stack& stack, typename call_traits< t >::reference array, s32 index )
 		{
-			typedef typename no_ref< t >::type value_type;
-			typedef typename remove_extent< value_type >::type type;
-			type_check< value_type >( stack, index, type::table );
+			typedef typename no_ref< t >::type type;
+			type_check< t >( stack, index, type::table );
 			up_t table_size = stack.objlen( index );
-			up_t array_size = extent< value_type >::value;
+			up_t array_size = extent< type >::value;
 
 			if ( table_size != array_size )
 				throw error::lua() <<
@@ -275,7 +271,7 @@ namespace ooe
 			for ( up_t i = 0; i != array_size; ++i )
 			{
 				stack.raw_geti( index, i + 1 );
-				to< type >::call( stack, array[ i ], -1 );
+				to< typename remove_extent< type >::type >::call( stack, array[ i ], -1 );
 				stack.pop( 1 );
 			}
 		}
@@ -284,16 +280,15 @@ namespace ooe
 	template< typename t >
 		struct lua::push< t, typename enable_if< is_array< t > >::type >
 	{
-		static void call( stack& stack, call_traits< t >::param_type array )
+		static void call( stack& stack, typename call_traits< t >::param_type array )
 		{
-			typedef typename no_ref< t >::type value_type;
-			typedef typename remove_extent< value_type >::type type;
-			up_t array_size = extent< value_type >::value;
+			typedef typename no_ref< t >::type type;
+			up_t array_size = extent< type >::value;
 			stack.create_table( array_size, 0 );
 
 			for ( up_t i = 0; i != array_size; ++i )
 			{
-				push< type >::call( stack, array[ i ] );
+				push< typename remove_extent< type >::type >::call( stack, array[ i ] );
 				stack.raw_seti( -2, i + 1 );
 			}
 		}
@@ -308,10 +303,10 @@ namespace ooe
 		if ( type == id )
 			return;
 
-		const c8* name = stack.type_name( type );
 		stack.where();
-		throw error::lua( stack ) << "bad argument at index " << index <<
-			" (" << demangle( typeid( t ).name() ) << " expected, got " << name << " )";
+		throw error::lua( stack ) << "bad argument at index " << index << " for type \"" <<
+			demangle( typeid( typename no_ref< t >::type ).name() ) << "\" (" <<
+			stack.type_name( id ) << " expected, got " << stack.type_name( type ) << ')';
 	}
 }
 

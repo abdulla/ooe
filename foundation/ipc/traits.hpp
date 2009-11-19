@@ -66,7 +66,7 @@ namespace ooe
 			{
 				typename type::value_type element;
 				pointer += read< typename type::value_type >::call( pointer, element );
-				container.insert( container.end(), element );
+				container.push_back( element );
 			}
 
 			value.swap( container );
@@ -109,7 +109,7 @@ namespace ooe
 		read< typename no_ref< t ## n >::type >::call( buffer, a ## n );
 	#define WRITE( z, n, _ ) buffer += write< t ## n >::call( buffer, a ## n );
 
-	#define TUPLE_SIZE( z, n, _ ) +\
+	#define TUPLE_SIZE( z, n, d ) +\
 		size< typename tuple_element< n, t >::type >::call( value._ ## n )
 	#define TUPLE_READ( z, n, _ ) pointer +=\
 		read< typename tuple_element< n, t >::type >::call( pointer, at< n >( value ) );
@@ -161,7 +161,7 @@ namespace ooe
 		static up_t call( typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, value ) )
 			OOE_PURE
 		{
-			return 0 BOOST_PP_REPEAT( LIMIT, TUPLE_SIZE, _ );
+			return 0 BOOST_PP_REPEAT( LIMIT, TUPLE_SIZE, ~ );
 		}
 	};
 
