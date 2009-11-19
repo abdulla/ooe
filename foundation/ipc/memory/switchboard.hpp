@@ -103,11 +103,10 @@ namespace ooe
 				struct invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
 
 #if LIMIT
-			template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+			template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 				struct invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >;
 
-			template< typename r, typename t0 COMMA
-				BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+			template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 				struct invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >;
 #endif
 		}
@@ -156,7 +155,7 @@ namespace ooe
 
 #if LIMIT
 //--- ipc::memory::invoke_member -----------------------------------------------
-	template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct ipc::memory::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, u8* buffer_ptr, up_t buffer_size, write_buffer& buffer,
@@ -177,7 +176,7 @@ namespace ooe
 		}
 	};
 
-	template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct ipc::memory::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, u8* buffer_ptr, up_t buffer_size, write_buffer& buffer,
