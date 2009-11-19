@@ -41,7 +41,7 @@ namespace ooe
 			type* find( const std::string& name,
 			typename enable_if< is_function< type > >::type* = 0 ) const
 		{
-			return symbol< type* >( find( name ) ).function;
+			return ptr_cast< type* >( find( name ) );
 		}
 
 		template< typename type >
@@ -55,7 +55,7 @@ namespace ooe
 			static type* find( const std::string& name, find_type flag,
 			typename enable_if< is_function< type > >::type* = 0 )
 		{
-			return symbol< type* >( find( name, flag ) ).function;
+			return ptr_cast< type* >( find( name, flag ) );
 		}
 
 		template< typename type >

@@ -112,7 +112,7 @@ namespace ooe
 
 			void* userdata = stack.touserdata( upvalue( 1 ) );
 			typedef r ( * type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-			type call = symbol< type >( userdata ).function;
+			type call = ptr_cast< type >( userdata );
 
 			OOE_ERROR( traits< r >::push( stack, call( BOOST_PP_ENUM( LIMIT, TO, ~ ) ) ) );
 			return 1;
@@ -134,7 +134,7 @@ namespace ooe
 
 			void* userdata = stack.touserdata( upvalue( 1 ) );
 			typedef void ( * type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-			type call = symbol< type >( userdata ).function;
+			type call = ptr_cast< type >( userdata );
 
 			OOE_ERROR( call( BOOST_PP_ENUM( LIMIT, TO, ~ ) ) );
 			return 0;

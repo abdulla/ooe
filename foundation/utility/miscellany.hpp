@@ -57,28 +57,13 @@ namespace ooe
 		return j;
 	}
 
-//--- symbol -------------------------------------------------------------------
-	template< typename type = void ( * )( void ) >
-		union symbol
-	{
-		void* pointer;
-		type function;
-
-		symbol( void* pointer_ )
-			: pointer( pointer_ )
-		{
-		}
-
-		symbol( type function_ )
-			: function( function_ )
-		{
-		}
-	};
-
+//--- ptr_cast -----------------------------------------------------------------
 	template< typename type >
-		void* to_pointer( type function )
+		type ptr_cast( void* pointer )
 	{
-		return symbol< type >( function ).pointer;
+		union { void* in; type out; } pun;
+		pun.in = pointer;
+		return pun.out;
 	}
 
 //--- destroy ------------------------------------------------------------------

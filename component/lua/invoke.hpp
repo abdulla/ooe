@@ -5,6 +5,8 @@
 	#ifndef OOE_COMPONENT_LUA_INVOKE_HPP
 	#define OOE_COMPONENT_LUA_INVOKE_HPP
 
+#include "component/lua/traits.hpp"
+
 namespace ooe
 {
 	namespace lua
@@ -18,7 +20,7 @@ namespace ooe
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "component/lua/function.hpp"
+	#define BOOST_PP_FILENAME_1 "component/lua/invoke.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
@@ -67,6 +69,8 @@ namespace ooe
 
 			BOOST_PP_REPEAT( LIMIT, TO, ~ )
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+
+			return 0;
 		}
 	};
 
@@ -84,6 +88,8 @@ namespace ooe
 			BOOST_PP_REPEAT( LIMIT, TO, ~ )
 			r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 			push< r >::call( stack, value );
+
+			return 1;
 		}
 	};
 
@@ -104,6 +110,8 @@ namespace ooe
 			to< t0 >::call( stack, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
 			( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+
+			return 0;
 		}
 	};
 
@@ -123,6 +131,8 @@ namespace ooe
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
 			r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 			push< r >::call( stack, value );
+
+			return 1;
 		}
 	};
 #endif

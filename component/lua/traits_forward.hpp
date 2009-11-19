@@ -4,8 +4,8 @@
 #define OOE_COMPONENT_LUA_TRAITS_FORWARD_HPP
 
 #include "foundation/utility/macro.hpp"
+#include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/string.hpp"
-#include "foundation/utility/traits.hpp"
 
 namespace ooe
 {
@@ -197,7 +197,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
 		{
 			type_check< t >( stack, index, type::lightuserdata );
-			pointer = stack.to_userdata( index );
+			pointer = ptr_cast< typename no_ref< t >::type >( stack.to_userdata( index ) );
 		}
 	};
 
