@@ -2,13 +2,20 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_COMPONENT_LUA_INVOKE_HPP
-	#define OOE_COMPONENT_LUA_INVOKE_HPP
+	#ifndef OOE_COMPONENT_LUA_SCRIPT_HPP
+	#define OOE_COMPONENT_LUA_SCRIPT_HPP
+
+#include <vector>
 
 #include "component/lua/traits.hpp"
 
 namespace ooe
 {
+	namespace facade
+	{
+		class lua;
+	}
+
 	namespace lua
 	{
 		template< typename >
@@ -17,15 +24,45 @@ namespace ooe
 		template< typename, typename >
 			struct invoke_member;
 	}
+
+//--- facade::lua_script -------------------------------------------------------
+	class facade::lua
+	{
+	public:
+		typedef std::vector< ooe::lua::cfunction > vector_type;
+
+		const vector_type& get( void ) const OOE_VISIBLE;
+		void insert( up_t, ooe::lua::cfunction ) OOE_VISIBLE;
+
+		template< typename type >
+			void insert( up_t index,
+			typename enable_if< is_function_pointer< type > >::type* = 0 )
+		{
+			typedef typename remove_pointer< type >::type function_type;
+			insert( index, ooe::lua::invoke_function< function_type >::call );
+		}
+
+		template< typename type >
+			void insert( up_t index,
+			typename enable_if< is_member_function_pointer< type > >::type* = 0 )
+		{
+			typedef typename member_of< type >::type object_type;
+			typedef typename remove_member< type >::type member_type;
+			insert( index, ooe::lua::invoke_member< object_type, member_type >::call );
+		}
+
+	private:
+		vector_type vector;
+	};
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "component/lua/invoke.hpp"
+	#define BOOST_PP_FILENAME_1 "component/lua/script.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
-	#endif	// OOE_COMPONENT_LUA_INVOKE_HPP
+	#endif	// OOE_COMPONENT_LUA_SCRIPT_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 
@@ -59,7 +96,7 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 dispatch( lua::state* state )
+		static s32 call( lua::state* state )
 		{
 			stack stack( state );
 
@@ -77,7 +114,7 @@ namespace ooe
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 dispatch( lua::state* state )
+		static s32 call( lua::state* state )
 		{
 			stack stack( state );
 
@@ -98,7 +135,7 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 dispatch( lua::state* state )
+		static s32 call( lua::state* state )
 		{
 			stack stack( state );
 
@@ -118,7 +155,7 @@ namespace ooe
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 dispatch( lua::state* state )
+		static s32 call( lua::state* state )
 		{
 			stack stack( state );
 

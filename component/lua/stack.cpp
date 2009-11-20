@@ -6,7 +6,6 @@ extern "C"
 }
 
 #include "component/lua/error.hpp"
-#include "component/lua/invoke.hpp"
 
 namespace ooe
 {

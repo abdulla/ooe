@@ -3,9 +3,10 @@
 #ifndef OOE_COMPONENT_LUA_TRAITS_FORWARD_HPP
 #define OOE_COMPONENT_LUA_TRAITS_FORWARD_HPP
 
-#include "foundation/utility/macro.hpp"
+#include <cstring>
+
+#include "component/lua/error.hpp"
 #include "foundation/utility/miscellany.hpp"
-#include "foundation/utility/string.hpp"
 
 namespace ooe
 {
