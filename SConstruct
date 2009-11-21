@@ -24,7 +24,7 @@ def IOConfigure( platform, setup ):
 def GeneralConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
 
-	if name == 'posix':
+	if platform == 'posix':
 		if not setup.CheckLib( ooe.x11.library ): Exit( 1 )
 
 def LuaConfigure( platform, setup ):
@@ -61,13 +61,12 @@ foundation
 build.Configurable( configure = UtilityConfigure )
 build.Linkable( 'executable', 'foundation/executable', [ ooe.dl.library, ooe.rt.library ],
 	ooe.appkit.framework )
-build.Linkable( 'general', 'foundation/general', frameworks = ooe.qtkit.framework,
-	include_path = ooe.freetype.include_path, library_path = ooe.freetype.library_path )
+build.Linkable( 'general', 'foundation/general', 'parallel', ooe.qtkit.framework,
+	ooe.freetype.include_path, ooe.freetype.library_path, GeneralConfigure )
 build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.include_path,
 	configure = ImageConfigure )
 build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
-build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/memory/socket',
-	'io parallel' )
+build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
 build.Linkable( 'lua-old', 'foundation/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
 build.Linkable( 'maths', 'foundation/maths' )
@@ -79,7 +78,8 @@ build.Linkable( 'scene', 'foundation/scene', 'image io lua-old maths parallel' )
 component
 """
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
-build.Linkable( 'lua', 'component/lua', 'io', configure = LuaConfigure )
+build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
+	configure = LuaConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
 
 """
@@ -96,7 +96,7 @@ build.Linkable( 'unit', 'test/unit', 'executable' )
 """
 external
 """
-build.Executable( 'engine', 'external/engine', 'executable parallel service' )
+build.Executable( 'engine', 'external/engine', 'executable io lua-old parallel service' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'ipc_check', 'external/ipc_check', 'executable ipc' )
 build.Executable( 'monitor', 'external/monitor', 'executable general image' )

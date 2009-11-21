@@ -52,7 +52,7 @@ class Build( object ):
 		Help( variables.GenerateHelpText( self.environment ) )
 		self.environment.Replace( variables = variables )
 
-		if not sys.stdout.isatty():
+		if sys.stdout.isatty():
 			self.environment[ 'CXXCOMSTR' ] =\
 				'\t%s[CC]%s $SOURCE' % ( self.COLOURS[ 'green' ], self.COLOURS[ 'none' ] )
 			self.environment[ 'SHCXXCOMSTR' ] =\
@@ -127,6 +127,7 @@ class Build( object ):
 
 		if self.platform == 'posix':
 			build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
+			build.Append( LINKFLAGS = '-Wl,-rpath-link,library' )
 		elif self.platform == 'darwin':
 			build.Append( LINKFLAGS = '-Wl,-rpath,@executable_path/../library' )
 
