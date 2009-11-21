@@ -1,5 +1,0 @@
-Import( 'root' )
-build = root.Clone()
-
-out = build.SharedLibrary( '#library/libservice', Glob( '*.cpp' ) )
-build.SideEffect( Glob( '*.rpo' ), out )

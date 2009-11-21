@@ -1,75 +1,109 @@
-import sys
+from platform.build import *
 
-### flags ######################################################################
-defines_debug = Split( '_FORTIFY_SOURCE=2' )
-flags_debug = Split( '-O0 -g2 -fno-inline -fstack-protector-all' )
+### variables ##################################################################
+variables = Variables()
+variables.Add( EnumVariable( 'build', 'build type', 'debug', ( 'debug', 'release' ) ) )
 
-flags_release = Split( '-O3 -g0 -fomit-frame-pointer -ffast-math -ftracer -fweb '
-	'-fvisibility=hidden -fvisibility-inlines-hidden' )
-	# visibility is set in release build, otherwise backtrace() won't work in debug build
+### configure ##################################################################
+def ImageConfigure( platform, setup ):
+	if not setup.CheckLibWithHeader( 'jpeg', [ 'stdio.h', 'jpeglib.h' ], 'c' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'openjpeg', 'openjpeg.h', 'c' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'png', 'png.h', 'c' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'squish', 'squish.h', 'c++' ): Exit( 1 )
+	if not setup.CheckLib( 'Half', language = 'c++' ): Exit( 1 )
+	if not setup.CheckLib( 'Iex', language = 'c++' ): Exit( 1 )
+	if not setup.CheckLib( 'IlmImf', language = 'c++' ): Exit( 1 )
 
-flags_cxx = Split( '-pipe -ansi -pedantic-errors -fno-enforce-eh-specs -fuse-cxa-atexit '
-	' -funit-at-a-time -fstrict-aliasing -mfpmath=sse' )
-	# -frepo
+	if platform == 'darwin':
+		if not setup.CheckLib( 'IlmThread', language = 'c++' ): Exit( 1 )
 
-flags_cxx += Split( '-Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wnon-virtual-dtor -Wcast-align '
-	'-Woverloaded-virtual -Wreorder -Wpointer-arith -Wwrite-strings -Wno-long-long -Wformat=2 '
-	'-Wstrict-aliasing -Wmissing-include-dirs -Wswitch-default -Wlarger-than-8192 -Wundef' )
-	# -Wold-style-cast
+def IOConfigure( platform, setup ):
+	if platform == 'posix':
+		if not setup.CheckFunc( 'splice', '#include <fcntl.h>' ): Exit( 1 )
 
-### setup ######################################################################
-root = Environment( CPPPATH = '#', LIBPATH = '#library', CXXFLAGS = flags_cxx )
-#root.SetOption( 'num_jobs', 4 )
+def GeneralConfigure( platform, setup ):
+	if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
 
-colour = { 'cyan': '\033[46m', 'green': '\033[42m', 'yellow': '\033[43m', 'none': '\033[0m' }
+	if name == 'posix':
+		if not setup.CheckLib( ooe.x11.library ): Exit( 1 )
 
-if not sys.stdout.isatty():
-	for key in colour.iterkeys():
-		colour[ key ] = ''
+def LuaConfigure( platform, setup ):
+	if not setup.CheckLibWithHeader( ooe.lua.library, 'lauxlib.h', 'c' ): Exit( 1 )
 
-root[ 'CXXCOMSTR' ] = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] )
-root[ 'SHCXXCOMSTR' ] = '\t%s[CC]%s $SOURCE' % ( colour[ 'green' ], colour[ 'none' ] )
-root[ 'LINKCOMSTR' ] = '\t%s[LD]%s $TARGET' % ( colour[ 'cyan' ], colour[ 'none' ] )
-root[ 'SHLINKCOMSTR' ] = '\t%s[LD]%s $TARGET' % ( colour[ 'yellow' ], colour[ 'none' ] )
+def OpenGLConfigure( platform, setup ):
+	if platform == 'darwin':
+		if not setup.CheckCHeader( 'OpenGL/OpenGL.h' ): Exit( 1 )
+	elif platform == 'posix':
+		if not setup.CheckLibWithHeader( ooe.gl.library, 'GL/glx.h', 'c' ): Exit( 1 )
 
-### arguments ##################################################################
-vars = Variables()
-vars.Add( EnumVariable( 'build', 'build type', 'debug', ( 'debug', 'release' ) ) )
-Help( vars.GenerateHelpText( root ) )
-root.Replace( variables = vars )
+def UtilityConfigure( platform, setup ):
+	if not setup.CheckCXXHeader( 'boost/call_traits.hpp' ): Exit( 1 )
+	if not setup.CheckCXXHeader( 'boost/noncopyable.hpp' ): Exit( 1 )
+	if not setup.CheckCXXHeader( 'boost/preprocessor.hpp' ): Exit( 1 )
+	if not setup.CheckCXXHeader( 'boost/type_traits.hpp' ): Exit( 1 )
+	if not setup.CheckCXXHeader( 'boost/mpl/vector.hpp' ): Exit( 1 )
+	if not setup.CheckCXXHeader( 'boost/utility/enable_if.hpp' ): Exit( 1 )
 
-build = ARGUMENTS.get( 'build', 'debug' )
-print 'Build:', build
+def UUIDConfigure( platform, setup ):
+	if platform == 'posix':
+		if not setup.CheckLibWithHeader( 'uuid', 'uuid/uuid.h', 'c' ): Exit( 1 )
+	elif platform == 'darwin':
+		if not setup.CheckCHeader( 'uuid/uuid.h' ): Exit( 1 )
 
-if build == 'release':
-	root.Append( CXXFLAGS = flags_release )
-else:
-	root.Append( CPPDEFINES = defines_debug )
-	root.Append( CXXFLAGS = flags_debug )
+### build ######################################################################
+build = Build( variables )
+build.Configure( 'release' == ARGUMENTS.get( 'build', 'debug' ) )
+exec 'from platform.' + build.platform + ' import *'
 
-### platform ###################################################################
-name = root[ 'PLATFORM' ]
+"""
+foundation
+"""
+build.Configurable( configure = UtilityConfigure )
+build.Linkable( 'executable', 'foundation/executable', [ ooe.dl.library, ooe.rt.library ],
+	ooe.appkit.framework )
+build.Linkable( 'general', 'foundation/general', frameworks = ooe.qtkit.framework,
+	include_path = ooe.freetype.include_path, library_path = ooe.freetype.library_path )
+build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.include_path,
+	configure = ImageConfigure )
+build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
+build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/memory/socket',
+	'io parallel' )
+build.Linkable( 'lua-old', 'foundation/lua', 'io', include_path = ooe.lua.include_path,
+	configure = LuaConfigure )
+build.Linkable( 'maths', 'foundation/maths' )
+build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
+build.Linkable( 'parallel', 'foundation/parallel', ooe.pthread.library )
+build.Linkable( 'scene', 'foundation/scene', 'image io lua-old maths parallel' )
 
-if name == 'posix':
-	from platform.posix import *
-	root.Replace( CXX = ooe.compiler )
-	root.Append( CXXFLAGS = Split( '-march=native' ) )
-	if build == 'release': root.Append( LINKFLAGS = Split( '-Wl,--strip-all -Wl,--gc-sections' ) )
-elif name == 'darwin':
-	from platform.darwin import *
-	root.Replace( CXX = ooe.compiler )
-	root.Append( CXXFLAGS = Split( '-march=core2' ) )
-else:
-	print 'Platform:', name, '->', 'unknown'
-	Exit( 1 )
+"""
+component
+"""
+build.Executable( 'registry', 'component/registry/server', 'executable registry' )
+build.Linkable( 'lua', 'component/lua', 'io', configure = LuaConfigure )
+build.Linkable( 'registry', 'component/registry', 'ipc' )
 
-platform = '#/platform/' + name
-print 'Platform:', name, '->', platform
+"""
+test
+"""
+build.Executable( 'registry_test', 'test/component/registry', 'registry unit' )
+build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
+build.Executable( 'io_test', 'test/foundation/io', 'io parallel unit' )
+build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
+build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
+build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
+build.Linkable( 'unit', 'test/unit', 'executable' )
 
-root.Append( CPPPATH = [ platform ] + ooe.include_path )
-root.Append( LIBPATH = ooe.library_path )
-root.Append( SHLINKFLAGS = ooe.link_flags )
-
-### exports ####################################################################
-Export( Split( 'name ooe platform root' ) )
-SConscript( dirs = Split( 'component external foundation test' ) )
+"""
+external
+"""
+build.Executable( 'engine', 'external/engine', 'executable parallel service' )
+build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
+build.Executable( 'ipc_check', 'external/ipc_check', 'executable ipc' )
+build.Executable( 'monitor', 'external/monitor', 'executable general image' )
+build.Executable( 'tools', 'external/tools', 'executable graph image' )
+build.Executable( 'uuid_check', 'external/uuid_check', 'executable', configure = UUIDConfigure )
+build.Linkable( 'graph', 'external/graph', 'general lua-old maths' )
+build.Linkable( 'hello', 'external/hello', 'lua registry' )
+build.Linkable( 'runtime', 'external/runtime', 'scene' )
+build.Linkable( 'service', 'external/service', 'general' )
+build.Linkable( 'show', 'external/show', 'graph scene' )

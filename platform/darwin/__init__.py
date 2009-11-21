@@ -1,37 +1,39 @@
 class ooe:
 	compiler = 'platform/darwin/compiler'
-	include_path = [ '/sw/include' ]
-	library_path = [ '/sw/lib' ]
-	link_flags = [ '-Wl,-undefined,dynamic_lookup' ]
+	include_path = '/sw/include'
+	library_path = '/sw/lib'
+	cxx_flags = '-march=core2'
+	link_flags = '-Wl,-undefined,dynamic_lookup'
+	release_flags = ''
 
 	class appkit:
-		framework = [ 'AppKit' ]
+		framework = 'AppKit'
 
 	class dl:
-		library = []
+		library = ''
 
 	class exr:
-		include_path = [ '/sw/include/OpenEXR' ]
+		include_path = '/sw/include/OpenEXR'
 
 	class freetype:
-		include_path = [ '/sw/lib/freetype219/include', '/sw/lib/freetype219/include/freetype2' ]
-		library_path = [ '/sw/lib/freetype219/lib' ]
+		include_path = '/sw/lib/freetype219/include /sw/lib/freetype219/include/freetype2'
+		library_path = '/sw/lib/freetype219/lib'
 
 	class gl:
-		library = []
+		library = ''
 
 	class lua:
-		include_path = []
-		library = [ 'lua.5.1' ]
+		include_path = ''
+		library = 'lua.5.1'
 
 	class pthread:
-		library = []
+		library = ''
 
 	class qtkit:
-		framework = [ 'QTKit' ]
+		framework = 'QTKit'
 
 	class rt:
-		library = []
+		library = ''
 
 	class x11:
-		library = []
+		library = ''

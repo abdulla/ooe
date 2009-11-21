@@ -1,3 +1,0 @@
-import os
-
-SConscript( dirs = [ i for i in os.listdir( '.' ) if os.path.isdir( i ) ] )
