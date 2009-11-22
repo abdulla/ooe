@@ -4,6 +4,7 @@
 
 #include <csignal>
 
+#include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 #include "component/registry/remote.hpp"
 #include "foundation/executable/fork_io.hpp"
@@ -54,7 +55,7 @@ namespace
 		fork_ptr fork;
 	};
 
-	typedef unit::group< setup, empty_t, 3 > group_type;
+	typedef unit::group< setup, empty_t, 4 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "registry" );
 }
@@ -80,6 +81,19 @@ namespace ooe
 		template<>
 			void fixture_type::test< 1 >( setup& )
 		{
+			std::cerr << "load library in-process\n";
+
+			std::string root = executable::path()._0;
+			std::string path = root + "../library/libhello" + library::suffix;
+
+			local local( path );
+			local.find< void ( * )( void ) >( "hello" )();
+		}
+
+		template<>
+		template<>
+			void fixture_type::test< 2 >( setup& )
+		{
 			std::cerr << "insert and load library as surrogate\n";
 
 			std::string root = executable::path()._0;
@@ -94,7 +108,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 2 >( setup& )
+			void fixture_type::test< 3 >( setup& )
 		{
 			std::cerr << "insert and load module from server\n";
 
