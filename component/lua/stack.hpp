@@ -55,20 +55,20 @@ namespace ooe
 
 		f64 to_number( s32 ) const;
 		bool to_boolean( s32 ) const;
-		const c8* to_lstring( s32, up_t* ) const;
+		const c8* to_lstring( s32, up_t* = 0 ) const;
 		up_t objlen( s32 ) const;
 		void* to_userdata( s32 ) const;
 
 		void push_nil( void );
 		void push_number( f64 );
 		void push_lstring( const c8*, up_t );
-		void push_cclosure( cfunction, u32 );
+		void push_cclosure( cfunction, u32 = 0 );
 		void push_boolean( bool );
 		void push_lightuserdata( void* );
 
 		void raw_get( s32 );
 		void raw_geti( s32, u32 );
-		void create_table( u32, u32 );
+		void create_table( u32 = 0, u32 = 0 );
 		void* new_userdata( up_t );
 
 		void raw_set( s32 );

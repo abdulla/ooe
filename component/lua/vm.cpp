@@ -59,7 +59,7 @@ namespace ooe
 		lua::stack stack_ = stack();
 		stack_.push_lstring( "_VERSION", 8 );
 		stack_.raw_get( globals_index );
-		std::string string = stack_.to_lstring( -1, 0 );
+		std::string string = stack_.to_lstring( -1 );
 		stack_.pop( 1 );
 		return string;
 	}

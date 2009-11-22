@@ -207,7 +207,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::param_type pointer )
 		{
-			stack.push_lightuserdata( const_cast< typename no_qual< t >::type* >( pointer ) );
+			stack.push_lightuserdata( ptr_cast( pointer ) );
 		}
 	};
 
@@ -285,7 +285,7 @@ namespace ooe
 		{
 			typedef typename no_ref< t >::type type;
 			up_t array_size = extent< type >::value;
-			stack.create_table( array_size, 0 );
+			stack.create_table( array_size );
 
 			for ( up_t i = 0; i != array_size; ++i )
 			{

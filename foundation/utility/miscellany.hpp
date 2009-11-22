@@ -66,6 +66,14 @@ namespace ooe
 		return pun.out;
 	}
 
+	template< typename type >
+		void* ptr_cast( type pointer )
+	{
+		union { type in; void* out; } pun;
+		pun.in = pointer;
+		return pun.out;
+	}
+
 //--- destroy ------------------------------------------------------------------
 	template< typename type >
 		void destroy( const void* object )

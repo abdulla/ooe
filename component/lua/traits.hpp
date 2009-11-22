@@ -49,7 +49,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::param_type container )
 		{
 			typedef typename no_ref< t >::type type;
-			stack.create_table( container.size(), 0 );
+			stack.create_table( container.size() );
 			up_t index = 1;
 
 			for ( typename type::const_iterator i = container.begin(), end = container.end();
@@ -116,7 +116,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::param_type tuple )
 		{
-			stack.create_table( LIMIT, 0 );
+			stack.create_table( LIMIT );
 			BOOST_PP_REPEAT( LIMIT, TUPLE_PUSH, ~ )
 		}
 	};

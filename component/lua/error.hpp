@@ -19,7 +19,7 @@ namespace ooe
 		lua( ooe::lua::stack& stack )
 			: runtime( "lua: " )
 		{
-			*this << stack.to_lstring( -1, 0 );
+			*this << stack.to_lstring( -1 );
 			stack.pop( 1 );
 		}
 

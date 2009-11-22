@@ -5,9 +5,9 @@
 	#ifndef OOE_COMPONENT_LUA_SCRIPT_HPP
 	#define OOE_COMPONENT_LUA_SCRIPT_HPP
 
-#include <vector>
-
 #include "component/lua/traits.hpp"
+#include "component/registry/module.hpp"
+#include "foundation/executable/library.hpp"
 
 namespace ooe
 {
@@ -18,6 +18,8 @@ namespace ooe
 
 	namespace lua
 	{
+		class script;
+
 		template< typename >
 			struct invoke_function;
 
@@ -25,7 +27,7 @@ namespace ooe
 			struct invoke_member;
 	}
 
-//--- facade::lua_script -------------------------------------------------------
+//--- facade::lua --------------------------------------------------------------
 	class facade::lua
 	{
 	public:
@@ -53,6 +55,17 @@ namespace ooe
 
 	private:
 		vector_type vector;
+	};
+
+//--- lua::script --------------------------------------------------------------
+	class OOE_VISIBLE lua::script
+	{
+	public:
+		script( const std::string&, stack& );
+
+	private:
+		ooe::library library;
+		ooe::module module;
 	};
 }
 

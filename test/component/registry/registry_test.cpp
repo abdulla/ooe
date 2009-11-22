@@ -4,6 +4,7 @@
 
 #include <csignal>
 
+#include "component/lua/script.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 #include "component/registry/remote.hpp"
@@ -55,7 +56,7 @@ namespace
 		fork_ptr fork;
 	};
 
-	typedef unit::group< setup, empty_t, 4 > group_type;
+	typedef unit::group< setup, empty_t, 5 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "registry" );
 }
@@ -129,6 +130,13 @@ namespace ooe
 			registry.insert( registry::server, "/ooe.hello" );
 			remote remote( "/ooe.hello" );
 			remote.find< void ( void ) >( "hello" )();
+		}
+
+		template<>
+		template<>
+			void fixture_type::test< 4 >( setup& )
+		{
+			std::cerr << "load module in to lua\n";
 		}
 	}
 }
