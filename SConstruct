@@ -55,9 +55,7 @@ build = Build( variables )
 build.Configure( 'release' == ARGUMENTS.get( 'build', 'debug' ) )
 exec 'from platform.' + build.platform + ' import *'
 
-"""
-foundation
-"""
+#--- foundation ----------------------------------------------------------------
 build.Configurable( configure = UtilityConfigure )
 build.Linkable( 'executable', 'foundation/executable', [ ooe.dl.library, ooe.rt.library ],
 	ooe.appkit.framework )
@@ -74,17 +72,13 @@ build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', ooe.pthread.library )
 build.Linkable( 'scene', 'foundation/scene', 'image io lua-old maths parallel' )
 
-"""
-component
-"""
+#--- component -----------------------------------------------------------------
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
 
-"""
-test
-"""
+#--- test ----------------------------------------------------------------------
 build.Executable( 'registry_test', 'test/component/registry', 'registry unit' )
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'io parallel unit' )
@@ -93,9 +87,8 @@ build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
 build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 build.Linkable( 'unit', 'test/unit', 'executable' )
 
-"""
-external
-"""
+
+#--- external ------------------------------------------------------------------
 build.Executable( 'engine', 'external/engine', 'executable io lua-old parallel service' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'ipc_check', 'external/ipc_check', 'executable ipc' )
