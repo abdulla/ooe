@@ -30,6 +30,10 @@ namespace
 	module_set set;
 	read_write mutex;
 
+	void insert( registry::type, const std::string& );
+	registry::info_vector find( const interface::vector_type& );
+	std::string surrogate( const std::string& );
+
 	module::vector_type load_server( const std::string& path )
 	{
 		ipc::memory::client client( path );
@@ -38,9 +42,12 @@ namespace
 
 	module::vector_type load_library( const std::string& path )
 	{
-		library library( path );
+		/*library library( path );
 		ooe::module module = library.find< ooe::module ( void ) >( "module_open" )();
-		return module.get();
+		return module.get();*/
+
+		// for security, load library as a surrogate
+		return load_server( surrogate( path ) );
 	}
 
 	void load_nameservice( ipc::memory::nameservice& nameservice, const module& module )
