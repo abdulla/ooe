@@ -24,7 +24,7 @@ namespace
 	{
 	public:
 		setup( void )
-			: fork( 0 )
+			: path_( executable::path()._0 ), fork( 0 )
 		{
 			std::string name = ipc::unique_name();
 			ipc::semaphore semaphore( name, ipc::semaphore::create, 0 );
@@ -35,8 +35,7 @@ namespace
 				OOE_IGNORE
 				(
 					executable::null_fd( STDOUT_FILENO );
-					std::string root = executable::path()._0;
-					fork_io::execute( root + "registry", "-u", name.c_str(), NULL );
+					fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL );
 				);
 
 				fork_io::exit( true );
@@ -50,9 +49,15 @@ namespace
 			fork->signal( SIGKILL );
 		}
 
+		std::string path() const
+		{
+			return path_;
+		}
+
 	private:
 		typedef scoped_ptr< ooe::fork_io > fork_ptr;
 
+		std::string path_;
 		fork_ptr fork;
 	};
 
@@ -80,12 +85,11 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 1 >( setup& )
+			void fixture_type::test< 1 >( setup& setup )
 		{
 			std::cerr << "load library in-process\n";
 
-			std::string root = executable::path()._0;
-			std::string path = root + "../library/libhello" + library::suffix;
+			std::string path = setup.path() + "../library/libhello" + library::suffix;
 
 			local local( path );
 			local.find< void ( * )( void ) >( "hello" )();
@@ -93,12 +97,11 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 2 >( setup& )
+			void fixture_type::test< 2 >( setup& setup )
 		{
 			std::cerr << "insert and load library as surrogate\n";
 
-			std::string root = executable::path()._0;
-			std::string path = root + "../library/libhello" + library::suffix;
+			std::string path = setup.path() + "../library/libhello" + library::suffix;
 
 			registry registry;
 			registry.insert( registry::library, path );
@@ -109,12 +112,11 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 3 >( setup& )
+			void fixture_type::test< 3 >( setup& setup )
 		{
 			std::cerr << "insert and load module from server\n";
 
-			std::string root = executable::path()._0;
-			std::string path = root + "hello";
+			std::string path = setup.path() + "hello";
 			std::string name = ipc::unique_name();
 
 			ipc::semaphore semaphore( name, ipc::semaphore::create, 0 );
