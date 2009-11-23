@@ -26,7 +26,10 @@ namespace ooe
 #else	// BOOST_PP_IS_ITERATING
 
 	#define LIMIT BOOST_PP_ITERATION()
-	#define INSERT( z, n, d ) tuple._ ## n ->insert< d >( i );
+	#define BUILDER_INSERT( z, n, d ) a ## n ->insert< d >( i );
+	#define MODULE_INSERT( z, n, d ) module.insert( typeid( t ## n ).name(), a ## n );
+	#define POINTER_NEW( z, n, _ ) a ## n( new t ## n )
+	#define POINTER_DECLARE( z, n, _ ) scoped_ptr< t ## n > a ## n;
 
 namespace ooe
 {
@@ -39,10 +42,16 @@ namespace ooe
 #endif
 	{
 	public:
-		builder( ooe::module& module_, facade::local& local_ BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::reference a ) )
-			: module( module_ ), local( local_ ), tuple( BOOST_PP_ENUM_PARAMS( LIMIT, &a ) )
+		builder( ooe::module& module_ )
+			: module( module_ ), local( new facade::local )
+			BOOST_PP_ENUM_TRAILING( LIMIT, POINTER_NEW, ~ )
 		{
+		}
+
+		~builder( void )
+		{
+			module.insert( typeid( facade::local ).name(), local );
+			BOOST_PP_REPEAT( LIMIT, MODULE_INSERT, ~ )
 		}
 
 		template< typename type >
@@ -51,8 +60,8 @@ namespace ooe
 		{
 			typedef typename remove_pointer< type >::type function_type;
 			up_t i = module.insert( name, typeid( function_type ).name() );
-			local.insert( i, function );
-			BOOST_PP_REPEAT( LIMIT, INSERT, function_type )
+			local->insert( i, function );
+			BOOST_PP_REPEAT( LIMIT, BUILDER_INSERT, function_type )
 		}
 
 		template< typename type >
@@ -61,18 +70,21 @@ namespace ooe
 		{
 			typedef typename function_of< type >::type signature_type;
 			up_t i = module.insert( name, typeid( signature_type ).name() );
-			local.insert( i, member );
-			BOOST_PP_REPEAT( LIMIT, INSERT, signature_type )
+			local->insert( i, member );
+			BOOST_PP_REPEAT( LIMIT, BUILDER_INSERT, signature_type )
 		}
 
 	private:
 		ooe::module& module;
-		facade::local& local;
-		ooe::tuple< BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, * BOOST_PP_INTERCEPT ) > tuple;
+		scoped_ptr< facade::local > local;
+		BOOST_PP_REPEAT( LIMIT, POINTER_DECLARE, ~ )
 	};
 }
 
-	#undef INSERT
+	#undef POINTER_DECLARE
+	#undef POINTER_NEW
+	#undef MODULE_INSERT
+	#undef BUILDER_INSERT
 	#undef LIMIT
 
 #endif	// BOOST_PP_IS_ITERATING

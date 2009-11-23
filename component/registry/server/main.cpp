@@ -53,10 +53,10 @@ namespace
 	void load_nameservice( ipc::memory::nameservice& nameservice, const module& module )
 	{
 		const module::vector_type& names = module.get();
-		const facade::remote::vector_type& remotes =
-			static_cast< const facade::remote* >( module.find( "remote" ) )->get();
-		const facade::local::vector_type& locals =
-			static_cast< const facade::local* >( module.find( "local" ) )->get();
+		const facade::remote::vector_type& remotes = static_cast< const facade::remote* >
+			( module.find( typeid( facade::remote ).name() ) )->get();
+		const facade::local::vector_type& locals = static_cast< const facade::local* >
+			( module.find( typeid( facade::local ).name() ) )->get();
 		up_t size = names.size();
 
 		if ( remotes.size() != size || locals.size() != size )

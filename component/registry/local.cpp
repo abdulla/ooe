@@ -23,7 +23,8 @@ namespace ooe
 //--- local --------------------------------------------------------------------
 	local::local( const std::string& path )
 		: library( path ), module( library.find< ooe::module ( void ) >( "module_open" )() ),
-		vector( static_cast< const facade::local* >( module.find( "local" ) )->get() )
+		vector( static_cast< const facade::local* >
+			( module.find( typeid( facade::local ).name() ) )->get() )
 	{
 	}
 

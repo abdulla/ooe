@@ -33,14 +33,8 @@ namespace ooe
 			std::cerr << "build module\n";
 
 			module module;
-			scoped_ptr< facade::local > local_ptr( new facade::local );
-			scoped_ptr< facade::remote > remote_ptr( new facade::remote );
-
-			builder< facade::remote > builder( module, *local_ptr, *remote_ptr );
+			builder< facade::remote > builder( module );
 			builder.insert( "callback", callback );
-
-			module.insert( "local", local_ptr );
-			module.insert( "remote", remote_ptr );
 		}
 
 	}

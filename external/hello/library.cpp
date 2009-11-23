@@ -20,15 +20,9 @@ namespace
 extern "C" ooe::module OOE_VISIBLE module_open( void )
 {
 	module module;
-	scoped_ptr< facade::local > local_ptr( new facade::local );
-	scoped_ptr< facade::remote > remote_ptr( new facade::remote );
-	scoped_ptr< facade::lua > lua_ptr( new facade::lua );
 
-	builder< facade::remote, facade::lua > builder( module, *local_ptr, *remote_ptr, *lua_ptr );
+	builder< facade::remote, facade::lua > builder( module );
 	builder.insert( "hello", hello );
 
-	module.insert( "local", local_ptr );
-	module.insert( "remote", remote_ptr );
-	module.insert( "lua", lua_ptr );
 	return module;
 }
