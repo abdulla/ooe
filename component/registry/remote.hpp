@@ -21,8 +21,8 @@ namespace ooe
 		typedef ooe::ipc::memory::switchboard::call_type call_type;
 		typedef std::vector< call_type > vector_type;
 
-		const vector_type& get( void ) const;
-		void insert( up_t, call_type );
+		const vector_type& get( void ) const OOE_VISIBLE;
+		void insert( up_t, call_type ) OOE_VISIBLE;
 
 		template< typename type >
 			void insert( up_t index,
@@ -49,7 +49,7 @@ namespace ooe
 	class remote
 	{
 	public:
-		remote( const std::string& );
+		remote( const std::string& ) OOE_VISIBLE;
 
 		template< typename type >
 			ipc::memory::rpc< type > find( const c8* name )

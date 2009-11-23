@@ -33,7 +33,7 @@ namespace ooe
 
 		servlet( pid_t, u32, const memory::switchboard&, server& );
 		servlet( ooe::socket&, u32, const memory::switchboard&, server& );
-		~servlet( void );
+		~servlet( void ) OOE_VISIBLE;
 
 		void migrate( ooe::socket& );
 

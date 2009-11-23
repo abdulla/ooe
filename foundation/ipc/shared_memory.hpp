@@ -30,8 +30,8 @@ namespace ooe
 	class ipc::shared_memory_base
 	{
 	public:
-		std::string name( void ) const;
-		void unlink( void );
+		std::string name( void ) const OOE_VISIBLE;
+		void unlink( void ) OOE_VISIBLE;
 
 	protected:
 		scoped_ptr< shared_memory_id > id;

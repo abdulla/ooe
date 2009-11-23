@@ -146,7 +146,7 @@ namespace ooe
 			lua::setup( stack, setup.path() );
 
 			std::string path = setup.path() + "../resource/hello.lua";
-			vm.load( path, path );
+			vm.load( "hello.lua", path );
 		}
 	}
 }

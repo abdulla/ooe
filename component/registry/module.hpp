@@ -14,7 +14,7 @@
 namespace ooe
 {
 //--- facade_id ----------------------------------------------------------------
-	struct facade_id
+	struct OOE_VISIBLE facade_id
 	{
 		typedef void ( * function_type )( const void* );
 

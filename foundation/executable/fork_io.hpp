@@ -18,7 +18,7 @@ namespace ooe
 		pid_t pid;
 
 		fork_id( void );
-		~fork_id( void );
+		~fork_id( void ) OOE_VISIBLE;
 	};
 
 //--- fork_io ------------------------------------------------------------------

@@ -35,7 +35,7 @@ namespace ooe
 	};
 
 	typedef tuple< socket, socket > socket_pair;
-	socket_pair make_pair( void );
+	socket_pair make_pair( void ) OOE_VISIBLE;
 
 //--- listen -------------------------------------------------------------------
 	struct OOE_VISIBLE listen
