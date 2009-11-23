@@ -15,6 +15,7 @@
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/utility/scoped.hpp"
+#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
 namespace
@@ -43,6 +44,9 @@ namespace
 			}
 
 			semaphore.down();
+			std::string module_path = path_ + "../library/libhello" + library::suffix;
+			registry registry;
+			registry.insert( registry::library, module_path );
 		}
 
 		~setup( void )
@@ -81,7 +85,8 @@ namespace ooe
 			interface.insert< void ( void ) >( "hello" );
 
 			registry registry;
-			registry.find( interface );
+			registry::info_vector vector = registry.find( interface );
+			check( "vector.size()", vector.size() );
 		}
 
 		template<>
@@ -105,7 +110,6 @@ namespace ooe
 			std::string path = setup.path() + "../library/libhello" + library::suffix;
 
 			registry registry;
-			registry.insert( registry::library, path );
 			remote remote( registry.surrogate( path ) );
 			remote.find< void ( void ) >( "hello" )();
 		}
@@ -128,6 +132,7 @@ namespace ooe
 			scoped< void ( s32 ) >
 				scoped( function< void ( s32 ) >( fork, &fork_io::signal ), SIGKILL );
 			semaphore.down();
+
 			registry registry;
 			registry.insert( registry::server, "/ooe.hello" );
 			remote remote( "/ooe.hello" );
