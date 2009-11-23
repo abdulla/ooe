@@ -2,6 +2,7 @@
 
 #include "component/lua/facade.hpp"
 #include "component/registry/local.hpp"
+#include "component/registry/registry.hpp"
 
 namespace
 {
@@ -24,6 +25,40 @@ namespace
 		ooe::library library;
 		ooe::module module;
 	};
+
+	typedef std::vector< std::string > find_vector;
+
+	s32 find( lua::state* state )
+	{
+		lua::stack stack = lua::verify_arguments( state, 1 );
+
+		find_vector input;
+		lua::to< find_vector >::call( stack, input, 1 );
+		interface interface;
+
+		for ( find_vector::const_iterator i = input.begin(), end = input.end(); i != end; ++i )
+		{
+			up_t j = i->find( '/' );
+
+			if ( j == up_t( -1 ) )
+				throw error::runtime( "lua::find: " ) << "Invalid function \"" << *i << '\"';
+
+			interface.insert( i->substr( 0, j ), i->substr( j + 1 ) );
+		}
+
+		registry registry;
+		registry::info_vector v = registry.find( interface );
+		find_vector output;
+
+		for ( registry::info_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+		{
+			if ( i->_0 == registry::library )
+				output.push_back( i->_1 );
+		}
+
+		lua::push< find_vector >::call( stack, output );
+		return 1;
+	}
 
 	s32 load( lua::state* state )
 	{
@@ -53,7 +88,7 @@ namespace
 			else
 			{
 				stack.pop( 2 );
-				throw error::runtime( "lua: " ) << "Function \"" << names[ i ]._0 <<
+				throw error::runtime( "lua::load: " ) << "Function \"" << names[ i ]._0 <<
 					"\" of type \"" << names[ i ]._1 << "\" has unknown pointer";
 			}
 
@@ -85,20 +120,44 @@ namespace ooe
 //--- lua ----------------------------------------------------------------------
 	void lua::setup( stack& stack, const std::string& path )
 	{
-		push< const c8* >::call( stack, "registry" );
+		push< const c8* >::call( stack, "ooe" );
 		stack.create_table( 0, 3 );
+
+		//--- executable -------------------------------------------------------
+		push< const c8* >::call( stack, "executable" );
+		stack.create_table( 0, 1 );
 
 		push< const c8* >::call( stack, "path" );
 		push< std::string >::call( stack, path );
 		stack.raw_set( -3 );
 
+		stack.raw_set( -3 );
+
+		//--- library ----------------------------------------------------------
+		push< const c8* >::call( stack, "library" );
+		stack.create_table( 0, 1 );
+
 		push< const c8* >::call( stack, "suffix" );
 		push< const c8* >::call( stack, library::suffix );
+		stack.raw_set( -3 );
+
+		stack.raw_set( -3 );
+
+		//--- registry ---------------------------------------------------------
+		push< const c8* >::call( stack, "registry" );
+		stack.create_table( 0, 2 );
+
+		push< const c8* >::call( stack, "find" );
+		stack.push_cclosure( find );
 		stack.raw_set( -3 );
 
 		push< const c8* >::call( stack, "load" );
 		stack.push_cclosure( load );
 		stack.raw_set( -3 );
+
+		stack.raw_set( -3 );
+
+		//----------------------------------------------------------------------
 
 		stack.raw_set( globals_index );
 	}

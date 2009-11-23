@@ -24,8 +24,9 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference container, s32 index )
 		{
-			typedef typename no_ref< t >::type type;
 			type_check< t >( stack, index, type::table );
+
+			typedef typename no_ref< t >::type type;
 			up_t table_size = stack.objlen( index );
 			type out;
 			reserve( out, table_size );
@@ -55,7 +56,7 @@ namespace ooe
 			for ( typename type::const_iterator i = container.begin(), end = container.end();
 				i != end; ++i, ++index )
 			{
-				push< type >::call( stack, *i );
+				push< typename type::value_type >::call( stack, *i );
 				stack.raw_seti( -2, index );
 			}
 		}

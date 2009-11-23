@@ -1,9 +1,6 @@
-local table, source = registry.load( registry.path .. '../library/libhello' .. registry.suffix )
+local result = ooe.registry.find{ 'hello/FvvE' }
+local table, source = ooe.registry.load( result[ 1 ] )
 local hello = table[ 'hello/FvvE' ]
 
-if not hello then
-	error( 'hello/FvvE not found' )
-end
-
 hello()
-print( 'hello lua' )
+print 'hello lua'

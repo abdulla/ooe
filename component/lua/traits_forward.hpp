@@ -131,6 +131,7 @@ namespace ooe
 		struct lua::is_class
 	{
 		static const bool value = !is_stdstring< t >::value &&
+			!is_stdcontainer< t >::value &&
 			!has_trivial_copy< typename no_ref< t >::type >::value &&
 			( ooe::is_class< typename no_ref< t >::type >::value ||
 			is_union< typename no_ref< t >::type >::value );

@@ -21,6 +21,9 @@ def IOConfigure( platform, setup ):
 	if platform == 'posix':
 		if not setup.CheckFunc( 'splice', '#include <fcntl.h>' ): Exit( 1 )
 
+def JavaScriptConfigure( platform, setup ):
+	if not setup.CheckLibWithHeader( 'v8', 'v8.h', 'c++' ): Exit( 1 )
+
 def GeneralConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
 
@@ -74,6 +77,7 @@ build.Linkable( 'scene', 'foundation/scene', 'image io lua-old maths parallel' )
 
 #--- component -----------------------------------------------------------------
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
+build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
