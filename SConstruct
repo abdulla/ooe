@@ -2,7 +2,7 @@ from platform.build import *
 
 ### variables ##################################################################
 variables = Variables()
-variables.Add( EnumVariable( 'build', 'build type', 'debug', ( 'debug', 'release' ) ) )
+variables.Add( EnumVariable( 'mode', 'build mode', 'debug', ( 'debug', 'release' ) ) )
 
 ### configure ##################################################################
 def ImageConfigure( platform, setup ):
@@ -52,7 +52,7 @@ def UUIDConfigure( platform, setup ):
 
 ### build ######################################################################
 build = Build( variables )
-build.Configure( 'release' == ARGUMENTS.get( 'build', 'debug' ) )
+build.Configure( 'release' == ARGUMENTS.get( 'mode', 'debug' ) )
 exec 'from platform.' + build.platform + ' import *'
 
 #--- foundation ----------------------------------------------------------------
