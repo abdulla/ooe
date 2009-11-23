@@ -23,10 +23,9 @@ namespace ooe
 			stack.pop( 1 );
 		}
 
-		lua( const std::string& string_ )
+		lua( void )
 			: runtime( "lua: " )
 		{
-			*this << string_;
 		}
 
 		virtual ~lua( void ) throw()
