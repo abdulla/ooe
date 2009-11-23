@@ -155,9 +155,9 @@ namespace
 	}
 
 	//--------------------------------------------------------------------------
-	void registry( const std::string& root, const std::string& name )
+	void registry( const std::string& self_path, const c8* up_name )
 	{
-		self = root + name;
+		self = self_path;
 		ipc::memory::switchboard switchboard;
 
 		if ( switchboard.insert( find ) != 1 )
@@ -168,6 +168,9 @@ namespace
 			throw error::runtime( "registry: " ) << "\"surrogate\" not at index 4";
 
 		ipc::memory::server server( "/ooe.registry", switchboard );
+
+		if ( up_name )
+			ipc::semaphore( up_name ).up();
 
 		while ( !executable::signal() )
 			server.decode();
@@ -190,6 +193,7 @@ namespace
 	{
 		const c8* module_path = 0;
 		const c8* surrogate_path = 0;
+		const c8* up_name = 0;
 
 		for ( s32 option; ( option = getopt( argc, argv, "m:s:u:" ) ) != -1; )
 		{
@@ -204,7 +208,7 @@ namespace
 				break;
 
 			case 'u':
-				{ ipc::semaphore( optarg ).up(); }
+				up_name = optarg;
 				break;
 
 			default:
@@ -215,7 +219,7 @@ namespace
 		if ( module_path && surrogate_path )
 			surrogate( surrogate_path, module_path );
 		else
-			registry( root, name );
+			registry( root + name, up_name );
 
 		return true;
 	}
