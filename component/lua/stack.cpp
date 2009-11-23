@@ -110,6 +110,11 @@ namespace ooe
 		return lua_newuserdata( state, size_ );
 	}
 
+	bool lua::stack::get_metatable( s32 index )
+	{
+		return lua_getmetatable( state, index );
+	}
+
 	void lua::stack::raw_set( s32 index )
 	{
 		lua_rawset( state, index );

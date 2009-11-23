@@ -71,6 +71,7 @@ namespace ooe
 		void raw_geti( s32, u32 );
 		void create_table( u32 = 0, u32 = 0 );
 		void* new_userdata( up_t );
+		bool get_metatable( s32 );
 
 		void raw_set( s32 );
 		void raw_seti( s32, u32 );
