@@ -49,6 +49,7 @@ namespace ooe
 		stack( lua::state* );
 
 		void pop( u32 );
+		u32 size( void ) const;
 
 		type::id type( s32 ) const;
 		const c8* type_name( type::id ) const;
@@ -73,7 +74,9 @@ namespace ooe
 
 		void raw_set( s32 );
 		void raw_seti( s32, u32 );
+		void set_metatable( s32 );
 
+		bool new_metatable( const c8* );
 		void where( void );
 
 	private:

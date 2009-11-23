@@ -24,6 +24,9 @@ namespace ooe
 		template< typename >
 			struct is_pod;
 
+		template< typename >
+			struct is_class;
+
 //--- lua::to ------------------------------------------------------------------
 		template< typename, typename = void >
 			struct to;
@@ -45,6 +48,9 @@ namespace ooe
 
 		template< typename t >
 			struct to< t, typename enable_if< is_pod< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_class< t > >::type >;
 
 		template< typename t >
 			struct to< t, typename enable_if< is_array< t > >::type >;
@@ -72,11 +78,18 @@ namespace ooe
 			struct push< t, typename enable_if< is_pod< t > >::type >;
 
 		template< typename t >
+			struct push< t, typename enable_if< is_class< t > >::type >;
+
+		template< typename t >
 			struct push< t, typename enable_if< is_array< t > >::type >;
 
 //--- type_check ---------------------------------------------------------------
 		template< typename >
 			void type_check( stack&, s32, type::id );
+
+//--- destruct -----------------------------------------------------------------
+		template< typename >
+			s32 destruct( state* );
 	}
 
 //--- lua::is_boolean ----------------------------------------------------------
@@ -107,10 +120,20 @@ namespace ooe
 	template< typename t >
 		struct lua::is_pod
 	{
-		static const bool value = // !is_cstring< t >::value &&
+		static const bool value = !is_cstring< t >::value &&
 			!is_pointer< t >::value &&
 			( ooe::is_pod< typename no_ref< t >::type >::value ||
 			has_trivial_copy< typename no_ref< t >::type >::value );
+	};
+
+//--- lua::is_class ------------------------------------------------------------
+	template< typename t >
+		struct lua::is_class
+	{
+		static const bool value = !is_stdstring< t >::value &&
+			!has_trivial_copy< typename no_ref< t >::type >::value &&
+			( ooe::is_class< typename no_ref< t >::type >::value ||
+			is_union< typename no_ref< t >::type >::value );
 	};
 
 //--- lua::traits: default -----------------------------------------------------
@@ -254,6 +277,36 @@ namespace ooe
 		}
 	};
 
+//--- lua::traits: class -------------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< lua::is_class< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::reference class_, s32 index )
+		{
+			type_check< t >( stack, index, type::userdata );
+			class_ = *static_cast< typename no_ref< t >::type >( stack.to_userdata( index ) );
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< lua::is_class< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::param_type class_ )
+		{
+			typedef typename no_ref< t >::type type;
+			new( stack.new_userdata( sizeof( type ) ) ) type( class_ );
+
+			if ( stack.new_metatable( typeid( type ).name() ) )
+			{
+				push< const c8* >::call( stack, "__gc" );
+				stack.push_cclosure( destruct< type > );
+				stack.raw_set( -3 );
+			}
+
+			stack.set_metatable( -2 );
+		}
+	};
+
 //--- lua::traits: array -------------------------------------------------------
 	template< typename t >
 		struct lua::to< t, typename enable_if< is_array< t > >::type >
@@ -308,6 +361,15 @@ namespace ooe
 		throw error::lua( stack ) << "bad argument at index " << index << " for type \"" <<
 			demangle( typeid( typename no_ref< t >::type ).name() ) << "\" (" <<
 			stack.type_name( id ) << " expected, got " << stack.type_name( type ) << ')';
+	}
+
+//--- lua::destruct ------------------------------------------------------------
+	template< typename t >
+		s32 lua::destruct( state* state )
+	{
+		stack stack( state );
+		static_cast< t* >( stack.to_userdata( 1 ) )->~t();
+		return 0;
 	}
 }
 

@@ -15,9 +15,14 @@ namespace ooe
 	{
 	}
 
-	void lua::stack::pop( u32 size )
+	void lua::stack::pop( u32 size_ )
 	{
-		lua_settop( state, -1 - size );
+		lua_settop( state, -1 - size_ );
+	}
+
+	u32 lua::stack::size( void ) const
+	{
+		return lua_gettop( state );
 	}
 
 	lua::type::id lua::stack::type( s32 index ) const
@@ -40,9 +45,9 @@ namespace ooe
 		return lua_toboolean( state, index );
 	}
 
-	const c8* lua::stack::to_lstring( s32 index, up_t* size ) const
+	const c8* lua::stack::to_lstring( s32 index, up_t* size_ ) const
 	{
-		return lua_tolstring( state, index, size );
+		return lua_tolstring( state, index, size_ );
 	}
 
 	up_t lua::stack::objlen( s32 index ) const
@@ -65,9 +70,9 @@ namespace ooe
 		lua_pushnumber( state, number );
 	}
 
-	void lua::stack::push_lstring( const c8* string, up_t size )
+	void lua::stack::push_lstring( const c8* string, up_t size_ )
 	{
-		lua_pushlstring( state, string, size );
+		lua_pushlstring( state, string, size_ );
 	}
 
 	void lua::stack::push_cclosure( cfunction function, u32 upvalues )
@@ -100,9 +105,9 @@ namespace ooe
 		lua_createtable( state, array_size, table_size );
 	}
 
-	void* lua::stack::new_userdata( up_t size )
+	void* lua::stack::new_userdata( up_t size_ )
 	{
-		return lua_newuserdata( state, size );
+		return lua_newuserdata( state, size_ );
 	}
 
 	void lua::stack::raw_set( s32 index )
@@ -113,6 +118,16 @@ namespace ooe
 	void lua::stack::raw_seti( s32 index, u32 array_index )
 	{
 		lua_rawseti( state, index, array_index );
+	}
+
+	void lua::stack::set_metatable( s32 index )
+	{
+		lua_setmetatable( state, index );
+	}
+
+	bool lua::stack::new_metatable( const c8* name )
+	{
+		return luaL_newmetatable( state, name );
 	}
 
 	void lua::stack::where( void )
