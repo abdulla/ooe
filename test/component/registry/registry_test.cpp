@@ -4,7 +4,8 @@
 
 #include <csignal>
 
-#include "component/lua/script.hpp"
+#include "component/lua/facade.hpp"
+#include "component/lua/vm.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 #include "component/registry/remote.hpp"
@@ -136,9 +137,16 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 4 >( setup& )
+			void fixture_type::test< 4 >( setup& setup )
 		{
 			std::cerr << "load module in to lua\n";
+
+			lua::vm vm;
+			lua::stack stack = vm.stack();
+			lua::setup( stack, setup.path() );
+
+			std::string path = setup.path() + "../resource/hello.lua";
+			vm.load( path, path );
 		}
 	}
 }

@@ -79,7 +79,7 @@ build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_pat
 build.Linkable( 'registry', 'component/registry', 'ipc' )
 
 #--- test ----------------------------------------------------------------------
-build.Executable( 'registry_test', 'test/component/registry', 'registry unit' )
+build.Executable( 'registry_test', 'test/component/registry', 'lua registry unit' )
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'io parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )

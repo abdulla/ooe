@@ -2,12 +2,12 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_COMPONENT_LUA_SCRIPT_HPP
-	#define OOE_COMPONENT_LUA_SCRIPT_HPP
+	#ifndef OOE_COMPONENT_LUA_FACADE_HPP
+	#define OOE_COMPONENT_LUA_FACADE_HPP
+
+#include <vector>
 
 #include "component/lua/traits.hpp"
-#include "component/registry/module.hpp"
-#include "foundation/executable/library.hpp"
 
 namespace ooe
 {
@@ -18,8 +18,7 @@ namespace ooe
 
 	namespace lua
 	{
-		class script;
-
+		void setup( stack&, const std::string& ) OOE_VISIBLE;
 		inline stack verify_arguments( state*, u32 );
 
 		template< typename >
@@ -59,17 +58,6 @@ namespace ooe
 		vector_type vector;
 	};
 
-//--- lua::script --------------------------------------------------------------
-	class OOE_VISIBLE lua::script
-	{
-	public:
-		script( const std::string&, stack& );
-
-	private:
-		ooe::library library;
-		ooe::module module;
-	};
-
 //--- lua ----------------------------------------------------------------------
 	inline lua::stack lua::verify_arguments( state* state, u32 size )
 	{
@@ -84,12 +72,12 @@ namespace ooe
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "component/lua/script.hpp"
+	#define BOOST_PP_FILENAME_1 "component/lua/facade.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
-	#endif	// OOE_COMPONENT_LUA_SCRIPT_HPP
+	#endif	// OOE_COMPONENT_LUA_FACADE_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 

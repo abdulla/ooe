@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "component/lua/script.hpp"
+#include "component/lua/facade.hpp"
 #include "component/registry/builder.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/remote.hpp"
