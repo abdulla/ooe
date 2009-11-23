@@ -21,7 +21,6 @@ namespace ooe
 		vm( void );
 		~vm( void );
 
-		void load( const std::string&, const std::string& );
 		void load( const std::string&, const descriptor& );
 		void collect( void );
 

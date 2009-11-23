@@ -10,20 +10,6 @@ extern "C"
 #include "component/lua/vm.hpp"
 #include "foundation/io/memory.hpp"
 
-namespace
-{
-	using namespace ooe;
-
-	void vm_load( lua::state* state, const c8* string, up_t size, const c8* name )
-	{
-		if ( luaL_loadbuffer( state, string, size, name ) || lua_pcall( state, 0, 0, 0 ) )
-		{
-			lua::stack stack( state );
-			throw error::lua( stack );
-		}
-	}
-}
-
 namespace ooe
 {
 //--- lua::vm ------------------------------------------------------------------
@@ -41,15 +27,16 @@ namespace ooe
 		lua_close( state );
 	}
 
-	void lua::vm::load( const std::string& name, const std::string& script )
-	{
-		vm_load( state, script.c_str(), script.size(), name.c_str() );
-	}
-
 	void lua::vm::load( const std::string& name, const descriptor& desc )
 	{
 		memory memory( desc );
-		vm_load( state, memory.as< c8 >(), memory.size(), name.c_str() );
+
+		if ( luaL_loadbuffer( state, memory.as< c8 >(), memory.size(), name.c_str() ) ||
+			lua_pcall( state, 0, 0, 0 ) )
+		{
+			lua::stack stack_ = stack();
+			throw error::lua( stack_ );
+		}
 	}
 
 	void lua::vm::collect( void )
