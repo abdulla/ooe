@@ -106,8 +106,7 @@ namespace ooe
 
 			registry registry;
 			registry.insert( registry::library, path );
-			std::string name = registry.surrogate( path );
-			remote remote( name );
+			remote remote( registry.surrogate( path ) );
 			remote.find< void ( void ) >( "hello" )();
 		}
 
