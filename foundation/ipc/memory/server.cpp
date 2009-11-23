@@ -134,6 +134,11 @@ namespace ooe
 			throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
 	}
 
+	// required to ensure servlet can be hidden
+	ipc::memory::server::~server( void )
+	{
+	}
+
 	std::string ipc::memory::server::name( void ) const
 	{
 		return transport.name();

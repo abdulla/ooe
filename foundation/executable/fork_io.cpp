@@ -104,9 +104,14 @@ namespace ooe
 		close( read );
 	}
 
-//--- fork_io ------------------------------------------------------
+//--- fork_io ------------------------------------------------------------------
 	fork_io::fork_io( void )
 		: id( new fork_id )
+	{
+	}
+
+	// required to ensure fork_id can be hidden
+	fork_io::~fork_io( void )
 	{
 	}
 

@@ -18,7 +18,7 @@ namespace ooe
 		pid_t pid;
 
 		fork_id( void );
-		~fork_id( void ) OOE_VISIBLE;
+		~fork_id( void );
 	};
 
 //--- fork_io ------------------------------------------------------------------
@@ -33,6 +33,7 @@ namespace ooe
 		};
 
 		fork_io( void );
+		~fork_io( void );
 
 		up_t read( void*, up_t );
 		up_t write( const void*, up_t );

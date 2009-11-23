@@ -33,7 +33,7 @@ namespace ooe
 
 		servlet( pid_t, u32, const memory::switchboard&, server& );
 		servlet( ooe::socket&, u32, const memory::switchboard&, server& );
-		~servlet( void ) OOE_VISIBLE;
+		~servlet( void );
 
 		void migrate( ooe::socket& );
 
@@ -55,7 +55,7 @@ namespace ooe
 	{
 	public:
 		server( const std::string&, const switchboard& ) OOE_VISIBLE;
-		~server( void ) {}
+		~server( void ) OOE_VISIBLE;
 
 		bool decode( void ) OOE_VISIBLE;
 		std::string name( void ) const;
