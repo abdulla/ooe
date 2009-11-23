@@ -20,6 +20,8 @@ namespace ooe
 	{
 		class script;
 
+		inline stack verify_arguments( state*, u32 );
+
 		template< typename >
 			struct invoke_function;
 
@@ -67,6 +69,18 @@ namespace ooe
 		ooe::library library;
 		ooe::module module;
 	};
+
+//--- lua ----------------------------------------------------------------------
+	inline lua::stack lua::verify_arguments( state* state, u32 size )
+	{
+		stack stack( state );
+
+		if ( stack.size() < size )
+			throw error::lua() << "Not enough arguments to function, " << size <<
+				" expected, got " << stack.size();
+
+		return stack;
+	}
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
@@ -109,9 +123,9 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 call( lua::state* state )
+		static s32 call( state* state )
 		{
-			stack stack( state );
+			stack stack = verify_arguments( state, LIMIT );
 
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function;
@@ -127,9 +141,9 @@ namespace ooe
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 call( lua::state* state )
+		static s32 call( state* state )
 		{
-			stack stack( state );
+			stack stack = verify_arguments( state, LIMIT );
 
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function;
@@ -148,9 +162,9 @@ namespace ooe
 	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 call( lua::state* state )
+		static s32 call( state* state )
 		{
-			stack stack( state );
+			stack stack = verify_arguments( state, LIMIT );
 
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member;
@@ -168,9 +182,9 @@ namespace ooe
 	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct lua::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
-		static s32 call( lua::state* state )
+		static s32 call( state* state )
 		{
-			stack stack( state );
+			stack stack = verify_arguments( state, LIMIT );
 
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member;
