@@ -6,6 +6,8 @@
 #include "foundation/utility/macro.hpp"
 
 #define check( reason, boolean )\
+do\
+{\
 	if ( !( boolean ) )\
 	{\
 		ooe::unit::fail();\
@@ -13,7 +15,9 @@
 			reason "\n"\
 			"\tFile \"" __FILE__ "\", Line " << __LINE__ << ":\n"\
 			"\t" #boolean "\n";\
-	}
+	}\
+}\
+while ( false )
 
 namespace ooe
 {
