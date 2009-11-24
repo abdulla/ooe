@@ -7,6 +7,7 @@
 
 #include "foundation/ipc/error.hpp"
 #include "foundation/ipc/traits.hpp"
+#include "foundation/utility/hint.hpp"
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/noncopyable.hpp"
 
@@ -18,15 +19,6 @@ namespace ooe
 
 //--- *_ptr --------------------------------------------------------------------
 		template< typename >
-			class proxy_ptr;
-
-		template< typename >
-			struct construct_ptr;
-
-		template< typename >
-			struct destruct_ptr;
-
-		template< typename >
 			struct nullable_ptr;
 
 		template< typename >
@@ -35,12 +27,6 @@ namespace ooe
 //--- is_* ---------------------------------------------------------------------
 		template< typename >
 			struct is_pointer;
-
-		template< typename >
-			struct is_construct;
-
-		template< typename >
-			struct is_destruct;
 
 		template< typename >
 			struct is_nullable;
@@ -97,61 +83,6 @@ namespace ooe
 		map_type map;
 	};
 
-//--- ipc::proxy_ptr -----------------------------------------------------------
-	template< typename t >
-		class ipc::proxy_ptr
-	{
-	public:
-		typedef t* pointer;
-		typedef t& reference;
-
-		operator pointer( void ) const
-		{
-			return value;
-		}
-
-		pointer operator ->( void ) const
-		{
-			return value;
-		}
-
-		reference operator *( void ) const
-		{
-			return *value;
-		}
-
-	protected:
-		proxy_ptr( pointer value_ )
-			: value( value_ )
-		{
-		}
-
-	private:
-		pointer value;
-	};
-
-//--- ipc::construct_ptr -------------------------------------------------------
-	template< typename t >
-		struct ipc::construct_ptr
-		: public proxy_ptr< t >
-	{
-		construct_ptr( t* value_ = 0 )
-			: proxy_ptr< t >( value_ )
-		{
-		}
-	};
-
-//--- ipc::destruct_ptr --------------------------------------------------------
-	template< typename t >
-		struct ipc::destruct_ptr
-		: public proxy_ptr< t >
-	{
-		destruct_ptr( t* value_ = 0 )
-			: proxy_ptr< t >( value_ )
-		{
-		}
-	};
-
 //--- ipc::nullable_ptr --------------------------------------------------------
 	template< typename t >
 		struct ipc::nullable_ptr
@@ -181,55 +112,6 @@ namespace ooe
 		static const bool value = !is_cstring< t >::value && ooe::is_pointer< t >::value;
 	};
 
-//--- ipc::is_construct --------------------------------------------------------
-	template< typename t >
-		struct ipc::is_construct
-#if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
-		: public is_template1< t, construct_ptr >
-	{
-	};
-#else
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename t0 >
-			struct apply< construct_ptr< t0 > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-#endif
-
-//--- ipc::is_destruct ---------------------------------------------------------
-	template< typename t >
-		struct ipc::is_destruct
-#if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
-		: public is_template1< t, destruct_ptr >
-	{
-	};
-#else
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename t0 >
-			struct apply< destruct_ptr< t0 > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-#endif
 
 //--- ipc::is_nullable ---------------------------------------------------------
 	template< typename t >
@@ -329,7 +211,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::verify< t, typename enable_if< ipc::is_construct< t > >::type >
+		struct ipc::verify< t, typename enable_if< is_construct< t > >::type >
 	{
 		static void call( pool& pool, t pointer, u8 )
 		{
@@ -339,7 +221,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct ipc::verify< t, typename enable_if< ipc::is_destruct< t > >::type >
+		struct ipc::verify< t, typename enable_if< is_destruct< t > >::type >
 	{
 		static void call( pool& pool, t pointer, u8 )
 		{
