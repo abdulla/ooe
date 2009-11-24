@@ -49,12 +49,12 @@ namespace
 		}
 	};
 
-	ipc::construct_ptr< print > print_construct( void )
+	construct_ptr< print > print_construct( void )
 	{
 		return new print;
 	}
 
-	void print_destruct( ipc::destruct_ptr< print > p )
+	void print_destruct( destruct_ptr< print > p )
 	{
 		delete p;
 	}
@@ -161,7 +161,7 @@ namespace
 		inline_test( vector_type( 10 * 1024, "." ) );
 
 		//----------------------------------------------------------------------
-		ipc::memory::call< ipc::construct_ptr< print > ( void ) >
+		ipc::memory::call< construct_ptr< print > ( void ) >
 			print_construct( client, "print_construct" );
 		print* p = print_construct();
 
@@ -172,7 +172,7 @@ namespace
 		value = multiply( p, 2, 8 );
 		std::cout << "multiply( " << p << ", 2, 8 ) = " << value << '\n';
 
-		ipc::memory::call< void ( ipc::destruct_ptr< print > ) >
+		ipc::memory::call< void ( destruct_ptr< print > ) >
 			print_destruct( client, "print_destruct" );
 		print_destruct( p );
 
@@ -212,7 +212,7 @@ namespace
 	void client_ptr( void )
 	{
 		ipc::memory::client client( "/ooe" );
-		ipc::memory::call< ipc::construct_ptr< print > ( void ) >
+		ipc::memory::call< construct_ptr< print > ( void ) >
 			print_construct( client, "print_construct" );
 		ipc::memory::call< void ( print* ) > printer( client, "printer" );
 		std::set< print* > set;
@@ -259,7 +259,7 @@ namespace
 		ipc::socket::call< void ( void ) > unknown( client, "unknown" );
 		OOE_PRINT( "\nCLIENT_FAIL", unknown()() );
 
-		ipc::socket::call< ipc::construct_ptr< print > ( void ) >
+		ipc::socket::call< construct_ptr< print > ( void ) >
 			print_construct( client, "print_construct" );
 
 		for ( up_t i = 0; i != iteration_limit; ++i )
