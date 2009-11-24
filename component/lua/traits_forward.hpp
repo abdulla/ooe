@@ -121,7 +121,7 @@ namespace ooe
 		struct lua::is_arithmetic
 	{
 		static const bool value =
-			// !is_boolean< t >::value &&
+			!is_boolean< t >::value &&
 			( ooe::is_arithmetic< typename no_ref< t >::type >::value ||
 			is_enum< typename no_ref< t >::type >::value );
 	};
@@ -140,6 +140,8 @@ namespace ooe
 		struct lua::is_pod
 	{
 		static const bool value =
+			!is_boolean< t >::value &&
+			!is_arithmetic< t >::value &&
 			!is_cstring< t >::value &&
 			!is_pointer< t >::value &&
 			( ooe::is_pod< typename no_ref< t >::type >::value ||
@@ -151,10 +153,11 @@ namespace ooe
 		struct lua::is_class
 	{
 		static const bool value =
-			!is_stdstring< t >::value &&
-			!is_stdcontainer< t >::value &&
 			!is_construct< t >::value &&
 			!is_destruct< t >::value &&
+			!is_stdstring< t >::value &&
+			!is_stdcontainer< t >::value &&
+			!is_tuple< t >::value &&
 			!has_trivial_copy< typename no_ref< t >::type >::value &&
 			( ooe::is_class< typename no_ref< t >::type >::value ||
 			is_union< typename no_ref< t >::type >::value );
