@@ -24,6 +24,11 @@ namespace
 			std::cout << value << '\n';
 		}
 
+		void say( void )
+		{
+			std::cout << this << " said: " << value << '\n';
+		}
+
 	private:
 		std::string value;
 	};
@@ -57,6 +62,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 	builder.insert( "hello", hello );
 	builder.insert( "allocate", allocate );
 	builder.insert( "deallocate", deallocate );
+	builder.insert( "say", &print::say );
 	builder.insert( "lua_gauntlet", lua_gauntlet );
 
 	return module;
