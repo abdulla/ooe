@@ -73,4 +73,21 @@ namespace ooe
 	{
 		semaphore.up();
 	}
+
+//--- ipc::barrier_wait --------------------------------------------------------
+	ipc::barrier_wait::barrier_wait( const std::string& name )
+		: semaphore( name, ipc::semaphore::create, 0 )
+	{
+	}
+
+	ipc::barrier_wait::~barrier_wait( void )
+	{
+		semaphore.down();
+	}
+
+//--- ipc ----------------------------------------------------------------------
+	void ipc::barrier_notify( const std::string& name )
+	{
+		ipc::semaphore( name ).up();
+	}
 }

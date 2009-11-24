@@ -17,6 +17,9 @@ namespace ooe
 		class semaphore_id;
 		class semaphore;
 		class process_lock;
+
+		class barrier_wait;
+		void barrier_notify( const std::string& ) OOE_VISIBLE;
 	}
 
 //--- ipc::semaphore_id --------------------------------------------------------
@@ -68,6 +71,17 @@ namespace ooe
 
 	private:
 		ipc::semaphore& semaphore;
+	};
+
+//--- ipc::barrier_wait --------------------------------------------------------
+	class OOE_VISIBLE ipc::barrier_wait
+	{
+	public:
+		barrier_wait( const std::string& );
+		~barrier_wait( void );
+
+	private:
+		ipc::semaphore semaphore;
 	};
 }
 
