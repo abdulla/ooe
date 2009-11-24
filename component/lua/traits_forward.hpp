@@ -387,7 +387,7 @@ namespace ooe
 
 			if ( !is_equal )
 				throw error::lua() << "meta-table mismatch at index " << index << " for type \"" <<
-					demangle( typeid( pointer ).name() ) << "\" (type at index " <<
+					demangle( typeid( pointer ).name() ) << "\" (got type " <<
 					stack.type_name( stack.type( index ) ) << ')';
 
 			stack.push_nil();

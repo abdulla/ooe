@@ -52,6 +52,11 @@ namespace
 	{
 		return make_tuple( b, f );
 	}
+
+	bool* lua_mismatch( void )
+	{
+		return 0;
+	}
 }
 
 extern "C" ooe::module OOE_VISIBLE module_open( void )
@@ -64,6 +69,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 	builder.insert( "deallocate", deallocate );
 	builder.insert( "say", &print::say );
 	builder.insert( "lua_gauntlet", lua_gauntlet );
+	builder.insert( "lua_mismatch", lua_mismatch );
 
 	return module;
 }
