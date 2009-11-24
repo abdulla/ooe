@@ -21,6 +21,7 @@
 namespace
 {
 	using namespace ooe;
+	typedef scoped_ptr< scoped_fork > fork_ptr;
 
 	class setup
 	{
@@ -28,30 +29,26 @@ namespace
 		setup( void )
 			: path_( executable::path()._0 ), fork( 0 )
 		{
-			std::string name = ipc::unique_name();
-			ipc::semaphore semaphore( name, ipc::semaphore::create, 0 );
-			fork_ptr( new fork_io ).swap( fork );
-
-			if ( fork->is_child() )
 			{
-				OOE_IGNORE
-				(
-					executable::null_fd( STDOUT_FILENO );
-					fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL );
-				);
+				std::string name = ipc::unique_name();
+				ipc::barrier_wait wait( name );
+				fork_ptr( new scoped_fork ).swap( fork );
 
-				fork_io::exit( true );
+				if ( fork->is_child() )
+				{
+					OOE_IGNORE
+					(
+						executable::null_fd( STDOUT_FILENO );
+						fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL );
+					);
+
+					fork_io::exit( true );
+				}
 			}
 
-			semaphore.down();
 			std::string module_path = path_ + "../library/libhello" + library::suffix;
 			registry registry;
 			registry.insert( registry::library, module_path );
-		}
-
-		~setup( void )
-		{
-			fork->signal( SIGKILL );
 		}
 
 		std::string path() const
@@ -60,8 +57,6 @@ namespace
 		}
 
 	private:
-		typedef scoped_ptr< ooe::fork_io > fork_ptr;
-
 		std::string path_;
 		fork_ptr fork;
 	};
@@ -119,19 +114,16 @@ namespace ooe
 			void fixture_type::test< 3 >( setup& setup )
 		{
 			std::cerr << "insert and load module from server\n";
+			fork_ptr fork( 0 );
 
-			std::string path = setup.path() + "hello";
-			std::string name = ipc::unique_name();
+			{
+				std::string name = ipc::unique_name();
+				ipc::barrier_wait wait( name );
+				fork_ptr( new scoped_fork ).swap( fork );
 
-			ipc::semaphore semaphore( name, ipc::semaphore::create, 0 );
-			fork_io fork;
-
-			if ( fork.is_child() )
-				fork_io::execute( path, "-u", name.c_str(), NULL );
-
-			scoped< void ( s32 ) >
-				scoped( function< void ( s32 ) >( fork, &fork_io::signal ), SIGKILL );
-			semaphore.down();
+				if ( fork->is_child() )
+					fork_io::execute( setup.path() + "hello", "-u", name.c_str(), NULL );
+			}
 
 			registry registry;
 			registry.insert( registry::server, "/ooe.hello" );

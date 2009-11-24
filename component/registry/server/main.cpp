@@ -144,13 +144,12 @@ namespace
 	std::string surrogate( const std::string& path )
 	{
 		std::string name = ipc::unique_name();
-		ipc::semaphore semaphore( name + ".g", ipc::semaphore::create, 0 );
+		ipc::barrier_wait wait( name + ".g" );
 		fork_io fork;
 
 		if ( fork.is_child() )
 			fork_io::execute( self, "-m", path.c_str(), "-s", name.c_str(), NULL );
 
-		semaphore.down();
 		return name;
 	}
 
@@ -170,7 +169,7 @@ namespace
 		ipc::memory::server server( "/ooe.registry", switchboard );
 
 		if ( up_name )
-			ipc::semaphore( up_name ).up();
+			ipc::barrier_notify( up_name );
 
 		while ( !executable::signal() )
 			server.decode();
@@ -183,7 +182,7 @@ namespace
 		load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
 
 		ipc::memory::server server( surrogate_path, nameservice );
-		ipc::semaphore( surrogate_path + ".g" ).up();
+		ipc::barrier_notify( surrogate_path + ".g" );
 
 		while ( !executable::signal() && server.decode() ) {}
 	}

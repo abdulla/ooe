@@ -38,7 +38,7 @@ namespace
 		ipc::memory::server server( "/ooe.hello", nameservice );
 
 		if ( up_name )
-			ipc::semaphore( up_name ).up();
+			ipc::barrier_notify( up_name );
 
 		while ( !executable::signal() )
 			server.decode();
