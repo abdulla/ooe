@@ -51,6 +51,13 @@ namespace ooe
 	std::string read( fork_io& ) OOE_VISIBLE;
 	fork_io& operator <<( fork_io&, const c8* ) OOE_VISIBLE;
 	fork_io& operator <<( fork_io&, const std::string& ) OOE_VISIBLE;
+
+//--- scoped_fork --------------------------------------------------------------
+	struct scoped_fork
+		: public fork_io
+	{
+		~scoped_fork( void ) OOE_VISIBLE;
+	};
 }
 
 #endif	// OOE_FOUNDATION_EXECUTABLE_FORK_IO_HPP

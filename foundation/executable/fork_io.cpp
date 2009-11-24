@@ -226,4 +226,10 @@ namespace ooe
 		out.write( value.c_str(), value.size() + 1 );
 		return out;
 	}
+
+//--- scoped_fork --------------------------------------------------------------
+	scoped_fork::~scoped_fork( void )
+	{
+		signal( SIGKILL );
+	}
 }
