@@ -114,6 +114,7 @@ namespace ooe
 			void fixture_type::test< 3 >( setup& setup )
 		{
 			std::cerr << "insert and load module from server\n";
+
 			fork_ptr fork( 0 );
 
 			{
