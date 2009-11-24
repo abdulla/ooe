@@ -69,7 +69,8 @@ namespace ooe
 	template< typename t >
 		struct ipc::is_pod
 	{
-		static const bool value = !is_cstring< t >::value &&
+		static const bool value =
+			!is_cstring< t >::value &&
 			( ooe::is_pod< typename no_ref< t >::type >::value ||
 			has_trivial_copy< typename no_ref< t >::type >::value );
 	};

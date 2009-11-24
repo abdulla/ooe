@@ -53,6 +53,7 @@ namespace ooe
 
 		type::id type( s32 ) const;
 		const c8* type_name( type::id ) const;
+		bool raw_equal( s32, s32 ) const;
 
 		f64 to_number( s32 ) const;
 		bool to_boolean( s32 ) const;
@@ -65,7 +66,6 @@ namespace ooe
 		void push_lstring( const c8*, up_t );
 		void push_cclosure( cfunction, u32 = 0 );
 		void push_boolean( bool );
-		void push_lightuserdata( void* );
 
 		void raw_get( s32 );
 		void raw_geti( s32, u32 );

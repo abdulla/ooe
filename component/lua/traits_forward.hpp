@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include "component/lua/error.hpp"
+#include "foundation/utility/hint.hpp"
 #include "foundation/utility/miscellany.hpp"
 
 namespace ooe
@@ -53,6 +54,12 @@ namespace ooe
 			struct to< t, typename enable_if< is_class< t > >::type >;
 
 		template< typename t >
+			struct to< t, typename enable_if< is_construct< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_destruct< t > >::type >;
+
+		template< typename t >
 			struct to< t, typename enable_if< is_array< t > >::type >;
 
 //--- lua::push ----------------------------------------------------------------
@@ -81,6 +88,12 @@ namespace ooe
 			struct push< t, typename enable_if< is_class< t > >::type >;
 
 		template< typename t >
+			struct push< t, typename enable_if< is_construct< t > >::type >;
+
+		template< typename t >
+			struct push< t, typename enable_if< is_destruct< t > >::type >;
+
+		template< typename t >
 			struct push< t, typename enable_if< is_array< t > >::type >;
 
 //--- type_check ---------------------------------------------------------------
@@ -90,6 +103,10 @@ namespace ooe
 //--- destruct -----------------------------------------------------------------
 		template< typename >
 			s32 destruct( state* );
+
+//--- destroy ------------------------------------------------------------------
+		template< typename >
+			s32 destroy( state* );
 	}
 
 //--- lua::is_boolean ----------------------------------------------------------
@@ -103,7 +120,8 @@ namespace ooe
 	template< typename t >
 		struct lua::is_arithmetic
 	{
-		static const bool value = // !is_boolean< t >::value &&
+		static const bool value =
+			// !is_boolean< t >::value &&
 			( ooe::is_arithmetic< typename no_ref< t >::type >::value ||
 			is_enum< typename no_ref< t >::type >::value );
 	};
@@ -112,7 +130,8 @@ namespace ooe
 	template< typename t >
 		struct lua::is_pointer
 	{
-		static const bool value = !is_cstring< t >::value &&
+		static const bool value =
+			!is_cstring< t >::value &&
 			ooe::is_pointer< typename no_ref< t >::type >::value;
 	};
 
@@ -120,7 +139,8 @@ namespace ooe
 	template< typename t >
 		struct lua::is_pod
 	{
-		static const bool value = !is_cstring< t >::value &&
+		static const bool value =
+			!is_cstring< t >::value &&
 			!is_pointer< t >::value &&
 			( ooe::is_pod< typename no_ref< t >::type >::value ||
 			has_trivial_copy< typename no_ref< t >::type >::value );
@@ -130,8 +150,11 @@ namespace ooe
 	template< typename t >
 		struct lua::is_class
 	{
-		static const bool value = !is_stdstring< t >::value &&
+		static const bool value =
+			!is_stdstring< t >::value &&
 			!is_stdcontainer< t >::value &&
+			!is_construct< t >::value &&
+			!is_destruct< t >::value &&
 			!has_trivial_copy< typename no_ref< t >::type >::value &&
 			( ooe::is_class< typename no_ref< t >::type >::value ||
 			is_union< typename no_ref< t >::type >::value );
@@ -221,8 +244,8 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
 		{
-			type_check< t >( stack, index, type::lightuserdata );
-			pointer = ptr_cast< typename no_ref< t >::type >( stack.to_userdata( index ) );
+			type_check< t >( stack, index, type::userdata );
+			pointer = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
 		}
 	};
 
@@ -231,7 +254,8 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::param_type pointer )
 		{
-			stack.push_lightuserdata( ptr_cast( pointer ) );
+			typedef typename no_ref< t >::type type;
+			new( stack.new_userdata( sizeof( type ) ) ) type( pointer );
 		}
 	};
 
@@ -308,6 +332,75 @@ namespace ooe
 		}
 	};
 
+//--- lua::traits: construct -------------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< is_construct< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::reference construct, s32 index )
+		{
+			typedef typename t::pointer pointer;
+			pointer p;
+			to< pointer >::call( stack, p, index );
+			construct = p;
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< is_construct< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::param_type construct )
+		{
+			typedef typename t::pointer pointer;
+			push< pointer >::call( stack, construct );
+
+			if ( stack.new_metatable( typeid( pointer ).name() ) )
+			{
+				push< const c8* >::call( stack, "__gc" );
+				stack.push_cclosure( destroy< typename t::value_type > );
+				stack.raw_set( -3 );
+			}
+
+			stack.set_metatable( -2 );
+		}
+	};
+
+//--- lua::traits: destruct ----------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< is_destruct< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::reference destruct, s32 index )
+		{
+			typedef typename t::pointer pointer;
+			pointer p;
+			to< pointer >::call( stack, p, index );
+			destruct = p;
+
+			push< const c8* >::call( stack, typeid( pointer ).name() );
+			stack.raw_get( registry_index );
+			stack.get_metatable( index );
+
+			bool is_equal = stack.raw_equal( -1, -2 );
+			stack.pop( 2 );
+
+			if ( !is_equal )
+				throw error::lua() << "meta-table mismatch at index " << index << " for type \"" <<
+					demangle( typeid( pointer ).name() ) << "\" (type at index " <<
+					stack.type_name( stack.type( index ) ) << ')';
+
+			stack.push_nil();
+			stack.set_metatable( index );
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< is_destruct< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::param_type destruct )
+		{
+			push< typename t::pointer >::call( stack, destruct );
+		}
+	};
+
 //--- lua::traits: array -------------------------------------------------------
 	template< typename t >
 		struct lua::to< t, typename enable_if< is_array< t > >::type >
@@ -370,6 +463,15 @@ namespace ooe
 	{
 		stack stack( state );
 		static_cast< t* >( stack.to_userdata( 1 ) )->~t();
+		return 0;
+	}
+
+//--- lua::destroy -------------------------------------------------------------
+	template< typename t >
+		s32 lua::destroy( state* state )
+	{
+		stack stack( state );
+		delete *static_cast< t** >( stack.to_userdata( 1 ) );
 		return 0;
 	}
 }

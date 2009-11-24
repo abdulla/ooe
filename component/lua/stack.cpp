@@ -35,6 +35,11 @@ namespace ooe
 		return lua_typename( state, id );
 	}
 
+	bool lua::stack::raw_equal( s32 index_1, s32 index_2 ) const
+	{
+		return lua_rawequal( state, index_1, index_2 );
+	}
+
 	f64 lua::stack::to_number( s32 index ) const
 	{
 		return lua_tonumber( state, index );
@@ -83,11 +88,6 @@ namespace ooe
 	void lua::stack::push_boolean( bool boolean )
 	{
 		lua_pushboolean( state, boolean );
-	}
-
-	void lua::stack::push_lightuserdata( void* pointer )
-	{
-		lua_pushlightuserdata( state, pointer );
 	}
 
 	void lua::stack::raw_get( s32 index )

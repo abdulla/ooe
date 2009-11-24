@@ -86,7 +86,7 @@ namespace ooe
 
 	#define TO( z, n, _ )\
 		typename no_ref< t ## n >::type a ## n;\
-		to< t ## n >::call( stack, a ## n, n + 1 );
+		to< typename no_ref< t ## n >::type >::call( stack, a ## n, n + 1 );
 
 namespace ooe
 {
@@ -133,7 +133,7 @@ namespace ooe
 		{
 			stack stack = verify_arguments( state, LIMIT );
 
-			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
+			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function;
 			to< function_type >::call( stack, function, upvalue( 1 ) );
 
@@ -174,7 +174,7 @@ namespace ooe
 		{
 			stack stack = verify_arguments( state, LIMIT );
 
-			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
+			typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member;
 			to< member_type >::call( stack, member, upvalue( 1 ) );
 
