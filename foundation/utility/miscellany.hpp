@@ -7,7 +7,6 @@
 
 #include <algorithm>
 
-#include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/traits.hpp"
 
 namespace ooe

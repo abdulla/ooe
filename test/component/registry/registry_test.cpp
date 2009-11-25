@@ -4,6 +4,8 @@
 
 #include <csignal>
 
+#include "component/javascript/traits_forward.hpp"
+#include "component/javascript/vm.hpp"
 #include "component/lua/facade.hpp"
 #include "component/lua/vm.hpp"
 #include "component/registry/local.hpp"
@@ -61,7 +63,7 @@ namespace
 		fork_ptr fork;
 	};
 
-	typedef unit::group< setup, empty_t, 5 > group_type;
+	typedef unit::group< setup, empty_t, 6 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "registry" );
 }
@@ -144,6 +146,17 @@ namespace ooe
 
 			std::string path = setup.path() + "../external/hello/script.lua";
 			vm.load( "hello.lua", path );
+		}
+
+		template<>
+		template<>
+			void fixture_type::test< 5 >( setup& )
+		{
+			std::cerr << "load module in to javascript\n";
+
+			javascript::vm vm;
+
+			v8::Handle< v8::Value > value = javascript::from< bool >::call( true );
 		}
 	}
 }

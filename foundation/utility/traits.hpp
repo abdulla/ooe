@@ -20,6 +20,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/preprocessor.hpp"
 
 namespace std
@@ -49,8 +50,10 @@ namespace ooe
 	using traits::is_class;
 	using traits::is_const;
 	using traits::is_enum;
+	using traits::is_floating_point;
 	using traits::is_function;
 	using traits::is_fundamental;
+	using traits::is_integral;
 	using traits::is_member_function_pointer;
 	using traits::is_member_object_pointer;
 	using traits::is_member_pointer;
