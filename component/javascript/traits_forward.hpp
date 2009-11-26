@@ -26,6 +26,9 @@ namespace ooe
 			struct to;
 
 		template< typename t >
+			struct to< t, typename enable_if< is_empty< t > >::type >;
+
+		template< typename t >
 			struct to< t, typename enable_if< is_boolean< t > >::type >;
 
 		template< typename t >
@@ -43,6 +46,9 @@ namespace ooe
 //--- javascript:from ----------------------------------------------------------
 		template< typename, typename = void >
 			struct from;
+
+		template< typename t >
+			struct from< t, typename enable_if< is_empty< t > >::type >;
 
 		template< typename t >
 			struct from< t, typename enable_if< is_boolean< t > >::type >;
@@ -100,6 +106,27 @@ namespace ooe
 		{
 			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 			return v8::Undefined();
+		}
+	};
+
+//--- javascript::traits: empty ------------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< is_empty< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference )
+		{
+			if ( !value->IsNull() )
+				throw error::javascript() << "Value is not null";
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< is_empty< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type )
+		{
+			return v8::Null();
 		}
 	};
 
@@ -192,6 +219,50 @@ namespace ooe
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type integral )
 		{
 			return v8::Integer::New( integral );
+		}
+	};
+
+//--- javascript::traits: array ------------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< is_array< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference array )
+		{
+			if ( !value->IsArray() )
+				throw error::javascript() << "Value is not an array";
+
+			typedef typename no_ref< t >::type type;
+			v8::Array* js_array = v8::Array::Cast( *value );
+			up_t js_size = js_array->Length();
+			up_t array_size = extent< type >::value;
+
+			if ( js_size != array_size )
+				throw error::javascript() << "Array in javascript is of size " << js_size <<
+					", array is of size " << array_size;
+
+			v8::HandleScope scope;
+
+			for ( up_t i = 0; i != array_size; ++i )
+				to< typename remove_extent< type >::type >::
+					call( js_array->CloneElementAt( i ), array[ i ] );
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< is_array< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type array )
+		{
+			typedef typename no_ref< t >::type type;
+			up_t array_size = extent< type >::value;
+			v8::Local< v8::Array > local = v8::Array::New( array_size );
+
+			for ( up_t i = 0; i != array_size; ++i )
+				local->Set( v8::Number::New( i ),
+					from< typename remove_extent< type >::type >::call( array[ i ] ) );
+
+			return local;
 		}
 	};
 }

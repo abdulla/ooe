@@ -410,8 +410,9 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference array, s32 index )
 		{
-			typedef typename no_ref< t >::type type;
 			type_check< t >( stack, index, type::table );
+
+			typedef typename no_ref< t >::type type;
 			up_t table_size = stack.objlen( index );
 			up_t array_size = extent< type >::value;
 

@@ -6,6 +6,7 @@
 #include <v8.h>
 
 #include "foundation/utility/macro.hpp"
+#include "foundation/utility/string.hpp"
 
 namespace ooe
 {
@@ -20,6 +21,11 @@ namespace ooe
 	public:
 		vm( void );
 		~vm( void );
+
+		void collect( void );
+
+		up_t size( void ) const;
+		std::string version( void ) const;
 
 	private:
 		v8::Persistent< v8::Context > context;

@@ -28,15 +28,18 @@ namespace ooe
 
 			typedef typename no_ref< t >::type type;
 			up_t table_size = stack.objlen( index );
+
 			type out;
 			reserve( out, table_size );
 
 			for ( up_t i = 0; i != table_size; ++i )
 			{
 				stack.raw_geti( index, i + 1 );
+
 				typename type::value_type value;
 				to< typename type::value_type >::call( stack, value, -1 );
 				out.push_back( value );
+
 				stack.pop( 1 );
 			}
 
@@ -75,13 +78,13 @@ namespace ooe
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-	#define TUPLE_TO( z, n, _ )\
+	#define TUPLE_TO( z, n, d )\
 		stack.raw_geti( index, n + 1 );\
-		to< typename tuple_element< n, t >::type >::call( stack, at< n >( tuple ), -1 );\
+		to< typename tuple_element< n, t >::type >::call( stack, tuple._ ## n, -1 );\
 		stack.pop( 1 );
 
-	#define TUPLE_PUSH( z, n, _ )\
-		push< typename tuple_element< n, t >::type >::call( stack, at< n >( tuple ) );\
+	#define TUPLE_PUSH( z, n, d )\
+		push< typename tuple_element< n, t >::type >::call( stack, tuple._ ## n );\
 		stack.raw_seti( -2, n + 1 );
 
 namespace ooe
@@ -123,6 +126,7 @@ namespace ooe
 	};
 }
 
+	#undef TUPLE_PUSH
 	#undef TUPLE_TO
 	#undef LIMIT
 

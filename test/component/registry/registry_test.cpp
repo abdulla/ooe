@@ -4,7 +4,7 @@
 
 #include <csignal>
 
-#include "component/javascript/traits_forward.hpp"
+#include "component/javascript/traits.hpp"
 #include "component/javascript/vm.hpp"
 #include "component/lua/facade.hpp"
 #include "component/lua/vm.hpp"

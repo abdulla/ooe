@@ -111,10 +111,10 @@ namespace ooe
 
 	#define TUPLE_SIZE( z, n, d ) +\
 		size< typename tuple_element< n, t >::type >::call( value._ ## n )
-	#define TUPLE_READ( z, n, _ ) pointer +=\
-		read< typename tuple_element< n, t >::type >::call( pointer, at< n >( value ) );
-	#define TUPLE_WRITE( z, n, _ ) pointer +=\
-		write< typename tuple_element< n, t >::type >::call( pointer, at< n >( value ) );
+	#define TUPLE_READ( z, n, d ) pointer +=\
+		read< typename tuple_element< n, t >::type >::call( pointer, value._ ## n );
+	#define TUPLE_WRITE( z, n, d ) pointer +=\
+		write< typename tuple_element< n, t >::type >::call( pointer, value._ ## n );
 
 namespace ooe
 {
@@ -238,6 +238,7 @@ namespace ooe
 
 	#undef TUPLE_WRITE
 	#undef TUPLE_READ
+	#undef TUPLE_SIZE
 	#undef WRITE
 	#undef READ
 	#undef SIZE
