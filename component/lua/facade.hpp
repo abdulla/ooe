@@ -62,10 +62,11 @@ namespace ooe
 	inline lua::stack lua::verify_arguments( state* state, u32 size )
 	{
 		stack stack( state );
+		u32 stack_size = stack.size();
 
-		if ( stack.size() < size )
+		if ( stack_size < size )
 			throw error::lua() << "Not enough arguments to function, " << size <<
-				" expected, got " << stack.size();
+				" expected, got " << stack_size;
 
 		return stack;
 	}
@@ -82,7 +83,6 @@ namespace ooe
 #else	// BOOST_PP_IS_ITERATING
 
 	#define LIMIT BOOST_PP_ITERATION()
-	#define COMMA BOOST_PP_COMMA_IF( BOOST_PP_GREATER( LIMIT, 1 ) )
 
 	#define TO( z, n, _ )\
 		typename no_ref< t ## n >::type a ## n;\
@@ -191,7 +191,6 @@ namespace ooe
 }
 
 	#undef TO
-	#undef COMMA
 	#undef LIMIT
 
 #endif	// BOOST_PP_IS_ITERATING
