@@ -23,6 +23,9 @@ namespace ooe
 		inline void verify_arguments( const v8::Arguments&, s32 );
 
 		template< typename >
+			struct invoke;
+
+		template< typename >
 			struct invoke_function;
 
 		template< typename, typename >
@@ -43,7 +46,9 @@ namespace ooe
 			typename enable_if< is_function_pointer< type > >::type* = 0 )
 		{
 			typedef typename remove_pointer< type >::type function_type;
-			insert( index, ooe::javascript::invoke_function< function_type >::call );
+			typedef ooe::javascript::
+				invoke< ooe::javascript::invoke_function< function_type > > invoke_type;
+			insert( index, invoke_type::call );
 		}
 
 		template< typename type >
@@ -52,7 +57,9 @@ namespace ooe
 		{
 			typedef typename member_of< type >::type object_type;
 			typedef typename remove_member< type >::type member_type;
-			insert( index, ooe::javascript::invoke_member< object_type, member_type >::call );
+			typedef ooe::javascript::
+				invoke< ooe::javascript::invoke_member< object_type, member_type > > invoke_type;
+			insert( index, invoke_type::call );
 		}
 
 	private:
@@ -68,6 +75,35 @@ namespace ooe
 			throw error::javascript() << "Not enough arguments to function, " << size <<
 				" expected, got " << argument_size;
 	}
+
+//--- javascript::invoke -------------------------------------------------------
+	template< typename type >
+		struct javascript::invoke
+	{
+		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
+		{
+			try
+			{
+				return type::call( arguments );
+			}
+			catch ( error::runtime& error )
+			{
+				v8::ThrowException( from< std::string >::call( std::string( error.what() ) +
+					"\n\nStack trace:" + error.where() + "\n\nSource line:" ) );
+			}
+			catch ( std::exception& error )
+			{
+				v8::ThrowException( from< std::string >::call( std::string( error.what() ) +
+					"\n\nSource line:" ) );
+			}
+			catch ( ... )
+			{
+				v8::ThrowException( from< const c8* >::call( "Unknown\n\nSource line:" ) );
+			}
+
+			return v8::Undefined();
+		}
+	};
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )

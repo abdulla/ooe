@@ -6,5 +6,6 @@ var module = ooe.registry.load( result[ 0 ] );
 
 var hello = module[ 'hello/FvvE' ];
 
-print( hello );
+hello();
+
 print( 'hello javascript' );
