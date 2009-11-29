@@ -307,7 +307,10 @@ namespace ooe
 	{
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pointer )
 		{
-			v8::Handle< v8::Object > object = v8::Object::New();
+			v8::Handle< v8::ObjectTemplate > template_ = v8::ObjectTemplate::New();
+			template_->SetInternalFieldCount( 1 );
+
+			v8::Handle< v8::Object > object = template_->NewInstance();
 			object->SetPointerInInternalField( 0, ptr_cast( pointer ) );
 			return object;
 		}
@@ -357,8 +360,11 @@ namespace ooe
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type construct )
 		{
 			typedef typename t::value_type type;
+			v8::Handle< v8::ObjectTemplate > template_ = v8::ObjectTemplate::New();
+			template_->SetInternalFieldCount( 1 );
+
 			v8::Persistent< v8::Object > object =
-				v8::Persistent< v8::Object >::New( v8::Object::New() );
+				v8::Persistent< v8::Object >::New( template_->NewInstance() );
 			object->SetPointerInInternalField( 0, construct );
 			object.MakeWeak( 0, destroy< type > );
 			object.Dispose();
@@ -374,16 +380,11 @@ namespace ooe
 		static void call( const v8::Handle< v8::Value >& value,
 			typename call_traits< t >::reference destruct )
 		{
-			v8::Persistent< v8::Value > persistent( value );
-
-			if ( !persistent.IsWeak() )
-				throw error::javascript() << "Value is not a weak reference";
-
 			typedef typename t::pointer pointer;
 			pointer p;
 			to< pointer >::call( value, p );
 			destruct = p;
-			persistent.ClearWeak();
+			v8::Persistent< v8::Value >( value ).ClearWeak();
 		}
 	};
 

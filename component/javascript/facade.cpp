@@ -28,6 +28,23 @@ namespace
 		ooe::module module;
 	};
 
+	template< v8::Handle< v8::Value > ( * function )( const v8::Arguments& arguments ) >
+		struct embed
+	{
+		struct defer
+		{
+			static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
+			{
+				return function( arguments );
+			}
+		};
+
+		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
+		{
+			return javascript::invoke< defer >::call( arguments );
+		}
+	};
+
 	typedef std::vector< std::string > find_vector;
 
 	v8::Handle< v8::Value > find( const v8::Arguments& arguments )
@@ -84,18 +101,18 @@ namespace
 		{
 			v8::Handle< v8::Value > key =
 				javascript::from< std::string >::call( names[ i ]._0 + '/' + names[ i ]._1 );
-			v8::Handle< v8::Value > function;
+			v8::Handle< v8::Value > data;
 
 			if ( names[ i ]._1[ 0 ] == 'F' )
-				function = javascript::from< void ( * )( void ) >::call( local[ i ].function );
+				data = javascript::from< void ( * )( void ) >::call( local[ i ].function );
 			else if ( names[ i ]._1[ 0 ] == 'M' )
-				function = javascript::from< void ( any::* )( void ) >::call( local[ i ].member );
+				data = javascript::from< void ( any::* )( void ) >::call( local[ i ].member );
 			else
 				throw error::runtime( "javascript::load: " ) << "Function \"" << names[ i ]._0 <<
 					"\" of type \"" << names[ i ]._1 << "\" has unknown pointer";
 
 			object->Set( key,
-				v8::FunctionTemplate::New( javascript[ i ], function )->GetFunction() );
+				v8::FunctionTemplate::New( javascript[ i ], data )->GetFunction() );
 		}
 
 		object->Set( javascript::from< up_t >::call( 0 ),
@@ -159,9 +176,9 @@ namespace ooe
 		ooe->Set( from< const c8* >::call( "registry" ), registry );
 
 		registry->Set( from< const c8* >::call( "find" ),
-			v8::FunctionTemplate::New( find )->GetFunction() );
+			v8::FunctionTemplate::New( embed< find >::call )->GetFunction() );
 		registry->Set( from< const c8* >::call( "load" ),
-			v8::FunctionTemplate::New( load )->GetFunction() );
+			v8::FunctionTemplate::New( embed< load >::call )->GetFunction() );
 
 		//----------------------------------------------------------------------
 

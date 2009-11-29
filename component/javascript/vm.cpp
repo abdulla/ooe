@@ -53,6 +53,7 @@ namespace ooe
 	javascript::vm::~vm( void )
 	{
 		context.Dispose();
+		collect();
 	}
 
 	void javascript::vm::load( const std::string& name, const descriptor& desc )
