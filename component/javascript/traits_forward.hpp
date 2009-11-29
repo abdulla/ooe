@@ -139,6 +139,10 @@ namespace ooe
 		struct javascript::is_class
 	{
 		static const bool value =
+			!is_construct< t >::value &&
+			!is_destruct< t >::value &&
+			!is_stdstring< t >::value &&
+			!is_stdcontainer< t >::value &&
 			!is_tuple< t >::value &&
 			( is_member_pointer< typename no_ref< t >::type >::value ||
 			ooe::is_class< typename no_ref< t >::type >::value ||
@@ -370,7 +374,7 @@ namespace ooe
 		static void call( const v8::Handle< v8::Value >& value,
 			typename call_traits< t >::reference destruct )
 		{
-			v8::Persistent< v8::Value > persistent = value;
+			v8::Persistent< v8::Value > persistent( value );
 
 			if ( !persistent.IsWeak() )
 				throw error::javascript() << "Value is not a weak reference";

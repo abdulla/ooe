@@ -4,7 +4,7 @@
 
 #include <csignal>
 
-#include "component/javascript/traits.hpp"
+#include "component/javascript/facade.hpp"
 #include "component/javascript/vm.hpp"
 #include "component/lua/facade.hpp"
 #include "component/lua/vm.hpp"
@@ -150,13 +150,14 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 5 >( setup& )
+			void fixture_type::test< 5 >( setup& setup )
 		{
 			std::cerr << "load module in to javascript\n";
 
 			javascript::vm vm;
 
-			v8::Handle< v8::Value > value = javascript::from< bool >::call( true );
+			std::string path = setup.path() + "../external/hello/script.js";
+			vm.load( "hello.js", path );
 		}
 	}
 }

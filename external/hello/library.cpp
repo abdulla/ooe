@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "component/javascript/facade.hpp"
 #include "component/lua/facade.hpp"
 #include "component/registry/builder.hpp"
 #include "component/registry/local.hpp"
@@ -48,12 +49,12 @@ namespace
 		delete value;
 	}
 
-	tuple< bool, f32 > lua_gauntlet( bool b, f32 f )
+	tuple< bool, f32 > gauntlet( bool b, f32 f )
 	{
 		return make_tuple( b, f );
 	}
 
-	bool* lua_mismatch( void )
+	bool* mismatch( void )
 	{
 		return 0;
 	}
@@ -63,13 +64,13 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 {
 	module module;
 
-	builder< facade::remote, facade::lua > builder( module );
+	builder< facade::remote, facade::lua, facade::javascript > builder( module );
 	builder.insert( "hello", hello );
 	builder.insert( "allocate", allocate );
 	builder.insert( "deallocate", deallocate );
 	builder.insert( "say", &print::say );
-	builder.insert( "lua_gauntlet", lua_gauntlet );
-	builder.insert( "lua_mismatch", lua_mismatch );
+	builder.insert( "gauntlet", gauntlet );
+	builder.insert( "mismatch", mismatch );
 
 	return module;
 }

@@ -36,6 +36,23 @@ namespace ooe
 		const vector_type& get( void ) const OOE_VISIBLE;
 		void insert( up_t, v8::InvocationCallback ) OOE_VISIBLE;
 
+		template< typename type >
+			void insert( up_t index,
+			typename enable_if< is_function_pointer< type > >::type* = 0 )
+		{
+			typedef typename remove_pointer< type >::type function_type;
+			insert( index, ooe::javascript::invoke_function< function_type >::call );
+		}
+
+		template< typename type >
+			void insert( up_t index,
+			typename enable_if< is_member_function_pointer< type > >::type* = 0 )
+		{
+			typedef typename member_of< type >::type object_type;
+			typedef typename remove_member< type >::type member_type;
+			insert( index, ooe::javascript::invoke_member< object_type, member_type >::call );
+		}
+
 	private:
 		vector_type vector;
 	};
