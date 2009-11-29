@@ -144,6 +144,34 @@ namespace ooe
 		std::snprintf( buffer, sizeof( buffer ), "%#0*lx", field_width, ptr.value );
 		return out << buffer;
 	}
+
+//--- repeat -------------------------------------------------------------------
+	template< typename t0, typename t1 >
+		struct repeat
+	{
+		const t0 value;
+		const t1 number;
+
+		explicit repeat( t0 value_, t1 number_ )
+			: value( value_ ), number( number_ )
+		{
+		}
+	};
+
+	template< typename t0, typename t1 >
+		repeat< t0, t1 > rep( t0 value, t1 number )
+	{
+		return repeat< t0, t1 >( value, number );
+	}
+
+	template< typename type, typename t0, typename t1 >
+		type& operator <<( type& out, const repeat< t0, t1 >& rep )
+	{
+		for ( t1 i = 0; i != rep.number; ++i )
+			out << rep.value;
+
+		return out;
+	}
 }
 
 #endif	// OOE_FOUNDATION_UTILITY_CONVERT_HPP
