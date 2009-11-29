@@ -18,7 +18,7 @@ namespace ooe
 
 	namespace lua
 	{
-		void setup( stack&, const std::string& ) OOE_VISIBLE;
+		void component_setup( stack, const std::string& ) OOE_VISIBLE;
 		inline stack verify_arguments( state*, u32 );
 
 		template< typename >

@@ -18,6 +18,8 @@ namespace ooe
 	class OOE_VISIBLE javascript::vm
 	{
 	public:
+		typedef void ( * function_type )( v8::Handle< v8::Object >, const std::string& );
+
 		vm( void );
 		~vm( void );
 
@@ -26,6 +28,8 @@ namespace ooe
 
 		up_t size( void ) const;
 		std::string version( void ) const;
+
+		void setup( function_type, const std::string& );
 
 	private:
 		v8::Persistent< v8::Context > context;

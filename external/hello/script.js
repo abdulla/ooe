@@ -1,2 +1,10 @@
-1 / 1
-// d adad ada
+var result = ooe.registry.find( [ 'hello/FvvE' ] );
+var module = ooe.registry.load( result[ 0 ] );
+
+/*for ( var i in module )
+	print( i );*/
+
+var hello = module[ 'hello/FvvE' ];
+
+print( hello );
+print( 'hello javascript' );

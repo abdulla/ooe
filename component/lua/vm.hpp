@@ -18,6 +18,8 @@ namespace ooe
 		: private noncopyable
 	{
 	public:
+		typedef void ( * function_type )( stack, const std::string& );
+
 		vm( void );
 		~vm( void );
 
@@ -27,7 +29,7 @@ namespace ooe
 		up_t size( void ) const;
 		std::string version( void ) const;
 
-		lua::stack stack( void ) const;
+		void setup( function_type, const std::string& );
 
 	private:
 		lua::state* state;

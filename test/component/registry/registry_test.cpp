@@ -141,8 +141,7 @@ namespace ooe
 			std::cerr << "load module in to lua\n";
 
 			lua::vm vm;
-			lua::stack stack = vm.stack();
-			lua::setup( stack, setup.path() );
+			vm.setup( lua::component_setup, setup.path() );
 
 			std::string path = setup.path() + "../external/hello/script.lua";
 			vm.load( "hello.lua", path );
@@ -155,6 +154,7 @@ namespace ooe
 			std::cerr << "load module in to javascript\n";
 
 			javascript::vm vm;
+			vm.setup( javascript::component_setup, setup.path() );
 
 			std::string path = setup.path() + "../external/hello/script.js";
 			vm.load( "hello.js", path );

@@ -97,8 +97,8 @@ namespace
 		}
 
 		lua::push< shared_ptr< source > >::call( stack, source_ptr );
-
-		return 2;
+		stack.raw_seti( -2, 1 );
+		return 1;
 	}
 }
 
@@ -118,7 +118,7 @@ namespace ooe
 	}
 
 //--- lua ----------------------------------------------------------------------
-	void lua::setup( stack& stack, const std::string& path )
+	void lua::component_setup( stack stack, const std::string& path )
 	{
 		push< const c8* >::call( stack, "ooe" );
 		stack.create_table( 0, 3 );

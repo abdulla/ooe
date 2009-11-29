@@ -34,7 +34,7 @@ namespace ooe
 		if ( luaL_loadbuffer( state, memory.as< c8 >(), memory.size(), name.c_str() ) ||
 			lua_pcall( state, 0, 0, 0 ) )
 		{
-			lua::stack stack_ = stack();
+			lua::stack stack_( state );
 			throw error::lua( stack_ );
 		}
 	}
@@ -51,7 +51,7 @@ namespace ooe
 
 	std::string lua::vm::version( void ) const
 	{
-		lua::stack stack_ = stack();
+		lua::stack stack_( state );
 		stack_.push_lstring( "_VERSION", 8 );
 		stack_.raw_get( globals_index );
 		std::string string = stack_.to_lstring( -1 );
@@ -59,8 +59,8 @@ namespace ooe
 		return string;
 	}
 
-	lua::stack lua::vm::stack( void ) const
+	void lua::vm::setup( function_type function, const std::string& path )
 	{
-		return state;
+		function( stack( state ), path );
 	}
 }

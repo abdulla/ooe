@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "component/javascript/traits.hpp"
+#include "component/javascript/vm.hpp"
 
 namespace ooe
 {
@@ -18,6 +19,7 @@ namespace ooe
 
 	namespace javascript
 	{
+		void component_setup( v8::Handle< v8::Object >, const std::string& ) OOE_VISIBLE;
 		inline void verify_arguments( const v8::Arguments&, s32 );
 
 		template< typename >

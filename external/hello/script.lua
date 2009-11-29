@@ -1,5 +1,5 @@
 local result = ooe.registry.find{ 'hello/FvvE' }
-local module, source = ooe.registry.load( result[ 1 ] )
+local module = ooe.registry.load( result[ 1 ] )
 
 local hello = module[ 'hello/FvvE' ]
 local allocate = module[ 'allocate/FN3ooe13construct_ptrIN12_GLOBAL__N_15printEEERKSsE' ]

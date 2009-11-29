@@ -39,10 +39,10 @@ namespace ooe
 
 			for ( up_t i = 0; i != array_size; ++i )
 			{
-				v8::Local< v8::Object > local = array->CloneElementAt( i );
+				v8::Local< v8::Value > item = array->Get( from< up_t >::call( i ) );
 
 				typename type::value_type out_value;
-				to< typename type::value_type >::call( local, out_value );
+				to< typename type::value_type >::call( item, out_value );
 				out.push_back( out_value );
 			}
 
@@ -61,7 +61,8 @@ namespace ooe
 
 			for ( typename type::const_iterator i = container.begin(), end = container.end();
 				i != end; ++i, ++index )
-				local->Set( v8::Number( i ), from< typename type::value_type >::call( *i ) );
+				local->Set( v8::Number::New( index ),
+					from< typename type::value_type >::call( *i ) );
 
 			return local;
 		}
@@ -82,7 +83,7 @@ namespace ooe
 
 	#define TUPLE_TO( z, n, d )\
 		to< typename tuple_element< n, t >::type >::\
-			call( array->CloneElementAt( n ), tuple._ ## n );
+			call( array->Get( from< up_t >::call( n ) ), tuple._ ## n );
 
 	#define TUPLE_FROM( z, n, d )\
 		local->Set( v8::Number::New( n ),\

@@ -308,7 +308,7 @@ namespace ooe
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pointer )
 		{
 			v8::Handle< v8::Object > object = v8::Object::New();
-			object->SetPointerInInternalField( 0, pointer );
+			object->SetPointerInInternalField( 0, ptr_cast( pointer ) );
 			return object;
 		}
 	};
@@ -333,7 +333,7 @@ namespace ooe
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type class_ )
 		{
 			typedef typename no_ref< t >::type type;
-			return from< construct_ptr< type > >( new type( class_ ) );
+			return from< construct_ptr< type > >::call( new type( class_ ) );
 		}
 	};
 
@@ -419,7 +419,7 @@ namespace ooe
 
 			for ( up_t i = 0; i != array_size; ++i )
 				to< typename remove_extent< type >::type >::
-					call( js_array->CloneElementAt( i ), array[ i ] );
+					call( js_array->Get( from< up_t >::call( i ) ), array[ i ] );
 		}
 	};
 
@@ -433,7 +433,7 @@ namespace ooe
 			v8::Local< v8::Array > local = v8::Array::New( array_size );
 
 			for ( up_t i = 0; i != array_size; ++i )
-				local->Set( v8::Number::New( i ),
+				local->Set( from< up_t >::call( i ),
 					from< typename remove_extent< type >::type >::call( array[ i ] ) );
 
 			return local;
