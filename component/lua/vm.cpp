@@ -49,11 +49,6 @@ namespace ooe
 		return lua_gc( state, LUA_GCCOUNT, 0 ) * 1024 + lua_gc( state, LUA_GCCOUNTB, 0 );
 	}
 
-	lua::stack lua::vm::stack( void ) const
-	{
-		return state;
-	}
-
 	std::string lua::vm::version( void ) const
 	{
 		lua::stack stack_ = stack();
@@ -62,5 +57,10 @@ namespace ooe
 		std::string string = stack_.to_lstring( -1 );
 		stack_.pop( 1 );
 		return string;
+	}
+
+	lua::stack lua::vm::stack( void ) const
+	{
+		return state;
 	}
 }

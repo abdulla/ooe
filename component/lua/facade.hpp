@@ -159,7 +159,7 @@ namespace ooe
 			to< member_type >::call( stack, member, upvalue( 1 ) );
 
 			t0* a0;
-			to< t0 >::call( stack, a0, 1 );
+			to< t0* >::call( stack, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
 			( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 
@@ -179,7 +179,7 @@ namespace ooe
 			to< member_type >::call( stack, member, upvalue( 1 ) );
 
 			t0* a0;
-			to< t0 >::call( stack, a0, 1 );
+			to< t0* >::call( stack, a0, 1 );
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
 			r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 			push< r >::call( stack, value );

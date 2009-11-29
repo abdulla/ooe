@@ -19,7 +19,6 @@ namespace ooe
 	namespace javascript
 	{
 		inline void verify_arguments( const v8::Arguments&, s32 );
-		inline v8::Local< v8::Value > verify_external( const v8::Arguments& );
 
 		template< typename >
 			struct invoke_function;
@@ -28,8 +27,8 @@ namespace ooe
 			struct invoke_member;
 	}
 
-//--- facade::lua --------------------------------------------------------------
-	class facade::lua
+//--- facade::javascript -------------------------------------------------------
+	class facade::javascript
 	{
 	public:
 		typedef std::vector< v8::InvocationCallback > vector_type;
@@ -42,23 +41,13 @@ namespace ooe
 	};
 
 //--- javascript ---------------------------------------------------------------
-	inline void verify_arguments( const v8::Arguments& arguments, s32 size )
+	inline void javascript::verify_arguments( const v8::Arguments& arguments, s32 size )
 	{
 		s32 argument_size = arguments.Length();
 
 		if ( argument_size < size )
 			throw error::javascript() << "Not enough arguments to function, " << size <<
 				" expected, got " << argument_size;
-	}
-
-	inline v8::Local< v8::Value > verify_external( const v8::Arguments& arguments )
-	{
-		v8::Local< v8::Value > external = arguments.Data();
-
-		if ( !external->IsExternal() )
-			throw error::javascript() << "Value is not an external pointer";
-
-		return external;
 	}
 }
 
@@ -105,11 +94,10 @@ namespace ooe
 		{
 			verify_arguments( arguments, LIMIT );
 			v8::HandleScope scope;
-			v8::Local< v8::Value > external = verify_external( arguments );
 
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-			function_type function =
-				*static_cast< function_type* >( v8::External::Unwrap( *external ) );
+			function_type function;
+			to< function_type >::call( arguments.Data(), function );
 
 			BOOST_PP_REPEAT( LIMIT, TO, ~ )
 			function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
@@ -124,11 +112,10 @@ namespace ooe
 		{
 			verify_arguments( arguments, LIMIT );
 			v8::HandleScope scope;
-			v8::Local< v8::Value > external = verify_external( arguments );
 
 			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-			function_type function =
-				*static_cast< function_type* >( v8::External::Unwrap( *external ) );
+			function_type function;
+			to< function_type >::call( arguments.Data(), function );
 
 			BOOST_PP_REPEAT( LIMIT, TO, ~ )
 			r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
@@ -136,9 +123,51 @@ namespace ooe
 		}
 	};
 
+#if LIMIT
 //--- javascript::invoke_member ------------------------------------------------
+	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
+		struct javascript::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
+	{
+		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
+		{
+			verify_arguments( arguments, LIMIT );
+			v8::HandleScope scope;
+
+			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
+			member_type member;
+			to< member_type >::call( arguments.Data(), member );
+
+			t0* a0;
+			to< t0* >::call( arguments[ 0 ], a0 );
+			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
+			( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+			return v8::Undefined();
+		}
+	};
+
+	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+		struct javascript::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
+	{
+		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
+		{
+			verify_arguments( arguments, LIMIT );
+			v8::HandleScope scope;
+
+			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
+			member_type member;
+			to< member_type >::call( arguments.Data(), member );
+
+			t0* a0;
+			to< t0* >::call( arguments[ 0 ], a0 );
+			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
+			r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+			return from< r >::call( value );
+		}
+	};
+#endif
 }
 
+	#undef TO
 	#undef LIMIT
 
 #endif	// BOOST_PP_IS_ITERATING

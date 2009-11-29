@@ -6,7 +6,8 @@
 #include <v8.h>
 
 #include "component/javascript/error.hpp"
-#include "foundation/utility/traits.hpp"
+#include "foundation/utility/hint.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 namespace ooe
 {
@@ -20,6 +21,12 @@ namespace ooe
 
 		template< typename >
 			struct is_integral;
+
+		template< typename >
+			struct is_pointer;
+
+		template< typename >
+			struct is_class;
 
 //--- javascript::to -----------------------------------------------------------
 		template< typename, typename = void >
@@ -39,6 +46,18 @@ namespace ooe
 
 		template< typename t >
 			struct to< t, typename enable_if< is_integral< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_pointer< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_class< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_construct< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_destruct< t > >::type >;
 
 		template< typename t >
 			struct to< t, typename enable_if< is_array< t > >::type >;
@@ -63,7 +82,23 @@ namespace ooe
 			struct from< t, typename enable_if< is_integral< t > >::type >;
 
 		template< typename t >
+			struct from< t, typename enable_if< is_pointer< t > >::type >;
+
+		template< typename t >
+			struct from< t, typename enable_if< is_class< t > >::type >;
+
+		template< typename t >
+			struct from< t, typename enable_if< is_construct< t > >::type >;
+
+		template< typename t >
+			struct from< t, typename enable_if< is_destruct< t > >::type >;
+
+		template< typename t >
 			struct from< t, typename enable_if< is_array< t > >::type >;
+
+//--- destroy ------------------------------------------------------------------
+		template< typename >
+			void destroy( v8::Persistent< v8::Value >, void* );
 	}
 
 //--- javascript::is_boolean ---------------------------------------------------
@@ -87,6 +122,27 @@ namespace ooe
 		static const bool value =
 			!is_boolean< t >::value &&
 			ooe::is_integral< typename no_ref< t >::type >::value;
+	};
+
+//--- javascript::traits: is_pointer -------------------------------------------
+	template< typename t >
+		struct javascript::is_pointer
+	{
+		static const bool value =
+			!is_cstring< t >::value &&
+			!is_member_pointer< typename no_ref< t >::type >::value &&
+			ooe::is_pointer< typename no_ref< t >::type >::value;
+	};
+
+//--- javascript::traits: is_class ---------------------------------------------
+	template< typename t >
+		struct javascript::is_class
+	{
+		static const bool value =
+			!is_tuple< t >::value &&
+			( is_member_pointer< typename no_ref< t >::type >::value ||
+			ooe::is_class< typename no_ref< t >::type >::value ||
+			is_union< typename no_ref< t >::type >::value );
 	};
 
 //--- javascript::traits: default ----------------------------------------------
@@ -222,6 +278,120 @@ namespace ooe
 		}
 	};
 
+//--- javascript::traits: pointer ----------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< javascript::is_pointer< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference pointer )
+		{
+			if ( !value->IsObject() )
+				throw error::javascript() << "Value is not an object";
+
+			v8::Object* object = v8::Object::Cast( *value );
+
+			if ( !object->InternalFieldCount() )
+				throw error::javascript() << "Object has no internal fields";
+
+			pointer = ptr_cast< typename no_ref< t >::type >
+				( object->GetPointerFromInternalField( 0 ) );
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< javascript::is_pointer< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pointer )
+		{
+			v8::Handle< v8::Object > object = v8::Object::New();
+			object->SetPointerInInternalField( 0, pointer );
+			return object;
+		}
+	};
+
+//--- javascript::traits: class ------------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< javascript::is_class< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference class_ )
+		{
+			typedef typename no_ref< t >::type* pointer;
+			pointer p;
+			to< pointer >::call( value, p );
+			class_ = *p;
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< javascript::is_class< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type class_ )
+		{
+			typedef typename no_ref< t >::type type;
+			return from< construct_ptr< type > >( new type( class_ ) );
+		}
+	};
+
+//--- javascript::traits: construct --------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< is_construct< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference construct )
+		{
+			typedef typename t::pointer pointer;
+			pointer p;
+			to< pointer >::call( value, p );
+			construct = p;
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< is_construct< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type construct )
+		{
+			typedef typename t::value_type type;
+			v8::Persistent< v8::Object > object =
+				v8::Persistent< v8::Object >::New( v8::Object::New() );
+			object->SetPointerInInternalField( 0, construct );
+			object.MakeWeak( 0, destroy< type > );
+			object.Dispose();
+			v8::V8::AdjustAmountOfExternalAllocatedMemory( sizeof( type ) );
+			return object;
+		}
+	};
+
+//--- javascript::traits: destruct ---------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< is_destruct< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference destruct )
+		{
+			v8::Persistent< v8::Value > persistent = value;
+
+			if ( !persistent.IsWeak() )
+				throw error::javascript() << "Value is not a weak reference";
+
+			typedef typename t::pointer pointer;
+			pointer p;
+			to< pointer >::call( value, p );
+			destruct = p;
+			persistent.ClearWeak();
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< is_destruct< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type destruct )
+		{
+			return from< typename t::pointer >::call( destruct );
+		}
+	};
+
 //--- javascript::traits: array ------------------------------------------------
 	template< typename t >
 		struct javascript::to< t, typename enable_if< is_array< t > >::type >
@@ -265,6 +435,16 @@ namespace ooe
 			return local;
 		}
 	};
+
+//--- javascript::destroy ------------------------------------------------------
+	template< typename type >
+		void javascript::destroy( v8::Persistent< v8::Value > value, void* )
+	{
+		type* pointer;
+		to< type* >::call( value, pointer );
+		delete pointer;
+		value.ClearWeak();
+	}
 }
 
 #endif	// OOE_COMPONENT_JAVASCRIPT_TRAITS_FORWARD_HPP

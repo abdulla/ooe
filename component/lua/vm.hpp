@@ -25,8 +25,9 @@ namespace ooe
 		void collect( void );
 
 		up_t size( void ) const;
-		lua::stack stack( void ) const;
 		std::string version( void ) const;
+
+		lua::stack stack( void ) const;
 
 	private:
 		lua::state* state;

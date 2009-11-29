@@ -5,8 +5,7 @@
 
 #include <v8.h>
 
-#include "foundation/utility/macro.hpp"
-#include "foundation/utility/string.hpp"
+#include "foundation/io/descriptor.hpp"
 
 namespace ooe
 {
@@ -22,6 +21,7 @@ namespace ooe
 		vm( void );
 		~vm( void );
 
+		void load( const std::string&, const descriptor& );
 		void collect( void );
 
 		up_t size( void ) const;

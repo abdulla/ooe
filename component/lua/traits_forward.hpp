@@ -7,7 +7,6 @@
 
 #include "component/lua/error.hpp"
 #include "foundation/utility/hint.hpp"
-#include "foundation/utility/miscellany.hpp"
 
 namespace ooe
 {
