@@ -145,6 +145,10 @@ namespace ooe
 
 			std::string path = setup.path() + "../external/hello/script.lua";
 			vm.load( "hello.lua", path );
+
+			std::cout <<
+				"Lua version: " << vm.version() << "\n"
+				"Lua VM size: " << vm.size() << " bytes\n";
 		}
 
 		template<>
@@ -158,6 +162,10 @@ namespace ooe
 
 			std::string path = setup.path() + "../external/hello/script.js";
 			vm.load( "hello.js", path );
+
+			std::cout <<
+				"JavaScript version: " << vm.version() << "\n"
+				"JavaScript VM size: " << vm.size() << " bytes\n";
 		}
 	}
 }
