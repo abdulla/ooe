@@ -72,7 +72,7 @@ do\
 	}\
 	catch ( ... )\
 	{\
-		OOE_WARNING( "executable", "Uncaught exception:\nUnknown\n" );\
+		OOE_WARNING( "executable", "Uncaught exception:\nAn unknown exception was thrown\n" );\
 	}\
 }\
 while ( false )

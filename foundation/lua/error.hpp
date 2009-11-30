@@ -62,7 +62,7 @@ do\
 	}\
 	catch ( ... )\
 	{\
-		traits< const c8* >::push( stack, "Unknown" );\
+		traits< const c8* >::push( stack, "An unknown exception was thrown" );\
 		stack.error();\
 	}\
 }\

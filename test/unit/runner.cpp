@@ -50,7 +50,7 @@ namespace
 		}
 		catch ( ... )
 		{
-			std::cerr << "Unknown exception\n";
+			std::cerr << "An unknown exception was thrown\n";
 		}
 
 		fork_io::exit( false );
@@ -152,7 +152,7 @@ namespace
 		}
 		catch ( error::runtime& error )
 		{
-			output << error.what() << "\n\n    Stack trace:" << error.where();
+			output << error.what() << "\n\nStack trace:" << error.where();
 		}
 		catch ( std::exception& error )
 		{
@@ -160,7 +160,7 @@ namespace
 		}
 		catch ( ... )
 		{
-			output << "Unknown";
+			output << "An unknown exception was thrown";
 		}
 
 		std::cout <<
