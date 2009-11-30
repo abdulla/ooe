@@ -7,8 +7,19 @@ local deallocate = module[ 'deallocate/FvN3ooe12destruct_ptrIN12_GLOBAL__N_15pri
 local say = module[ 'say/FvPN12_GLOBAL__N_15printEE' ]
 
 hello()
-local object = allocate( 'hello lua gc' )
-say( object )
 deallocate( allocate( 'hello lua delete' ) )
+
+function printer( name )
+	return
+	{
+		value = allocate( name ),
+		said = function( self )
+			say( self.value )
+		end
+	}
+end
+
+local heap = printer( 'hello lua gc' )
+heap:said()
 
 print 'hello lua'
