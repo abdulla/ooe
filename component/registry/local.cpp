@@ -61,10 +61,10 @@ namespace ooe
 	{
 		module::vector_tuple tuple( name, type );
 		const module::vector_type& names = source.get().get();
-		module::vector_type::const_iterator i =
-			std::lower_bound( names.begin(), names.end(), tuple );
+		module::vector_type::const_iterator end = names.end();
+		module::vector_type::const_iterator i = std::lower_bound( names.begin(), end, tuple );
 
-		if ( i == names.end() && *i == tuple )
+		if ( i == end )
 			throw error::runtime( "local: " ) <<
 				"Unable to find \"" << name << "\" of type \"" << type << "\", does not exist";
 
