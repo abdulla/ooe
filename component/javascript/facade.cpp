@@ -187,4 +187,13 @@ namespace ooe
 
 		global->Set( from< const c8* >::call( "ooe" ), ooe );
 	}
+
+	void javascript::throw_exception( const c8* what, const c8* where )
+	{
+		std::string string;
+		string << what << "\n\nStack trace:" << where << "\n\nSource line:";
+
+		v8::Handle< v8::String > error = v8::String::New( string.c_str(), string.size() );
+		v8::ThrowException( v8::Exception::Error( error ) );
+	}
 }

@@ -130,6 +130,11 @@ namespace ooe
 		lua_setmetatable( state, index );
 	}
 
+	void lua::stack::error( void )
+	{
+		lua_error( state );
+	}
+
 	bool lua::stack::new_metatable( const c8* name )
 	{
 		return luaL_newmetatable( state, name );

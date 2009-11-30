@@ -161,4 +161,14 @@ namespace ooe
 
 		stack.raw_set( globals_index );
 	}
+
+	void lua::throw_exception( state* state, const c8* what, const c8* where )
+	{
+		std::string string;
+		string << what << "\n\nStack trace:" << where;
+
+		stack stack( state );
+		push< std::string >::call( stack, string );
+		stack.error();
+	}
 }

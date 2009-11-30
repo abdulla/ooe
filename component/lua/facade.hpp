@@ -19,7 +19,11 @@ namespace ooe
 	namespace lua
 	{
 		void component_setup( stack, const std::string& ) OOE_VISIBLE;
+		void throw_exception( state*, const c8*, const c8* ) OOE_VISIBLE;
 		inline stack verify_arguments( state*, u32 );
+
+		template< typename >
+			struct invoke;
 
 		template< typename >
 			struct invoke_function;
@@ -42,7 +46,8 @@ namespace ooe
 			typename enable_if< is_function_pointer< type > >::type* = 0 )
 		{
 			typedef typename remove_pointer< type >::type function_type;
-			insert( index, ooe::lua::invoke_function< function_type >::call );
+			typedef ooe::lua::invoke< ooe::lua::invoke_function< function_type > > invoke_type;
+			insert( index, invoke_type::call );
 		}
 
 		template< typename type >
@@ -51,7 +56,9 @@ namespace ooe
 		{
 			typedef typename member_of< type >::type object_type;
 			typedef typename remove_member< type >::type member_type;
-			insert( index, ooe::lua::invoke_member< object_type, member_type >::call );
+			typedef ooe::lua::invoke< ooe::lua::invoke_member< object_type, member_type > >
+				invoke_type;
+			insert( index, invoke_type::call );
 		}
 
 	private:
@@ -70,6 +77,34 @@ namespace ooe
 
 		return stack;
 	}
+
+//--- lua::invoke --------------------------------------------------------------
+	template< typename type >
+		struct lua::invoke
+	{
+		static s32 call( state* state )
+		{
+			try
+			{
+				return type::call( state );
+			}
+			catch ( error::runtime& error )
+			{
+				throw_exception( state, error.what(), error.where() );
+			}
+			catch ( std::exception& error )
+			{
+				throw_exception( state, error.what(), "\nNo stack trace available" );
+			}
+			catch ( ... )
+			{
+				throw_exception( state, "An unknown exception was thrown",
+					"\nNo stack trace available" );
+			}
+
+			return 0;
+		}
+	};
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )

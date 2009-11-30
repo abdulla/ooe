@@ -20,6 +20,7 @@ namespace ooe
 	namespace javascript
 	{
 		void component_setup( v8::Handle< v8::Object >, const std::string& ) OOE_VISIBLE;
+		void throw_exception( const c8*, const c8* ) OOE_VISIBLE;
 		inline void verify_arguments( const v8::Arguments&, s32 );
 
 		template< typename >
@@ -88,17 +89,15 @@ namespace ooe
 			}
 			catch ( error::runtime& error )
 			{
-				v8::ThrowException( from< std::string >::call( std::string( error.what() ) +
-					"\n\nStack trace:" + error.where() + "\n\nSource line:" ) );
+				throw_exception( error.what(), error.where() );
 			}
 			catch ( std::exception& error )
 			{
-				v8::ThrowException( from< std::string >::call( std::string( error.what() ) +
-					"\n\nSource line:" ) );
+				throw_exception( error.what(), "\nNo stack trace available" );
 			}
 			catch ( ... )
 			{
-				v8::ThrowException( from< const c8* >::call( "Unknown\n\nSource line:" ) );
+				throw_exception( "An unknown exception was thrown", "\nNo stack trace available" );
 			}
 
 			return v8::Undefined();
