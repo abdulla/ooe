@@ -14,9 +14,6 @@ namespace ooe
 	namespace javascript
 	{
 		template< typename >
-			struct is_boolean;
-
-		template< typename >
 			struct is_floating_point;
 
 		template< typename >
@@ -100,13 +97,6 @@ namespace ooe
 		template< typename >
 			void destroy( v8::Persistent< v8::Value >, void* );
 	}
-
-//--- javascript::is_boolean ---------------------------------------------------
-	template< typename t >
-		struct javascript::is_boolean
-		: public is_like< t, bool >
-	{
-	};
 
 //--- javascript::is_floating_point --------------------------------------------
 	template< typename t >
@@ -192,7 +182,7 @@ namespace ooe
 
 //--- javascript::traits: boolean ----------------------------------------------
 	template< typename t >
-		struct javascript::to< t, typename enable_if< javascript::is_boolean< t > >::type >
+		struct javascript::to< t, typename enable_if< is_boolean< t > >::type >
 	{
 		static void call( const v8::Handle< v8::Value >& value, bool& boolean )
 		{
@@ -204,7 +194,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct javascript::from< t, typename enable_if< javascript::is_boolean< t > >::type >
+		struct javascript::from< t, typename enable_if< is_boolean< t > >::type >
 	{
 		static v8::Handle< v8::Value > call( bool boolean )
 		{

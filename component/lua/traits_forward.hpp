@@ -13,9 +13,6 @@ namespace ooe
 	namespace lua
 	{
 		template< typename >
-			struct is_boolean;
-
-		template< typename >
 			struct is_arithmetic;
 
 		template< typename >
@@ -108,13 +105,6 @@ namespace ooe
 			s32 destroy( state* );
 	}
 
-//--- lua::is_boolean ----------------------------------------------------------
-	template< typename t >
-		struct lua::is_boolean
-		: public is_like< t, bool >
-	{
-	};
-
 //--- lua::is_arithmetic -------------------------------------------------------
 	template< typename t >
 		struct lua::is_arithmetic
@@ -202,7 +192,7 @@ namespace ooe
 
 //--- lua::traits: boolean -----------------------------------------------------
 	template< typename t >
-		struct lua::to< t, typename enable_if< lua::is_boolean< t > >::type >
+		struct lua::to< t, typename enable_if< is_boolean< t > >::type >
 	{
 		static void call( stack& stack, bool& boolean, s32 index )
 		{
@@ -212,7 +202,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct lua::push< t, typename enable_if< lua::is_boolean< t > >::type >
+		struct lua::push< t, typename enable_if< is_boolean< t > >::type >
 	{
 		static void call( stack& stack, bool boolean )
 		{
