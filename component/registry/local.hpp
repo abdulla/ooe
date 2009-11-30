@@ -29,6 +29,18 @@ namespace ooe
 		vector_type vector;
 	};
 
+//--- source -------------------------------------------------------------------
+	class OOE_VISIBLE source
+	{
+	public:
+		source( const std::string& );
+		const ooe::module& get( void ) const;
+
+	private:
+		ooe::library library;
+		ooe::module module;
+	};
+
 //--- local --------------------------------------------------------------------
 	class local
 	{
@@ -55,8 +67,7 @@ namespace ooe
 		}
 
 	private:
-		ooe::library library;
-		ooe::module module;
+		ooe::source source;
 		const facade::local::vector_type& vector;
 	};
 }

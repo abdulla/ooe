@@ -9,24 +9,7 @@
 namespace
 {
 	using namespace ooe;
-
-	class source
-	{
-	public:
-		source( const std::string& path )
-			: library( path ), module( library.find< ooe::module ( void ) >( "module_open" )() )
-		{
-		}
-
-		const ooe::module& get( void ) const
-		{
-			return module;
-		}
-
-	private:
-		ooe::library library;
-		ooe::module module;
-	};
+	typedef std::vector< std::string > find_vector;
 
 	template< v8::Handle< v8::Value > ( * function )( const v8::Arguments& arguments ) >
 		struct embed
@@ -44,8 +27,6 @@ namespace
 			return javascript::invoke< defer >::call( arguments );
 		}
 	};
-
-	typedef std::vector< std::string > find_vector;
 
 	v8::Handle< v8::Value > find( const v8::Arguments& arguments )
 	{

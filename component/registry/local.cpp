@@ -20,18 +20,28 @@ namespace ooe
 		vector.insert( i, any );
 	}
 
+//--- source -------------------------------------------------------------------
+	source::source( const std::string& path )
+		: library( path ), module( library.find< ooe::module ( void ) >( "module_open" )() )
+	{
+	}
+
+	const ooe::module& source::get( void ) const
+	{
+		return module;
+	}
+
 //--- local --------------------------------------------------------------------
 	local::local( const std::string& path )
-		: library( path ), module( library.find< ooe::module ( void ) >( "module_open" )() ),
-		vector( static_cast< const facade::local* >
-			( module.find( typeid( facade::local ).name() ) )->get() )
+		: source( path ), vector( static_cast< const facade::local* >
+			( source.get().find( typeid( facade::local ).name() ) )->get() )
 	{
 	}
 
 	any local::find( const std::string& name, const std::string& type ) const
 	{
 		module::vector_tuple tuple( name, type );
-		const module::vector_type& names = module.get();
+		const module::vector_type& names = source.get().get();
 		module::vector_type::const_iterator i =
 			std::lower_bound( names.begin(), names.end(), tuple );
 
