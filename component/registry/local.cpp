@@ -48,16 +48,13 @@ namespace ooe
 		module::vector_type::const_iterator nend = names.end();
 		module::vector_type::const_iterator n = std::lower_bound( names.begin(), nend, *f );
 
-		for ( ; n != nend; ++n )
+		for ( ; n != nend && f != fend; ++n )
 		{
-			while ( f != fend )
-			{
-				if ( *n == *f )
-					++f;
-			}
+			if ( *n == *f )
+				++f;
 		}
 
-		return n == nend && f == fend;
+		return f == fend;
 	}
 
 	any local::find( const std::string& name, const std::string& type ) const
