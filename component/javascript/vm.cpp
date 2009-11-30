@@ -85,7 +85,7 @@ namespace ooe
 	{
 		v8::HeapStatistics heap;
 		v8::V8::GetHeapStatistics( &heap );
-		return heap.total_heap_size();
+		return heap.used_heap_size();
 	}
 
 	std::string javascript::vm::version( void ) const
