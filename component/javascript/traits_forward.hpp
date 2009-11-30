@@ -448,7 +448,7 @@ namespace ooe
 		type* pointer;
 		to< type* >::call( value, pointer );
 		delete pointer;
-		value.ClearWeak();
+		value.Dispose();
 	}
 }
 
