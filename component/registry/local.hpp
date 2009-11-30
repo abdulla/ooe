@@ -3,9 +3,7 @@
 #ifndef OOE_COMPONENT_REGISTRY_LOCAL_HPP
 #define OOE_COMPONENT_REGISTRY_LOCAL_HPP
 
-#include <typeinfo>
-#include <vector>
-
+#include "component/registry/interface.hpp"
 #include "component/registry/module.hpp"
 #include "foundation/executable/library.hpp"
 
@@ -46,6 +44,7 @@ namespace ooe
 	{
 	public:
 		local( const std::string& ) OOE_VISIBLE;
+		bool supports( const interface& ) const OOE_VISIBLE;
 		any find( const std::string&, const std::string& ) const OOE_VISIBLE;
 
 		template< typename type >

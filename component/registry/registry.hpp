@@ -28,7 +28,7 @@ namespace ooe
 		std::string surrogate( const std::string& );
 
 	private:
-		mutable ipc::memory::client client;
+		ipc::memory::client client;
 	};
 }
 

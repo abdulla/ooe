@@ -94,8 +94,12 @@ namespace ooe
 
 			std::string path = setup.path() + "../library/libhello" + library::suffix;
 
+			interface interface;
+			interface.insert< void ( void ) >( "hello" );
+
 			local local( path );
 			local.find< void ( * )( void ) >( "hello" )();
+			check( "local.supports( interface )", local.supports( interface ) );
 		}
 
 		template<>
@@ -106,9 +110,13 @@ namespace ooe
 
 			std::string path = setup.path() + "../library/libhello" + library::suffix;
 
+			interface interface;
+			interface.insert< void ( void ) >( "hello" );
+
 			registry registry;
 			remote remote( registry.surrogate( path ) );
 			remote.find< void ( void ) >( "hello" )();
+			check( "remote.supports( interface )", remote.supports( interface ) );
 		}
 
 		template<>

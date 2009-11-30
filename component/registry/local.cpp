@@ -38,6 +38,28 @@ namespace ooe
 	{
 	}
 
+	bool local::supports( const interface& interface ) const
+	{
+		const module::vector_type& names = source.get().get();
+		const interface::vector_type& faces = interface.get();
+
+		interface::vector_type::const_iterator fend = faces.end();
+		interface::vector_type::const_iterator f = faces.begin();
+		module::vector_type::const_iterator nend = names.end();
+		module::vector_type::const_iterator n = std::lower_bound( names.begin(), nend, *f );
+
+		for ( ; n != nend; ++n )
+		{
+			while ( f != fend )
+			{
+				if ( *n == *f )
+					++f;
+			}
+		}
+
+		return n == nend && f == fend;
+	}
+
 	any local::find( const std::string& name, const std::string& type ) const
 	{
 		module::vector_tuple tuple( name, type );

@@ -3,6 +3,7 @@
 #ifndef OOE_COMPONENT_REGISTRY_REMOTE_HPP
 #define OOE_COMPONENT_REGISTRY_REMOTE_HPP
 
+#include "component/registry/interface.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/switchboard.hpp"
@@ -50,6 +51,7 @@ namespace ooe
 	{
 	public:
 		remote( const std::string& ) OOE_VISIBLE;
+		bool supports( const interface& ) const OOE_VISIBLE;
 
 		template< typename type >
 			ipc::memory::rpc< type > find( const c8* name )
@@ -58,7 +60,7 @@ namespace ooe
 		}
 
 	private:
-		ipc::memory::client client;
+		mutable ipc::memory::client client;
 	};
 }
 

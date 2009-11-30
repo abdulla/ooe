@@ -24,4 +24,19 @@ namespace ooe
 		: client( path )
 	{
 	}
+
+	bool remote::supports( const interface& interface ) const
+	{
+		typedef ipc::memory::rpc< std::vector< u32 > ( const interface::vector_type& ) > rpc_type;
+		typedef rpc_type::result_type result_type;
+		result_type result = rpc_type( client, 3 )( interface.get() );
+
+		for ( result_type::const_iterator i = result.begin(), end = result.end(); i != end; ++i )
+		{
+			if ( *i == static_cast< u32 >( -1 ) )
+				return false;
+		}
+
+		return true;
+	}
 }

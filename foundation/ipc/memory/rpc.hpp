@@ -60,11 +60,12 @@ namespace ooe
 
 //--- ipc::memory::find_all ----------------------------------------------------
 	struct ipc::memory::find_all
-		: private rpc< std::vector< u32 > ( std::vector< tuple< std::string, std::string > > ) >
+		: private
+		rpc< std::vector< u32 > ( const std::vector< tuple< std::string, std::string > >& ) >
 	{
 		typedef tuple< std::string, std::string > tuple_type;
 		typedef std::vector< tuple_type > parameter_type;
-		typedef rpc< result_type ( parameter_type ) > base_type;
+		typedef rpc< result_type ( const parameter_type& ) > base_type;
 		using base_type::result_type;
 
 		find_all( memory::transport& transport_ )
