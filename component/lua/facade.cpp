@@ -9,6 +9,23 @@ namespace
 	using namespace ooe;
 	typedef std::vector< std::string > find_vector;
 
+	template< s32 ( * function )( lua::state* state ) >
+		struct embed
+	{
+		struct defer
+		{
+			static s32 call( lua::state* state )
+			{
+				return function( state );
+			}
+		};
+
+		static s32 call( lua::state* state )
+		{
+			return lua::invoke< defer >::call( state );
+		}
+	};
+
 	s32 find( lua::state* state )
 	{
 		lua::stack stack = lua::verify_arguments( state, 1 );
@@ -129,11 +146,11 @@ namespace ooe
 		stack.create_table( 0, 2 );
 
 		push< const c8* >::call( stack, "find" );
-		stack.push_cclosure( find );
+		stack.push_cclosure( embed< find >::call );
 		stack.raw_set( -3 );
 
 		push< const c8* >::call( stack, "load" );
-		stack.push_cclosure( load );
+		stack.push_cclosure( embed< load >::call );
 		stack.raw_set( -3 );
 
 		stack.raw_set( -3 );
