@@ -301,7 +301,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::reference class_, s32 index )
 		{
 			type_check< t >( stack, index, type::userdata );
-			class_ = *static_cast< typename no_ref< t >::type >( stack.to_userdata( index ) );
+			class_ = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
 		}
 	};
 
