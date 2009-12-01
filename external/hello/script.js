@@ -6,7 +6,12 @@ var module = ooe.registry.load( result[ 0 ] );
 function printer( name )
 {
 	for ( var i in module )
-		this[ i.substr( 0, i.indexOf( '/' ) ) ] = module[ i ];
+	{
+		var value = module[ i ];
+
+		if ( typeof( value ) == 'function' )
+			this[ i.substr( 0, i.indexOf( '/' ) ) ] = value;
+	}
 
 	this.value = this.allocate( name );
 	this.said = function()
