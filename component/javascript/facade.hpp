@@ -83,6 +83,8 @@ namespace ooe
 	{
 		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
 		{
+			v8::HandleScope scope;
+
 			try
 			{
 				return type::call( arguments );
@@ -147,7 +149,6 @@ namespace ooe
 		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
 		{
 			verify_arguments( arguments, LIMIT );
-			v8::HandleScope scope;
 
 			typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function;
@@ -165,7 +166,6 @@ namespace ooe
 		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
 		{
 			verify_arguments( arguments, LIMIT );
-			v8::HandleScope scope;
 
 			typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 			function_type function;
@@ -185,7 +185,6 @@ namespace ooe
 		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
 		{
 			verify_arguments( arguments, LIMIT );
-			v8::HandleScope scope;
 
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member;
@@ -205,7 +204,6 @@ namespace ooe
 		static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
 		{
 			verify_arguments( arguments, LIMIT );
-			v8::HandleScope scope;
 
 			typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 			member_type member;

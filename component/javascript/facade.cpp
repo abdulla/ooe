@@ -31,7 +31,6 @@ namespace
 	v8::Handle< v8::Value > find( const v8::Arguments& arguments )
 	{
 		javascript::verify_arguments( arguments, 1 );
-		v8::HandleScope scope;
 
 		find_vector input;
 		javascript::to< find_vector >::call( arguments[ 0 ], input );
@@ -63,7 +62,6 @@ namespace
 	v8::Handle< v8::Value > load( const v8::Arguments& arguments )
 	{
 		javascript::verify_arguments( arguments, 1 );
-		v8::HandleScope scope;
 
 		std::string path;
 		javascript::to< std::string >::call( arguments[ 0 ], path );
@@ -103,8 +101,6 @@ namespace
 
 	v8::Handle< v8::Value > print( const v8::Arguments& arguments )
 	{
-		v8::HandleScope scope;
-
 		for ( up_t i = 0, end = arguments.Length(); i != end; ++i )
 		{
 			if ( i )
@@ -164,7 +160,7 @@ namespace ooe
 		//----------------------------------------------------------------------
 
 		global->Set( from< const c8* >::call( "print" ),
-			v8::FunctionTemplate::New( print )->GetFunction() );
+			v8::FunctionTemplate::New( embed< print >::call )->GetFunction() );
 
 		global->Set( from< const c8* >::call( "ooe" ), ooe );
 	}
