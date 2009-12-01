@@ -110,8 +110,8 @@ namespace
 			if ( i )
 				std::cout << ' ';
 
-			v8::String::Utf8Value string( arguments[ i ] );
-			std::cout.write( *string, string.length() );
+			v8::String::AsciiValue ascii( arguments[ i ] );
+			std::cout.write( *ascii, ascii.length() );
 		}
 
 		std::cout << '\n';

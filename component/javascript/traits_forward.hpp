@@ -212,8 +212,8 @@ namespace ooe
 			if ( !value->IsString() )
 				throw error::javascript() << "Value is not a string";
 
-			v8::String::Utf8Value utf8( value );
-			string = string_make< typename no_ref< t >::type >( *utf8, utf8.length() );
+			v8::String::AsciiValue ascii( value );
+			string = string_make< typename no_ref< t >::type >( *ascii, ascii.length() );
 		}
 	};
 
@@ -357,7 +357,6 @@ namespace ooe
 				v8::Persistent< v8::Object >::New( template_->NewInstance() );
 			object->SetPointerInInternalField( 0, construct );
 			object.MakeWeak( 0, destroy< type > );
-			object.Dispose();
 			v8::V8::AdjustAmountOfExternalAllocatedMemory( sizeof( type ) );
 			return object;
 		}
@@ -375,6 +374,7 @@ namespace ooe
 			to< pointer >::call( value, p );
 			destruct = p;
 			v8::Persistent< v8::Value >( value ).ClearWeak();
+			v8::V8::AdjustAmountOfExternalAllocatedMemory( -sizeof( typename t::value_type ) );
 		}
 	};
 
@@ -439,6 +439,7 @@ namespace ooe
 		to< type* >::call( value, pointer );
 		delete pointer;
 		value.Dispose();
+		v8::V8::AdjustAmountOfExternalAllocatedMemory( -sizeof( type ) );
 	}
 }
 

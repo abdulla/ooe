@@ -62,8 +62,7 @@ namespace ooe
 		v8::HandleScope handle_scope;
 		v8::TryCatch try_catch;
 
-		mapped mapped( desc );
-		v8::Handle< v8::String > source = v8::String::NewExternal( &mapped );
+		v8::Handle< v8::String > source = v8::String::NewExternal( new mapped( desc ) );
 		v8::Handle< v8::String > origin = v8::String::New( name.c_str(), name.size() );
 		v8::Handle< v8::Script > script = v8::Script::Compile( source, origin );
 
@@ -79,6 +78,7 @@ namespace ooe
 	void javascript::vm::collect( void )
 	{
 		v8::V8::LowMemoryNotification();
+		while ( !v8::V8::IdleNotification() ) {}
 	}
 
 	up_t javascript::vm::size( void ) const
