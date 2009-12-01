@@ -2,27 +2,28 @@
 local result = ooe.registry.find{ 'hello/FvvE' }
 local module = ooe.registry.load( result[ 1 ] )
 
-local hello = module[ 'hello/FvvE' ]
-local allocate = module[ 'allocate/FN3ooe13construct_ptrIN12_GLOBAL__N_15printEEERKSsE' ]
-local deallocate = module[ 'deallocate/FvN3ooe12destruct_ptrIN12_GLOBAL__N_15printEEEE' ]
-local say = module[ 'say/FvPN12_GLOBAL__N_15printEE' ]
-
 --- run functions --------------------------------------------------------------
-hello()
-deallocate( allocate( 'hello lua delete' ) )
-
 function printer( name )
-	return
-	{
-		value = allocate( name ),
-		said = function( self )
-			say( self.value )
+	local self = {}
+
+	for k, v in pairs( module ) do
+		if type( k ) ~= 'number' then
+			self[ k:sub( 1, k:find( '/', 1, true ) - 1 ) ] = v
 		end
-	}
+	end
+
+	self.value = self.allocate( name )
+	self.said = function( self )
+		self.say( self.value )
+	end
+
+	return self
 end
 
 local heap = printer( 'hello lua gc' )
+heap.hello()
 heap:said()
+heap.deallocate( heap.allocate( 'hello lua delete' ) )
 
 --- print hello ----------------------------------------------------------------
 print 'hello lua'
