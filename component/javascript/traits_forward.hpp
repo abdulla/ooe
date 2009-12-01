@@ -374,7 +374,8 @@ namespace ooe
 			pointer p;
 			to< pointer >::call( value, p );
 			destruct = p;
-			v8::Persistent< v8::Value >( value ).Dispose();
+
+			v8::Object::Cast( *value )->SetPointerInInternalField( 0, 0 );
 			v8::V8::AdjustAmountOfExternalAllocatedMemory( -static_cast< s32 >( sizeof( type ) ) );
 		}
 	};
