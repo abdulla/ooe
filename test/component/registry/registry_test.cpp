@@ -51,10 +51,6 @@ namespace
 			std::string module_path = path_ + "../library/libhello" + library::suffix;
 			registry registry;
 			registry.insert( registry::library, module_path );
-
-			javascript::vm vm;
-			vm.setup( javascript::component_setup, path() );
-			vm.load( "hello.js", path() + "../external/hello/script.js" );
 		}
 
 		std::string path() const
