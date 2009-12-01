@@ -370,11 +370,12 @@ namespace ooe
 			typename call_traits< t >::reference destruct )
 		{
 			typedef typename t::pointer pointer;
+			typedef typename t::value_type type;
 			pointer p;
 			to< pointer >::call( value, p );
 			destruct = p;
-			v8::Persistent< v8::Value >( value ).ClearWeak();
-			v8::V8::AdjustAmountOfExternalAllocatedMemory( -sizeof( typename t::value_type ) );
+			v8::Persistent< v8::Value >( value ).Dispose();
+			v8::V8::AdjustAmountOfExternalAllocatedMemory( -static_cast< s32 >( sizeof( type ) ) );
 		}
 	};
 
@@ -439,7 +440,7 @@ namespace ooe
 		to< type* >::call( value, pointer );
 		delete pointer;
 		value.Dispose();
-		v8::V8::AdjustAmountOfExternalAllocatedMemory( -sizeof( type ) );
+		v8::V8::AdjustAmountOfExternalAllocatedMemory( -static_cast< s32 >( sizeof( type ) ) );
 	}
 }
 
