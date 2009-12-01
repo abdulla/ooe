@@ -65,8 +65,9 @@ namespace
 		std::string path;
 		lua::to< std::string >::call( stack, path, 1 );
 
-		shared_ptr< source > source_ptr = new source( path );
-		const module& module = source_ptr->get();
+		typedef shared_ptr< ooe::source > source_ptr;
+		source_ptr source = new ooe::source( path );
+		const module& module = source->get();
 		const module::vector_type& names = module.get();
 		const facade::local::vector_type& local = static_cast< const facade::local* >
 			( module.find( typeid( facade::local ).name() ) )->get();
@@ -94,7 +95,7 @@ namespace
 			stack.raw_set( -3 );
 		}
 
-		lua::push< shared_ptr< source > >::call( stack, source_ptr );
+		lua::push< source_ptr >::call( stack, source );
 		stack.raw_seti( -2, 1 );
 		return 1;
 	}

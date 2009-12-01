@@ -66,8 +66,9 @@ namespace
 		std::string path;
 		javascript::to< std::string >::call( arguments[ 0 ], path );
 
-		shared_ptr< source > source_ptr = new source( path );
-		const module& module = source_ptr->get();
+		typedef shared_ptr< ooe::source > source_ptr;
+		source_ptr source = new ooe::source( path );
+		const module& module = source->get();
 		const module::vector_type& names = module.get();
 		const facade::local::vector_type& local = static_cast< const facade::local* >
 			( module.find( typeid( facade::local ).name() ) )->get();
@@ -95,7 +96,7 @@ namespace
 		}
 
 		object->Set( javascript::from< up_t >::call( 0 ),
-			javascript::from< shared_ptr< source > >::call( source_ptr ) );
+			javascript::from< source_ptr >::call( source ) );
 		return object;
 	}
 
