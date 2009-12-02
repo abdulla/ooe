@@ -193,111 +193,6 @@ namespace ooe
 		typedef t type;
 	};
 
-//--- is_stdcontainer ----------------------------------------------------------
-	template< typename t >
-		struct is_stdcontainer
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename type, typename allocator >
-			struct apply< std::vector< type, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename type, typename allocator >
-			struct apply< std::list< type, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename type, typename allocator >
-			struct apply< std::deque< type, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename key, typename compare, typename allocator >
-			struct apply< std::set< key, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename key, typename compare, typename allocator >
-			struct apply< std::multiset< key, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename key, typename value, typename compare, typename allocator >
-			struct apply< std::map< key, value, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename key, typename value, typename compare, typename allocator >
-			struct apply< std::multimap< key, value, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-
-//--- is_set -------------------------------------------------------------------
-	template< typename t >
-		struct is_set
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename key, typename compare, typename allocator >
-			struct apply< std::set< key, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename key, typename compare, typename allocator >
-			struct apply< std::multiset< key, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-
-//--- is_map -------------------------------------------------------------------
-	template< typename t >
-		struct is_map
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename key, typename value, typename compare, typename allocator >
-			struct apply< std::map< key, value, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		template< typename key, typename value, typename compare, typename allocator >
-			struct apply< std::multimap< key, value, compare, allocator > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-
 //--- reserve ------------------------------------------------------------------
 	template< typename t >
 		void reserve( typename call_traits< t >::param_type, up_t )
@@ -345,6 +240,48 @@ namespace ooe
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
+
+namespace ooe
+{
+//--- is_stdcontainer ----------------------------------------------------------
+	template< typename t >
+		struct is_stdcontainer
+	{
+		static const bool value =
+			is_template2< t, std::vector >::value ||
+			is_template2< t, std::list >::value ||
+			is_template2< t, std::deque >::value ||
+			is_template3< t, std::set >::value ||
+			is_template3< t, std::multiset >::value ||
+			is_template4< t, std::map >::value ||
+			is_template4< t, std::multimap >::value;
+	};
+
+//--- is_set -------------------------------------------------------------------
+	template< typename t >
+		struct is_set
+	{
+		static const bool value =
+			is_template3< t, std::set >::value ||
+			is_template3< t, std::multiset >::value;
+	};
+
+//--- is_map -------------------------------------------------------------------
+	template< typename t >
+		struct is_map
+	{
+		static const bool value =
+			is_template4< t, std::map >::value ||
+			is_template4< t, std::multimap >::value;
+	};
+
+//--- is_pair ------------------------------------------------------------------
+	template< typename t >
+		struct is_pair
+		: public is_template2< t, std::pair >
+	{
+	};
+}
 
 	#endif	// OOE_FOUNDATION_UTILITY_TRAITS_HPP
 
