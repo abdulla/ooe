@@ -74,6 +74,10 @@ namespace ooe
 	using boost::enable_if;
 	using boost::enable_if_c;
 	using boost::function_traits;
+	using boost::lazy_disable_if;
+	using boost::lazy_disable_if_c;
+	using boost::lazy_enable_if;
+	using boost::lazy_enable_if_c;
 
 //--- no_ptr -------------------------------------------------------------------
 	template< typename t >
@@ -217,6 +221,35 @@ namespace ooe
 	{
 		vector.reserve( size );
 	}
+
+//--- container_size -----------------------------------------------------------
+	template< typename, typename, typename = void >
+		struct container_size;
+
+	template< typename t, typename v >
+		struct container_size< t, v, typename enable_if< is_pod< v > >::type >
+	{
+		template< typename f >
+			static up_t call( const t& value, f )
+		{
+			return value.size() * sizeof( v );
+		}
+	};
+
+	template< typename t, typename v >
+		struct container_size< t, v, typename disable_if< is_pod< v > >::type >
+	{
+		template< typename f >
+			static up_t call( const t& value, f function )
+		{
+			up_t sum = 0;
+
+			for ( typename t::const_iterator i = value.begin(), end = value.end(); i != end; ++i )
+				sum += function( *i );
+
+			return sum;
+		}
+	};
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )

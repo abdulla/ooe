@@ -66,52 +66,16 @@ namespace ooe
 //--- is_construct -------------------------------------------------------------
 	template< typename t >
 		struct is_construct
-#if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< t, construct_ptr >
 	{
 	};
-#else
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename t0 >
-			struct apply< construct_ptr< t0 > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-#endif
 
 //--- is_destruct --------------------------------------------------------------
 	template< typename t >
 		struct is_destruct
-#if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< t, destruct_ptr >
 	{
 	};
-#else
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename t0 >
-			struct apply< destruct_ptr< t0 > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-#endif
 }
 
 #endif	// OOE_FOUNDATION_UTILITY_HINT_HPP

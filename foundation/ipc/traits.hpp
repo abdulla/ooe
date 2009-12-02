@@ -41,13 +41,10 @@ namespace ooe
 		static up_t call( typename call_traits< t >::param_type value ) OOE_PURE
 		{
 			typedef typename no_ref< t >::type type;
-			up_t sum = sizeof( up_t );
+			typedef typename type::value_type value_type;
 
-			for ( typename type::const_iterator i = value.begin(), end = value.end();
-				i != end; ++i )
-				sum += size< typename type::value_type >::call( *i );
-
-			return sum;
+			return sizeof( up_t ) + container_size< type, value_type >::
+				call( value, size< value_type >::call );
 		}
 	};
 

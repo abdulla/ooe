@@ -42,6 +42,8 @@ namespace ooe
 		: private noncopyable
 	{
 	public:
+		typedef type value_type;
+
 		operator type*( void ) const
 		{
 			return value;
@@ -192,6 +194,9 @@ namespace ooe
 		class shared_base
 	{
 	public:
+		typedef type value_type;
+		typedef shared_ref< type, function, ref_t > ref_type;
+
 		shared_base( const shared_base& copy )
 			: ref( copy.ref )
 		{
@@ -235,7 +240,6 @@ namespace ooe
 		}
 
 	protected:
-		typedef shared_ref< type, function, ref_t > ref_type;
 		ref_type* ref;
 
 		shared_base( type* value )

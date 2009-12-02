@@ -8,6 +8,7 @@
 #include "component/javascript/error.hpp"
 #include "foundation/utility/hint.hpp"
 #include "foundation/utility/miscellany.hpp"
+#include "foundation/utility/object_size.hpp"
 
 namespace ooe
 {
@@ -351,13 +352,17 @@ namespace ooe
 		{
 			typedef typename t::value_type type;
 			v8::Handle< v8::ObjectTemplate > template_ = v8::ObjectTemplate::New();
-			template_->SetInternalFieldCount( 1 );
+			template_->SetInternalFieldCount( 2 );
 
 			v8::Persistent< v8::Object > object =
 				v8::Persistent< v8::Object >::New( template_->NewInstance() );
 			object->SetPointerInInternalField( 0, construct );
 			object.MakeWeak( 0, destroy< type > );
-			v8::V8::AdjustAmountOfExternalAllocatedMemory( sizeof( type ) );
+
+			up_t size = object_size< type >::call( *construct );
+			object->SetInternalField( 1, from< up_t >::call( size ) );
+			v8::V8::AdjustAmountOfExternalAllocatedMemory( size );
+
 			return object;
 		}
 	};
@@ -375,8 +380,12 @@ namespace ooe
 			to< pointer >::call( value, p );
 			destruct = p;
 
-			v8::Object::Cast( *value )->SetPointerInInternalField( 0, 0 );
-			v8::V8::AdjustAmountOfExternalAllocatedMemory( -static_cast< s32 >( sizeof( type ) ) );
+			v8::Object* object = v8::Object::Cast( *value );
+			object->SetPointerInInternalField( 0, 0 );
+
+			up_t size;
+			to< up_t >::call( object->GetInternalField( 1 ), size );
+			v8::V8::AdjustAmountOfExternalAllocatedMemory( -size );
 		}
 	};
 
@@ -441,7 +450,11 @@ namespace ooe
 		to< type* >::call( value, pointer );
 		delete pointer;
 		value.Dispose();
-		v8::V8::AdjustAmountOfExternalAllocatedMemory( -static_cast< s32 >( sizeof( type ) ) );
+
+		up_t size;
+		v8::Object* object = v8::Object::Cast( *value );
+		to< up_t >::call( object->GetInternalField( 1 ), size );
+		v8::V8::AdjustAmountOfExternalAllocatedMemory( -size );
 	}
 }
 
