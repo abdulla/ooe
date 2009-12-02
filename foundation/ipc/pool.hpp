@@ -116,52 +116,16 @@ namespace ooe
 //--- ipc::is_nullable ---------------------------------------------------------
 	template< typename t >
 		struct ipc::is_nullable
-#if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< t, nullable_ptr >
 	{
 	};
-#else
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename t0 >
-			struct apply< nullable_ptr< t0 > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-#endif
 
 //--- ipc::is_unchecked --------------------------------------------------------
 	template< typename t >
 		struct ipc::is_unchecked
-#if __GNUC__ >=4 && __GNUC_MINOR__ >= 2 && __GNUC_PATCHLEVEL__ >= 4
 		: public is_template1< t, unchecked_ptr >
 	{
 	};
-#else
-	{
-		template< typename >
-			struct apply
-			: public false_type
-		{
-		};
-
-		template< typename t0 >
-			struct apply< unchecked_ptr< t0 > >
-			: public true_type
-		{
-		};
-
-		static const bool value = apply< typename no_ref< t >::type >::value;
-	};
-#endif
 
 //--- ipc::is_proxy ------------------------------------------------------------
 	template< typename t >
