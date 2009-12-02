@@ -28,6 +28,12 @@ namespace std
 	template< typename >
 		class allocator;
 
+	template< typename >
+		class less;
+
+	template< typename, typename >
+		class pair;
+
 	template< typename, typename >
 		class vector;
 
@@ -36,6 +42,18 @@ namespace std
 
 	template< typename, typename >
 		class deque;
+
+	template< typename, typename, typename >
+		class set;
+
+	template< typename, typename, typename >
+		class multiset;
+
+	template< typename, typename, typename, typename >
+		class map;
+
+	template< typename, typename, typename, typename >
+		class multimap;
 }
 
 namespace ooe
@@ -199,6 +217,80 @@ namespace ooe
 
 		template< typename type, typename allocator >
 			struct apply< std::deque< type, allocator > >
+			: public true_type
+		{
+		};
+
+		template< typename key, typename compare, typename allocator >
+			struct apply< std::set< key, compare, allocator > >
+			: public true_type
+		{
+		};
+
+		template< typename key, typename compare, typename allocator >
+			struct apply< std::multiset< key, compare, allocator > >
+			: public true_type
+		{
+		};
+
+		template< typename key, typename value, typename compare, typename allocator >
+			struct apply< std::map< key, value, compare, allocator > >
+			: public true_type
+		{
+		};
+
+		template< typename key, typename value, typename compare, typename allocator >
+			struct apply< std::multimap< key, value, compare, allocator > >
+			: public true_type
+		{
+		};
+
+		static const bool value = apply< typename no_ref< t >::type >::value;
+	};
+
+//--- is_set -------------------------------------------------------------------
+	template< typename t >
+		struct is_set
+	{
+		template< typename >
+			struct apply
+			: public false_type
+		{
+		};
+
+		template< typename key, typename compare, typename allocator >
+			struct apply< std::set< key, compare, allocator > >
+			: public true_type
+		{
+		};
+
+		template< typename key, typename compare, typename allocator >
+			struct apply< std::multiset< key, compare, allocator > >
+			: public true_type
+		{
+		};
+
+		static const bool value = apply< typename no_ref< t >::type >::value;
+	};
+
+//--- is_map -------------------------------------------------------------------
+	template< typename t >
+		struct is_map
+	{
+		template< typename >
+			struct apply
+			: public false_type
+		{
+		};
+
+		template< typename key, typename value, typename compare, typename allocator >
+			struct apply< std::map< key, value, compare, allocator > >
+			: public true_type
+		{
+		};
+
+		template< typename key, typename value, typename compare, typename allocator >
+			struct apply< std::multimap< key, value, compare, allocator > >
 			: public true_type
 		{
 		};
