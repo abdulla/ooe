@@ -341,10 +341,17 @@ namespace ooe
 		}
 
 #if LIMIT == 2
-		tuple( const std::pair< t0, t1 >& pair )
+		typedef std::pair< t0, t1 > pair_type;
+
+		tuple( const pair_type& pair )
 			: tuple_base< 0, t0, is_empty< t0 >::value >( pair.first ),
 			tuple_base< 1, t1, is_empty< t1 >::value >( pair.second )
 		{
+		}
+
+		operator pair_type( void ) const
+		{
+			return pair_type( this->_0, this->_1 );
 		}
 #endif
 	};
