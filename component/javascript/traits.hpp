@@ -34,16 +34,17 @@ namespace ooe
 
 			type out;
 			reserve( out, array_size );
+			std::insert_iterator< type > j( out, out.begin() );
 
 			v8::HandleScope scope;
 
-			for ( up_t i = 0; i != array_size; ++i )
+			for ( up_t i = 0; i != array_size; ++i, ++j )
 			{
 				v8::Local< v8::Value > item = array->Get( from< up_t >::call( i ) );
 
-				typename type::value_type out_value;
-				to< typename type::value_type >::call( item, out_value );
-				out.push_back( out_value );
+				typename type::value_type element;
+				to< typename type::value_type >::call( item, element );
+				*j = element;
 			}
 
 			container.swap( out );

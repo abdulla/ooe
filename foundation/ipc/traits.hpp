@@ -55,18 +55,20 @@ namespace ooe
 		{
 			typedef typename no_ref< t >::type type;
 			up_t size = *reinterpret_cast< const up_t* >( buffer );
-			type container;
-			reserve( container, size );
 			const u8* pointer = buffer + sizeof( up_t );
 
-			for ( up_t i = 0; i != size; ++i )
+			type out;
+			reserve( out, size );
+			std::insert_iterator< type > j( out, out.begin() );
+
+			for ( up_t i = 0; i != size; ++i, ++j )
 			{
 				typename type::value_type element;
 				pointer += read< typename type::value_type >::call( pointer, element );
-				container.push_back( element );
+				*j = element;
 			}
 
-			value.swap( container );
+			value.swap( out );
 			return pointer - buffer;
 		}
 	};

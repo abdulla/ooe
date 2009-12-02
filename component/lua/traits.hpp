@@ -31,14 +31,15 @@ namespace ooe
 
 			type out;
 			reserve( out, table_size );
+			std::insert_iterator< type > j( out, out.begin() );
 
-			for ( up_t i = 0; i != table_size; ++i )
+			for ( up_t i = 0; i != table_size; ++i, ++j )
 			{
 				stack.raw_geti( index, i + 1 );
 
-				typename type::value_type value;
-				to< typename type::value_type >::call( stack, value, -1 );
-				out.push_back( value );
+				typename type::value_type element;
+				to< typename type::value_type >::call( stack, element, -1 );
+				*j = element;
 
 				stack.pop( 1 );
 			}
