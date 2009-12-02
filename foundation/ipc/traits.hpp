@@ -16,6 +16,9 @@ namespace ooe
 		template< typename t >
 			struct size< t, typename enable_if< is_stdcontainer< t > >::type >;
 
+		template< typename t >
+			struct size< t, typename enable_if< is_pair< t > >::type >;
+
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_size;
 
@@ -23,12 +26,18 @@ namespace ooe
 		template< typename t >
 			struct read< t, typename enable_if< is_stdcontainer< t > >::type >;
 
+		template< typename t >
+			struct read< t, typename enable_if< is_pair< t > >::type >;
+
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_read;
 
 //--- ipc::write ---------------------------------------------------------------
 		template< typename t >
 			struct write< t, typename enable_if< is_stdcontainer< t > >::type >;
+
+		template< typename t >
+			struct write< t, typename enable_if< is_pair< t > >::type >;
 
 		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
 			struct stream_write;
@@ -86,6 +95,44 @@ namespace ooe
 				i != end; ++i )
 				pointer += write< typename type::value_type >::call( pointer, *i );
 
+			return pointer - buffer;
+		}
+	};
+
+//--- ipc::traits: pair --------------------------------------------------------
+	template< typename t >
+		struct ipc::size< t, typename enable_if< is_pair< t > >::type >
+	{
+		static up_t call( typename call_traits< t >::param_type value )
+		{
+			typedef typename no_ref< t >::type value_type;
+			return size< typename value_type::first_type >::call( value.first ) +
+				size< typename value_type::second_type >::call( value.second );
+		}
+	};
+
+	template< typename t >
+		struct ipc::read< t, typename enable_if< is_pair< t > >::type >
+	{
+		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
+		{
+			typedef typename no_ref< t >::type value_type;
+			const u8* pointer = buffer;
+			pointer += read< typename value_type::first_type >::call( pointer, value.first );
+			pointer += read< typename value_type::second_type >::call( pointer, value.second );
+			return pointer - buffer;
+		}
+	};
+
+	template< typename t >
+		struct ipc::write< t, typename enable_if< is_pair< t > >::type >
+	{
+		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
+		{
+			typedef typename no_ref< t >::type value_type;
+			u8* pointer = buffer;
+			pointer += write< typename value_type::first_type >::call( pointer, value.first );
+			pointer += write< typename value_type::second_type >::call( pointer, value.second );
 			return pointer - buffer;
 		}
 	};
