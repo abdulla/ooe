@@ -12,13 +12,34 @@ namespace ooe
 {
 	namespace javascript
 	{
+//--- javascript::to -----------------------------------------------------------
 		template< typename t >
 			struct to< t, typename enable_if< is_stdcontainer< t > >::type >;
 
 		template< typename t >
+			struct to< t, typename enable_if< is_set< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_map< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_pair< t > >::type >;
+
+//--- javascript::from ---------------------------------------------------------
+		template< typename t >
 			struct from< t, typename enable_if< is_stdcontainer< t > >::type >;
+
+		template< typename t >
+			struct from< t, typename enable_if< is_set< t > >::type >;
+
+		template< typename t >
+			struct from< t, typename enable_if< is_map< t > >::type >;
+
+		template< typename t >
+			struct from< t, typename enable_if< is_pair< t > >::type >;
 	}
 
+//--- javascript::traits: container --------------------------------------------
 	template< typename t >
 		struct javascript::to< t, typename enable_if< is_stdcontainer< t > >::type >
 	{
@@ -68,6 +89,52 @@ namespace ooe
 			return local;
 		}
 	};
+
+//--- javascript::traits: set --------------------------------------------------
+//--- javascript::traits: map --------------------------------------------------
+//--- javascript::traits: pair -------------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< is_pair< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference pair )
+		{
+			if ( !value->IsArray() )
+				throw error::javascript() << "Value is not an array";
+
+			v8::Array* array = v8::Array::Cast( *value );
+			up_t array_size = array->Length();
+
+			if ( array_size != 2 )
+				throw error::javascript() <<
+					"Array is of size " << array_size << ", pair is of size 2";
+
+			typedef typename no_ref< t >::type type;
+			v8::HandleScope scope;
+
+			to< typename type::first_type >::
+				call( array->Get( from< up_t >::call( 0 ) ), pair.first );
+			to< typename type::second_type >::
+				call( array->Get( from< up_t >::call( 1 ) ), pair.second );
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< is_pair< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pair )
+		{
+			typedef typename no_ref< t >::type type;
+			v8::Local< v8::Array > local = v8::Array::New( 2 );
+
+			local->Set( from< up_t >::call( 0 ),
+				from< typename type::first_type >::call( pair.first ) );
+			local->Set( from< up_t >::call( 1 ),
+				from< typename type::second_type >::call( pair.second ) );
+
+			return local;
+		}
+	};
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
@@ -87,7 +154,7 @@ namespace ooe
 			call( array->Get( from< up_t >::call( n ) ), tuple._ ## n );
 
 	#define TUPLE_FROM( z, n, d )\
-		local->Set( v8::Number::New( n ),\
+		local->Set( from< up_t >::call( n ),\
 			from< typename tuple_element< n, t >::type >::call( tuple._ ## n ) );
 
 namespace ooe
