@@ -140,6 +140,47 @@ namespace ooe
 	};
 
 //--- lua::traits: map ---------------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< is_map< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::reference map, s32 index )
+		{
+			type_check< t >( stack, index, type::table );
+
+			typedef typename no_ref< t >::type type;
+			type out;
+			stack.push_nil();
+
+			for ( ; stack.next( index ); stack.pop( 1 ) )
+			{
+				typename type::key_type key;
+				to< typename type::key_type >::call( stack, key, -2 );
+				typename type::data_type data;
+				to< typename type::data_type >::call( stack, data, -1 );
+				out.insert( typename type::value_type( key, data ) );
+			}
+
+			map.swap( out );
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< is_map< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::param_type map )
+		{
+			typedef typename no_ref< t >::type type;
+			stack.create_table( 0, map.size() );
+
+			for ( typename type::const_iterator i = map.being(), end = map.end(); i != end; ++i )
+			{
+				push< typename type::key_type >::call( stack, i->first );
+				push< typename type::data_type >::call( stack, i->second );
+				stack.raw_set( -3 );
+			}
+		}
+	};
+
 //--- lua::traits: pair --------------------------------------------------------
 	template< typename t >
 		struct lua::to< t, typename enable_if< is_pair< t > >::type >
