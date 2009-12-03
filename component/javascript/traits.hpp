@@ -14,7 +14,7 @@ namespace ooe
 	{
 //--- javascript::to -----------------------------------------------------------
 		template< typename t >
-			struct to< t, typename enable_if< is_stdcontainer< t > >::type >;
+			struct to< t, typename enable_if< is_sequence< t > >::type >;
 
 		template< typename t >
 			struct to< t, typename enable_if< is_set< t > >::type >;
@@ -27,7 +27,7 @@ namespace ooe
 
 //--- javascript::from ---------------------------------------------------------
 		template< typename t >
-			struct from< t, typename enable_if< is_stdcontainer< t > >::type >;
+			struct from< t, typename enable_if< is_sequence< t > >::type >;
 
 		template< typename t >
 			struct from< t, typename enable_if< is_set< t > >::type >;
@@ -39,9 +39,9 @@ namespace ooe
 			struct from< t, typename enable_if< is_pair< t > >::type >;
 	}
 
-//--- javascript::traits: container --------------------------------------------
+//--- javascript::traits: sequence ---------------------------------------------
 	template< typename t >
-		struct javascript::to< t, typename enable_if< is_stdcontainer< t > >::type >
+		struct javascript::to< t, typename enable_if< is_sequence< t > >::type >
 	{
 		static void call( const v8::Handle< v8::Value >& value,
 			typename call_traits< t >::reference container )
@@ -50,22 +50,20 @@ namespace ooe
 				throw error::javascript() << "Value is not an array";
 
 			typedef typename no_ref< t >::type type;
+			v8::HandleScope scope;
 			v8::Array* array = v8::Array::Cast( *value );
 			up_t array_size = array->Length();
 
 			type out;
 			reserve( out, array_size );
-			std::insert_iterator< type > j( out, out.begin() );
 
-			v8::HandleScope scope;
-
-			for ( up_t i = 0; i != array_size; ++i, ++j )
+			for ( up_t i = 0; i != array_size; ++i )
 			{
-				v8::Local< v8::Value > item = array->Get( from< up_t >::call( i ) );
+				v8::Handle< v8::Value > item = array->Get( from< up_t >::call( i ) );
 
 				typename type::value_type element;
 				to< typename type::value_type >::call( item, element );
-				*j = element;
+				out.push_back( element );
 			}
 
 			container.swap( out );
@@ -73,24 +71,66 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct javascript::from< t, typename enable_if< is_stdcontainer< t > >::type >
+		struct javascript::from< t, typename enable_if< is_sequence< t > >::type >
 	{
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type container )
 		{
 			typedef typename no_ref< t >::type type;
-			v8::Local< v8::Array > local = v8::Array::New( container.size() );
+			v8::Handle< v8::Array > array = v8::Array::New( container.size() );
 			up_t index = 0;
 
 			for ( typename type::const_iterator i = container.begin(), end = container.end();
 				i != end; ++i, ++index )
-				local->Set( v8::Number::New( index ),
+				array->Set( from< up_t >::call( index ),
 					from< typename type::value_type >::call( *i ) );
 
-			return local;
+			return array;
 		}
 	};
 
 //--- javascript::traits: set --------------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< is_set< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference set )
+		{
+			if ( !value->IsObject() )
+				throw error::javascript() << "Value is not an object";
+
+			typedef typename no_ref< t >::type type;
+			v8::HandleScope scope;
+			v8::Object* object = v8::Object::Cast( *value );
+			v8::Handle< v8::Array > array = object->GetPropertyNames();
+
+			type out;
+
+			for ( up_t i = 0, end = array->Length(); i != end; ++i )
+			{
+				typename type::key_type key;
+				to< typename type::key_type >::call( array->Get( from< up_t >::call( i ) ), key );
+				out.insert( key );
+			}
+
+			set.swap( out );
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< is_set< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type set )
+		{
+			typedef typename no_ref< t >::type type;
+			v8::Handle< v8::Object > object = v8::Object::New();
+
+			for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
+				object->Set( from< typename type::key_type >::call( *i ), v8::Null() );
+
+			return object;
+		}
+	};
+
 //--- javascript::traits: map --------------------------------------------------
 //--- javascript::traits: pair -------------------------------------------------
 	template< typename t >
@@ -125,14 +165,14 @@ namespace ooe
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pair )
 		{
 			typedef typename no_ref< t >::type type;
-			v8::Local< v8::Array > local = v8::Array::New( 2 );
+			v8::Handle< v8::Array > array = v8::Array::New( 2 );
 
-			local->Set( from< up_t >::call( 0 ),
+			array->Set( from< up_t >::call( 0 ),
 				from< typename type::first_type >::call( pair.first ) );
-			local->Set( from< up_t >::call( 1 ),
+			array->Set( from< up_t >::call( 1 ),
 				from< typename type::second_type >::call( pair.second ) );
 
-			return local;
+			return array;
 		}
 	};
 }
@@ -154,7 +194,7 @@ namespace ooe
 			call( array->Get( from< up_t >::call( n ) ), tuple._ ## n );
 
 	#define TUPLE_FROM( z, n, d )\
-		local->Set( from< up_t >::call( n ),\
+		array->Set( from< up_t >::call( n ),\
 			from< typename tuple_element< n, t >::type >::call( tuple._ ## n ) );
 
 namespace ooe
@@ -195,9 +235,9 @@ namespace ooe
 	{
 		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type tuple )
 		{
-			v8::Local< v8::Array > local = v8::Array::New( LIMIT );
+			v8::Handle< v8::Array > array = v8::Array::New( LIMIT );
 			BOOST_PP_REPEAT( LIMIT, TUPLE_FROM, ~ )
-			return local;
+			return array;
 		}
 	};
 }
