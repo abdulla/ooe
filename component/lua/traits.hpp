@@ -65,15 +65,14 @@ namespace ooe
 
 			type out;
 			reserve( out, table_size );
-			std::insert_iterator< type > j( out, out.begin() );
 
-			for ( up_t i = 0; i != table_size; ++i, ++j )
+			for ( up_t i = 0; i != table_size; ++i )
 			{
 				stack.raw_geti( index, i + 1 );
 
 				typename type::value_type element;
 				to< typename type::value_type >::call( stack, element, -1 );
-				*j = element;
+				out.push_back( element );
 
 				stack.pop( 1 );
 			}
@@ -101,6 +100,43 @@ namespace ooe
 	};
 
 //--- lua::traits: set ---------------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< is_set< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::reference set, s32 index )
+		{
+			type_check< t >( stack, index, type::table );
+
+			typedef typename no_ref< t >::type type;
+			type out;
+			stack.push_nil();
+
+			for ( ; stack.next( index ); stack.pop( 1 ) )
+			{
+				typename type::key_type key;
+				to< typename type::key_type >::call( stack, key, -2 );
+				out.insert( key );
+			}
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< is_set< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::param_type set )
+		{
+			typedef typename no_ref< t >::type type;
+			stack.create_table( 0, set.size() );
+
+			for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
+			{
+				push< typename type::key_type >::call( stack, *i );
+				push< bool >::call( stack, true );
+				stack.raw_set( -3 );
+			}
+		}
+	};
+
 //--- lua::traits: map ---------------------------------------------------------
 //--- lua::traits: pair --------------------------------------------------------
 	template< typename t >
