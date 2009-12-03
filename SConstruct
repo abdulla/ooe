@@ -73,7 +73,7 @@ build.Linkable( 'lua-old', 'foundation/lua', 'io', include_path = ooe.lua.includ
 build.Linkable( 'maths', 'foundation/maths' )
 build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', ooe.pthread.library )
-build.Linkable( 'scene', 'foundation/scene', 'image io lua-old maths parallel' )
+build.Linkable( 'scene', 'foundation/scene', 'image io maths parallel' )
 
 #--- component -----------------------------------------------------------------
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
