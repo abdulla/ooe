@@ -117,6 +117,8 @@ namespace ooe
 				to< typename type::key_type >::call( stack, key, -2 );
 				out.insert( key );
 			}
+
+			set.swap( out );
 		}
 	};
 
