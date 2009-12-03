@@ -150,11 +150,14 @@ namespace ooe
 
 			for ( up_t i = 0, end = array->Length(); i != end; ++i )
 			{
+				v8::Handle< v8::Value > item = array->Get( from< up_t >::call( i ) );
+				v8::Handle< v8::Value > data = object->Get( item );
+
 				typename type::key_type key;
-				to< typename type::key_type >::call( value, key );
-				typename type::data_type data;
-				to< typename type::data_type >::call( value, data );
-				out.insert( typename type::value_type( key, data ) );
+				to< typename type::key_type >::call( item, key );
+				typename type::mapped_type mapped;
+				to< typename type::mapped_type >::call( data, mapped );
+				out.insert( typename type::value_type( key, mapped ) );
 			}
 
 			map.swap( out );
@@ -171,7 +174,7 @@ namespace ooe
 
 			for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
 				object->Set( from< typename type::key_type >::call( i->first ),
-					from< typename type::data_type >::call( i->second ) );
+					from< typename type::mapped_type >::call( i->second ) );
 
 			return object;
 		}

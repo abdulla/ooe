@@ -142,9 +142,9 @@ namespace ooe
 			{
 				typename type::key_type key;
 				to< typename type::key_type >::call( stack, key, -2 );
-				typename type::data_type data;
-				to< typename type::data_type >::call( stack, data, -1 );
-				out.insert( typename type::value_type( key, data ) );
+				typename type::mapped_type mapped;
+				to< typename type::mapped_type >::call( stack, mapped, -1 );
+				out.insert( typename type::value_type( key, mapped ) );
 			}
 
 			map.swap( out );
@@ -159,10 +159,10 @@ namespace ooe
 			typedef typename no_ref< t >::type type;
 			stack.create_table( 0, map.size() );
 
-			for ( typename type::const_iterator i = map.being(), end = map.end(); i != end; ++i )
+			for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
 			{
 				push< typename type::key_type >::call( stack, i->first );
-				push< typename type::data_type >::call( stack, i->second );
+				push< typename type::mapped_type >::call( stack, i->second );
 				stack.raw_set( -3 );
 			}
 		}

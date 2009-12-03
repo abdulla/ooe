@@ -117,9 +117,13 @@ namespace ooe
 		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
 		{
 			typedef typename no_ref< t >::type value_type;
+			typedef typename no_ref< typename value_type::first_type >::type first_type;
+			typedef typename no_ref< typename value_type::second_type >::type second_type;
+
 			const u8* pointer = buffer;
-			pointer += read< typename value_type::first_type >::call( pointer, value.first );
-			pointer += read< typename value_type::second_type >::call( pointer, value.second );
+			pointer += read< first_type >::
+				call( pointer, const_cast< first_type& >( value.first ) );
+			pointer += read< second_type >::call( pointer, value.second );
 			return pointer - buffer;
 		}
 	};
@@ -130,6 +134,7 @@ namespace ooe
 		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
 		{
 			typedef typename no_ref< t >::type value_type;
+
 			u8* pointer = buffer;
 			pointer += write< typename value_type::first_type >::call( pointer, value.first );
 			pointer += write< typename value_type::second_type >::call( pointer, value.second );

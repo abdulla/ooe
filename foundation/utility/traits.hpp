@@ -195,7 +195,7 @@ namespace ooe
 
 //--- reserve ------------------------------------------------------------------
 	template< typename t >
-		void reserve( typename call_traits< t >::param_type, up_t )
+		void reserve( t&, up_t )
 	{
 	}
 
