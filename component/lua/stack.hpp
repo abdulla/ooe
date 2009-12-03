@@ -78,6 +78,7 @@ namespace ooe
 		void set_metatable( s32 );
 
 		void error( void );
+		bool next( s32 );
 		bool new_metatable( const c8* );
 		void where( void );
 

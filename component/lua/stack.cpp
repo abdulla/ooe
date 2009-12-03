@@ -135,6 +135,11 @@ namespace ooe
 		lua_error( state );
 	}
 
+	bool lua::stack::next( s32 index )
+	{
+		return lua_next( state, index );
+	}
+
 	bool lua::stack::new_metatable( const c8* name )
 	{
 		return luaL_newmetatable( state, name );
