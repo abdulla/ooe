@@ -25,5 +25,12 @@ heap.hello()
 heap:said()
 heap.deallocate( heap.allocate( 'hello lua delete' ) )
 
+local alphabet = { a = 1, b = 2, c = 3 }
+alphabet = heap.stdmap( alphabet )
+
+for k, v in pairs( alphabet ) do
+	print( k, v )
+end
+
 --- print hello ----------------------------------------------------------------
 print 'hello lua'

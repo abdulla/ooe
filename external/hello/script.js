@@ -25,5 +25,11 @@ heap.hello();
 heap.said();
 heap.deallocate( heap.allocate( 'hello javascript delete' ) );
 
+var alphabet = { a: 1, b: 2, c: 3 };
+alphabet = heap.stdmap( alphabet );
+
+for ( var i in alphabet )
+	print( i, alphabet[ i ] );
+
 //--- print hello --------------------------------------------------------------
 print( 'hello javascript' );

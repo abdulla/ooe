@@ -58,6 +58,15 @@ namespace
 	{
 		return 0;
 	}
+
+	typedef std::map< std::string, up_t > map_type;
+	map_type stdmap( const map_type& map )
+	{
+		for ( map_type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
+			std::cout << "key: " << i->first << ", value: " << i->second << '\n';
+
+		return map;
+	}
 }
 
 extern "C" ooe::module OOE_VISIBLE module_open( void )
@@ -71,6 +80,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 	builder.insert( "say", &print::say );
 	builder.insert( "gauntlet", gauntlet );
 	builder.insert( "mismatch", mismatch );
+	builder.insert( "stdmap", stdmap );
 
 	return module;
 }
