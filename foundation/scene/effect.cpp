@@ -1,8 +1,8 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include <iostream>
+
 #include "foundation/io/memory.hpp"
-#include "foundation/lua/table.hpp"
-#include "foundation/lua/vm.hpp"
 #include "foundation/scene/effect.hpp"
 
 namespace ooe
@@ -11,24 +11,26 @@ namespace ooe
 	effect::effect( const descriptor& desc, const vfs& vfs, const video& video )
 		: program( video.program() )
 	{
-		lua::vm vm;
-		lua::stack stack = vm.stack();
+		const up_t end = -1;
+		std::string source = memory( desc ).as< c8 >();
 
-		lua::table global( stack, lua::global );
-		global[ "vertex" ] = shader::vertex;
-		global[ "fragment" ] = shader::fragment;
-		vm.load( "effect", desc );
-
-		typedef lua::table::iterator iterator;
-		lua::table table = global[ "table" ];
-
-		for ( iterator i = table.begin(), end = table.end(); i != end; ++i )
+		for ( up_t i = 0, j = 0; ( j = source.find( '\n', i ) ) != end; i = j + 1 )
 		{
-			const iterator::value_type value( *i );
-			scoped_ptr< ooe::shader > shader( video.shader( value.second ) );
-			memory memory( vfs[ value.first ] );
+			if ( source[ i ] == '#' )
+				continue;
+
+			std::string line = source.substr( i, j - i );
+			up_t k = line.rfind( '.' );
+
+			if ( k == end )
+				continue;
+
+			shader::type type = line.substr( k + 1 ) == "vs" ? shader::vertex : shader::fragment;
+			scoped_ptr< ooe::shader > shader( video.shader( type ) );
+			memory memory( vfs[ line ] );
 			shader->compile( memory.as< c8 >(), memory.size() );
 			program->attach( shader );
+
 		}
 
 		program->link();

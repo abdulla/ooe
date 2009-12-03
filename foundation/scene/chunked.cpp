@@ -519,7 +519,7 @@ namespace ooe
 		header( chunked_header_f( memory.get() ) ), chunk( new chunk::type[ header.chunk_count ] ),
 		lod( ( header.max_error / max_pixel ) * ( static_cast< f32 >( width ) / std::tan( fov ) ) ),
 		scheduler( scheduler_ ), video( cache.video ),
-		program( cache.program( "effect/chunked.lua" ) ), delta()
+		program( cache.program( "effect/chunked.effect" ) ), delta()
 	{
 		program.bind();
 		chunk_args args( program, header, chunk, memory.get(), tqt.depth() );
