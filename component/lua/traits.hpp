@@ -12,12 +12,9 @@ namespace ooe
 {
 	namespace lua
 	{
-		template< typename t >
-			struct is_stdcontainer;
-
 //--- lua::to ------------------------------------------------------------------
 		template< typename t >
-			struct to< t, typename enable_if< is_stdcontainer< t > >::type >;
+			struct to< t, typename enable_if< is_sequence< t > >::type >;
 
 		template< typename t >
 			struct to< t, typename enable_if< is_set< t > >::type >;
@@ -30,7 +27,7 @@ namespace ooe
 
 //--- lua::push ----------------------------------------------------------------
 		template< typename t >
-			struct push< t, typename enable_if< is_stdcontainer< t > >::type >;
+			struct push< t, typename enable_if< is_sequence< t > >::type >;
 
 		template< typename t >
 			struct push< t, typename enable_if< is_set< t > >::type >;
@@ -42,19 +39,9 @@ namespace ooe
 			struct push< t, typename enable_if< is_pair< t > >::type >;
 	}
 
-//--- is_stdcontainer ----------------------------------------------------------
+//--- lua::traits: sequence ----------------------------------------------------
 	template< typename t >
-		struct lua::is_stdcontainer
-	{
-		static const bool value =
-			!is_set< t >::value &&
-			!is_map< t >::value &&
-			ooe::is_stdcontainer< t >::value;
-	};
-
-//--- lua::traits: stdcontainer ------------------------------------------------
-	template< typename t >
-		struct lua::to< t, typename enable_if< lua::is_stdcontainer< t > >::type >
+		struct lua::to< t, typename enable_if< is_sequence< t > >::type >
 	{
 		static void call( stack& stack, typename call_traits< t >::reference container, s32 index )
 		{
@@ -82,7 +69,7 @@ namespace ooe
 	};
 
 	template< typename t >
-		struct lua::push< t, typename enable_if< lua::is_stdcontainer< t > >::type >
+		struct lua::push< t, typename enable_if< is_sequence< t > >::type >
 	{
 		static void call( stack& stack, typename call_traits< t >::param_type container )
 		{
