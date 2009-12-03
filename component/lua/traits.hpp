@@ -12,13 +12,34 @@ namespace ooe
 {
 	namespace lua
 	{
+//--- lua::to ------------------------------------------------------------------
 		template< typename t >
 			struct to< t, typename enable_if< is_stdcontainer< t > >::type >;
 
 		template< typename t >
+			struct to< t, typename enable_if< is_set< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_map< t > >::type >;
+
+		template< typename t >
+			struct to< t, typename enable_if< is_pair< t > >::type >;
+
+//--- lua::push ----------------------------------------------------------------
+		template< typename t >
 			struct push< t, typename enable_if< is_stdcontainer< t > >::type >;
+
+		template< typename t >
+			struct push< t, typename enable_if< is_set< t > >::type >;
+
+		template< typename t >
+			struct push< t, typename enable_if< is_map< t > >::type >;
+
+		template< typename t >
+			struct push< t, typename enable_if< is_pair< t > >::type >;
 	}
 
+//--- lua::traits: stdcontainer ------------------------------------------------
 	template< typename t >
 		struct lua::to< t, typename enable_if< is_stdcontainer< t > >::type >
 	{
@@ -63,6 +84,48 @@ namespace ooe
 				push< typename type::value_type >::call( stack, *i );
 				stack.raw_seti( -2, index );
 			}
+		}
+	};
+
+//--- lua::traits: set ---------------------------------------------------------
+//--- lua::traits: map ---------------------------------------------------------
+//--- lua::traits: pair --------------------------------------------------------
+	template< typename t >
+		struct lua::to< t, typename enable_if< is_pair< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::reference pair, s32 index )
+		{
+			type_check< t >( stack, index, type::table );
+			up_t table_size = stack.objlen( index );
+
+			if ( table_size != 2 )
+				throw error::lua() << "Table is of size " << table_size << ", pair is of size 2";
+
+			typedef typename no_ref< t >::type type;
+
+			stack.raw_geti( index, 1 );
+			to< typename type::first_type >::call( stack, pair.first, -1 );
+			stack.pop( 1 );
+
+			stack.raw_geti( index, 2 );
+			to< typename type::second_type >::call( stack, pair.second, -1 );
+			stack.pop( 1 );
+		}
+	};
+
+	template< typename t >
+		struct lua::push< t, typename enable_if< is_pair< t > >::type >
+	{
+		static void call( stack& stack, typename call_traits< t >::param_type pair )
+		{
+			typedef typename no_ref< t >::type type;
+			stack.create_table( 2 );
+
+			push< typename type::first_type >::call( stack, pair.first );
+			stack.raw_seti( -2, 1 );
+
+			push< typename type::second_type >::call( stack, pair.second );
+			stack.raw_seti( -2, 2 );
 		}
 	};
 }
