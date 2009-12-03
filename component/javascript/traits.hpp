@@ -132,6 +132,51 @@ namespace ooe
 	};
 
 //--- javascript::traits: map --------------------------------------------------
+	template< typename t >
+		struct javascript::to< t, typename enable_if< is_map< t > >::type >
+	{
+		static void call( const v8::Handle< v8::Value >& value,
+			typename call_traits< t >::reference map )
+		{
+			if ( !value->IsObject() )
+				throw error::javascript() << "Value is not an object";
+
+			typedef typename no_ref< t >::type type;
+			v8::HandleScope scope;
+			v8::Object* object = v8::Object::Cast( *value );
+			v8::Handle< v8::Array > array = object->GetPropertyNames();
+
+			type out;
+
+			for ( up_t i = 0, end = array->Length(); i != end; ++i )
+			{
+				typename type::key_type key;
+				to< typename type::key_type >::call( value, key );
+				typename type::data_type data;
+				to< typename type::data_type >::call( value, data );
+				out.insert( typename type::value_type( key, data ) );
+			}
+
+			map.swap( out );
+		}
+	};
+
+	template< typename t >
+		struct javascript::from< t, typename enable_if< is_map< t > >::type >
+	{
+		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type map )
+		{
+			typedef typename no_ref< t >::type type;
+			v8::Handle< v8::Object > object = v8::Object::New();
+
+			for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
+				object->Set( from< typename type::key_type >::call( i->first ),
+					from< typename type::data_type >::call( i->second ) );
+
+			return object;
+		}
+	};
+
 //--- javascript::traits: pair -------------------------------------------------
 	template< typename t >
 		struct javascript::to< t, typename enable_if< is_pair< t > >::type >
