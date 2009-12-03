@@ -30,9 +30,8 @@ namespace ooe
 
 		enum
 		{
-			registry_index		= -10000,
-			environment_index	= -10001,
-			globals_index		= -10002
+			registry_index	= -10000,
+			globals_index	= -10002
 		};
 
 		typedef lua_State state;
