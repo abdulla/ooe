@@ -257,6 +257,16 @@ namespace ooe
 			is_template4< t, std::multimap >::value;
 	};
 
+//--- is_sequence --------------------------------------------------------------
+	template< typename t >
+		struct is_sequence
+	{
+		static const bool value =
+			is_template2< t, std::vector >::value ||
+			is_template2< t, std::list >::value ||
+			is_template2< t, std::deque >::value;
+	};
+
 //--- is_set -------------------------------------------------------------------
 	template< typename t >
 		struct is_set
