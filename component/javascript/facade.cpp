@@ -105,7 +105,7 @@ namespace
 		for ( up_t i = 0, end = arguments.Length(); i != end; ++i )
 		{
 			if ( i )
-				std::cout << ' ';
+				std::cout << '\t';
 
 			v8::String::AsciiValue ascii( arguments[ i ] );
 			std::cout.write( *ascii, ascii.length() );
