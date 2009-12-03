@@ -1,6 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include <iostream>
+#include <set>
 
 #include "component/javascript/facade.hpp"
 #include "component/lua/facade.hpp"
@@ -67,6 +68,15 @@ namespace
 
 		return map;
 	}
+
+	typedef std::set< std::string > set_type;
+	set_type stdset( const set_type& set )
+	{
+		for ( set_type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
+			std::cout << "key: " << *i << '\n';
+
+		return set;
+	}
 }
 
 extern "C" ooe::module OOE_VISIBLE module_open( void )
@@ -81,6 +91,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 	builder.insert( "gauntlet", gauntlet );
 	builder.insert( "mismatch", mismatch );
 	builder.insert( "stdmap", stdmap );
+	builder.insert( "stdset", stdset );
 
 	return module;
 }

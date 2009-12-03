@@ -25,10 +25,13 @@ heap.hello()
 heap:said()
 heap.deallocate( heap.allocate( 'hello lua delete' ) )
 
-local alphabet = { a = 1, b = 2, c = 3 }
-alphabet = heap.stdmap( alphabet )
+local alphabet = { a = 9, b = 8, c = 7 }
 
-for k, v in pairs( alphabet ) do
+for k, v in pairs( heap.stdmap( alphabet ) ) do
+	print( k, v )
+end
+
+for k, v in pairs( heap.stdset( alphabet ) ) do
 	print( k, v )
 end
 
