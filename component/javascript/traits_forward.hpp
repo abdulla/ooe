@@ -421,13 +421,13 @@ namespace ooe
 		{
 			typedef typename no_ref< t >::type type;
 			up_t array_size = extent< type >::value;
-			v8::Local< v8::Array > local = v8::Array::New( array_size );
+			v8::Handle< v8::Array > handle = v8::Array::New( array_size );
 
 			for ( up_t i = 0; i != array_size; ++i )
-				local->Set( from< up_t >::call( i ),
+				handle->Set( from< up_t >::call( i ),
 					from< typename remove_extent< type >::type >::call( array[ i ] ) );
 
-			return local;
+			return handle;
 		}
 	};
 
