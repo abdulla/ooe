@@ -125,7 +125,7 @@ namespace ooe
 			v8::Handle< v8::Object > object = v8::Object::New();
 
 			for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
-				object->Set( from< typename type::key_type >::call( *i ), v8::Null() );
+				object->Set( from< typename type::key_type >::call( *i ), v8::True() );
 
 			return object;
 		}
