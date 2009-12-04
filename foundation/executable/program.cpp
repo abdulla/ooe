@@ -30,6 +30,7 @@ namespace
 		case SIGFPE:
 		case SIGBUS:
 		case SIGSEGV:
+		case SIGABRT:
 			description = strsignal( code );
 			trace = stack_trace();
 			OOE_WARNING( "executable",
@@ -96,18 +97,16 @@ namespace ooe
 
 		try
 		{
-			if ( close( STDERR_FILENO ) == -1 )
-				throw error::runtime( "executable::launch: " ) <<
-					"Unable to close standard error: " << error::number( errno );
-
 			path_tuple path = executable::path();
 			std::string log = path._0 + path._1 + ".log";
 
-			if ( open( log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600 ) != STDERR_FILENO )
+			if ( close( STDERR_FILENO ) == -1 )
+				throw error::runtime( "executable::launch: " ) <<
+					"Unable to close standard error: " << error::number( errno );
+			else if ( open( log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600 ) != STDERR_FILENO )
 				throw error::runtime( "executable::launch: " ) <<
 					"Unable to override standard error: " << error::number( errno );
-
-			if ( platform::launch( launch, path._0, path._1, argc, argv ) )
+			else if ( platform::launch( launch, path._0, path._1, argc, argv ) )
 				status = EXIT_SUCCESS;
 		}
 		catch ( error::runtime& error )
