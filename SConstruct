@@ -47,12 +47,6 @@ def UtilityConfigure( platform, setup ):
 	if not setup.CheckCXXHeader( 'boost/mpl/vector.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/utility/enable_if.hpp' ): Exit( 1 )
 
-def UUIDConfigure( platform, setup ):
-	if platform == 'posix':
-		if not setup.CheckLibWithHeader( 'uuid', 'uuid/uuid.h', 'c' ): Exit( 1 )
-	elif platform == 'darwin':
-		if not setup.CheckCHeader( 'uuid/uuid.h' ): Exit( 1 )
-
 ### build ######################################################################
 build = Build( variables )
 build.Configure( 'release' == ARGUMENTS.get( 'mode', 'debug' ) )
