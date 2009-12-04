@@ -68,8 +68,6 @@ build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.includ
 	configure = ImageConfigure )
 build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
 build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
-#build.Linkable( 'lua-old', 'foundation/lua', 'io', include_path = ooe.lua.include_path,
-#	configure = LuaConfigure )
 build.Linkable( 'maths', 'foundation/maths' )
 build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', ooe.pthread.library )
@@ -93,11 +91,8 @@ build.Linkable( 'unit', 'test/unit', 'executable' )
 
 
 #--- external ------------------------------------------------------------------
-#build.Executable( 'engine', 'external/engine', 'executable io lua-old parallel service' )
 build.Executable( 'chunked', 'external/chunked', 'executable general parallel scene' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'ipc_check', 'external/ipc_check', 'executable ipc' )
 build.Executable( 'monitor', 'external/monitor', 'executable general image' )
 build.Linkable( 'hello', 'external/hello', 'javascript lua registry' )
-#build.Linkable( 'runtime', 'external/runtime', 'scene' )
-#build.Linkable( 'service', 'external/service', 'general' )
