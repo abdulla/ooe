@@ -9,8 +9,7 @@
 #include "foundation/opengl/symbol.hpp"
 #include "foundation/opengl/texture.hpp"
 #include "foundation/utility/error.hpp"
-
-#include "external/engine/dynamic.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 namespace
 {
