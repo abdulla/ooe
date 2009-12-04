@@ -68,6 +68,8 @@ build.Linkable( 'parallel', 'foundation/parallel', ooe.pthread.library )
 build.Linkable( 'scene', 'foundation/scene', 'image io maths parallel' )
 
 #--- component -----------------------------------------------------------------
+build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
+build.Executable( 'javascript_host', 'component/javascript/host', 'executable javascript registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
