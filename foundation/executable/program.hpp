@@ -14,14 +14,12 @@ namespace ooe
 	namespace executable
 	{
 		typedef void ( * signal_handler_type )( s32 );
-		typedef void ( * emergency_handler_type )( void );
 		typedef bool ( * launch_type )( const std::string&, const std::string&, s32, c8** );
 		typedef tuple< std::string, std::string > path_tuple;
 
 		signal_handler_type signal( struct sigaction&, signal_handler_type, s32 ) OOE_VISIBLE;
 		s32 signal( void ) OOE_VISIBLE;
 		void quit( void ) OOE_VISIBLE;
-		void emergency( emergency_handler_type ) OOE_VISIBLE;
 
 		s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
 		void null_fd( s32 ) OOE_VISIBLE;

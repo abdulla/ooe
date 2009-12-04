@@ -16,8 +16,6 @@
 namespace
 {
 	using namespace ooe;
-	void null_handler( void ) {}
-	executable::emergency_handler_type emergency_handler = null_handler;
 	s32 signal_code = 0;
 
 	void signal_handler( s32 code )
@@ -35,7 +33,6 @@ namespace
 			trace = stack_trace();
 			OOE_WARNING( "executable",
 				"Caught signal " << code << ": " << description << "\n\nStack trace:\n" << trace );
-			emergency_handler();
 			std::exit( EXIT_FAILURE );
 
 		default:
@@ -76,11 +73,6 @@ namespace ooe
 	void executable::quit( void )
 	{
 		signal_code = SIGQUIT;
-	}
-
-	void executable::emergency( emergency_handler_type handler )
-	{
-		emergency_handler = handler;
 	}
 
 	s32 executable::launch( launch_type launch, s32 argc, c8** argv )
