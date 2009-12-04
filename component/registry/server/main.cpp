@@ -194,13 +194,21 @@ namespace
 		const c8* surrogate_path = 0;
 		const c8* up_name = 0;
 
-		for ( s32 option; ( option = getopt( argc, argv, "m:s:u:" ) ) != -1; )
+		for ( s32 option; ( option = getopt( argc, argv, "l:m:r:s:u:" ) ) != -1; )
 		{
 			switch ( option )
 			{
+			case 'l':
+				ooe::registry().insert( registry::library, optarg );
+				return true;
+
 			case 'm':
 				module_path = optarg;
 				break;
+
+			case 'r':
+				ooe::registry().insert( registry::server, optarg );
+				return true;
 
 			case 's':
 				surrogate_path = optarg;
