@@ -13,7 +13,7 @@ namespace ooe
 	}
 
 	struct opengl::attribute
-		: private noncopyable, public ooe::attribute
+		: public ooe::attribute
 	{
 		s32 id;
 		u8 size;

@@ -13,7 +13,7 @@ namespace ooe
 	}
 
 	class opengl::program
-		: private noncopyable, public ooe::program
+		: public ooe::program
 	{
 	public:
 		program( void );

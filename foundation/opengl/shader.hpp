@@ -14,7 +14,7 @@ namespace ooe
 	}
 
 	class opengl::shader
-		: private noncopyable, public ooe::shader
+		: public ooe::shader
 	{
 	public:
 		shader( type );

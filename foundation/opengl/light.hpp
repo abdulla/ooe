@@ -13,7 +13,7 @@ namespace ooe
 	}
 
 	class opengl::light
-		: private noncopyable, public ooe::light
+		: public ooe::light
 	{
 	public:
 		light( u32, bool& );

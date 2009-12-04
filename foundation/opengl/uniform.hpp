@@ -13,7 +13,7 @@ namespace ooe
 	}
 
 	class opengl::uniform
-		: private noncopyable, public ooe::uniform
+		: public ooe::uniform
 	{
 	public:
 		typedef void ( * function_type )( s32, const void* );

@@ -13,7 +13,7 @@ namespace ooe
 	}
 
 	class opengl::texture
-		: private noncopyable, public ooe::texture
+		: public ooe::texture
 	{
 	public:
 		texture( void );

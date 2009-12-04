@@ -13,7 +13,7 @@ namespace ooe
 	}
 
 	class opengl::buffer
-		: private noncopyable, public ooe::buffer
+		: public ooe::buffer
 	{
 	public:
 		buffer( type );

@@ -18,7 +18,7 @@ namespace
 	using namespace opengl;
 
 	class video
-		: private noncopyable, public ooe::video
+		: public ooe::video
 	{
 	public:
 		video( const view_data&, platform::context_type );
@@ -635,14 +635,9 @@ namespace
 			DisableClientState( TEXTURE_COORD_ARRAY );
 		}
 	}
-
-	void close( void* pointer )
-	{
-		delete static_cast< video_type* >( pointer );
-	}
 }
 
-extern "C" dynamic::close_type OOE_VISIBLE ooe_open( const view_data& view )
+extern "C" video_type* video_open( const view_data& view )
 {
-	return dynamic::close_type( new video_type( view, context_f( view ) ), close );
+	return new video_type( view, context_f( view ) );
 }
