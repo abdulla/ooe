@@ -59,8 +59,8 @@ namespace ooe
 		return string;
 	}
 
-	void lua::vm::setup( function_type function, const std::string& path )
+	void lua::vm::setup( function_type function )
 	{
-		function( stack( state ), path );
+		function( stack( state ) );
 	}
 }

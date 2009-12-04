@@ -19,7 +19,7 @@ namespace ooe
 
 	namespace javascript
 	{
-		void component_setup( v8::Handle< v8::Object >, const std::string& ) OOE_VISIBLE;
+		void component_setup( v8::Handle< v8::Object > ) OOE_VISIBLE;
 		void throw_exception( const c8*, const c8* ) OOE_VISIBLE;
 		inline void verify_arguments( const v8::Arguments&, s32 );
 

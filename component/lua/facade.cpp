@@ -117,30 +117,10 @@ namespace ooe
 	}
 
 //--- lua ----------------------------------------------------------------------
-	void lua::component_setup( stack stack, const std::string& path )
+	void lua::component_setup( stack stack )
 	{
 		push< const c8* >::call( stack, "ooe" );
 		stack.create_table( 0, 3 );
-
-		//--- executable -------------------------------------------------------
-		push< const c8* >::call( stack, "executable" );
-		stack.create_table( 0, 1 );
-
-		push< const c8* >::call( stack, "path" );
-		push< std::string >::call( stack, path );
-		stack.raw_set( -3 );
-
-		stack.raw_set( -3 );
-
-		//--- library ----------------------------------------------------------
-		push< const c8* >::call( stack, "library" );
-		stack.create_table( 0, 1 );
-
-		push< const c8* >::call( stack, "suffix" );
-		push< const c8* >::call( stack, library::suffix );
-		stack.raw_set( -3 );
-
-		stack.raw_set( -3 );
 
 		//--- registry ---------------------------------------------------------
 		push< const c8* >::call( stack, "registry" );

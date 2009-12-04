@@ -93,13 +93,13 @@ namespace ooe
 		return v8::V8::GetVersion();
 	}
 
-	void javascript::vm::setup( function_type function, const std::string& path )
+	void javascript::vm::setup( function_type function )
 	{
 		v8::Context::Scope context_scope( context );
 		v8::HandleScope handle_scope;
 		v8::TryCatch try_catch;
 
-		function( context->Global(), path );
+		function( context->Global() );
 
 		if ( try_catch.HasCaught() )
 			throw error::javascript( try_catch );

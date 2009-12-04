@@ -132,22 +132,9 @@ namespace ooe
 	}
 
 //--- javascript ---------------------------------------------------------------
-	void javascript::component_setup( v8::Handle< v8::Object > global, const std::string& path )
+	void javascript::component_setup( v8::Handle< v8::Object > global )
 	{
 		v8::Handle< v8::Object > ooe = v8::Object::New();
-
-		//--- executable -------------------------------------------------------
-		v8::Handle< v8::Object > executable = v8::Object::New();
-		ooe->Set( from< const c8* >::call( "executable" ), executable );
-
-		executable->Set( from< const c8* >::call( "path" ), from< std::string >::call( path ) );
-
-		//--- library ----------------------------------------------------------
-		v8::Handle< v8::Object > library = v8::Object::New();
-		ooe->Set( from< const c8* >::call( "library" ), library );
-
-		library->Set( from< const c8* >::call( "suffix" ),
-			from< const c8* >::call( library::suffix ) );
 
 		//--- registry ---------------------------------------------------------
 		v8::Handle< v8::Object > registry = v8::Object::New();
