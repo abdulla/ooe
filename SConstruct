@@ -88,6 +88,5 @@ build.Linkable( 'unit', 'test/unit', 'executable' )
 #--- external ------------------------------------------------------------------
 build.Executable( 'chunked', 'external/chunked', 'executable general parallel scene' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
-build.Executable( 'ipc_check', 'external/ipc_check', 'executable ipc' )
 build.Executable( 'monitor', 'external/monitor', 'executable general image' )
 build.Linkable( 'hello', 'external/hello', 'javascript lua registry' )
