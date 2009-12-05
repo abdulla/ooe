@@ -116,7 +116,7 @@ namespace
 					nameservice.insert( "ipcvector_test", ipcvector_test );
 					nameservice.insert( "jumbo_test", jumbo_test );
 
-					ipc::memory::server server( "/ooe.test.rpc", nameservice );
+					ipc::memory::server server( "/ooe.test.memory-rpc", nameservice );
 					ipc::barrier_notify( name );
 
 					while ( !executable::signal() )
@@ -137,7 +137,7 @@ namespace
 	{
 	public:
 		data( void )
-			: client( "/ooe.test.rpc" )
+			: client( "/ooe.test.memory-rpc" )
 		{
 		}
 
@@ -147,7 +147,7 @@ namespace
 
 	typedef unit::group< setup, data, 4 > group_type;
 	typedef group_type::fixture_type fixture_type;
-	group_type group( "rpc" );
+	group_type group( "memory rpc" );
 }
 
 namespace ooe
