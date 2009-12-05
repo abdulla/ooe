@@ -19,6 +19,24 @@ do\
 }\
 while ( false )
 
+#define except( reason, raise )\
+do\
+{\
+	try\
+	{\
+		raise;\
+		ooe::unit::fail();\
+		std::cerr <<\
+			reason "\n"\
+			"\tFile \"" __FILE__ "\", Line " << __LINE__ << ":\n"\
+			"\t" #raise "\n";\
+	}\
+	catch ( ... )\
+	{\
+	}\
+}\
+while ( false )
+
 namespace ooe
 {
 	namespace unit
