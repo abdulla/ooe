@@ -171,7 +171,7 @@ namespace ooe
 
 #if LIMIT
 //--- ipc::socket::invoke_member -----------------------------------------------
-	template< typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, const u8* data, u8* buffer_ptr, up_t, ooe::socket& socket,
@@ -192,7 +192,7 @@ namespace ooe
 		}
 	};
 
-	template< typename r, typename t0 COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, typename t ) >
+	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct ipc::socket::invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 	{
 		static void call( const any& any, const u8* data, u8* buffer_ptr, up_t buffer_size,
@@ -203,7 +203,7 @@ namespace ooe
 
 			t0* a0;
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, ARGUMENT, ~ )
-			stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+			stream_read< t0* COMMA BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) >::
 				call( data BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 			verify< t0* >::call( pool, a0, 1 );
