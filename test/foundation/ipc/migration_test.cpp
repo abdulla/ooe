@@ -33,7 +33,7 @@ namespace
 			socket_pair pair = make_pair();
 			ipc::semaphore semaphore( ipc::unique_name(), ipc::semaphore::create, 0 );
 
-			fork_ptr( new fork_io ).swap( fork0 );
+			fork_ptr( new scoped_fork ).swap( fork0 );
 
 			if ( fork0->is_child() )
 			{
@@ -52,7 +52,7 @@ namespace
 			}
 
 		 	semaphore.down();
-			fork_ptr( new fork_io ).swap( fork1 );
+			fork_ptr( new scoped_fork ).swap( fork1 );
 
 			if ( fork1->is_child() )
 			{
@@ -72,16 +72,8 @@ namespace
 		 	semaphore.down();
 		}
 
-		~setup( void )
-		{
-			fork1->signal( SIGTERM );
-			fork1->wait();
-			fork0->signal( SIGTERM );
-			fork0->wait();
-		}
-
 	private:
-		typedef scoped_ptr< fork_io > fork_ptr;
+		typedef scoped_ptr< scoped_fork > fork_ptr;
 
 		fork_ptr fork0;
 		fork_ptr fork1;
