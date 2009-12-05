@@ -121,7 +121,7 @@ namespace ooe
 		typedef t type;
 	};
 
-	template< typename r, typename t >
+	template< typename t, typename r >
 		struct remove_member< r t::* >
 	{
 		typedef r type;
@@ -301,12 +301,25 @@ namespace ooe
 
 namespace ooe
 {
+//--- remove_member ------------------------------------------------------------
+	template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+		struct remove_member< r ( t::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) const >
+	{
+		typedef r ( type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
+	};
+
 //--- function_of --------------------------------------------------------------
 	template< typename >
 		struct function_of;
 
 	template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		struct function_of< r ( t::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+	{
+		typedef r type( t* BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) );
+	};
+
+	template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+		struct function_of< r ( t::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) const >
 	{
 		typedef r type( t* BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) );
 	};
