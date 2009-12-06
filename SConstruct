@@ -67,7 +67,6 @@ build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/sock
 build.Linkable( 'maths', 'foundation/maths' )
 build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', ooe.pthread.library )
-build.Linkable( 'scene', 'foundation/scene', 'image io maths parallel' )
 
 #--- component -----------------------------------------------------------------
 build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
@@ -91,4 +90,5 @@ build.Linkable( 'unit', 'test/unit', 'executable' )
 build.Executable( 'chunked', 'external/chunked', 'executable general parallel scene' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'monitor', 'external/monitor', 'executable general image' )
+build.Linkable( 'scene', 'external/scene', 'image io maths parallel' )
 build.Linkable( 'hello', 'external/hello', 'javascript lua registry' )
