@@ -19,6 +19,9 @@ extend setup_path
 	- read /proc/curproc/file on freebsd
 	- would using realpath() help to resolve paths?
 
+extend socket descriptor send and receive
+	- use WSADuplicateSocket() under windows
+
 scheduler layered on top of ipc
 	- useful for guaranteeing that no one process can hog processing
 
