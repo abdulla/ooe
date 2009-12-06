@@ -1,3 +1,5 @@
+--[[ Copyright (C) 2009 Abdulla Kamar. All rights reserved. ]]
+
 --- query registry -------------------------------------------------------------
 local result = ooe.registry.find{ 'hello/FvvE' }
 local module = ooe.registry.load( result[ 1 ] )

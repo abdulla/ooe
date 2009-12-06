@@ -1,3 +1,5 @@
+/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+
 //--- query registry -----------------------------------------------------------
 var result = ooe.registry.find( [ 'hello/FvvE' ] );
 var module = ooe.registry.load( result[ 0 ] );

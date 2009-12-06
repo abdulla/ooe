@@ -1,3 +1,5 @@
+### Copyright (C) 2009 Abdulla Kamar. All rights reserved. ###
+
 class ooe:
 	compiler = 'g++'
 	include_path = ''

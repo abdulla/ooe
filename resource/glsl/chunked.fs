@@ -1,3 +1,5 @@
+/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+
 uniform sampler2D tex_1;
 uniform sampler2D tex_2;
 
