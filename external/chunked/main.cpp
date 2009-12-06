@@ -1,5 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#include "external/scene/cache.hpp"
+#include "external/scene/chunked.hpp"
 #include "foundation/executable/environment.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
@@ -8,8 +10,6 @@
 #include "foundation/general/video.hpp"
 #include "foundation/general/view.hpp"
 #include "foundation/parallel/scheduler.hpp"
-#include "foundation/scene/cache.hpp"
-#include "foundation/scene/chunked.hpp"
 
 namespace
 {
