@@ -16,7 +16,7 @@ namespace ooe
 
 		for ( up_t i = 0, j = 0; ( j = source.find( '\n', i ) ) != end; i = j + 1 )
 		{
-			if ( source[ i ] == '#' )
+			if ( source[ i ] == '#' || source[ i + 1 ] == '\n' )
 				continue;
 
 			std::string line = source.substr( i, j - i );
