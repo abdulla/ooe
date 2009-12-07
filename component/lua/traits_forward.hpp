@@ -179,7 +179,8 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::nil );
+			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::nil );
 		}
 	};
 
@@ -198,7 +199,8 @@ namespace ooe
 	{
 		static void call( stack& stack, bool& boolean, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::boolean );
+			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::boolean );
 			boolean = stack.to_boolean( index );
 		}
 	};
@@ -218,7 +220,8 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference number, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::number );
+			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::number );
 			number = stack.to_number( index );
 		}
 	};
@@ -238,8 +241,9 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::userdata );
-			pointer = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
+			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::userdata );
+			pointer = *static_cast< type* >( stack.to_userdata( index ) );
 		}
 	};
 
@@ -259,10 +263,12 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference string, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::string );
+			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::string );
+
 			up_t size;
 			const c8* data = stack.to_lstring( index, &size );
-			string = string_make< typename no_ref< t >::type >( data, size );
+			string = string_make< type >( data, size );
 		}
 	};
 
@@ -281,8 +287,9 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference pod, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::userdata );
-			std::memcpy( &pod, stack.to_userdata( index ), sizeof( typename no_ref< t >::type ) );
+			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::userdata );
+			std::memcpy( &pod, stack.to_userdata( index ), sizeof( type ) );
 		}
 	};
 
@@ -302,8 +309,9 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference class_, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::userdata );
-			class_ = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
+			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::userdata );
+			class_ = *static_cast< type* >( stack.to_userdata( index ) );
 		}
 	};
 
@@ -346,11 +354,10 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference destruct, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::userdata );
-
 			typedef typename no_ref< t >::type type;
-			destruct = *static_cast< typename type::pointer* >( stack.to_userdata( index ) );
+			type_check( stack, index, typeid( type ), lua::type::userdata );
 
+			destruct = *static_cast< typename type::pointer* >( stack.to_userdata( index ) );
 			stack.push_nil();
 			stack.set_metatable( index );
 		}
@@ -371,9 +378,9 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference array, s32 index )
 		{
-			type_check( stack, index, typeid( t ), type::table );
-
 			typedef typename no_ref< t >::type type;
+			type_check( stack, index, typeid( type ), lua::type::table );
+
 			up_t table_size = stack.objlen( index );
 			up_t array_size = extent< type >::value;
 
