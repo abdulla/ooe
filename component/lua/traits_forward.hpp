@@ -96,6 +96,9 @@ namespace ooe
 		template< typename >
 			void type_check( stack&, s32, type::id );
 
+//--- meta_set -----------------------------------------------------------------
+		inline void meta_set( stack&, s32, const std::type_info&, lua::cfunction );
+
 //--- destruct -----------------------------------------------------------------
 		template< typename >
 			s32 destruct( state* );
@@ -312,28 +315,17 @@ namespace ooe
 		{
 			typedef typename no_ref< t >::type type;
 			new( stack.new_userdata( sizeof( type ) ) ) type( class_ );
-
-			if ( stack.new_metatable( typeid( type ).name() ) )
-			{
-				push< const c8* >::call( stack, "__gc" );
-				stack.push_cclosure( destruct< type > );
-				stack.raw_set( -3 );
-			}
-
-			stack.set_metatable( -2 );
+			meta_set( stack, -2, typeid( type ), destruct< type > );
 		}
 	};
 
 //--- lua::traits: construct -------------------------------------------------------
-	template< typename t >
-		struct lua::to< t, typename enable_if< is_construct< t > >::type >
+	template< typename INVALID_USAGE >
+		struct lua::to< INVALID_USAGE, typename enable_if< is_construct< INVALID_USAGE > >::type >
 	{
-		static void call( stack& stack, typename call_traits< t >::reference construct, s32 index )
+		static void call( stack&, INVALID_USAGE, s32 ) OOE_CONST
 		{
-			typedef typename t::pointer pointer;
-			pointer p;
-			to< pointer >::call( stack, p, index );
-			construct = p;
+			BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 		}
 	};
 
@@ -342,17 +334,10 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::param_type construct )
 		{
-			typedef typename t::pointer pointer;
-			push< pointer >::call( stack, construct );
-
-			if ( stack.new_metatable( typeid( pointer ).name() ) )
-			{
-				push< const c8* >::call( stack, "__gc" );
-				stack.push_cclosure( destroy< typename t::value_type > );
-				stack.raw_set( -3 );
-			}
-
-			stack.set_metatable( -2 );
+			typedef typename no_ref< t >::type type;
+			typedef typename type::pointer pointer;
+			new( stack.new_userdata( sizeof( pointer ) ) ) pointer( construct );
+			meta_set( stack, -2, typeid( type ), destroy< typename type::value_type > );
 		}
 	};
 
@@ -362,34 +347,22 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference destruct, s32 index )
 		{
-			typedef typename t::pointer pointer;
-			pointer p;
-			to< pointer >::call( stack, p, index );
-			destruct = p;
+			type_check< t >( stack, index, type::userdata );
 
-			push< const c8* >::call( stack, typeid( pointer ).name() );
-			stack.raw_get( registry_index );
-			stack.get_metatable( index );
-
-			bool is_equal = stack.raw_equal( -1, -2 );
-			stack.pop( 2 );
-
-			if ( !is_equal )
-				throw error::lua() << "meta-table mismatch at index " << index << " for type \"" <<
-					demangle( typeid( pointer ).name() ) << "\" (got type " <<
-					stack.type_name( stack.type( index ) ) << ')';
+			typedef typename no_ref< t >::type type;
+			destruct = *static_cast< typename type::pointer* >( stack.to_userdata( index ) );
 
 			stack.push_nil();
 			stack.set_metatable( index );
 		}
 	};
 
-	template< typename t >
-		struct lua::push< t, typename enable_if< is_destruct< t > >::type >
+	template< typename INVALID_USAGE >
+		struct lua::push< INVALID_USAGE, typename enable_if< is_destruct< INVALID_USAGE > >::type >
 	{
-		static void call( stack& stack, typename call_traits< t >::param_type destruct )
+		static void call( stack&, INVALID_USAGE ) OOE_CONST
 		{
-			push< typename t::pointer >::call( stack, destruct );
+			BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 		}
 	};
 
@@ -448,6 +421,20 @@ namespace ooe
 		throw error::lua( stack ) << "bad argument at index " << index << " for type \"" <<
 			demangle( typeid( typename no_ref< t >::type ).name() ) << "\" (" <<
 			stack.type_name( id ) << " expected, got " << stack.type_name( type ) << ')';
+	}
+
+//--- lua::meta_set ------------------------------------------------------------
+	inline void lua::meta_set( stack& stack, s32 index, const std::type_info& type_info,
+		lua::cfunction gc )
+	{
+		if ( stack.new_metatable( type_info.name() ) )
+		{
+			push< const c8* >::call( stack, "__gc" );
+			stack.push_cclosure( gc );
+			stack.raw_set( -3 );
+		}
+
+		stack.set_metatable( index );
 	}
 
 //--- lua::destruct ------------------------------------------------------------

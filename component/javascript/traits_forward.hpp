@@ -331,16 +331,13 @@ namespace ooe
 	};
 
 //--- javascript::traits: construct --------------------------------------------
-	template< typename t >
-		struct javascript::to< t, typename enable_if< is_construct< t > >::type >
+	template< typename INVALID_USAGE >
+		struct javascript::to< INVALID_USAGE,
+		typename enable_if< is_construct< INVALID_USAGE > >::type >
 	{
-		static void call( const v8::Handle< v8::Value >& value,
-			typename call_traits< t >::reference construct )
+		static void call( const v8::Handle< v8::Value >& value, INVALID_USAGE ) OOE_CONST
 		{
-			typedef typename t::pointer pointer;
-			pointer p;
-			to< pointer >::call( value, p );
-			construct = p;
+			BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 		}
 	};
 
@@ -378,12 +375,14 @@ namespace ooe
 		}
 	};
 
-	template< typename t >
-		struct javascript::from< t, typename enable_if< is_destruct< t > >::type >
+	template< typename INVALID_USAGE >
+		struct javascript::from< INVALID_USAGE,
+		typename enable_if< is_destruct< INVALID_USAGE > >::type >
 	{
-		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type destruct )
+		static v8::Handle< v8::Value > call( INVALID_USAGE )
 		{
-			return from< typename t::pointer >::call( destruct );
+			BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+			return v8::Undefined();
 		}
 	};
 
