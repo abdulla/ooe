@@ -184,11 +184,11 @@ namespace ooe
 
 			stack.raw_geti( index, 1 );
 			to< typename type::first_type >::call( stack, pair.first, -1 );
-			stack.pop( 1 );
 
 			stack.raw_geti( index, 2 );
 			to< typename type::second_type >::call( stack, pair.second, -1 );
-			stack.pop( 1 );
+
+			stack.pop( 2 );
 		}
 	};
 
@@ -223,8 +223,7 @@ namespace ooe
 
 	#define TUPLE_TO( z, n, d )\
 		stack.raw_geti( index, n + 1 );\
-		to< typename tuple_element< n, t >::type >::call( stack, tuple._ ## n, -1 );\
-		stack.pop( 1 );
+		to< typename tuple_element< n, t >::type >::call( stack, tuple._ ## n, -1 );
 
 	#define TUPLE_PUSH( z, n, d )\
 		push< typename tuple_element< n, t >::type >::call( stack, tuple._ ## n );\
@@ -255,6 +254,7 @@ namespace ooe
 					"Table is of size " << table_size << ", tuple is of size " << LIMIT;
 
 			BOOST_PP_REPEAT( LIMIT, TUPLE_TO, ~ )
+			BOOST_PP_EXPR_IF( LIMIT, stack.pop( LIMIT ); )
 		}
 	};
 
