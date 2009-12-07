@@ -45,7 +45,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference container, s32 index )
 		{
-			type_check< t >( stack, index, type::table );
+			type_check( stack, index, typeid( t ), type::table );
 
 			typedef typename no_ref< t >::type type;
 			up_t table_size = stack.objlen( index );
@@ -92,7 +92,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference set, s32 index )
 		{
-			type_check< t >( stack, index, type::table );
+			type_check( stack, index, typeid( t ), type::table );
 
 			typedef typename no_ref< t >::type type;
 			type out;
@@ -132,7 +132,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference map, s32 index )
 		{
-			type_check< t >( stack, index, type::table );
+			type_check( stack, index, typeid( t ), type::table );
 
 			typedef typename no_ref< t >::type type;
 			type out;
@@ -174,7 +174,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference pair, s32 index )
 		{
-			type_check< t >( stack, index, type::table );
+			type_check( stack, index, typeid( t ), type::table );
 			up_t table_size = stack.objlen( index );
 
 			if ( table_size != 2 )
@@ -247,7 +247,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference tuple, s32 index )
 		{
-			type_check< t >( stack, index, type::table );
+			type_check( stack, index, typeid( t ), type::table );
 			up_t table_size = stack.objlen( index );
 
 			if ( table_size != LIMIT )

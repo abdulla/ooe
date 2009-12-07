@@ -93,8 +93,7 @@ namespace ooe
 			struct push< t, typename enable_if< is_array< t > >::type >;
 
 //--- type_check ---------------------------------------------------------------
-		template< typename >
-			void type_check( stack&, s32, type::id );
+		inline void type_check( stack&, s32, const std::type_info&, type::id );
 
 //--- meta_set -----------------------------------------------------------------
 		inline void meta_set( stack&, s32, const std::type_info&, lua::cfunction );
@@ -180,7 +179,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference, s32 index )
 		{
-			type_check< t >( stack, index, type::nil );
+			type_check( stack, index, typeid( t ), type::nil );
 		}
 	};
 
@@ -199,7 +198,7 @@ namespace ooe
 	{
 		static void call( stack& stack, bool& boolean, s32 index )
 		{
-			type_check< bool >( stack, index, type::boolean );
+			type_check( stack, index, typeid( t ), type::boolean );
 			boolean = stack.to_boolean( index );
 		}
 	};
@@ -219,7 +218,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference number, s32 index )
 		{
-			type_check< t >( stack, index, type::number );
+			type_check( stack, index, typeid( t ), type::number );
 			number = stack.to_number( index );
 		}
 	};
@@ -239,7 +238,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
 		{
-			type_check< t >( stack, index, type::userdata );
+			type_check( stack, index, typeid( t ), type::userdata );
 			pointer = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
 		}
 	};
@@ -260,7 +259,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference string, s32 index )
 		{
-			type_check< t >( stack, index, type::string );
+			type_check( stack, index, typeid( t ), type::string );
 			up_t size;
 			const c8* data = stack.to_lstring( index, &size );
 			string = string_make< typename no_ref< t >::type >( data, size );
@@ -282,7 +281,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference pod, s32 index )
 		{
-			type_check< t >( stack, index, type::userdata );
+			type_check( stack, index, typeid( t ), type::userdata );
 			std::memcpy( &pod, stack.to_userdata( index ), sizeof( typename no_ref< t >::type ) );
 		}
 	};
@@ -303,7 +302,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference class_, s32 index )
 		{
-			type_check< t >( stack, index, type::userdata );
+			type_check( stack, index, typeid( t ), type::userdata );
 			class_ = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
 		}
 	};
@@ -347,7 +346,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference destruct, s32 index )
 		{
-			type_check< t >( stack, index, type::userdata );
+			type_check( stack, index, typeid( t ), type::userdata );
 
 			typedef typename no_ref< t >::type type;
 			destruct = *static_cast< typename type::pointer* >( stack.to_userdata( index ) );
@@ -372,7 +371,7 @@ namespace ooe
 	{
 		static void call( stack& stack, typename call_traits< t >::reference array, s32 index )
 		{
-			type_check< t >( stack, index, type::table );
+			type_check( stack, index, typeid( t ), type::table );
 
 			typedef typename no_ref< t >::type type;
 			up_t table_size = stack.objlen( index );
@@ -409,8 +408,8 @@ namespace ooe
 	};
 
 //--- lua::type_check ----------------------------------------------------------
-	template< typename t >
-		void lua::type_check( stack& stack, s32 index, type::id id )
+	inline void lua::type_check( stack& stack, s32 index, const std::type_info& type_info,
+		type::id id )
 	{
 		type::id type = stack.type( index );
 
@@ -419,8 +418,8 @@ namespace ooe
 
 		stack.where();
 		throw error::lua( stack ) << "bad argument at index " << index << " for type \"" <<
-			demangle( typeid( typename no_ref< t >::type ).name() ) << "\" (" <<
-			stack.type_name( id ) << " expected, got " << stack.type_name( type ) << ')';
+			demangle( type_info.name() ) << "\" (" << stack.type_name( id ) << " expected, got " <<
+			stack.type_name( type ) << ')';
 	}
 
 //--- lua::meta_set ------------------------------------------------------------
