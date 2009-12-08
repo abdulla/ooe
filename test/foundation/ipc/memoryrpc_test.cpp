@@ -257,6 +257,10 @@ namespace ooe
 
 			ipc::memory::call< void ( print* ) > print_show( client, "print_show" );
 			except( "null-pointer argument", print_show( 0 ) );
+
+			ipc::memory::call< void ( destruct_ptr< print > ) >
+				print_destruct( client, "print_destruct" );
+			except( "unknown destruct_ptr argument", print_destruct( 0 ) );
 		}
 	}
 }

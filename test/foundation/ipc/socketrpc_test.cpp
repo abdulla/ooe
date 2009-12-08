@@ -235,6 +235,10 @@ namespace ooe
 
 			ipc::socket::call< void ( print* ) > print_show( client, "print_show" );
 			except( "null-pointer argument", print_show( 0 )() );
+
+			ipc::socket::call< void ( destruct_ptr< print > ) >
+				print_destruct( client, "print_destruct" );
+			except( "unknown destruct_ptr argument", print_destruct( 0 )() );
 		}
 	}
 }
