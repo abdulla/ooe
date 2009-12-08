@@ -1,6 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/ipc/pool.hpp"
+#include "foundation/utility/convert.hpp"
 
 namespace ooe
 {
@@ -13,18 +14,23 @@ namespace ooe
 			i->second( i->first );
 	}
 
-	void ipc::pool::insert( const void* pointer, function_type function )
+	void ipc::pool::insert( const void* p, function_type f )
 	{
-		map.insert( map_type::value_type( pointer, function ) );
+		map.insert( map_type::value_type( p, f ) );
 	}
 
-	void ipc::pool::erase( const void* pointer )
+	void ipc::pool::erase( const void* p )
 	{
-		map.erase( pointer );
+		map_type::iterator i = map.find( p );
+
+		if ( i == map.end() )
+			throw error::runtime( "pool: " ) << "Unknown pointer " << ptr( p );
+
+		map.erase( i );
 	}
 
-	bool ipc::pool::find( const void* pointer ) const
+	bool ipc::pool::find( const void* p ) const
 	{
-		return map.find( pointer ) != map.end();
+		return map.find( p ) != map.end();
 	}
 }
