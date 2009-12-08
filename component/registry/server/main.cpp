@@ -109,24 +109,18 @@ namespace
 
 		for ( name_iterator i = names.begin(), end = names.end(); i != end; ++i )
 		{
-			info_tuple info;
+			typedef std::pair< module_map::const_iterator, module_map::const_iterator > pair_type;
+			read_lock lock( mutex );
 
+			for ( pair_type j = map.equal_range( *i ); j.first != j.second; ++j.first )
 			{
-				read_lock lock( mutex );
-				module_map::const_iterator j = map.find( *i );
+				histogram_map::iterator k = histogram.find( j.first->second );
 
-				if ( j == map.end() )
-					continue;
-
-				info = j->second;
+				if ( k == histogram.end() )
+					histogram.insert( histogram_map::value_type( j.first->second, 1 ) );
+				else
+					++k->second;
 			}
-
-			histogram_map::iterator k = histogram.find( info );
-
-			if ( k == histogram.end() )
-				histogram.insert( histogram_map::value_type( info, 1 ) );
-			else
-				++k->second;
 		}
 
 		typedef histogram_map::const_iterator histogram_iterator;
