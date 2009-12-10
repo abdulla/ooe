@@ -11,6 +11,11 @@
 
 	namespace traits = std::tr1;
 #else
+	#if !defined( BOOST_MSVC_FULL_VER ) && !defined( BOOST_MSVC_FULL_VER_WORKAROUND_GUARD )
+	#define BOOST_MSVC_FULL_VER 0
+	#define BOOST_MSVC_FULL_VER_WORKAROUND_GUARD 0
+	#endif
+
 	#include <boost/type_traits.hpp>
 
 	namespace traits = boost;
