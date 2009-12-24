@@ -100,8 +100,8 @@ OOE_HIDDEN
 
 //--- Sight( Delegate ) --------------------------------------------------------
 @interface Sight( Delegate )
-- ( void ) captureOutput: ( QTCaptureOutput* )output_ didOutputVideoFrame: ( CVImageBufferRef )frame
-	withSampleBuffer: ( QTSampleBuffer* )buffer fromConnection: ( QTCaptureConnection* )connection;
+- ( void ) captureOutput: ( QTCaptureOutput* )output_ didOutputVideoFrame: ( CVImageBufferRef )image
+	withSampleBuffer: ( QTSampleBuffer* )sample fromConnection: ( QTCaptureConnection* )connection;
 @end
 
 @implementation Sight( Delegate )
