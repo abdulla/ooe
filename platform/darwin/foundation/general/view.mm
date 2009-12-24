@@ -1,5 +1,6 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
+#undef __CONSTANT_CFSTRINGS__
 #include <AppKit/AppKit.h>
 
 #include "foundation/general/view.hpp"
@@ -64,12 +65,31 @@ namespace ooe
 		if ( !full )
 			return;
 
+		CFArrayRef modes = CGDisplayCopyAllDisplayModes( display, 0 );
+		CGDisplayMode* mode = 0;
+
+		for ( sp_t i = 0; i != CFArrayGetCount( modes ); ++i )
+		{
+			CGDisplayMode* current = ( CGDisplayMode* )CFArrayGetValueAtIndex( modes, i );
+
+			if ( CGDisplayModeGetWidth( current ) != width &&
+				CGDisplayModeGetHeight( current ) != height )
+				continue;
+
+			CFStringRef encoding = CGDisplayModeCopyPixelEncoding( current );
+
+			if ( !CFStringCompare( encoding, CFSTR( IO32BitDirectPixels ), 0 ) )
+			{
+				mode = current;
+				break;
+			}
+		}
+
 		CGDisplayCapture( display );
-		CFDictionaryRef mode = CGDisplayBestModeForParameters( display, 24, width, height, 0 );
 
 		if ( !mode )
 			throw error::runtime( "view: " ) << "Unable to find display mode";
-		else if ( CGDisplaySwitchToMode( display, mode ) )
+		else if ( CGDisplaySetDisplayMode( display, mode, 0 ) )
 			throw error::runtime( "view: " ) << "Unable to set display mode";
 	}
 
