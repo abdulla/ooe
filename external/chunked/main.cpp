@@ -63,6 +63,9 @@ namespace
 
 	void setup_key( u32 value, bool press, vec3& translate, up_t& speed )
 	{
+		if ( !press )
+			return;
+
 		switch ( value )
 		{
 		case '.':
@@ -98,8 +101,7 @@ namespace
 			break;
 
 		case 'q':
-			if ( !press )
-				executable::quit();
+			executable::quit();
 
 		default:
 			break;
