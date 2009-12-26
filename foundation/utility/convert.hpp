@@ -43,22 +43,6 @@ namespace ooe
 	}
 
 	template< typename type >
-		type& operator <<( type& out, s64 value )
-	{
-		c8 buffer[ 32 ];
-		std::snprintf( buffer, sizeof( buffer ), "%lli", value );
-		return out << buffer;
-	}
-
-	template< typename type >
-		type& operator <<( type& out, u64 value )
-	{
-		c8 buffer[ 32 ];
-		std::snprintf( buffer, sizeof( buffer ), "%llu", value );
-		return out << buffer;
-	}
-
-	template< typename type >
 		type& operator <<( type& out, sp_t value )
 	{
 		c8 buffer[ 32 ];
@@ -110,16 +94,6 @@ namespace ooe
 		return hexadecimal< u32 >( value );
 	}
 
-	inline hexadecimal< u64 > hex( s64 value )
-	{
-		return hexadecimal< u64 >( value );
-	}
-
-	inline hexadecimal< u64 > hex( u64 value )
-	{
-		return hexadecimal< u64 >( value );
-	}
-
 	inline hexadecimal< up_t > hex( sp_t value )
 	{
 		return hexadecimal< up_t >( value );
@@ -135,14 +109,6 @@ namespace ooe
 	{
 		c8 buffer[ 32 ];
 		std::snprintf( buffer, sizeof( buffer ), "%x", hex.value );
-		return out << buffer;
-	}
-
-	template< typename type >
-		type& operator <<( type& out, hexadecimal< u64 > hex )
-	{
-		c8 buffer[ 32 ];
-		std::snprintf( buffer, sizeof( buffer ), "%llx", hex.value );
 		return out << buffer;
 	}
 
@@ -206,6 +172,43 @@ namespace ooe
 
 		return out;
 	}
+
+#ifndef __LP64__
+//--- ilp32 --------------------------------------------------------------------
+	template< typename type >
+		type& operator <<( type& out, s64 value )
+	{
+		c8 buffer[ 32 ];
+		std::snprintf( buffer, sizeof( buffer ), "%lli", value );
+		return out << buffer;
+	}
+
+	template< typename type >
+		type& operator <<( type& out, u64 value )
+	{
+		c8 buffer[ 32 ];
+		std::snprintf( buffer, sizeof( buffer ), "%llu", value );
+		return out << buffer;
+	}
+
+	inline hexadecimal< u64 > hex( s64 value )
+	{
+		return hexadecimal< u64 >( value );
+	}
+
+	inline hexadecimal< u64 > hex( u64 value )
+	{
+		return hexadecimal< u64 >( value );
+	}
+
+	template< typename type >
+		type& operator <<( type& out, hexadecimal< u64 > hex )
+	{
+		c8 buffer[ 32 ];
+		std::snprintf( buffer, sizeof( buffer ), "%llx", hex.value );
+		return out << buffer;
+	}
+#endif
 }
 
 #endif	// OOE_FOUNDATION_UTILITY_CONVERT_HPP
