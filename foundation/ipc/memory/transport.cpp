@@ -15,4 +15,9 @@ namespace ooe
 	{
 		return memory.name();
 	}
+
+	void ipc::memory::transport::unlink( void )
+	{
+		memory.unlink();
+	}
 }

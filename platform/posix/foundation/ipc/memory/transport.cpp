@@ -94,11 +94,6 @@ namespace ooe
 		return memory.size() - sizeof( platform::ipc::unnamed_semaphore ) * 2 - private_size;
 	}
 
-	void ipc::memory::transport::unlink( void )
-	{
-		memory.unlink();
-	}
-
 	void ipc::memory::transport::migrate( ooe::socket& socket )
 	{
 		socket.send( memory );

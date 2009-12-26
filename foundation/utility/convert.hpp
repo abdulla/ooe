@@ -43,6 +43,22 @@ namespace ooe
 	}
 
 	template< typename type >
+		type& operator <<( type& out, s64 value )
+	{
+		c8 buffer[ 32 ];
+		std::snprintf( buffer, sizeof( buffer ), "%lli", value );
+		return out << buffer;
+	}
+
+	template< typename type >
+		type& operator <<( type& out, u64 value )
+	{
+		c8 buffer[ 32 ];
+		std::snprintf( buffer, sizeof( buffer ), "%llu", value );
+		return out << buffer;
+	}
+
+	template< typename type >
 		type& operator <<( type& out, sp_t value )
 	{
 		c8 buffer[ 32 ];
@@ -104,6 +120,16 @@ namespace ooe
 		return hexadecimal< u64 >( value );
 	}
 
+	inline hexadecimal< up_t > hex( sp_t value )
+	{
+		return hexadecimal< up_t >( value );
+	}
+
+	inline hexadecimal< up_t > hex( up_t value )
+	{
+		return hexadecimal< up_t >( value );
+	}
+
 	template< typename type >
 		type& operator <<( type& out, hexadecimal< u32 > hex )
 	{
@@ -117,6 +143,14 @@ namespace ooe
 	{
 		c8 buffer[ 32 ];
 		std::snprintf( buffer, sizeof( buffer ), "%llx", hex.value );
+		return out << buffer;
+	}
+
+	template< typename type >
+		type& operator <<( type& out, hexadecimal< up_t > hex )
+	{
+		c8 buffer[ 32 ];
+		std::snprintf( buffer, sizeof( buffer ), "%lx", hex.value );
 		return out << buffer;
 	}
 

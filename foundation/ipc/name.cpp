@@ -15,10 +15,10 @@ namespace
 namespace ooe
 {
 //--- ipc ----------------------------------------------------------------------
-	std::string ipc::link_name( pid_t pid, u32 link_id )
+	std::string ipc::link_name( pid_t pid, time_t time, u32 link_id )
 	{
 		std::string name( "/ooe." );
-		return name << hex( pid ) << 'l' << hex( link_id );
+		return name << hex( pid ) << 't' << hex( time ) << 'l' << hex( link_id );
 	}
 
 	std::string ipc::local_name( const std::string& name )
@@ -29,6 +29,6 @@ namespace ooe
 	std::string ipc::unique_name( void )
 	{
 		std::string name( "/ooe." );
-		return name << hex( getpid() ) << 'r' << hex( seed++ );
+		return name << hex( getpid() ) << 'u' << hex( seed++ );
 	}
 }

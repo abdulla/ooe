@@ -10,28 +10,14 @@
 
 namespace ooe
 {
-	class descriptor;
-
 	namespace ipc
 	{
-		class semaphore_id;
 		class semaphore;
 		class process_lock;
 
 		class barrier_wait;
 		void barrier_notify( const std::string& ) OOE_VISIBLE;
 	}
-
-//--- ipc::semaphore_id --------------------------------------------------------
-	class ipc::semaphore_id
-	{
-	public:
-		semaphore_id( const std::string& );
-		~semaphore_id( void );
-
-	private:
-		std::string name;
-	};
 
 //--- ipc::semaphore -----------------------------------------------------------
 	class OOE_VISIBLE ipc::semaphore
@@ -49,15 +35,12 @@ namespace ooe
 		void up( void );
 		void down( void );
 
+		std::string name( void ) const;
 		void unlink( void );
 
-#ifdef __APPLE__
-		semaphore( const descriptor& );
-		operator descriptor( void ) const;
-#endif
-
 	private:
-		scoped_ptr< semaphore_id > id;
+		const std::string name_;
+		bool unlinkable;
 		sem_t* const sem;
 	};
 

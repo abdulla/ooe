@@ -10,7 +10,7 @@ namespace ooe
 {
 	namespace ipc
 	{
-		std::string link_name( pid_t, u32 );
+		std::string link_name( pid_t, time_t, u32 );
 		std::string local_name( const std::string& );
 		std::string unique_name( void ) OOE_VISIBLE;
 	}

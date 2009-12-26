@@ -26,9 +26,10 @@ namespace
 		ipc::memory::write_buffer& buffer, ipc::pool& )
 	{
 		pid_t pid;
-		ipc::stream_read< pid_t >::call( header_adjust( buffer ), pid );
+		time_t time;
+		ipc::stream_read< pid_t, time_t >::call( header_adjust( buffer ), pid, time );
 
-		u32 link = static_cast< ipc::memory::server* >( any.pointer )->link( pid );
+		u32 link = static_cast< ipc::memory::server* >( any.pointer )->link( pid, time );
 		up_t size = ipc::stream_size< u32 >::call( link );
 		u8* pointer = return_write( buffer_ptr, buffer_size, buffer, size );
 		ipc::stream_write< u32 >::call( pointer, link );
@@ -53,11 +54,11 @@ namespace
 namespace ooe
 {
 //--- ipc::memory::servlet -------------------------------------------------------------
-	ipc::memory::servlet::servlet( pid_t pid, u32 link_id_, const memory::switchboard& switchboard_,
-		server& server )
-		: link_id( link_id_ ), transport( link_name( pid, link_id ), transport::create ),
-		switchboard( switchboard_ ), listen( new link_listen( link_name( pid, link_id ) ) ),
-		link( 0 ), state( work ), thread( make_function( *this, &servlet::call ), &server )
+	ipc::memory::servlet::servlet( const std::string& link_name, u32 link_id_,
+		const memory::switchboard& switchboard_, server& server )
+		: link_id( link_id_ ), transport( link_name, transport::create ),
+		switchboard( switchboard_ ), listen( new link_listen( link_name ) ), link( 0 ),
+		state( work ), thread( make_function( *this, &servlet::call ), &server )
 	{
 	}
 
@@ -153,10 +154,12 @@ namespace ooe
 	}
 
 	// note: no need for lock or atomics, semaphore is used when calling link/unlink via decode
-	u32 ipc::memory::server::link( pid_t pid )
+	u32 ipc::memory::server::link( pid_t pid, time_t time )
 	{
 		u32 link_id = seed++;
-		servlet_map::value_type value( link_id, new servlet( pid, link_id, external, *this ) );
+		std::string link_name = ipc::link_name( pid, time, link_id );
+		servlet_map::value_type
+			value( link_id, new servlet( link_name, link_id, external, *this ) );
 		servlets.insert( servlets.end(), value );
 		return link_id;
 	}

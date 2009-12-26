@@ -27,8 +27,11 @@ namespace ooe
 		operator memory::transport&( void );
 
 	private:
-		scoped_ptr< memory::transport > transport;
-		link_client link;
+		typedef scoped_ptr< memory::transport > transport_ptr;
+		typedef scoped_ptr< link_client > link_ptr;
+
+		transport_ptr transport;
+		link_ptr link;
 	};
 
 //--- ipc::memory::shared_data -------------------------------------------------
