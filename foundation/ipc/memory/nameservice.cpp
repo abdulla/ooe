@@ -14,9 +14,7 @@ namespace
 		ipc::stream_read< const c8*, const c8* >::call( header_adjust( buffer ), name, type );
 
 		u32 value = static_cast< ipc::memory::nameservice* >( any.pointer )->find( name, type );
-		up_t size = ipc::stream_size< u32 >::call( value );
-		u8* pointer = return_write( buffer_ptr, buffer_size, buffer, size );
-		ipc::stream_write< u32 >::call( pointer, value );
+		ipc::memory::return_write< u32 >( buffer_ptr, buffer_size, buffer, value );
 	}
 
 	void ipc_list( const any& any, u8* buffer_ptr, up_t buffer_size,
@@ -24,9 +22,7 @@ namespace
 	{
 		typedef ipc::memory::nameservice::list_type list_type;
 		list_type value = static_cast< ipc::memory::nameservice* >( any.pointer )->list();
-		up_t size = ipc::stream_size< list_type >::call( value );
-		u8* pointer = return_write( buffer_ptr, buffer_size, buffer, size );
-		ipc::stream_write< list_type >::call( pointer, value );
+		ipc::memory::return_write< list_type >( buffer_ptr, buffer_size, buffer, value );
 	}
 
 	void ipc_find_all( const any& any, u8* buffer_ptr, up_t buffer_size,
@@ -46,9 +42,7 @@ namespace
 		for ( in_type::const_iterator i = in.begin(), end = in.end(); i != end; ++i )
 			out.push_back( nameservice.find( i->_0, i->_1 ) );
 
-		up_t size = ipc::stream_size< out_type >::call( out );
-		u8* pointer = return_write( buffer_ptr, buffer_size, buffer, size );
-		ipc::stream_write< out_type >::call( pointer, out );
+		ipc::memory::return_write< out_type >( buffer_ptr, buffer_size, buffer, out );
 	}
 }
 
@@ -94,7 +88,7 @@ namespace ooe
 		map.insert( map_type::value_type( map_tuple( name, type ), index ) );
 	}
 
-	void ipc::memory::nameservice:: insert_direct
+	void ipc::memory::nameservice::insert_direct
 		( const std::string& name, const std::string& type, switchboard::call_type call, any any )
 	{
 		insert_direct( name, type, switchboard.insert_direct( call, any ) );

@@ -30,9 +30,7 @@ namespace
 		ipc::stream_read< pid_t, time_t >::call( header_adjust( buffer ), pid, time );
 
 		u32 link = static_cast< ipc::memory::server* >( any.pointer )->link( pid, time );
-		up_t size = ipc::stream_size< u32 >::call( link );
-		u8* pointer = return_write( buffer_ptr, buffer_size, buffer, size );
-		ipc::stream_write< u32 >::call( pointer, link );
+		ipc::memory::return_write< u32 >( buffer_ptr, buffer_size, buffer, link );
 	}
 
 	void ipc_unlink( const any& any, u8* buffer_ptr, up_t buffer_size,
@@ -42,7 +40,7 @@ namespace
 		ipc::stream_read< u32 >::call( header_adjust( buffer ), link );
 
 		static_cast< ipc::memory::server* >( any.pointer )->unlink( link );
-		return_write( buffer_ptr, buffer_size, buffer );
+		ipc::memory::return_write( buffer_ptr, buffer_size, buffer );
 	}
 
 	void release( scoped_ptr< ipc::memory::link_server >& link )

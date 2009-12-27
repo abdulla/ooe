@@ -25,6 +25,10 @@ namespace ooe
 				struct invoke_member;
 
 			inline u8* return_write( u8*, up_t, write_buffer&, up_t = 0, error::ipc = error::none );
+
+			template< typename r >
+				void return_write
+				( u8*, up_t, write_buffer&, typename call_traits< r >::param_type );
 		}
 	}
 
@@ -72,6 +76,15 @@ namespace ooe
 
 		stream_write< u32 >::call( data, error );
 		return data + sizeof( u32 );
+	}
+
+	template< typename r >
+		void ipc::memory::return_write( u8* buffer_ptr, up_t buffer_size, write_buffer& buffer,
+		typename call_traits< r >::param_type value )
+	{
+		up_t size = stream_size< r >::call( value );
+		u8* data = return_write( buffer_ptr, buffer_size, buffer, size );
+		stream_write< r >::call( data, value );
 	}
 }
 
@@ -148,8 +161,7 @@ namespace ooe
 			BOOST_PP_REPEAT( LIMIT, VERIFY, ~ )
 			r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 			verify< r >::call( pool, value, 0 );
-			up_t size = stream_size< r >::call( value );
-			stream_write< r >::call( return_write( buffer_ptr, buffer_size, buffer, size ), value );
+			return_write< r >( buffer_ptr, buffer_size, buffer, value );
 		}
 	};
 
@@ -194,8 +206,7 @@ namespace ooe
 			BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, VERIFY, ~ )
 			r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 			verify< r >::call( pool, value, 0 );
-			up_t size = stream_size< r >::call( value );
-			stream_write< r >::call( return_write( buffer_ptr, buffer_size, buffer, size ), value );
+			return_write< r >( buffer_ptr, buffer_size, buffer, value );
 		}
 	};
 #endif
