@@ -10,9 +10,9 @@ namespace
 {
 	using namespace ooe;
 
-	s32 mode( library::type flag )
+	s32 mode( library::type type )
 	{
-		switch ( flag )
+		switch ( type )
 		{
 		case library::local_lazy:
 			return RTLD_LOCAL | RTLD_LAZY;
@@ -27,13 +27,13 @@ namespace
 			return RTLD_GLOBAL | RTLD_NOW;
 
 		default:
-			throw error::runtime( "library: " ) << "Unknown type: " << flag;
+			throw error::runtime( "library: " ) << "Unknown type: " << type;
 		}
 	}
 
-	void* mode( library::find_type flag )
+	void* mode( library::find_type type )
 	{
-		switch ( flag )
+		switch ( type )
 		{
 		case library::all:
 			return RTLD_DEFAULT;
@@ -42,7 +42,7 @@ namespace
 			return RTLD_NEXT;
 
 		default:
-			throw error::runtime( "library: " ) << "Unknown find type: " << flag;
+			throw error::runtime( "library: " ) << "Unknown find type: " << type;
 		}
 	}
 

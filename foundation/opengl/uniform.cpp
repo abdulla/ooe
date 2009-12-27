@@ -115,7 +115,7 @@ namespace
 			return load_f< ooe::uniform::mat_4 >;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown uniform type";
+			throw error::runtime( "opengl: " ) << "Unknown uniform type: " << type;
 		}
 	}
 }

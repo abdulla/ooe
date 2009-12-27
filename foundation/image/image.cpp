@@ -58,7 +58,7 @@ namespace ooe
 			return 4;
 
 		default:
-			throw error::runtime( "uncompressed_image: " ) << "Unknown image type";
+			throw error::runtime( "uncompressed_image: " ) << "Unknown image type: " << format;
 		}
 	}
 
@@ -90,7 +90,7 @@ namespace ooe
 			return 4;
 
 		default:
-			throw error::runtime( "uncompressed_image: " ) << "Unknown image type";
+			throw error::runtime( "uncompressed_image: " ) << "Unknown image type: " << format;
 		}
 	}
 
@@ -133,7 +133,7 @@ namespace ooe
 			return 4;
 
 		default:
-			throw error::runtime( "compressed_image: " ) << "Unknown image type";
+			throw error::runtime( "compressed_image: " ) << "Unknown image type: " << format;
 		}
 	}
 
@@ -149,7 +149,7 @@ namespace ooe
 			return 16;
 
 		default:
-			throw error::runtime( "compressed_image: " ) << "Unknown image type";
+			throw error::runtime( "compressed_image: " ) << "Unknown image type: " << format;
 		}
 	}
 

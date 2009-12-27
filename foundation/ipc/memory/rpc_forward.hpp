@@ -60,7 +60,7 @@ namespace ooe
 			throw error::rpc( executed ) << what << "\n\nServer stack trace:" << where;
 
 		default:
-			throw error::rpc( false ) << "Unknown error code: " << type;
+			throw error::rpc( false ) << "Unknown error: " << type;
 		}
 	}
 }

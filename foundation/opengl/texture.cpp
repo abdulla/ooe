@@ -49,7 +49,7 @@ namespace ooe
 			return;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown environment type";
+			throw error::runtime( "opengl: " ) << "Unknown environment type: " << type;
 		};
 	}
 
@@ -98,14 +98,14 @@ namespace ooe
 			break;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown texture parameter";
+			throw error::runtime( "opengl: " ) << "Unknown texture parameter: " << type;
 		}
 
 		TexParameteri( TEXTURE_2D, key_1, value_1 );
 		TexParameteri( TEXTURE_2D, key_2, value_2 );
 	}
 
-	void opengl::texture::load( const void* data, u32 width, u32 height, u8 image_type, u8 flags )
+	void opengl::texture::load( const void* data, u32 width, u32 height, u8 format, u8 flags )
 	{
 		s32 internal;
 		s32 external = 0;
@@ -114,7 +114,7 @@ namespace ooe
 		u32 block = 0;
 		bool compressed = false;
 
-		switch ( image_type )
+		switch ( format )
 		{
 		case uncompressed_image::bgr_u8:
 			internal = RGB8;
@@ -242,7 +242,7 @@ namespace ooe
 
 		//----------------------------------------------------------------------
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown texture format";
+			throw error::runtime( "opengl: " ) << "Unknown texture format: " << format;
 		}
 
 		TexParameteri( TEXTURE_2D, GENERATE_MIPMAP, true );

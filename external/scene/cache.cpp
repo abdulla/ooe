@@ -44,11 +44,11 @@ namespace ooe
 		if ( i != textures.end() )
 			return *i->second;
 
-		std::string image_type = extension( name );
-		decoder_map::const_iterator j = decoders.find( image_type );
+		std::string type = extension( name );
+		decoder_map::const_iterator j = decoders.find( type );
 
 		if ( j == decoders.end() )
-			throw error::runtime( "cache: " ) << "Unknown image type \"" << image_type << '\"';
+			throw error::runtime( "cache: " ) << "Unknown image type: " << type;
 
 		image image = j->second( vfs[ name ] );
 		texture_ptr pointer = video.texture();

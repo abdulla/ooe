@@ -32,7 +32,7 @@ namespace
 			return 16;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown attribute type";
+			throw error::runtime( "opengl: " ) << "Unknown attribute type: " << type;
 		}
 	}
 }
@@ -40,8 +40,8 @@ namespace
 namespace ooe
 {
 //--- attribute ----------------------------------------------------------------
-	opengl::attribute::attribute( u32 program, const c8* name, type value )
-		: id( GetAttribLocation( program, name ) ), size( size_f( value ) )
+	opengl::attribute::attribute( u32 program, const c8* name, type flag )
+		: id( GetAttribLocation( program, name ) ), size( size_f( flag ) )
 	{
 		if ( id == -1 )
 			throw error::runtime( "opengl: " ) << "Invalid attribute \"" << name << '\"';

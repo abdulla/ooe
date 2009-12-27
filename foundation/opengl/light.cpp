@@ -41,7 +41,7 @@ namespace ooe
 			break;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown parameter type";
+			throw error::runtime( "opengl: " ) << "Unknown parameter type: " << type;
 		}
 
 		Lightfv( LIGHT0 + id, parameter_, values );

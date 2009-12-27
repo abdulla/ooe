@@ -153,7 +153,7 @@ namespace
 			break;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown matrix type";
+			throw error::runtime( "opengl: " ) << "Unknown matrix type: " << type;
 		}
 
 		MatrixMode( mode );
@@ -202,7 +202,7 @@ namespace
 			break;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown enable type";
+			throw error::runtime( "opengl: " ) << "Unknown enable type: " << type;
 		}
 
 		if ( enable_ )
@@ -338,7 +338,7 @@ namespace
 				break;
 
 			default:
-				throw error::runtime( "opengl: " ) << "Unknown layout type";
+				throw error::runtime( "opengl: " ) << "Unknown layout type: " << data.layout[ i ];
 			}
 		}
 
@@ -387,7 +387,7 @@ namespace
 			break;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown maximum type";
+			throw error::runtime( "opengl: " ) << "Unknown maximum type: " << type;
 		}
 
 		return maximum_;
@@ -448,7 +448,7 @@ namespace
 			return ONE_MINUS_DST_ALPHA;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown function type";
+			throw error::runtime( "opengl: " ) << "Unknown function type: " << mode;
 		}
 	}
 
@@ -472,7 +472,7 @@ namespace
 			return MAX;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown equation type";
+			throw error::runtime( "opengl: " ) << "Unknown equation type: " << mode;
 		}
 	}
 
@@ -505,7 +505,7 @@ namespace
 			return GEQUAL;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown compare type";
+			throw error::runtime( "opengl: " ) << "Unknown compare type: " << mode;
 		}
 	}
 
@@ -535,7 +535,7 @@ namespace
 			return QUADS;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown mode type";
+			throw error::runtime( "opengl: " ) << "Unknown mode type: " << mode;
 		}
 	}
 
@@ -591,7 +591,7 @@ namespace
 				break;
 
 			default:
-				throw error::runtime( "opengl: " ) << "Unknown layout type";
+				throw error::runtime( "opengl: " ) << "Unknown layout type: " << data.layout[ i ];
 			}
 		}
 

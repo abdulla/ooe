@@ -20,7 +20,7 @@ namespace
 		s32 fd;
 	};
 
-	s32 internet_family( internet_query::type type )
+	s32 family( internet_query::type type )
 	{
 		switch ( type )
 		{
@@ -34,7 +34,7 @@ namespace
 			return AF_INET6;
 
 		default:
-			throw error::io( "internet_query: " ) << "Unknown type specified: " << type;
+			throw error::io( "internet_query: " ) << "Unknown type: " << type;
 		}
 	}
 
@@ -94,7 +94,7 @@ namespace ooe
 			break;
 
 		default:
-			throw error::io( "socket: " ) << "Unknown shutdown type";
+			throw error::io( "socket: " ) << "Unknown shutdown type: " << type_;
 		};
 
 		if ( ::shutdown( get(), how ) && errno != ENOTCONN )
@@ -246,13 +246,12 @@ namespace ooe
 	}
 
 //--- internet_query -----------------------------------------------------------
-	internet_query::
-		internet_query( const std::string& host, const std::string& service, type family )
+	internet_query::internet_query( const std::string& host, const std::string& service, type flag )
 		: head()
 	{
 		addrinfo hint;
 		memset( &hint, 0, sizeof( hint ) );
-		hint.ai_family = internet_family( family );
+		hint.ai_family = family( flag );
 		hint.ai_socktype = SOCK_STREAM;
 
 		const c8* host_name = host.empty() ? 0 : host.c_str();

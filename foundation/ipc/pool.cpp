@@ -24,7 +24,7 @@ namespace ooe
 		map_type::iterator i = map.find( p );
 
 		if ( i == map.end() )
-			throw error::runtime( "pool: " ) << "Unknown pointer " << ptr( p );
+			throw error::runtime( "pool: " ) << "Unknown pointer: " << ptr( p );
 
 		map.erase( i );
 	}

@@ -25,7 +25,7 @@ namespace
 			return opengl::PIXEL_UNPACK_BUFFER;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown buffer type";
+			throw error::runtime( "opengl: " ) << "Unknown buffer type: " << type;
 		}
 	}
 }
@@ -54,11 +54,11 @@ namespace ooe
 		BindBuffer( target, 0 );
 	}
 
-	void* opengl::buffer::map( map_type value )
+	void* opengl::buffer::map( map_type type_ )
 	{
 		u32 mode;
 
-		switch ( value )
+		switch ( type_ )
 		{
 		case read:
 			mode = READ_ONLY;
@@ -73,7 +73,7 @@ namespace ooe
 			break;
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown map type";
+			throw error::runtime( "opengl: " ) << "Unknown map type: " << type_;
 		}
 
 		return MapBuffer( target, mode );
@@ -85,11 +85,11 @@ namespace ooe
 			throw error::runtime( "opengl: " ) << "Unable to unmap buffer";
 	}
 
-	void opengl::buffer::load( const void* data, up_t size, load_type value )
+	void opengl::buffer::load( const void* data, up_t size, load_type type_ )
 	{
 		u32 usage;
 
-		switch ( value )
+		switch ( type_ )
 		{
 		case stream_draw:
 			usage = STREAM_DRAW;
@@ -131,7 +131,7 @@ namespace ooe
 			return BufferSubData( target, 0, size, data );
 
 		default:
-			throw error::runtime( "opengl: " ) << "Unknown load type";
+			throw error::runtime( "opengl: " ) << "Unknown load type: " << type_;
 		}
 
 		BufferData( target, size, data, usage );

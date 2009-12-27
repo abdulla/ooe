@@ -108,7 +108,7 @@ namespace
 		else if ( format == "AY" )
 			return type == HALF ? uncompressed_image::ya_f16 : uncompressed_image::ya_f32;
 		else
-			throw error::runtime( "exr: " ) << "Unknown format \"" << format << '\"';
+			throw error::runtime( "exr: " ) << "Unknown format: " << format;
 	}
 }
 
