@@ -3,9 +3,12 @@
 #ifndef OOE_FOUNDATION_IO_SOCKET_HPP
 #define OOE_FOUNDATION_IO_SOCKET_HPP
 
+#include <boost/iterator/iterator_facade.hpp>
+
 #include "foundation/io/socket_forward.hpp"
 
 struct sockaddr;
+struct addrinfo;
 
 namespace ooe
 {
@@ -79,14 +82,48 @@ namespace ooe
 	struct internet_address
 		: public address
 	{
-		internet_address( const std::string&, u16 ) OOE_VISIBLE;
+		internet_address( const addrinfo& );
 	};
 
-//--- internet6_address --------------------------------------------------------
-	struct internet6_address
-		: public address
+//--- internet_query_iterator --------------------------------------------------
+	class internet_query_iterator
+		: public boost::iterator_facade< internet_query_iterator, internet_address,
+		boost::forward_traversal_tag, internet_address >
 	{
-		internet6_address( const std::string&, u16 ) OOE_VISIBLE;
+	private:
+		const addrinfo* node;
+
+		internet_query_iterator( const addrinfo* );
+
+		void increment( void );
+		bool equal( const internet_query_iterator& ) const;
+		internet_address dereference( void ) const;
+
+		friend class internet_query;
+		friend class boost::iterator_core_access;
+	};
+
+//--- internet_query -----------------------------------------------------------
+	class internet_query
+	{
+	public:
+		enum type
+		{
+			any,
+			ipv4,
+			ipv6
+		};
+
+		typedef internet_query_iterator iterator;
+
+		internet_query( const std::string&, const std::string&, type = any );
+		~internet_query( void );
+
+		iterator begin( void ) const;
+		iterator end( void ) const;
+
+	private:
+		addrinfo* head;
 	};
 }
 

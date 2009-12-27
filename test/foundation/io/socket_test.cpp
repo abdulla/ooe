@@ -42,7 +42,7 @@ namespace
 		socket_pair poll;
 	};
 
-	typedef unit::group< setup, empty_t, 2 > group_type;
+	typedef unit::group< setup, empty_t, 3 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "socket" );
 }
@@ -78,6 +78,20 @@ namespace ooe
 			poll poll;
 			poll.insert( poll_socket );
 			poll.wait();
+		}
+
+		template<>
+		template<>
+			void fixture_type::test< 2 >( setup& )
+		{
+			std::cerr << "internet query for localhost\n";
+
+			typedef internet_query::iterator iterator_type;
+			internet_query query( "localhost", "http" );
+			up_t j = 1;
+
+			for ( iterator_type i = query.begin(), end = query.end(); i != end; ++i, ++j )
+				std::cout << j << ": internet family " << i->family() << '\n';
 		}
 	}
 }

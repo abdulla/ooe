@@ -20,15 +20,22 @@ namespace
 		s32 fd;
 	};
 
-	hostent* lookup( const std::string& path, s32 family, const c8* name )
+	s32 internet_family( internet_query::type type )
 	{
-		hostent* he = gethostbyname2( path.c_str(), family );
+		switch ( type )
+		{
+		case internet_query::any:
+			return AF_UNSPEC;
 
-		if ( !he )
-			throw error::io( name ) << ": Unable to resolve \"" << path << "\": " <<
-				hstrerror( h_errno );
+		case internet_query::ipv4:
+			return AF_INET;
 
-		return he;
+		case internet_query::ipv6:
+			return AF_INET6;
+
+		default:
+			throw error::io( "internet_query: " ) << "Unknown type specified: " << type;
+		}
 	}
 
 	const descriptor& validate( const descriptor& desc )
@@ -211,26 +218,64 @@ namespace ooe
 	}
 
 //--- internet_address ---------------------------------------------------------
-	internet_address::internet_address( const std::string& path, u16 port )
-		: address( sizeof( sockaddr_in ) )
+	internet_address::internet_address( const addrinfo& ai )
+		: address( ai.ai_addrlen )
 	{
-		hostent* he = lookup( path, AF_INET, "internet" );
-
-		sockaddr_in& sa = *data.as< sockaddr_in >();
-		sa.sin_family = AF_INET;
-		sa.sin_port = htons( port );
-		sa.sin_addr = *reinterpret_cast< in_addr* >( he->h_addr );
+		std::memcpy( data, ai.ai_addr, ai.ai_addrlen );
 	}
 
-//--- internet6_address --------------------------------------------------------
-	internet6_address::internet6_address( const std::string& path, u16 port )
-		: address( sizeof( sockaddr_in6 ) )
+//--- internet_query_iterator --------------------------------------------------
+	internet_query_iterator::internet_query_iterator( const addrinfo* node_ )
+		: node( node_ )
 	{
-		hostent* he = lookup( path, AF_INET6, "internet6" );
+	}
 
-		sockaddr_in6& sa = *data.as< sockaddr_in6 >();
-		sa.sin6_family = AF_INET6;
-		sa.sin6_port = htons( port );
-		sa.sin6_addr = *reinterpret_cast< in6_addr* >( he->h_addr );
+	void internet_query_iterator::increment( void )
+	{
+		node = node->ai_next;
+	}
+
+	bool internet_query_iterator::equal( const internet_query_iterator& other ) const
+	{
+		return node == other.node;
+	}
+
+	internet_address internet_query_iterator::dereference( void ) const
+	{
+		return *node;
+	}
+
+//--- internet_query -----------------------------------------------------------
+	internet_query::
+		internet_query( const std::string& host, const std::string& service, type family )
+		: head()
+	{
+		addrinfo hint;
+		memset( &hint, 0, sizeof( hint ) );
+		hint.ai_family = internet_family( family );
+		hint.ai_socktype = SOCK_STREAM;
+
+		const c8* host_name = host.empty() ? 0 : host.c_str();
+		const c8* service_name = service.empty() ? 0 : service.c_str();
+		s32 status = getaddrinfo( host_name, service_name, &hint, &head );
+
+		if ( status )
+			throw error::io( "internet_query: " ) << "Unable to resolve \"" << host <<
+				"\" with \"" << service << "\": " << gai_strerror( status );
+	}
+
+	internet_query::~internet_query( void )
+	{
+		freeaddrinfo( head );
+	}
+
+	internet_query::iterator internet_query::begin( void ) const
+	{
+		return head;
+	}
+
+	internet_query::iterator internet_query::end( void ) const
+	{
+		return 0;
 	}
 }
