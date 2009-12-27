@@ -40,7 +40,7 @@ namespace
 		{
 			up_t j = i->find( '/' );
 
-			if ( j == up_t( -1 ) )
+			if ( j == ~up_t( 0 ) )
 				throw error::runtime( "javascript::find: " ) << "Invalid function \"" << *i << '\"';
 
 			interface.insert( i->substr( 0, j ), i->substr( j + 1 ) );

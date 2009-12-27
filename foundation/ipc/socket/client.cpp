@@ -77,7 +77,7 @@ namespace ooe
 
 			if ( !header_size( connect, length ) )
 				break;
-			else if ( length == static_cast< u32 >( -1 ) )
+			else if ( length == ~u32( 0 ) )
 			{
 				// an exception occurred, read exception
 				if ( !header_size( connect, length ) )

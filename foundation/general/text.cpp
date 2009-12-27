@@ -217,7 +217,7 @@ namespace ooe
 	{
 		const u32 string_length = string.size();
 		const u32 index_length = string_length * 6;
-		const bool bit_16 = index_length < static_cast< u16 >( -1 );
+		const bool bit_16 = index_length < u32( ~u16( 0 ) );
 
 		// 4 points per glyph, 4 floats per point: vertex_2, texture
 		scoped_array< f32 > points( new f32[ string_length * 4 * 4 ] );

@@ -40,7 +40,7 @@ namespace ooe
 		{
 			u32 i = base_type::operator ()( name, type );
 
-			if ( i != static_cast< u32 >( -1 ) )
+			if ( i != ~u32( 0 ) )
 				return i;
 
 			throw error::runtime( "ipc::memory::find: " ) <<
@@ -79,7 +79,7 @@ namespace ooe
 
 			for ( up_t i = 0, end = result.size(); i != end; ++i )
 			{
-				if ( result[ i ] != static_cast< u32 >( -1 ) )
+				if ( result[ i ] != ~u32( 0 ) )
 					continue;
 
 				throw error::runtime( "ipc::memory::find_all: " ) << "Unable to find \"" <<

@@ -53,7 +53,7 @@ namespace ooe
 	{
 	public:
 		string( const std::string& stdstring_ )
-			: stdstring( &stdstring_ ), size_( -1 )
+			: stdstring( &stdstring_ ), size_( ~up_t( 0 ) )
 		{
 		}
 
@@ -65,7 +65,7 @@ namespace ooe
 		string& operator =( const std::string& stdstring_ )
 		{
 			stdstring = &stdstring_;
-			size_ = -1;
+			size_ = ~up_t( 0 );
 			return *this;
 		}
 
@@ -78,12 +78,12 @@ namespace ooe
 
 		const c8* c_str( void ) const
 		{
-			return size_ == up_t( -1 ) ? stdstring->c_str() : cstring;
+			return size_ == ~up_t( 0 ) ? stdstring->c_str() : cstring;
 		}
 
 		up_t size( void ) const
 		{
-			return size_ == up_t( -1 ) ? stdstring->size() : size_;
+			return size_ == ~up_t( 0 ) ? stdstring->size() : size_;
 		}
 
 	private:

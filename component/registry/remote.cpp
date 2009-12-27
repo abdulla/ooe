@@ -33,7 +33,7 @@ namespace ooe
 
 		for ( result_type::const_iterator i = result.begin(), end = result.end(); i != end; ++i )
 		{
-			if ( *i == static_cast< u32 >( -1 ) )
+			if ( *i == ~u32( 0 ) )
 				return false;
 		}
 

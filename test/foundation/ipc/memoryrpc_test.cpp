@@ -244,7 +244,7 @@ namespace ooe
 		{
 			std::cerr << "test exceptions\n";
 
-			ipc::memory::rpc< void ( void ) > out_of_range( client, -1 );
+			ipc::memory::rpc< void ( void ) > out_of_range( client, ~u32( 0 ) );
 			except( "out-of-range index", out_of_range() );
 
 			ipc::memory::find find( client );

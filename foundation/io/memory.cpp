@@ -15,7 +15,7 @@ namespace ooe
 	memory_id::memory_id( u8 flags, up_t size_, s32 fd )
 		: area( mmap( 0, size_, flags, MAP_SHARED, fd, 0 ) ), size( size_ )
 	{
-		if ( area == reinterpret_cast< void* >( -1 ) )
+		if ( area == MAP_FAILED )
 			throw error::io( "memory: " ) << "Unable to map memory: " << error::number( errno );
 	}
 

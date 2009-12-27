@@ -227,7 +227,7 @@ namespace ooe
 		{
 			std::cerr << "test exceptions\n";
 
-			ipc::socket::rpc< void ( void ) > out_of_range( client, -1 );
+			ipc::socket::rpc< void ( void ) > out_of_range( client, ~u32( 0 ) );
 			except( "out-of-range index", out_of_range()() );
 
 			ipc::socket::find find( client );

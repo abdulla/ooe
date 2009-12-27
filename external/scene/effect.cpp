@@ -11,10 +11,9 @@ namespace ooe
 	effect::effect( const descriptor& desc, const vfs& vfs, const video& video )
 		: program( video.program() )
 	{
-		const up_t end = -1;
 		std::string source = memory( desc ).as< c8 >();
 
-		for ( up_t i = 0, j = 0; ( j = source.find( '\n', i ) ) != end; i = j + 1 )
+		for ( up_t i = 0, j = 0; ( j = source.find( '\n', i ) ) != std::string::npos; i = j + 1 )
 		{
 			if ( source[ i ] == '#' || source[ i + 1 ] == '\n' )
 				continue;
@@ -22,7 +21,7 @@ namespace ooe
 			std::string line = source.substr( i, j - i );
 			up_t k = line.rfind( '.' );
 
-			if ( k == end )
+			if ( k == std::string::npos )
 				continue;
 
 			shader::type type = line.substr( k + 1 ) == "vs" ? shader::vertex : shader::fragment;

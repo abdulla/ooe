@@ -36,7 +36,7 @@ namespace ooe
 	u32 ipc::socket::nameservice::find( const std::string& name, const std::string& type ) const
 	{
 		map_type::const_iterator i = map.find( map_tuple( name, type ) );
-		return i == map.end() ? -1 : i->second;
+		return i == map.end() ? ~u32( 0 ) : i->second;
 	}
 
 	void ipc::socket::nameservice::

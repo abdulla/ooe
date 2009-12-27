@@ -22,7 +22,7 @@ namespace
 		ipc::socket::write_buffer buffer( buffer_ptr, buffer_size, total );
 		u8* data = buffer.get();
 		ipc::stream_write< u32, u32, bool, const c8*, const c8* >::
-			call( data, -1, size, executed, what, where );
+			call( data, ~u32( 0 ), size, executed, what, where );
 
 		if ( socket.send( data, total ) != total )
 			throw error::runtime( "ipc::socket::switchboard: " ) << "Unable to write data";

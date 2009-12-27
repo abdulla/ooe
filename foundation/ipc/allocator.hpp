@@ -88,7 +88,7 @@ namespace ooe
 
 		size_type max_size( void ) const
 		{
-			return static_cast< size_type >( -1 ) / sizeof( type );
+			return ~size_type( 0 ) / sizeof( type );
 		}
 
 		pointer allocate( size_type size, std::allocator< void >::const_pointer = 0 )

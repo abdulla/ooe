@@ -34,7 +34,7 @@ namespace ooe
 		{
 			u32 i = result();
 
-			if ( i != static_cast< u32 >( -1 ) )
+			if ( i != ~u32( 0 ) )
 				return i;
 
 			throw error::runtime( "ipc::socket::find: " ) <<
