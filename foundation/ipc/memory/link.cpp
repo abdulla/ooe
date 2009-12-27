@@ -19,7 +19,7 @@ namespace ooe
 
 	ipc::memory::link_listen::~link_listen( void )
 	{
-		if ( path.size() && unlink( path.c_str() ) )
+		if ( !path.empty() && unlink( path.c_str() ) )
 			OOE_WARNING( "ipc::link_listen",
 				"Unable to unlink \"" << path << "\": " << error::number( errno ) );
 	}
