@@ -3,8 +3,6 @@
 #ifndef OOE_FOUNDATION_IPC_SOCKET_NAMESERVICE_HPP
 #define OOE_FOUNDATION_IPC_SOCKET_NAMESERVICE_HPP
 
-#include <typeinfo>
-
 #include "foundation/ipc/socket/switchboard.hpp"
 
 namespace ooe
