@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <ctime>
+
 #include "foundation/executable/program.hpp"
 #include "foundation/general/sight.hpp"
 #include "foundation/image/jpeg.hpp"
