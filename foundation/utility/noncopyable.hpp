@@ -5,9 +5,12 @@
 
 #include <boost/noncopyable.hpp>
 
-namespace ooe
-{
-	using boost::noncopyable;
-}
+#include "foundation/utility/namespace.hpp"
+
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+using boost::noncopyable;
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 #endif	// OOE_FOUNDATION_UTILITY_NONCOPYABLE_HPP

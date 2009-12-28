@@ -8,143 +8,130 @@
 #include "foundation/utility/function.hpp"
 #include "foundation/utility/noncopyable.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+template< typename >
+	class slot;
+
+template< typename >
+	struct signal;
+
+//--- last_value -----------------------------------------------------------------------------------
+template< typename r >
+	class last_value
 {
-	template< typename >
-		class last_value;
-
-	class slot_base;
-
-	template< typename >
-		class slot;
-
-	class signal_base;
-
-	template< typename >
-		struct signal;
-
-//--- last_value ---------------------------------------------------------------
-	template< typename r >
-		class last_value
+public:
+	last_value( void )
+		: value()
 	{
-	public:
-		last_value( void )
-			: value()
-		{
-		}
-
-		void operator ()( typename call_traits< r >::param_type value_ )
-		{
-			value = value_;
-		}
-
-		typename call_traits< r >::reference operator ()( void )
-		{
-			return value;
-		}
-
-	private:
-		r value;
-	};
-
-//--- slot_base ----------------------------------------------------------------
-	class slot_base
-		: private noncopyable
-	{
-	public:
-		bool connected( void ) const
-		{
-			return next;
-		}
-
-		void disconnect( void )
-		{
-			if ( !connected() )
-				return;
-
-			next->prev = prev;
-			prev->next = next;
-		}
-
-	protected:
-		slot_base( slot_base* next_ = 0, slot_base* prev_ = 0 )
-			: next( next_ ), prev( prev_ )
-		{
-		}
-
-		~slot_base( void )
-		{
-			disconnect();
-		}
-
-	private:
-		slot_base* next;
-		slot_base* prev;
-
-		friend class signal_base;
-	};
-
-//--- signal_base --------------------------------------------------------------
-	class signal_base
-		: private noncopyable
-	{
-	public:
-		void push_back( slot_base& slot )
-		{
-			this->root.prev->next = &slot;
-			slot.prev = this->root.prev;
-			slot.next = &this->root;
-			this->root.prev = &slot;
-		}
-
-		void push_front( slot_base& slot )
-		{
-			this->root.next->prev = &slot;
-			slot.next = this->root.next;
-			slot.prev = &this->root;
-			this->root.next = &slot;
-		}
-
-		void pop_back( void )
-		{
-			this->root.prev = this->root.prev->prev;
-			this->root.prev->next = &this->root;
-		}
-
-		void pop_front( void )
-		{
-			this->root.next = this->root.next->next;
-			this->root.next->prev = &this->root;
-		}
-
-		void clear( void )
-		{
-			this->root.next = &this->root;
-			this->root.prev = &this->root;
-		}
-
-	protected:
-		slot_base root;
-
-		signal_base( void )
-			: root( &root, &root )
-		{
-		}
-
-		template< typename type >
-			const type* next( const slot_base* curr ) const
-		{
-			return static_cast< const type* >( curr->next );
-		}
-	};
-
-//--- connect ------------------------------------------------------------------
-	inline void connect( signal_base* signal, slot_base& slot )
-	{
-		if ( signal )
-			signal->push_back( slot );
 	}
-}
+
+	void operator ()( typename call_traits< r >::param_type value_ )
+	{
+		value = value_;
+	}
+
+	typename call_traits< r >::reference operator ()( void )
+	{
+		return value;
+	}
+
+private:
+	r value;
+};
+
+//--- slot_base ------------------------------------------------------------------------------------
+class slot_base
+	: private noncopyable
+{
+public:
+	bool connected( void ) const
+	{
+		return next;
+	}
+
+	void disconnect( void )
+	{
+		if ( !connected() )
+			return;
+
+		next->prev = prev;
+		prev->next = next;
+	}
+
+protected:
+	slot_base( slot_base* next_ = 0, slot_base* prev_ = 0 )
+		: next( next_ ), prev( prev_ )
+	{
+	}
+
+	~slot_base( void )
+	{
+		disconnect();
+	}
+
+private:
+	slot_base* next;
+	slot_base* prev;
+
+	friend class signal_base;
+};
+
+//--- signal_base ----------------------------------------------------------------------------------
+class signal_base
+	: private noncopyable
+{
+public:
+	void push_back( slot_base& slot )
+	{
+		this->root.prev->next = &slot;
+		slot.prev = this->root.prev;
+		slot.next = &this->root;
+		this->root.prev = &slot;
+	}
+
+	void push_front( slot_base& slot )
+	{
+		this->root.next->prev = &slot;
+		slot.next = this->root.next;
+		slot.prev = &this->root;
+		this->root.next = &slot;
+	}
+
+	void pop_back( void )
+	{
+		this->root.prev = this->root.prev->prev;
+		this->root.prev->next = &this->root;
+	}
+
+	void pop_front( void )
+	{
+		this->root.next = this->root.next->next;
+		this->root.next->prev = &this->root;
+	}
+
+	void clear( void )
+	{
+		this->root.next = &this->root;
+		this->root.prev = &this->root;
+	}
+
+protected:
+	slot_base root;
+
+	signal_base( void )
+		: root( &root, &root )
+	{
+	}
+
+	template< typename type >
+		const type* next( const slot_base* curr ) const
+	{
+		return static_cast< const type* >( curr->next );
+	}
+};
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/utility/signal.hpp"
@@ -158,72 +145,73 @@ namespace ooe
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- slot -----------------------------------------------------------------------------------------
+template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+	class slot< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+	: public slot_base
 {
-//--- slot ---------------------------------------------------------------------
-	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		class slot< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: public slot_base
+public:
+	typedef function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function_type;
+
+	slot( void )
+		: slot_base(), call()
 	{
-	public:
-		typedef function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function_type;
+	}
 
-		slot( void )
-			: slot_base(), call()
-		{
-		}
-
-		slot( const function_type& call_ )
-			: slot_base(), call( call_ )
-		{
-		}
-
-		slot& operator =( const function_type& call_ )
-		{
-			call = call_;
-			return *this;
-		}
-
-	private:
-		function_type call;
-
-		r operator ()( BOOST_PP_ENUM_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) ) const
-		{
-			return call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-		}
-
-		friend class signal< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
-	};
-
-//--- signal -------------------------------------------------------------------
-	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct signal< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: public signal_base
+	slot( const function_type& call_ )
+		: slot_base(), call( call_ )
 	{
-		template< typename combiner >
-			void operator ()( BOOST_PP_ENUM_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a )
-			BOOST_PP_COMMA_IF( LIMIT ) combiner& combine ) const
-		{
-			typedef slot< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > slot_type;
+	}
 
-			for ( const slot_type* slot = next< slot_type >( &this->root );
-				slot != &this->root; slot = next< slot_type >( slot ) )
-				combine( ( *slot )( BOOST_PP_ENUM_PARAMS( LIMIT, a ) ) );
-		}
+	slot& operator =( const function_type& call_ )
+	{
+		call = call_;
+		return *this;
+	}
 
-		void operator ()( BOOST_PP_ENUM_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) ) const
-		{
-			typedef slot< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > slot_type;
+private:
+	function_type call;
 
-			for ( const slot_type* slot = next< slot_type >( &this->root );
-				slot != &this->root; slot = next< slot_type >( slot ) )
-				( *slot )( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-		}
-	};
-}
+	r operator ()( BOOST_PP_ENUM_BINARY_PARAMS
+		( LIMIT, typename call_traits< t, >::param_type a ) ) const
+	{
+		return call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+	}
+
+	friend class signal< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
+};
+
+//--- signal ---------------------------------------------------------------------------------------
+template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+	struct signal< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+	: public signal_base
+{
+	template< typename combiner >
+		void operator ()
+		( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a )
+		BOOST_PP_COMMA_IF( LIMIT ) combiner& combine ) const
+	{
+		typedef slot< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > slot_type;
+
+		for ( const slot_type* slot = next< slot_type >( &this->root );
+			slot != &this->root; slot = next< slot_type >( slot ) )
+			combine( ( *slot )( BOOST_PP_ENUM_PARAMS( LIMIT, a ) ) );
+	}
+
+	void operator ()
+		( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) ) const
+	{
+		typedef slot< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > slot_type;
+
+		for ( const slot_type* slot = next< slot_type >( &this->root );
+			slot != &this->root; slot = next< slot_type >( slot ) )
+			( *slot )( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+	}
+};
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 	#undef LIMIT
 

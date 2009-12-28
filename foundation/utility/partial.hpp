@@ -8,11 +8,12 @@
 #include "foundation/utility/function.hpp"
 #include "foundation/utility/tuple.hpp"
 
-namespace ooe
-{
-	template< typename >
-		class partial;
-}
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+template< typename >
+	class partial;
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/utility/partial.hpp"
@@ -26,39 +27,40 @@ namespace ooe
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- partial --------------------------------------------------------------------------------------
+template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+	class partial< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 {
-//--- partial ------------------------------------------------------------------
-	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		class partial< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+public:
+	typedef ooe::function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function_type;
+
+	partial( function_type function_ BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
+		( LIMIT, typename call_traits< t, >::param_type a ) )
+		: function( function_ ) BOOST_PP_COMMA_IF( LIMIT )
+		BOOST_PP_EXPR_IF( LIMIT, tuple( BOOST_PP_ENUM_PARAMS( LIMIT, a ) ) )
 	{
-	public:
-		typedef ooe::function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function_type;
+	}
 
-		partial( function_type function_ BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) )
-			: function( function_ ) BOOST_PP_COMMA_IF( LIMIT )
-			BOOST_PP_EXPR_IF( LIMIT, tuple( BOOST_PP_ENUM_PARAMS( LIMIT, a ) ) )
-		{
-		}
+	r operator ()( void ) const
+	{
+		return function( BOOST_PP_ENUM_PARAMS( LIMIT, tuple._ ) );
+	}
 
-		r operator ()( void ) const
-		{
-			return function( BOOST_PP_ENUM_PARAMS( LIMIT, tuple._ ) );
-		}
+	void clear( void )
+	{
+		function.clear();
+	}
 
-		void clear( void )
-		{
-			function.clear();
-		}
+private:
+	typedef ooe::tuple< BOOST_PP_ENUM_PARAMS( LIMIT, t ) > tuple_type;
 
-	private:
-		typedef ooe::tuple< BOOST_PP_ENUM_PARAMS( LIMIT, t ) > tuple_type;
+	function_type function;
+	BOOST_PP_EXPR_IF( LIMIT, tuple_type tuple; )
+};
 
-		function_type function;
-		BOOST_PP_EXPR_IF( LIMIT, tuple_type tuple; )
-	};
-}
+OOE_NAMESPACE_END( ( ooe ) )
 
 	#undef LIMIT
 

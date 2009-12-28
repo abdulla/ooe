@@ -36,7 +36,7 @@
 #define OOE_WARNING( id, statement )\
 do\
 {\
-	std::cerr << error::time() << " " id ": " << statement << '\n';\
+	std::cerr << id ": " << statement << '\n';\
 	std::cout << id ": " << statement << '\n';\
 }\
 while ( false )

@@ -5,77 +5,78 @@
 
 #include "foundation/utility/traits.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- proxy_ptr ------------------------------------------------------------------------------------
+template< typename t >
+	class proxy_ptr
 {
-//--- proxy_ptr ----------------------------------------------------------------
-	template< typename t >
-		class proxy_ptr
+public:
+	typedef t value_type;
+	typedef t* pointer;
+	typedef t& reference;
+
+	operator pointer( void ) const
 	{
-	public:
-		typedef t value_type;
-		typedef t* pointer;
-		typedef t& reference;
+		return value;
+	}
 
-		operator pointer( void ) const
-		{
-			return value;
-		}
-
-		pointer operator ->( void ) const
-		{
-			return value;
-		}
-
-		reference operator *( void ) const
-		{
-			return *value;
-		}
-
-	protected:
-		proxy_ptr( pointer value_ )
-			: value( value_ )
-		{
-		}
-
-	private:
-		pointer value;
-	};
-
-//--- construct_ptr ------------------------------------------------------------
-	template< typename t >
-		struct construct_ptr
-		: public proxy_ptr< t >
+	pointer operator ->( void ) const
 	{
-		construct_ptr( t* value_ = 0 )
-			: proxy_ptr< t >( value_ )
-		{
-		}
-	};
+		return value;
+	}
 
-//--- destruct_ptr -------------------------------------------------------------
-	template< typename t >
-		struct destruct_ptr
-		: public proxy_ptr< t >
+	reference operator *( void ) const
 	{
-		destruct_ptr( t* value_ = 0 )
-			: proxy_ptr< t >( value_ )
-		{
-		}
-	};
+		return *value;
+	}
 
-//--- is_construct -------------------------------------------------------------
-	template< typename t >
-		struct is_construct
-		: public is_template1< t, construct_ptr >
+protected:
+	proxy_ptr( pointer value_ )
+		: value( value_ )
 	{
-	};
+	}
 
-//--- is_destruct --------------------------------------------------------------
-	template< typename t >
-		struct is_destruct
-		: public is_template1< t, destruct_ptr >
+private:
+	pointer value;
+};
+
+//--- construct_ptr --------------------------------------------------------------------------------
+template< typename t >
+	struct construct_ptr
+	: public proxy_ptr< t >
+{
+	construct_ptr( t* value_ = 0 )
+		: proxy_ptr< t >( value_ )
 	{
-	};
-}
+	}
+};
+
+//--- destruct_ptr ---------------------------------------------------------------------------------
+template< typename t >
+	struct destruct_ptr
+	: public proxy_ptr< t >
+{
+	destruct_ptr( t* value_ = 0 )
+		: proxy_ptr< t >( value_ )
+	{
+	}
+};
+
+//--- is_construct ---------------------------------------------------------------------------------
+template< typename t >
+	struct is_construct
+	: public is_template1< t, construct_ptr >
+{
+};
+
+//--- is_destruct ----------------------------------------------------------------------------------
+template< typename t >
+	struct is_destruct
+	: public is_template1< t, destruct_ptr >
+{
+};
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 #endif	// OOE_FOUNDATION_UTILITY_HINT_HPP

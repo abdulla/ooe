@@ -7,11 +7,12 @@
 
 #include "foundation/utility/partial.hpp"
 
-namespace ooe
-{
-	template< typename >
-		class scoped;
-}
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+template< typename >
+	class scoped;
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/utility/scoped.hpp"
@@ -25,54 +26,55 @@ namespace ooe
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- scoped ---------------------------------------------------------------------------------------
+template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+	class scoped< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+	: private noncopyable
 {
-//--- scoped -------------------------------------------------------------------
-	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		class scoped< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: private noncopyable
+public:
+	typedef ooe::partial< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > partial_type;
+	typedef typename partial_type::function_type function_type;
+
+	scoped( void )
+		: partial( function_type()
+		BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, t, () BOOST_PP_INTERCEPT ) )
 	{
-	public:
-		typedef ooe::partial< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > partial_type;
-		typedef typename partial_type::function_type function_type;
+	}
 
-		scoped( void )
-			: partial( function_type()
-			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, t, () BOOST_PP_INTERCEPT ) )
-		{
-		}
+	scoped( function_type function BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
+		( LIMIT, typename call_traits< t, >::param_type a ) )
+		: partial( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) )
+	{
+	}
 
-		scoped( function_type function BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) )
-			: partial( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) )
-		{
-		}
+	~scoped( void )
+	{
+		partial();
+	}
 
-		~scoped( void )
-		{
-			partial();
-		}
+	void assign( function_type function BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
+		( LIMIT, typename call_traits< t, >::param_type a ) )
+	{
+		partial = partial_type( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
+	}
 
-		void assign( function_type function BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
-			( LIMIT, typename call_traits< t, >::param_type a ) )
-		{
-			partial = partial_type( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-		}
+	void clear( void )
+	{
+		partial.clear();
+	}
 
-		void clear( void )
-		{
-			partial.clear();
-		}
+	r execute( void ) const
+	{
+		return partial();
+	}
 
-		r execute( void ) const
-		{
-			return partial();
-		}
+private:
+	partial_type partial;
+};
 
-	private:
-		partial_type partial;
-	};
-}
+OOE_NAMESPACE_END( ( ooe ) )
 
 	#undef LIMIT
 
