@@ -5,40 +5,33 @@
 
 #include "foundation/utility/fundamental.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+
+//--- write_buffer ---------------------------------------------------------------------------------
+class write_buffer
 {
-	namespace ipc
+public:
+	write_buffer( u8* buffer_ptr, up_t buffer_size, up_t size )
+		: internal( buffer_size >= size ), pointer( internal ? buffer_ptr : new u8[ size ] )
 	{
-		namespace socket
-		{
-			class write_buffer;
-		}
 	}
 
-//--- ipc::socket::write_buffer ------------------------------------------------
-	class ipc::socket::write_buffer
+	~write_buffer( void )
 	{
-	public:
-		write_buffer( u8* buffer_ptr, up_t buffer_size, up_t size )
-			: internal( buffer_size >= size ), pointer( internal ? buffer_ptr : new u8[ size ] )
-		{
-		}
+		if ( !internal )
+			delete[] pointer;
+	}
 
-		~write_buffer( void )
-		{
-			if ( !internal )
-				delete[] pointer;
-		}
+	u8* get( void ) const
+	{
+		return pointer;
+	}
 
-		u8* get( void ) const
-		{
-			return pointer;
-		}
+private:
+	bool internal;
+	u8* pointer;
+};
 
-	private:
-		bool internal;
-		u8* pointer;
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 
 #endif	// OOE_FOUNDATION_IPC_SOCKET_WRITE_BUFFER_HPP
