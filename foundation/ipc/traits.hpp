@@ -60,11 +60,11 @@ namespace ooe
 	template< typename t >
 		struct ipc::read< t, typename enable_if< is_stdcontainer< t > >::type >
 	{
-		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
+		static up_t call( const u8* data, typename call_traits< t >::reference value )
 		{
 			typedef typename no_ref< t >::type type;
-			up_t size = *reinterpret_cast< const up_t* >( buffer );
-			const u8* pointer = buffer + sizeof( up_t );
+			up_t size = *reinterpret_cast< const up_t* >( data );
+			const u8* pointer = data + sizeof( up_t );
 
 			type out;
 			reserve( out, size );
@@ -78,24 +78,24 @@ namespace ooe
 			}
 
 			value.swap( out );
-			return pointer - buffer;
+			return pointer - data;
 		}
 	};
 
 	template< typename t >
 		struct ipc::write< t, typename enable_if< is_stdcontainer< t > >::type >
 	{
-		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
+		static up_t call( u8* data, typename call_traits< t >::param_type value )
 		{
 			typedef typename no_ref< t >::type type;
-			*reinterpret_cast< up_t* >( buffer ) = value.size();
-			u8* pointer = buffer + sizeof( up_t );
+			*reinterpret_cast< up_t* >( data ) = value.size();
+			u8* pointer = data + sizeof( up_t );
 
 			for ( typename type::const_iterator i = value.begin(), end = value.end();
 				i != end; ++i )
 				pointer += write< typename type::value_type >::call( pointer, *i );
 
-			return pointer - buffer;
+			return pointer - data;
 		}
 	};
 
@@ -114,31 +114,31 @@ namespace ooe
 	template< typename t >
 		struct ipc::read< t, typename enable_if< is_pair< t > >::type >
 	{
-		static up_t call( const u8* buffer, typename call_traits< t >::reference value )
+		static up_t call( const u8* data, typename call_traits< t >::reference value )
 		{
 			typedef typename no_ref< t >::type value_type;
 			typedef typename no_ref< typename value_type::first_type >::type first_type;
 			typedef typename no_ref< typename value_type::second_type >::type second_type;
 
-			const u8* pointer = buffer;
+			const u8* pointer = data;
 			pointer += read< first_type >::
 				call( pointer, const_cast< first_type& >( value.first ) );
 			pointer += read< second_type >::call( pointer, value.second );
-			return pointer - buffer;
+			return pointer - data;
 		}
 	};
 
 	template< typename t >
 		struct ipc::write< t, typename enable_if< is_pair< t > >::type >
 	{
-		static up_t call( u8* buffer, typename call_traits< t >::param_type value )
+		static up_t call( u8* data, typename call_traits< t >::param_type value )
 		{
 			typedef typename no_ref< t >::type value_type;
 
-			u8* pointer = buffer;
+			u8* pointer = data;
 			pointer += write< typename value_type::first_type >::call( pointer, value.first );
 			pointer += write< typename value_type::second_type >::call( pointer, value.second );
-			return pointer - buffer;
+			return pointer - data;
 		}
 	};
 }
@@ -156,9 +156,10 @@ namespace ooe
 	#define LIMIT BOOST_PP_ITERATION()
 
 	#define SIZE( z, n, _ ) + size< t ## n >::call( a ## n )
-	#define READ( z, n, _ ) buffer +=\
-		read< typename no_ref< t ## n >::type >::call( buffer, a ## n );
-	#define WRITE( z, n, _ ) buffer += write< t ## n >::call( buffer, a ## n );
+	#define READ( z, n, _ )\
+		OOE_PREFETCH( data );\
+		data += read< typename no_ref< t ## n >::type >::call( data, a ## n );
+	#define WRITE( z, n, _ ) data += write< t ## n >::call( data, a ## n );
 
 	#define TUPLE_SIZE( z, n, d ) +\
 		size< typename tuple_element< n, t >::type >::call( value._ ## n )
@@ -219,24 +220,24 @@ namespace ooe
 	template< typename t >
 		struct ipc::read< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 	{
-		static up_t call( const u8* buffer,
+		static up_t call( const u8* data,
 			typename call_traits< t >::reference BOOST_PP_EXPR_IF( LIMIT, value ) )
 		{
-			const u8* pointer = buffer;
+			const u8* pointer = data;
 			BOOST_PP_REPEAT( LIMIT, TUPLE_READ, ~ )
-			return pointer - buffer;
+			return pointer - data;
 		}
 	};
 
 	template< typename t >
 		struct ipc::write< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 	{
-		static up_t call( u8* buffer,
+		static up_t call( u8* data,
 			typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, value ) )
 		{
-			u8* pointer = buffer;
+			u8* pointer = data;
 			BOOST_PP_REPEAT( LIMIT, TUPLE_WRITE, ~ )
-			return pointer - buffer;
+			return pointer - data;
 		}
 	};
 
@@ -264,7 +265,7 @@ namespace ooe
 		struct ipc::stream_read< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >
 #endif
 	{
-		static void call( const u8* BOOST_PP_EXPR_IF( LIMIT, buffer )
+		static void call( const u8* BOOST_PP_EXPR_IF( LIMIT, data )
 			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, typename no_ref< t, >::type& a ) )
 		{
 			BOOST_PP_REPEAT( LIMIT, READ, ~ )
@@ -279,7 +280,7 @@ namespace ooe
 		struct ipc::stream_write< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >
 #endif
 	{
-		static void call( u8* BOOST_PP_EXPR_IF( LIMIT, buffer ) BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
+		static void call( u8* BOOST_PP_EXPR_IF( LIMIT, data ) BOOST_PP_ENUM_TRAILING_BINARY_PARAMS
 			( LIMIT, typename call_traits< t, >::param_type a ) )
 		{
 			BOOST_PP_REPEAT( LIMIT, WRITE, ~ )

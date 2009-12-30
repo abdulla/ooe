@@ -7,9 +7,9 @@
 #include "foundation/ipc/allocator.hpp"
 #include "foundation/ipc/jumbo.hpp"
 #include "foundation/ipc/name.hpp"
+#include "foundation/ipc/nameservice.hpp"
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/client.hpp"
-#include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "test/unit/check.hpp"
@@ -107,7 +107,7 @@ namespace
 				OOE_IGNORE
 				(
 					executable::null_fd( STDOUT_FILENO );
-					ipc::memory::nameservice nameservice;
+					ipc::nameservice nameservice;
 					nameservice.insert( "print_construct", print_construct );
 					nameservice.insert( "print_destruct", print_destruct );
 					nameservice.insert( "print_show", &print::show );

@@ -6,66 +6,63 @@
 #include "foundation/ipc/error_forward.hpp"
 #include "foundation/utility/error.hpp"
 
-namespace ooe
-{
-	namespace error
-	{
-		enum ipc
-		{
-			none,
-			link,
-			exception
-		};
+OOE_NAMESPACE_BEGIN( ( ooe )( error ) )
 
-		struct rpc;
-		struct connection;
-		struct verification;
+enum ipc
+{
+	none,
+	exception,
+	link
+};
+
+//--- rpc ------------------------------------------------------------------------------------------
+struct OOE_VISIBLE rpc
+	: virtual public runtime
+{
+	const bool executed;
+
+	rpc( bool executed_ )
+		: runtime( "ipc: " ), executed( executed_ )
+	{
+		*this << "Executed: " << ( executed ? "true" : "false" ) << '\n';
 	}
 
-	struct OOE_VISIBLE error::rpc
-		: virtual public runtime
+	virtual ~rpc( void ) throw()
 	{
-		const bool executed;
+	}
+};
 
-		rpc( bool executed_ )
-			: runtime( "ipc: " ), executed( executed_ )
-		{
-			*this << "Executed: " << ( executed ? "true" : "false" ) << '\n';
-		}
-
-		virtual ~rpc( void ) throw()
-		{
-		}
-	};
-
-	struct OOE_VISIBLE error::connection
-		: virtual public runtime
+//--- verification ---------------------------------------------------------------------------------
+struct OOE_VISIBLE verification
+	: virtual public runtime
+{
+	verification( const void* value, u8 index )
+		: runtime( "ipc: " )
 	{
-		connection( void )
-			: runtime( "ipc: " )
-		{
-			*this << "Connection down";
-		}
+		using ooe::operator <<;
+		*this << "Invalid pointer " << ptr( value ) << " in argument " << index;
+	}
 
-		virtual ~connection( void ) throw()
-		{
-		}
-	};
-
-	struct OOE_VISIBLE error::verification
-		: virtual public runtime
+	virtual ~verification( void ) throw()
 	{
-		verification( const void* value, u8 index )
-			: runtime( "ipc: " )
-		{
-			using ooe::operator <<;
-			*this << "Invalid pointer " << ptr( value ) << " in argument " << index;
-		}
+	}
+};
 
-		virtual ~verification( void ) throw()
-		{
-		}
-	};
-}
+//--- connection -----------------------------------------------------------------------------------
+struct OOE_VISIBLE connection
+	: virtual public runtime
+{
+	connection( void )
+		: runtime( "ipc: " )
+	{
+		*this << "Connection down";
+	}
+
+	virtual ~connection( void ) throw()
+	{
+	}
+};
+
+OOE_NAMESPACE_END( ( ooe )( error ) )
 
 #endif	// OOE_FOUNDATION_IPC_ERROR_HPP

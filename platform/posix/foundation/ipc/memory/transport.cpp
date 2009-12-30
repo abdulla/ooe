@@ -64,7 +64,7 @@ namespace ooe
 	void ipc::memory::transport::wait( wait_type function, const void* pointer )
 	{
 		in->down();
-		function( get(), size(), pointer );
+		function( pointer );
 		out->up();
 	}
 

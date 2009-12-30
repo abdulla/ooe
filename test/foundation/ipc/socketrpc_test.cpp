@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <paths.h>
-
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/allocator.hpp"
@@ -118,8 +116,9 @@ namespace
 					nameservice.insert( "ipcvector_test", ipcvector_test );
 					nameservice.insert( "jumbo_test", jumbo_test );
 
-					unlink( _PATH_TMP "ooe.test.socket-rpc" );
-					ipc::socket::server server( local_address( _PATH_TMP "/ooe.test.socket-rpc" ) );
+					std::string local_name = ipc::local_name( "ooe.test.socket-rpc" );
+					unlink( local_name.c_str() );
+					ipc::socket::server server( ( local_address( local_name ) ) );
 					ipc::barrier_notify( name );
 
 					while ( !executable::signal() )
@@ -140,7 +139,7 @@ namespace
 	{
 	public:
 		data( void )
-			: client( local_address( _PATH_TMP "/ooe.test.socket-rpc" ) )
+			: client( local_address( ipc::local_name( "/ooe.test.socket-rpc" ) ) )
 		{
 		}
 

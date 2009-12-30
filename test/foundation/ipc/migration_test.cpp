@@ -9,9 +9,9 @@
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
+#include "foundation/ipc/nameservice.hpp"
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/client.hpp"
-#include "foundation/ipc/memory/nameservice.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "test/unit/check.hpp"
@@ -27,7 +27,7 @@ namespace
 		setup( void )
 			: fork0( 0 ), fork1( 0 )
 		{
-			ipc::memory::nameservice nameservice;
+			ipc::nameservice nameservice;
 			nameservice.insert( "migrate", migrate );
 			nameservice.insert( "server_pid", server_pid );
 			socket_pair pair = make_pair();

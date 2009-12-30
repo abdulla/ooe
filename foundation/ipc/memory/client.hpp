@@ -5,41 +5,35 @@
 
 #include "foundation/ipc/memory/link.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+//--- client ---------------------------------------------------------------------------------------
+class OOE_VISIBLE client
 {
-	namespace ipc
-	{
-		namespace memory
-		{
-			class client;
-			struct shared_data;
-			void disconnect( const std::string&, u32 );
-		}
-	}
+public:
+	client( const std::string& );
+	~client( void );
 
-//--- ipc::memory::client ------------------------------------------------------
-	class OOE_VISIBLE ipc::memory::client
-	{
-	public:
-		client( const std::string& );
-		~client( void );
+	operator memory::transport&( void );
 
-		operator memory::transport&( void );
+private:
+	typedef scoped_ptr< memory::transport > transport_ptr;
+	typedef scoped_ptr< memory::link_client > link_ptr;
 
-	private:
-		typedef scoped_ptr< memory::transport > transport_ptr;
-		typedef scoped_ptr< link_client > link_ptr;
+	transport_ptr transport;
+	link_ptr link_client;
+};
 
-		transport_ptr transport;
-		link_ptr link;
-	};
+//--- client_data ----------------------------------------------------------------------------------
+struct OOE_PACKED client_data
+{
+	link_t link;
+	c8 name[ transport::private_size - sizeof( link_t ) ];
+};
 
-//--- ipc::memory::shared_data -------------------------------------------------
-	struct ipc::memory::shared_data
-	{
-		u32 link_id;
-		c8 name[ ipc::memory::transport::private_size - sizeof( u32 ) ];
-	} OOE_PACKED;
-}
+//--- disconnect -----------------------------------------------------------------------------------
+void disconnect( const std::string&, link_t );
+
+OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP

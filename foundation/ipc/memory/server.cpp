@@ -7,176 +7,211 @@
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/utility/scoped.hpp"
 
-namespace
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+OOE_TLS( ipc::memory::servlet* ) servlet_tls;
+
+typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool* > tuple_type;
+
+//--- ipc_decode -----------------------------------------------------------------------------------
+void ipc_decode( const void* pointer )
 {
-	using namespace ooe;
+	const tuple_type& tuple = *static_cast< const tuple_type* >( pointer );
+	shared_allocator& allocator = tuple._1;
+	io_buffer& buffer = tuple._2;
+	buffer.reset();
+	u8* data = buffer.get();
 
-	OOE_TLS( ipc::memory::servlet* ) servlet_tls;
+	bool_t internal;
+	index_t index;
+	const c8* name;
+	stream_read< bool_t, index_t, const c8* >::call( data, internal, index, name );
 
-	typedef tuple< const ipc::memory::switchboard&, ipc::memory::write_buffer*, ipc::pool* >
-		tuple_type;
-
-	void ipc_decode( u8* buffer_ptr, up_t buffer_size, const void* pointer )
+	if ( OOE_LIKELY( internal ) )
 	{
-		const tuple_type& args = *static_cast< const tuple_type* >( pointer );
-		args._0.execute( buffer_ptr, buffer_size, *args._1, *args._2 );
+		up_t preserve = stream_size< bool_t, index_t >::call( internal, index );
+		buffer.preserve( preserve );
+	}
+	else
+	{
+		allocator.set( name );
+		buffer.external();
 	}
 
-	void ipc_link( const any& any, u8* buffer_ptr, up_t buffer_size,
-		ipc::memory::write_buffer& buffer, ipc::pool& )
-	{
-		pid_t pid;
-		time_t time;
-		ipc::stream_read< pid_t, time_t >::call( header_adjust( buffer ), pid, time );
+	switchboard::size_type size = tuple._0.execute( index, buffer, *tuple._3 );
 
-		u32 link = static_cast< ipc::memory::server* >( any.pointer )->link( pid, time );
-		ipc::memory::return_write< u32 >( buffer_ptr, buffer_size, buffer, link );
-	}
+	buffer.preserve( 0 );
+	internal = buffer.is_internal();
+	error_t error = size._1 ? error::exception : error::none;
 
-	void ipc_unlink( const any& any, u8* buffer_ptr, up_t buffer_size,
-		ipc::memory::write_buffer& buffer, ipc::pool& )
-	{
-		u32 link;
-		ipc::stream_read< u32 >::call( header_adjust( buffer ), link );
-
-		static_cast< ipc::memory::server* >( any.pointer )->unlink( link );
-		ipc::memory::return_write( buffer_ptr, buffer_size, buffer );
-	}
-
-	void release( scoped_ptr< ipc::memory::link_server >& link )
-	{
-		delete link.release();
-	}
+	if ( OOE_LIKELY( internal ) )
+		stream_write< bool_t, error_t >::call( data, internal, error );
+	else
+		stream_write< bool_t, error_t, std::string >::
+			call( data, internal, error, allocator.name() );
 }
 
-namespace ooe
+//--- ipc_link -------------------------------------------------------------------------------------
+up_t ipc_link( const any& any, io_buffer& buffer, pool& pool )
 {
-//--- ipc::memory::servlet -------------------------------------------------------------
-	ipc::memory::servlet::servlet( const std::string& link_name, u32 link_id_,
-		const memory::switchboard& switchboard_, server& server )
-		: link_id( link_id_ ), transport( link_name, transport::create ),
-		switchboard( switchboard_ ), listen( new link_listen( link_name ) ), link( 0 ),
-		state( work ), thread( make_function( *this, &servlet::call ), &server )
+	pid_t pid;
+	time_t time;
+	stream_read< pid_t, time_t >::call( buffer.get(), pid, time );
+
+	link_t link = static_cast< server* >( any.pointer )->link( pid, time );
+	return return_write< link_t >( buffer, pool, link );
+}
+
+//--- ipc_unlink -----------------------------------------------------------------------------------
+up_t ipc_unlink( const any& any, io_buffer& buffer, pool& )
+{
+	link_t link;
+	stream_read< link_t >::call( buffer.get(), link );
+
+	static_cast< server* >( any.pointer )->unlink( link );
+	return 0;
+}
+
+//--- release --------------------------------------------------------------------------------------
+void release( scoped_ptr< ipc::memory::link_server >& link )
+{
+	delete link.release();
+}
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( memory ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+//--- servlet --------------------------------------------------------------------------------------
+servlet::servlet( const std::string& link_name, link_t link_, const ipc::switchboard& switchboard_,
+	server& server )
+	: link( link_ ), transport( link_name, transport::create ), switchboard( switchboard_ ),
+	link_listen( new memory::link_listen( link_name ) ), link_server( 0 ), state( work ),
+	thread( make_function( *this, &servlet::call ), &server )
+{
+}
+
+servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchboard_,
+	server& server )
+	: link( link_ ), transport( socket ), switchboard( switchboard_ ), link_listen( 0 ),
+	link_server( new memory::link_server( socket, link, server ) ), state( work ),
+	thread( make_function( *this, &servlet::call ), &server )
+{
+	client_data& data = *static_cast< client_data* >( transport.private_data() );
+
+	// disconnect from former server
+	disconnect( data.name, data.link );
+
+	// rewrite connection data in transport
+	data.link = link;
+	std::string name = server.name();
+	std::memcpy( data.name, name.c_str(), name.size() + 1 );
+}
+
+servlet::~servlet( void )
+{
+	if ( state != move )
 	{
+		// wake for arguments, indicating that the servlet should exit and calling null
+		state = idle;
+		stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
+		transport.wake_wait();
 	}
 
-	ipc::memory::servlet::servlet( socket& socket, u32 link_id_,
-		const memory::switchboard& switchboard_, server& server )
-		: link_id( link_id_ ), transport( socket ), switchboard( switchboard_ ), listen( 0 ),
-		link( new link_server( socket, link_id, server ) ), state( work ),
-		thread( make_function( *this, &servlet::call ), &server )
+	thread.join();
+}
+
+void* servlet::call( void* pointer )
+{
+	shared_allocator allocator;
+	io_buffer buffer( transport.get(), transport.size(), allocator );
+	pool pool;
+	tuple_type tuple( switchboard, allocator, buffer, &pool );
+
+	if ( link_listen )
 	{
-		ipc::memory::shared_data& data =
-			*static_cast< ipc::memory::shared_data* >( transport.private_data() );
-
-		// disconnect from former server
-		disconnect( data.name, data.link_id );
-
-		// rewrite connection data in transport
-		data.link_id = link_id;
-		const std::string& name = server.name();
-		std::memcpy( data.name, name.c_str(), name.size() + 1 );
+		memory::server& server = *static_cast< memory::server* >( pointer );
+		const socket& socket = link_listen->accept();
+		scoped_ptr< memory::link_server >
+			( new memory::link_server( socket, link, server ) ).swap( link_server );
+		delete link_listen.release();
+		transport.unlink();
 	}
 
-	ipc::memory::servlet::~servlet( void )
-	{
-		if ( state != move )
-		{
-			state = idle;
-			stream_write< u32, u32 >::call( transport.get(), true, 0 );
-			transport.wake_wait();
-		}
+	scoped< void ( scoped_ptr< memory::link_server >& ) > scoped( release, link_server );
+	servlet_tls = this;
 
-		thread.join();
-	}
-
-	void* ipc::memory::servlet::call( void* pointer )
-	{
-		write_buffer buffer( transport.get(), 0, 0 );
-		pool pool;
-		tuple_type tuple( switchboard, &buffer, &pool );
-
-		if ( listen )
-		{
-			memory::server& server = *static_cast< memory::server* >( pointer );
-			const socket& socket = listen->accept();
-			scoped_ptr< link_server >( new link_server( socket, link_id, server ) ).swap( link );
-			delete listen.release();
-			transport.unlink();
-		}
-
-		scoped< void ( scoped_ptr< link_server >& ) > scoped( release, link );
-		servlet_tls = this;
-
-		while ( state == work )
-			transport.wait( ipc_decode, &tuple );
-
-		return 0;
-	}
-
-	void ipc::memory::servlet::migrate( socket& socket )
-	{
-		transport.migrate( socket );
-		link->migrate( socket );
-		state = move;
-	}
-
-//--- ipc::memory::server --------------------------------------------------------------
-	ipc::memory::server::server( const std::string& name_, const switchboard& external_ )
-		: semaphore( name_, semaphore::create ), internal(), external( external_ ),
-		transport( name_, transport::create ), seed(), servlets()
-	{
-		if ( internal.insert_direct( ipc_link, this ) != 1 )
-			throw error::runtime( "ipc::memory::server: " ) << "\"link\" not at index 1";
-
-		if ( internal.insert_direct( ipc_unlink, this ) != 2 )
-			throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
-	}
-
-	// required to ensure servlet can be hidden
-	ipc::memory::server::~server( void )
-	{
-	}
-
-	std::string ipc::memory::server::name( void ) const
-	{
-		return transport.name();
-	}
-
-	bool ipc::memory::server::decode( void )
-	{
-		write_buffer buffer( transport.get(), 0, 0 );
-		tuple_type tuple( internal, &buffer, 0 );
+	while ( OOE_LIKELY( state == work ) )
 		transport.wait( ipc_decode, &tuple );
-		return !servlets.empty();
-	}
 
-	// note: no need for lock or atomics, semaphore is used when calling link/unlink via decode
-	u32 ipc::memory::server::link( pid_t pid, time_t time )
-	{
-		u32 link_id = seed++;
-		std::string link_name = ipc::link_name( pid, time, link_id );
-		servlet_map::value_type
-			value( link_id, new servlet( link_name, link_id, external, *this ) );
-		servlets.insert( servlets.end(), value );
-		return link_id;
-	}
-
-	void ipc::memory::server::unlink( u32 link_id )
-	{
-		servlets.erase( link_id );
-	}
-
-	void ipc::memory::server::relink( socket& socket )
-	{
-		process_lock lock( semaphore );
-		u32 link_id = seed++;
-		servlet_map::value_type value( link_id, new servlet( socket, link_id, external, *this ) );
-		servlets.insert( servlets.end(), value );
-	}
-
-	void ipc::memory::server::migrate( socket& socket )
-	{
-		( *servlet_tls ).migrate( socket );
-	}
+	return 0;
 }
+
+void servlet::migrate( socket& socket )
+{
+	transport.migrate( socket );
+	link_server->migrate( socket );
+	state = move;
+}
+
+//--- server ---------------------------------------------------------------------------------------
+server::server( const std::string& name_, const switchboard& external_ )
+	: semaphore( name_, semaphore::create ), internal(), external( external_ ),
+	transport( name_, transport::create ), seed(), servlets()
+{
+	if ( name_.size() + 1 > sizeof( client_data ) - sizeof( link_t ) )
+		throw error::runtime( "ipc::memory::server: " ) << '"' << name_ << "\" is too long";
+	else if ( internal.insert_direct( ipc_link, this ) != 1 )
+		throw error::runtime( "ipc::memory::server: " ) << "\"link\" not at index 1";
+	else if ( internal.insert_direct( ipc_unlink, this ) != 2 )
+		throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
+}
+
+// required to ensure servlet can be hidden
+server::~server( void )
+{
+}
+
+std::string server::name( void ) const
+{
+	return transport.name();
+}
+
+bool server::decode( void )
+{
+	shared_allocator allocator;
+	io_buffer buffer( transport.get(), transport.size(), allocator );
+	tuple_type tuple( internal, allocator, buffer, 0 );
+	transport.wait( ipc_decode, &tuple );
+	return !servlets.empty();
+}
+
+// note: no need for lock or atomics, semaphore is used when calling link/unlink via decode
+link_t server::link( pid_t pid, time_t time )
+{
+	link_t id = seed++;
+	std::string link_name = ipc::link_name( pid, time, id );
+	servlet_map::value_type value( id, new servlet( link_name, id, external, *this ) );
+	servlets.insert( servlets.end(), value );
+	return id;
+}
+
+void server::unlink( link_t id )
+{
+	servlets.erase( id );
+}
+
+void server::relink( socket& socket )
+{
+	process_lock lock( semaphore );
+	link_t id = seed++;
+	servlet_map::value_type value( id, new servlet( socket, id, external, *this ) );
+	servlets.insert( servlets.end(), value );
+}
+
+void server::migrate( socket& socket )
+{
+	( *servlet_tls ).migrate( socket );
+}
+
+OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

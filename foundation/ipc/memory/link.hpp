@@ -4,80 +4,73 @@
 #define OOE_FOUNDATION_IPC_MEMORY_LINK_HPP
 
 #include "foundation/io/socket.hpp"
+#include "foundation/ipc/fundamental.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/utility/atom.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+class server;
+
+//--- link_listen ----------------------------------------------------------------------------------
+class link_listen
 {
-	namespace ipc
+public:
+	link_listen( const std::string& );
+	~link_listen( void );
+
+	ooe::socket accept( void ) const;
+
+private:
+	mutable std::string path;
+	ooe::listen listen;
+};
+
+//--- link_server ----------------------------------------------------------------------------------
+class link_server
+{
+public:
+	enum type
 	{
-		namespace memory
-		{
-			class server;
-			class link_listen;
-			class link_server;
-			class link_client;
-		}
-	}
-
-//--- ipc::memory::link_listen -------------------------------------------------
-	class ipc::memory::link_listen
-	{
-	public:
-		link_listen( const std::string& );
-		~link_listen( void );
-
-		ooe::socket accept( void ) const;
-
-	private:
-		mutable std::string path;
-		ooe::listen listen;
+		idle,
+		work,
+		move
 	};
 
-//--- ipc::memory::link_server -------------------------------------------------
-	class ipc::memory::link_server
-	{
-	public:
-		enum type
-		{
-			idle,
-			work,
-			move
-		};
+	link_server( const ooe::socket&, link_t, server& );
+	~link_server( void );
 
-		link_server( const ooe::socket&, u32, server& );
-		~link_server( void );
+	void migrate( ooe::socket& );
 
-		void migrate( ooe::socket& );
+private:
+	ooe::socket socket;
+	socket_pair migrate_pair;
 
-	private:
-		ooe::socket socket;
-		socket_pair migrate_pair;
+	const link_t link;
+	atom< u32 > state;
+	ooe::thread thread;
 
-		const u32 link_id;
-		atom< u32 > state;
-		ooe::thread thread;
+	void* call( void* );
+};
 
-		void* call( void* );
-	};
+//--- link_client ----------------------------------------------------------------------------------
+class link_client
+{
+public:
+	link_client( const std::string&, transport& );
+	~link_client( void );
 
-//--- ipc::memory::link_client -------------------------------------------------
-	class ipc::memory::link_client
-	{
-	public:
-		link_client( const std::string&, transport& );
-		~link_client( void );
+	operator bool( void ) const;
 
-		operator bool( void ) const;
+private:
+	ooe::connect connect;
+	atom< bool > state;
+	ooe::thread thread;
 
-	private:
-		ooe::connect connect;
-		atom< bool > state;
-		ooe::thread thread;
+	void* call( void* );
+};
 
-		void* call( void* );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_LINK_HPP

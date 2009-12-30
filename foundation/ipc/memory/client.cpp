@@ -8,72 +8,72 @@
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/rpc_forward.hpp"
 
-namespace
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+//--- ipc_connect ----------------------------------------------------------------------------------
+link_t ipc_connect( const std::string& name, pid_t pid, time_t time )
 {
-	using namespace ooe;
+	transport transport( name, transport::open );
+	semaphore semaphore( name, semaphore::open );
+	process_lock lock( semaphore );
 
-	u32 ipc_connect( const std::string& name, pid_t pid, time_t time )
+	rpc< link_t ( pid_t, time_t ) > link( transport, 1 );
+	return link( pid, time );
+}
+
+//--- ipc_disconnect -------------------------------------------------------------------------------
+void ipc_disconnect( const std::string& name, link_t link )
+{
+	transport transport( name, ipc::memory::transport::open );
+	semaphore semaphore( name, ipc::semaphore::open );
+	process_lock lock( semaphore );
+
+	rpc< void ( link_t ) > unlink( transport, 2 );
+	unlink( link );
+}
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( memory ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+//--- client ---------------------------------------------------------------------------------------
+client::client( const std::string& name )
+	: transport( 0 ), link_client( 0 )
+{
+	if ( name.size() + 1 > sizeof( client_data ) - sizeof( link_t ) )
+		throw error::runtime( "ipc::memory::client: " ) << '"' << name << "\" is too long";
+
+	pid_t pid = getpid();
+	time_t time = timer::epoch()._0;
+	link_t link = ipc_connect( name, pid, time );
+	std::string link_name = ipc::link_name( pid, time, link );
+
+	transport_ptr( new memory::transport( link_name, transport::open ) ).swap( transport );
+	link_ptr( new memory::link_client( link_name, *transport ) ).swap( link_client );
+
+	// set client data, used for migration
+	client_data& data = *static_cast< client_data* >( transport->private_data() );
+	data.link = link;
+	std::memcpy( data.name, name.c_str(), name.size() + 1 );
+}
+
+client::~client( void )
+{
+	if ( link_client )
 	{
-		ipc::memory::transport transport( name, ipc::memory::transport::open );
-		ipc::semaphore semaphore( name, ipc::semaphore::open );
-		ipc::process_lock lock( semaphore );
-
-		ipc::memory::rpc< u32 ( pid_t, time_t ) > link( transport, 1 );
-		return link( pid, time );
-	}
-
-	void ipc_disconnect( const std::string& name, u32 link )
-	{
-		ipc::memory::transport transport( name, ipc::memory::transport::open );
-		ipc::semaphore semaphore( name, ipc::semaphore::open );
-		ipc::process_lock lock( semaphore );
-
-		ipc::memory::rpc< void ( u32 ) > unlink( transport, 2 );
-		unlink( link );
+		client_data& data = *static_cast< client_data* >( transport->private_data() );
+		OOE_PRINT( "ipc::memory::client", ipc_disconnect( data.name, data.link ) );
 	}
 }
 
-namespace ooe
+client::operator memory::transport&( void )
 {
-//--- ipc::memory::client ------------------------------------------------------
-	ipc::memory::client::client( const std::string& name )
-		: transport( 0 ), link( 0 )
-	{
-		if ( name.size() + 1 > sizeof( ipc::memory::shared_data ) - sizeof( u32 ) )
-			throw error::runtime( "ipc::memory::client: " ) << '"' << name << "\" is too long";
-
-		pid_t pid = getpid();
-		time_t time = timer::epoch()._0;
-		u32 link_id = ipc_connect( name, pid, time );
-		std::string link_name = ipc::link_name( pid, time, link_id );
-
-		transport_ptr( new ipc::memory::transport( link_name, ipc::memory::transport::open ) )
-			.swap( transport );
-		link_ptr( new link_client( link_name, *transport ) ).swap( link );
-
-		// set private data, used for migration
-		ipc::memory::shared_data& data =
-			*static_cast< ipc::memory::shared_data* >( transport->private_data() );
-		data.link_id = link_id;
-		std::memcpy( data.name, name.c_str(), name.size() + 1 );
-	}
-
-	ipc::memory::client::~client( void )
-	{
-		if ( link )
-		{
-			shared_data& data = *static_cast< shared_data* >( transport->private_data() );
-			OOE_PRINT( "ipc::memory::client", ipc_disconnect( data.name, data.link_id ) );
-		}
-	}
-
-	ipc::memory::client::operator memory::transport&( void )
-	{
-		return *transport;
-	}
-
-	void ipc::memory::disconnect( const std::string& name, u32 link_id )
-	{
-		ipc_disconnect( name, link_id );
-	}
+	return *transport;
 }
+
+void disconnect( const std::string& name, link_t link )
+{
+	ipc_disconnect( name, link );
+}
+
+OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
