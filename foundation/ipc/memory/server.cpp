@@ -44,11 +44,14 @@ void ipc_decode( const void* pointer )
 	internal = buffer.is_internal();
 	error_t error = size._1 ? error::exception : error::none;
 
-	if ( OOE_LIKELY( internal ) )
-		stream_write< bool_t, error_t >::call( data, internal, error );
-	else
+	if ( OOE_UNLIKELY( !internal ) )
 		stream_write< bool_t, error_t, std::string >::
 			call( data, internal, error, allocator.name() );
+	else
+	{
+		stream_write< bool_t, error_t >::call( data, internal, error );
+		allocator.deallocate();
+	}
 }
 
 //--- ipc_link -------------------------------------------------------------------------------------

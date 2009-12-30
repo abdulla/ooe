@@ -65,8 +65,6 @@ public:
 		return !memory;
 	}
 
-	// TODO: round allocations to page-sizes and reuse previous allocations
-	// TODO: check usage pattern to see if this is would be useful
 	virtual void allocate( up_t size, up_t )
 	{
 		scoped_ptr< shared_memory >
@@ -76,6 +74,11 @@ public:
 	virtual u8* get( up_t ) const
 	{
 		return memory->as< u8 >();
+	}
+
+	void deallocate( void )
+	{
+		scoped_ptr< shared_memory >( 0 ).swap( memory );
 	}
 
 	void set( const std::string& name_ )
