@@ -14,7 +14,7 @@ namespace
 {
 	using namespace ooe;
 
-	struct dds_pixel_format
+	struct OOE_PACKED dds_pixel_format
 	{
 		enum
 		{
@@ -29,9 +29,9 @@ namespace
 		u32 g_mask;
 		u32 b_mask;
 		u32 a_mask;
-	} OOE_PACKED;
+	};
 
-	struct dds_header
+	struct OOE_PACKED dds_header
 	{
 		enum
 		{
@@ -51,7 +51,7 @@ namespace
 		u32 surface_flags;
 		u32 cubemap_flags;
 		u32 reserved_2[ 3 ];
-	} OOE_PACKED;
+	};
 
 	compressed_image::type dds_compressed_image_type( u32 fourcc )
 	{

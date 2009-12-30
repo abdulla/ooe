@@ -10,30 +10,30 @@
 namespace ooe
 {
 //--- compressed_vertex --------------------------------------------------------
-	struct compressed_vertex
+	struct OOE_PACKED compressed_vertex
 	{
 		s16 x;					// compressed x
 		s16 y;					// compressed y
 		s16 z;					// compressed z
 		s16 delta;				// y morph delta
-	} OOE_PACKED;
+	};
 
 //--- vertex_header ------------------------------------------------------------
-	struct vertex_header
+	struct OOE_PACKED vertex_header
 	{
 		u16 vertex_count;
 		compressed_vertex vertex[ 1 ];
-	} OOE_PACKED;
+	};
 
 //--- index_header -------------------------------------------------------------
-	struct index_header
+	struct OOE_PACKED index_header
 	{
 		u32 index_count;
 		u16 index[ 1 ];
-	} OOE_PACKED;
+	};
 
 //--- tqt_header ---------------------------------------------------------------
-	struct tqt_header
+	struct OOE_PACKED tqt_header
 	{
 		u32 id;					// fourcc: "tqt"
 		u32 version;			// version: 1
@@ -41,10 +41,10 @@ namespace ooe
 
 		u32 tile_size;
 		u32 data_offset[ 1 ];	// texture data offset
-	} OOE_PACKED;
+	};
 
 //--- chunk_header -------------------------------------------------------------
-	struct chunk_header
+	struct OOE_PACKED chunk_header
 	{
 		u32 label;				// this chunk's label
 		s32 neighbour[ 4 ];		// the neighbour's labels
@@ -56,10 +56,10 @@ namespace ooe
 		s16 max_y;
 
 		u32 data_offset;		// vertex data offset
-	} OOE_PACKED;
+	};
 
 //--- chunked_header -----------------------------------------------------------
-	struct chunked_header
+	struct OOE_PACKED chunked_header
 	{
 		u32 id;					// fourcc: "CHU"
 		u16 version;			// version: 9
@@ -69,7 +69,7 @@ namespace ooe
 		f32 vertical_scale;		// vertical scale of terrain
 		f32 horizontal_scale;	// horizontal scale of terrain
 		u32 chunk_count;		// number of chunks contained
-	} OOE_PACKED;
+	};
 }
 
 namespace
