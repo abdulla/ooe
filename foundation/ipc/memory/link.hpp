@@ -48,7 +48,7 @@ private:
 	socket_pair migrate_pair;
 
 	const link_t link;
-	atom< u32 > state;
+	atom< type > state;
 	ooe::thread thread;
 
 	void* call( void* );
