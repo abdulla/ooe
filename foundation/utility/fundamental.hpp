@@ -54,12 +54,12 @@ typedef find_size< char_types, 4 >::type c32;
 
 struct no_t;
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN
+OOE_NAMESPACE_END( ( ooe ) )
+
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 struct empty_t {};
 
-OOE_ANONYMOUS_NAMESPACE_END
-
-OOE_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 #endif	// OOE_FOUNDATION_UTILITY_FUNDAMENTAL_HPP
