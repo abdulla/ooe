@@ -11,67 +11,86 @@
 #include "foundation/io/directory.hpp"
 #include "foundation/io/error.hpp"
 
-namespace
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- next_entry -----------------------------------------------------------------------------------
+bool next_entry( s32 fd, up_t& next, up_t& limit, c8* data, up_t size )
 {
-	using namespace ooe;
+	dirent* entry;
 
-	bool next_entry( s32 fd, up_t& next, up_t& limit, c8* buffer, up_t size )
+	do
 	{
-		dirent* entry;
-
-		do
+		if ( next >= limit )
 		{
-			if ( next >= limit )
-			{
-				long base;
-				s32 bytes = getdirentries( fd, buffer, size, &base );
+			long base;
+			s32 bytes = getdirentries( fd, data, size, &base );
 
-				if ( bytes <= 0 )
-					return false;
+			if ( bytes <= 0 )
+				return false;
 
-				limit = bytes;
-				next = 0;
-			}
-
-			entry = reinterpret_cast< dirent* >( buffer + next );
-			next += entry->d_reclen;
+			limit = bytes;
+			next = 0;
 		}
-		while ( entry->d_ino == 0 );	// ignore deleted entries
 
-		return true;
+		entry = reinterpret_cast< dirent* >( data + next );
+		next += entry->d_reclen;
 	}
+	while ( entry->d_ino == 0 );	// ignore deleted entries
 
-	const descriptor& validate( const descriptor& desc )
-	{
-		if ( desc.type() != descriptor::directory )
-			throw error::io( "directory: " ) << "Descriptor is not a directory";
-
-		return desc;
-	}
+	return true;
 }
 
-namespace ooe
+//--- validate -------------------------------------------------------------------------------------
+const descriptor& validate( const descriptor& desc )
 {
-//--- directory_id -------------------------------------------------------------
-	directory_id::directory_id( void )
-		: last( 0 ), next( 0 ), limit( 0 ), buffer()
-	{
-	}
+	if ( desc.type() != descriptor::directory )
+		throw error::io( "directory: " ) << "Descriptor is not a directory";
 
-//--- directory ----------------------------------------------------------------
-	directory::directory( const descriptor& desc )
-		: descriptor( validate( desc ) ), id( new directory_id )
-	{
-	}
-
-	bool directory::operator ++( void )
-	{
-		id->last = id->next;
-		return next_entry( get(), id->next, id->limit, id->buffer, sizeof( id->buffer ) );
-	}
-
-	std::string directory::operator *( void ) const
-	{
-		return reinterpret_cast< const dirent* >( id->buffer + id->last )->d_name;
-	}
+	return desc;
 }
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- directory::iterator --------------------------------------------------------------------------
+directory::iterator::iterator( directory* dir_ )
+	: dir( dir_ )
+{
+}
+
+void directory::iterator::increment( void )
+{
+	dir->prev = dir->next;
+
+	if ( !next_entry( dir->get(), dir->next, dir->limit, dir->data, sizeof( dir->data ) ) )
+		dir = 0;
+}
+
+bool directory::iterator::equal( const iterator& other ) const
+{
+	return dir == other.dir;
+}
+
+std::string directory::iterator::dereference( void ) const
+{
+	return reinterpret_cast< const dirent* >( dir->data + dir->prev )->d_name;
+}
+
+//--- directory ------------------------------------------------------------------------------------
+directory::directory( const descriptor& desc )
+	: descriptor( validate( desc ) ), prev( 0 ), next( 0 ), limit( 0 ), data()
+{
+}
+
+directory::iterator directory::begin( void )
+{
+	return this;
+}
+
+directory::iterator directory::end( void )
+{
+	return 0;
+}
+
+OOE_NAMESPACE_END( ( ooe ) )
