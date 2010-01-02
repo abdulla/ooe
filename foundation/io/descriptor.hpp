@@ -47,7 +47,7 @@ namespace ooe
 			socket
 		};
 
-		descriptor( s32 );
+		explicit descriptor( s32 );
 		descriptor( const std::string&, u8 = read );
 
 		node_type type( void ) const;
