@@ -9,3 +9,5 @@ DIR* directory_open( const ooe::descriptor& desc )
 {
 	return fdopendir( dup( desc.get() ) );
 }
+
+OOE_NAMESPACE_END( ( ooe )( platform ) )
