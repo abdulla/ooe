@@ -13,7 +13,7 @@ DIR* directory_open( const ooe::descriptor& desc )
 	DIR* dir = opendir( "/" );
 
 	if ( !dir )
-		return 0;
+		return dir;
 	else if ( close( dir->__dd_fd ) )
 		throw error::io( "directory: " ) << "Unable to close \"/\": " << error::number( errno );
 
