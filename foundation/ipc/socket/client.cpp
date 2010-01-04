@@ -97,7 +97,7 @@ void* client::call( void* )
 
 			if ( i == map.end() )
 				do_splice = true;
-			else if ( OOE_UNLIKELY( !socket_read( connect, buffer, length ) ) )
+			else if ( length && OOE_UNLIKELY( !socket_read( connect, buffer, length ) ) )
 				throw error::runtime( "ipc::socket::client: " ) <<
 					"Unable to read " << length << " bytes";
 			else
