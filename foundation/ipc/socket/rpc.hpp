@@ -5,6 +5,8 @@
 	#ifndef OOE_FOUNDATION_IPC_SOCKET_RPC_HPP
 	#define OOE_FOUNDATION_IPC_SOCKET_RPC_HPP
 
+#include <vector>
+
 #include "foundation/ipc/socket/rpc_forward.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
@@ -40,7 +42,7 @@ private:
 
 //--- find -----------------------------------------------------------------------------------------
 struct find
-	: public rpc< index_t ( const c8*, const c8* ) >
+	: private rpc< index_t ( const c8*, const c8* ) >
 {
 	typedef rpc< index_t ( const c8*, const c8* ) > base_type;
 
@@ -52,6 +54,16 @@ struct find
 	find_result operator ()( const c8* name, const c8* type ) const
 	{
 		return find_result( base_type::operator ()( name, type ), name, type );
+	}
+};
+
+//--- list -----------------------------------------------------------------------------------------
+struct list
+	: public rpc< std::vector< tuple< std::string, std::string > > ( void ) >
+{
+	list( socket::client& client_ )
+		: rpc< std::vector< tuple< std::string, std::string > > ( void ) >( client_, 2 )
+	{
 	}
 };
 

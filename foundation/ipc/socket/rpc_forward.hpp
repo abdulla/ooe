@@ -27,16 +27,18 @@ inline void except( const u8* buffer )
 }
 
 //--- result ---------------------------------------------------------------------------------------
-template< typename type >
+template< typename t >
 	class result
 {
 public:
+	typedef typename no_ref< t >::type return_type;
+
 	result( client& client, const client::iterator& i )
 		: base( new base_type( client, i ) )
 	{
 	}
 
-	type& operator ()( void ) const
+	return_type& operator ()( void ) const
 	{
 		if ( base->state == base_type::done )
 			return base->value;
@@ -49,12 +51,12 @@ public:
 		if ( base->state == base_type::error )
 			except( array );
 
-		stream_read< type >::call( array, base->value );
+		stream_read< t >::call( array, base->value );
 		return base->value;
 	}
 
 private:
-	typedef result_base< type > base_type;
+	typedef result_base< t > base_type;
 	shared_ptr< base_type > base;
 };
 
@@ -62,12 +64,14 @@ template<>
 	struct result< void >
 {
 public:
+	typedef void return_type;
+
 	result( client& client, const client::iterator& i )
 		: base( new base_type( client, i ) )
 	{
 	}
 
-	void operator ()( void )
+	return_type operator ()( void )
 	{
 		if ( base->state == base_type::done )
 			return;
@@ -133,12 +137,14 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 	: private rpc_base
 {
+	typedef result< r > result_type;
+
 	rpc( socket::client& client_, index_t index_ )
 		: rpc_base( client_, index_ )
 	{
 	}
 
-	result< r > operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
+	result_type operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
 	{
 		heap_allocator allocator;
 		io_buffer buffer( 0, 0, allocator );
@@ -153,7 +159,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		client::iterator i = client.insert();
 		buffer.preserve( 0 );
 		client.write( buffer.get(), size );
-		return result< r >( client, i );
+		return result_type( client, i );
 	}
 };
 

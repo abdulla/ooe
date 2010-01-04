@@ -164,6 +164,14 @@ template<>
 {
 	std::cerr << "test basic primitives\n";
 
+	//--- list -------------------------------------------------------------------------------------
+	typedef ipc::socket::list::result_type::return_type::const_iterator list_iterator;
+	ipc::socket::list list( client );
+	ipc::socket::list::result_type result_1 = list();
+
+	for ( list_iterator i = result_1().begin(), end = result_1().end(); i != end; ++i )
+		std::cout << "list = " << i->_0 << ' ' << i->_1 << '\n';
+
 	//--- find -------------------------------------------------------------------------------------
 	ipc::socket::find find( client );
 	u32 value = find( "print_construct", typeid( print_construct ).name() )();

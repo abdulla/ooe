@@ -81,11 +81,11 @@ template<>
 	}
 };
 
-template< typename type >
+template< typename t >
 	struct result_base
 	: public result_base< void >
 {
-	type value;
+	t value;
 
 	result_base( client_type& client_, const iterator& i_ )
 		: result_base< void >( client_, i_ ), value()
