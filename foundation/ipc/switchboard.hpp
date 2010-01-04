@@ -60,9 +60,6 @@ template< typename r >
 	up_t size = stream_size< r >::call( value );
 	buffer.allocate( size );
 
-	if ( OOE_UNLIKELY( !buffer.is_internal() ) )
-		buffer.preserve( 0 );
-
 	stream_write< r >::call( buffer.get(), value );
 	return size;
 }
