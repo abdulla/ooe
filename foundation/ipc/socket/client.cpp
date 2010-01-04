@@ -3,6 +3,7 @@
 #include "foundation/ipc/pool.hpp"
 #include "foundation/ipc/socket/client.hpp"
 #include "foundation/ipc/socket/rpc.hpp"
+#include "foundation/utility/scoped.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 
@@ -10,6 +11,22 @@ bool socket_read( ooe::socket& socket, io_buffer& buffer, up_t size )
 {
 	buffer.allocate( size );
 	return socket.receive( buffer.get(), size ) == size;
+}
+
+void error_set( u64& notify, mutex& mutex, condition& condition )
+{
+	{
+		lock lock( mutex );
+		notify = ~u64( 0 );
+	}
+
+	condition.notify_one();
+}
+
+void error_check( u64 notify )
+{
+	if ( OOE_UNLIKELY( notify == ~u64( 0 ) ) )
+		throw error::connection();
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( socket ) )
@@ -25,8 +42,12 @@ client::client( const address& address )
 
 client::~client( void )
 {
-	rpc< void ( void ) >( *this, 0 )()();			// call null function to flush pending calls
-	connect.shutdown( ooe::socket::read_write );	// shutdown socket to stop reader thread
+	if ( notify != ~u64( 0 ) )
+	{
+		rpc< void ( void ) >( *this, 0 )()();			// call null function to flush pending calls
+		connect.shutdown( ooe::socket::read_write );	// shutdown socket to stop reader thread
+	}
+
 	thread.join();
 }
 
@@ -36,11 +57,13 @@ client::array_type client::wait( result_type& result )
 
 	{
 		lock lock( mutex );
+		error_check( notify );
 
 		if ( result.i->first > in )
 		{
 			notify = result.i->first;
 			condition.wait( lock );
+			error_check( notify );
 		}
 
 		tuple = result.i->second;
@@ -71,6 +94,9 @@ void client::write( const u8* data, up_t size )
 
 void* client::call( void* )
 {
+	scoped< void ( u64&, ooe::mutex&, ooe::condition& ) >
+		scoped( error_set, notify, mutex, condition );
+
 	heap_allocator allocator;
 	io_buffer buffer( 0, 0, allocator );
 	ipc::pool pool;
@@ -90,10 +116,12 @@ void* client::call( void* )
 		stream_read< length_t, error_t >::call( buffer.get(), length, error );
 		buffer.set( 0, 0 );
 		bool do_splice = false;
+		bool do_notify;
 
 		{
 			lock lock( mutex );
 			map_type::iterator i = map.find( ++in );
+			do_notify = in == notify;
 
 			if ( i == map.end() )
 				do_splice = true;
@@ -104,10 +132,10 @@ void* client::call( void* )
 				i->second = map_tuple( allocator.release(), error == error::none );
 		}
 
-		if ( in == notify )
-			condition.notify_one();
-		else if ( do_splice )
+		if ( do_splice )
 			splice( connect, length );	// data not needed, splice out of stream
+		else if ( do_notify )
+			condition.notify_one();
 	}
 
 	return 0;
