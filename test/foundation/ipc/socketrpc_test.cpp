@@ -202,7 +202,8 @@ template<>
 	jumbo( "a brimful of asha" );
 	std::cout << "jumbo = " << jumbo.name() << '\n';
 
-	ipc::socket::call< void ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo );
+	// wait for result, to avoid race with jumbo being destructed before it is mapped by the server
+	ipc::socket::call< void ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo )();
 }
 
 template<>
