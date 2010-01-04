@@ -4,7 +4,7 @@
 
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/ipc/allocator.hpp"
+#include "foundation/ipc/container.hpp"
 #include "foundation/ipc/jumbo.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/nameservice.hpp"
