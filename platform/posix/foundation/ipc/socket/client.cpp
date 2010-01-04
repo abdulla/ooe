@@ -1,6 +1,7 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/ipc/socket/client.hpp"
+#include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( socket ) )
 
