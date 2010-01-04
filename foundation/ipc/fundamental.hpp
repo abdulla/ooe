@@ -14,9 +14,6 @@ typedef u32 error_t;
 typedef u32 length_t;
 
 /***************************************************************************************************
- * STRUCTURE OF HEADERS
- * ====================
- *
  * ________________________
  * MEMORY: ARGUMENTS HEADER
  *
@@ -40,6 +37,30 @@ typedef u32 length_t;
  *
  * NOTE: There is an assumption in the code that index_t and error_t are the same size.
  *
+ **************************************************************************************************/
+
+/***************************************************************************************************
+ * ________________________
+ * SOCKET: ARGUMENTS HEADER
+ *
+ *  ----------------------------------
+ * | 1: length_t | 2: index_t | 3: ...
+ * ----------------------------------
+ * 1: The length of the additional data.
+ * 2: The index of the function to call.
+ * 3: The rest of the data to pass to the function.
+ *
+ * ________________________
+ * SOCKET: RESULTS HEADER
+ *
+ *  ----------------------------------
+ * | 1: length_t | 2: error_t | 3: ...
+ * ----------------------------------
+ * 1: The length of the additional data.
+ * 2: Indication of whether the data is the result, or an error message.
+ * 3: The rest of the data, either the result of the function, or an error message.
+ *
+ * NOTE: There is an assumption in the code that index_t and error_t are the same size.
  **************************************************************************************************/
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
