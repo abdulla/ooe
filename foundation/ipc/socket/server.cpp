@@ -1,68 +1,114 @@
 /* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/ipc/socket/header.hpp"
+#include <iostream>
+
+#include "foundation/executable/environment.hpp"
+#include "foundation/ipc/io_buffer.hpp"
 #include "foundation/ipc/socket/server.hpp"
 
-namespace ooe
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+
+bool socket_read( ooe::socket& socket, io_buffer& buffer, up_t size )
 {
-//--- ipc::socket::servlet -----------------------------------------------------
-	ipc::socket::servlet::servlet( const servlet_list::iterator& iterator_, ooe::socket& socket_,
-		const socket::switchboard& switchboard_, server& server )
-		: iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ),
-		thread( make_function( *this, &servlet::call ), &server )
-	{
-	}
+	buffer.allocate( size );
+	return socket.receive( buffer.get(), size ) == size;
+}
 
-	void ipc::socket::servlet::join( void )
-	{
-		socket.shutdown( ooe::socket::read_write );
-		thread.join();
-	}
+bool socket_write( ooe::socket& socket, u8* data, up_t size )
+{
+	if ( socket.send( data, size ) == size )
+		return true;
 
-	void* ipc::socket::servlet::call( void* pointer )
-	{
-		buffer_type buffer;
-		ipc::pool pool;
+	OOE_WARNING( "servlet: ", "Unable to write " << size << " bytes" );
+	return false;
+}
 
-		while ( true )
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( socket ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+
+//--- servlet --------------------------------------------------------------------------------------
+servlet::servlet( const servlet_iterator& iterator_, ooe::socket& socket_,
+	const ipc::switchboard& switchboard_, server& server )
+	: iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ),
+	thread( make_function( *this, &servlet::call ), &server )
+{
+}
+
+void servlet::join( void )
+{
+	socket.shutdown( ooe::socket::read_write );
+	thread.join();
+}
+
+void* servlet::call( void* pointer )
+{
+	u8 data[ executable::static_page_size ];
+	heap_allocator allocator;
+	io_buffer buffer( data, sizeof( data ), allocator );
+	ipc::pool pool;
+
+	length_t length;
+	index_t index;
+	up_t preserve = stream_size< length_t, index_t >::call( length, index );
+
+	while ( true )
+	{
+		buffer.force( false );
+
+		if ( OOE_UNLIKELY( !socket_read( socket, buffer, preserve ) ) )
+			break;
+
+		stream_read< length_t, index_t >::call( buffer.get(), length, index );
+
+		if ( length && OOE_UNLIKELY( !socket_read( socket, buffer, length ) ) )
 		{
-			u32 size;
-
-			if ( !header_size( socket, size ) )
-				break;
-
-			header_read( socket, size, buffer );
-			switchboard.execute( &buffer[ 0 ], socket, pool );
+			OOE_WARNING( "servlet: ", "Unable to read " << length << " bytes" );
+			break;
 		}
 
-		static_cast< server* >( pointer )->erase( iterator );
-		return 0;
+		buffer.force( true );
+		switchboard::size_type size = switchboard.execute( index, buffer, pool );
+
+		length = size._1 ? size._1 : size._0;
+		error_t error = size._1 ? error::exception : error::none;
+		stream_write< length_t, error_t >::call( data, length, error );
+
+		if ( OOE_UNLIKELY( !socket_write( socket, data, preserve ) ) )
+			break;
+		else if ( OOE_UNLIKELY( !socket_write( socket, buffer.get(), length ) ) )
+			break;
 	}
 
-//--- ipc::socket::server ------------------------------------------------------
-	ipc::socket::server::server( const address& address )
-		: listen( address ), mutex(), list()
-	{
-	}
-
-	ipc::socket::server::~server( void )
-	{
-		for ( servlet_list::iterator i = list.begin(), end = list.end(); i != end; ++i )
-			( *i )->join();
-	}
-
-	void ipc::socket::server::accept( const switchboard& switchboard )
-	{
-		ooe::socket socket = listen.accept();
-
-		lock lock( mutex );
-		list.push_back( servlet_list::value_type() );
-		list.back() = new servlet( --list.end(), socket, switchboard, *this );
-	}
-
-	void ipc::socket::server::erase( const servlet_list::iterator& iterator )
-	{
-		lock lock( mutex );
-		list.erase( iterator );
-	}
+	static_cast< server* >( pointer )->erase( iterator );
+	return 0;
 }
+
+//--- server ---------------------------------------------------------------------------------------
+server::server( const address& address )
+	: listen( address ), mutex(), list()
+{
+}
+
+server::~server( void )
+{
+	for ( servlet_list::iterator i = list.begin(), end = list.end(); i != end; ++i )
+		( *i )->join();
+}
+
+void server::accept( const switchboard& switchboard )
+{
+	ooe::socket socket = listen.accept();
+
+	lock lock( mutex );
+	list.push_back( servlet_list::value_type() );
+	list.back() = new servlet( --list.end(), socket, switchboard, *this );
+}
+
+void server::erase( const servlet_list::iterator& iterator )
+{
+	lock lock( mutex );
+	list.erase( iterator );
+}
+
+OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )

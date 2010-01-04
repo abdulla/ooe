@@ -7,63 +7,55 @@
 
 #include "foundation/ipc/socket/rpc_forward.hpp"
 
-namespace ooe
-{
-	namespace ipc
-	{
-		namespace socket
-		{
-			class find_result;
-			struct find;
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 
-			template< typename >
-				struct call;
-		}
+template< typename >
+	struct call;
+
+//--- find_result ----------------------------------------------------------------------------------
+class find_result
+{
+public:
+	find_result( socket::result< index_t > result_, const c8* name_, const c8* type_ )
+		: result( result_ ), name( name_ ), type( type_ )
+	{
 	}
 
-//--- ipc::socket::find_result -------------------------------------------------
-	class ipc::socket::find_result
+	index_t operator ()( void ) const
 	{
-	public:
-		find_result( socket::result< u32 > result_, const c8* name_, const c8* type_ )
-			: result( result_ ), name( name_ ), type( type_ )
-		{
-		}
+		index_t i = result();
 
-		u32 operator ()( void ) const
-		{
-			u32 i = result();
+		if ( i != ~index_t( 0 ) )
+			return i;
 
-			if ( i != ~u32( 0 ) )
-				return i;
+		throw error::runtime( "ipc::socket::find: " ) <<
+			"Unable to find \"" << name << "\" of type \"" << type << '\"';
+	}
 
-			throw error::runtime( "ipc::socket::find: " ) <<
-				"Unable to find \"" << name << "\" of type \"" << type << '\"';
-		}
+private:
+	socket::result< index_t > result;
+	const c8* name;
+	const c8* type;
+};
 
-	private:
-		socket::result< u32 > result;
-		const c8* name;
-		const c8* type;
-	};
+//--- find -----------------------------------------------------------------------------------------
+struct find
+	: public rpc< index_t ( const c8*, const c8* ) >
+{
+	typedef rpc< index_t ( const c8*, const c8* ) > base_type;
 
-//--- ipc::socket::find --------------------------------------------------------
-	struct ipc::socket::find
-		: public rpc< u32 ( const c8*, const c8* ) >
+	find( socket::client& client_ )
+		: base_type( client_, 1 )
 	{
-		typedef rpc< u32 ( const c8*, const c8* ) > base_type;
+	}
 
-		find( socket::client& client_ )
-			: base_type( client_, 1 )
-		{
-		}
+	find_result operator ()( const c8* name, const c8* type ) const
+	{
+		return find_result( base_type::operator ()( name, type ), name, type );
+	}
+};
 
-		find_result operator ()( const c8* name, const c8* type ) const
-		{
-			return find_result( base_type::operator ()( name, type ), name, type );
-		}
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/ipc/socket/rpc.hpp"
@@ -77,33 +69,23 @@ namespace ooe
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-	#if LIMIT != OOE_PP_LIMIT
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+
+//--- call -----------------------------------------------------------------------------------------
+template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+	struct call< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+	: public rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 {
-	namespace ipc
+	typedef r signature_type( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
+	typedef rpc< signature_type > base_type;
+
+	call( socket::client& client_, const c8* name )
+		: base_type( client_, find( client_ )( name, typeid( signature_type ).name() )() )
 	{
-		namespace socket
-		{
-			template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-				struct call< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
-		}
 	}
+};
 
-//--- ipc::socket::rpc ---------------------------------------------------------
-	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct ipc::socket::call< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: public rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-	{
-		typedef r signature_type( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-		typedef rpc< signature_type > base_type;
-
-		call( socket::client& client_, const c8* name )
-			: base_type( client_, find( client_ )( name, typeid( signature_type ).name() )() )
-		{
-		}
-	};
-}
-	#endif
+OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 
 	#undef LIMIT
 

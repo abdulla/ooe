@@ -6,57 +6,52 @@
 #include <list>
 
 #include "foundation/io/socket.hpp"
-#include "foundation/ipc/socket/switchboard.hpp"
+#include "foundation/ipc/switchboard.hpp"
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+
+class servlet;
+class server;
+
+typedef shared_ptr< servlet > servlet_ptr;
+typedef std::list< servlet_ptr > servlet_list;
+typedef std::list< servlet_ptr >::iterator servlet_iterator;
+
+//--- servlet --------------------------------------------------------------------------------------
+class servlet
 {
-	namespace ipc
-	{
-		namespace socket
-		{
-			class servlet;
-			class server;
+public:
+	servlet( const servlet_iterator&, ooe::socket&, const ipc::switchboard&, server& );
 
-			typedef shared_ptr< servlet > servlet_ptr;
-			typedef std::list< servlet_ptr > servlet_list;
-			typedef std::list< servlet_ptr >::iterator servlet_iterator;
-		}
-	}
+	void join( void );
 
-//--- ipc::socket::servlet -----------------------------------------------------
-	class ipc::socket::servlet
-	{
-	public:
-		servlet( const servlet_iterator&, ooe::socket&, const socket::switchboard&, server& );
+private:
+	servlet_iterator iterator;
+	ooe::socket socket;
+	const ipc::switchboard& switchboard;
+	ooe::thread thread;
 
-		void join( void );
+	void* call( void* );
+};
 
-	private:
-		servlet_iterator iterator;
-		ooe::socket socket;
-		const socket::switchboard& switchboard;
-		ooe::thread thread;
+//--- server ---------------------------------------------------------------------------------------
+class OOE_VISIBLE server
+{
+public:
+	server( const address& );
+	~server( void );
 
-		void* call( void* );
-	};
+	void accept( const switchboard& );
+	void erase( const servlet_iterator& ) OOE_HIDDEN;
 
-//--- ipc::socket::server ------------------------------------------------------
-	class OOE_VISIBLE ipc::socket::server
-	{
-	public:
-		server( const address& );
-		~server( void );
+private:
+	ooe::listen listen;
+	ooe::mutex mutex;
+	servlet_list list;
+};
 
-		void accept( const switchboard& );
-		void erase( const servlet_iterator& ) OOE_HIDDEN;
-
-	private:
-		ooe::listen listen;
-		ooe::mutex mutex;
-		servlet_list list;
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 
 #endif	// OOE_FOUNDATION_IPC_SOCKET_SERVER_HPP

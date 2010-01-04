@@ -6,114 +6,113 @@
 	#define OOE_FOUNDATION_IPC_SOCKET_RPC_FORWARD_HPP
 
 #include "foundation/ipc/error.hpp"
+#include "foundation/ipc/fundamental.hpp"
+#include "foundation/ipc/io_buffer.hpp"
 #include "foundation/ipc/traits.hpp"
 #include "foundation/ipc/socket/client.hpp"
-#include "foundation/ipc/socket/write_buffer.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+
+template< typename >
+	struct rpc;
+
+//--- except ---------------------------------------------------------------------------------------
+inline void except( const u8* buffer )
 {
-	namespace ipc
-	{
-		namespace socket
-		{
-			template< typename >
-				class result;
-
-			template<>
-				class result< void >;
-
-			class rpc_base;
-
-			template< typename >
-				struct rpc;
-
-			inline void except( const u8* );
-		}
-	}
-
-//--- ipc::socket --------------------------------------------------------------
-	inline void ipc::socket::except( const u8* buffer )
-	{
-		bool executed;
-		const c8* what;
-		const c8* where;
-		stream_read< bool, const c8*, const c8* >::call( buffer, executed, what, where );
-		throw error::rpc( executed ) << what << "\n\nServer stack trace:" << where;
-	}
-
-//--- ipc::socket::result ------------------------------------------------------
-	template<>
-		struct ipc::socket::result< void >
-	{
-	public:
-		result( client& client, const client::iterator& i )
-			: base( new base_type( client, i ) )
-		{
-		}
-
-		void operator ()( void )
-		{
-			if ( base->state == base_type::done )
-				return;
-
-			array_type array;
-
-			if ( base->state == base_type::wait )
-				array = base->client.wait( *base );
-
-			if ( base->state == base_type::error )
-				except( array );
-		}
-
-	private:
-		typedef result_base< void > base_type;
-		shared_ptr< base_type > base;
-	};
-
-	template< typename type >
-		class ipc::socket::result
-	{
-	public:
-		result( client& client, const client::iterator& i )
-			: base( new base_type( client, i ) )
-		{
-		}
-
-		type& operator ()( void ) const
-		{
-			if ( base->state == base_type::done )
-				return base->value;
-
-			array_type array;
-
-			if ( base->state == base_type::wait )
-				array = base->client.wait( *base );
-
-			if ( base->state == base_type::error )
-				except( array );
-
-			stream_read< type >::call( array, base->value );
-			return base->value;
-		}
-
-	private:
-		typedef result_base< type > base_type;
-		shared_ptr< base_type > base;
-	};
-
-//--- ipc::socket::rpc_base ----------------------------------------------------
-	class ipc::socket::rpc_base
-	{
-	protected:
-		socket::client& client;
-		const u32 index;
-
-		rpc_base( socket::client& client_, u32 index_ )
-			: client( client_ ), index( index_ )
-		{
-		}
-	};
+	bool executed;
+	const c8* what;
+	const c8* where;
+	stream_read< bool, const c8*, const c8* >::call( buffer, executed, what, where );
+	throw error::rpc( executed ) << what << "\n\nServer stack trace:" << where;
 }
+
+//--- result ---------------------------------------------------------------------------------------
+template< typename type >
+	class result
+{
+public:
+	result( client& client, const client::iterator& i )
+		: base( new base_type( client, i ) )
+	{
+	}
+
+	type& operator ()( void ) const
+	{
+		if ( base->state == base_type::done )
+			return base->value;
+
+		client::array_type array;
+
+		if ( base->state == base_type::wait )
+			array = base->client.wait( *base );
+
+		if ( base->state == base_type::error )
+			except( array );
+
+		stream_read< type >::call( array, base->value );
+		return base->value;
+	}
+
+private:
+	typedef result_base< type > base_type;
+	shared_ptr< base_type > base;
+};
+
+template<>
+	struct result< void >
+{
+public:
+	result( client& client, const client::iterator& i )
+		: base( new base_type( client, i ) )
+	{
+	}
+
+	void operator ()( void )
+	{
+		if ( base->state == base_type::done )
+			return;
+
+		client::array_type array;
+
+		if ( base->state == base_type::wait )
+			array = base->client.wait( *base );
+
+		if ( base->state == base_type::error )
+			except( array );
+	}
+
+private:
+	typedef result_base< void > base_type;
+	shared_ptr< base_type > base;
+};
+
+//--- rpc_base -------------------------------------------------------------------------------------
+class rpc_base
+{
+protected:
+	socket::client& client;
+	const index_t index;
+
+	rpc_base( socket::client& client_, index_t index_ )
+		: client( client_ ), index( index_ )
+	{
+	}
+};
+
+//--- store_header ---------------------------------------------------------------------------------
+inline up_t store_header( io_buffer& buffer, up_t size, index_t index )
+{
+	up_t preserve = stream_size< length_t, index_t >::call( size, index );
+	up_t allocate = size + preserve;
+
+	buffer.allocate( allocate );
+	stream_write< length_t, index_t >::call( buffer.get(), size, index );
+	buffer.preserve( preserve );
+
+	return allocate;
+}
+
+OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/ipc/socket/rpc_forward.hpp"
@@ -127,45 +126,38 @@ namespace ooe
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-	#if LIMIT < BOOST_PP_DEC( OOE_PP_LIMIT )
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+
+//--- rpc ------------------------------------------------------------------------------------------
+template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+	struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
+	: private rpc_base
 {
-	namespace ipc
+	rpc( socket::client& client_, index_t index_ )
+		: rpc_base( client_, index_ )
 	{
-		namespace socket
-		{
-			template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-				struct rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >;
-		}
 	}
 
-//--- ipc::socket::rpc ---------------------------------------------------------
-	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		struct ipc::socket::rpc< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-		: private rpc_base
+	result< r > operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
 	{
-		rpc( socket::client& client_, u32 index_ )
-			: rpc_base( client_, index_ )
-		{
-		}
+		heap_allocator allocator;
+		io_buffer buffer( 0, 0, allocator );
 
-		result< r > operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
-		{
-			up_t size = stream_size< u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
-				call( index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-			write_buffer buffer( client.get(), client.size(), size + sizeof( u32 ) );
-			u8* data = buffer.get();
+		up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+			call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+		size = store_header( buffer, size, index );
+		stream_write< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
+			call( buffer.get() BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
-			stream_write< u32, u32 BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, t ) >::
-				call( data, size, index BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
-			client::iterator i = client.insert();
-			client.write( data, size + sizeof( u32 ) );
+		// must insert before write to avoid race, see commit: 00337dc5
+		client::iterator i = client.insert();
+		buffer.preserve( 0 );
+		client.write( buffer.get(), size );
+		return result< r >( client, i );
+	}
+};
 
-			return result< r >( client, i );
-		}
-	};
-}
-	#endif
+OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 
 	#undef LIMIT
 
