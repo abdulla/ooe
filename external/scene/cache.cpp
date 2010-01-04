@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "external/scene/cache.hpp"
 #include "foundation/image/dds.hpp"

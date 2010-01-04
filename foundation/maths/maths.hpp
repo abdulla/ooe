@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #ifndef OOE_FOUNDATION_MATHS_MATHS_HPP
 #define OOE_FOUNDATION_MATHS_MATHS_HPP
