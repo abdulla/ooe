@@ -105,8 +105,7 @@ class io_buffer
 {
 public:
 	io_buffer( u8* data_, up_t size_, buffer_allocator& allocator_ )
-		: preserved( 0 ), internal( true ), forced( false ), data( data_ ), size( size_ ),
-		allocator( allocator_ )
+		: preserved( 0 ), internal( true ), data( data_ ), size( size_ ), allocator( allocator_ )
 	{
 	}
 
@@ -126,26 +125,15 @@ public:
 		internal = true;
 	}
 
-	void force( bool forced_ )
-	{
-		forced = forced_;
-	}
-
 	void allocate( up_t request )
 	{
-		if ( !forced && request + preserved <= size )
+		if ( request + preserved <= size )
 			internal = true;
 		else
 		{
 			allocator.allocate( request );
 			internal = false;
 		}
-	}
-
-	void set( u8* data_, up_t size_ )
-	{
-		data = data_;
-		size = size_;
 	}
 
 	u8* get( void ) const
@@ -161,7 +149,6 @@ public:
 private:
 	up_t preserved;
 	bool internal;
-	bool forced;
 
 	u8* data;
 	up_t size;

@@ -48,14 +48,13 @@ void* servlet::call( void* pointer )
 	io_buffer buffer( data, sizeof( data ), allocator );
 	ipc::pool pool;
 
+	u8 header[ sizeof( length_t ) + sizeof( index_t ) ];
 	length_t length;
 	index_t index;
 	up_t preserve = stream_size< length_t, index_t >::call( length, index );
 
 	while ( true )
 	{
-		buffer.force( false );
-
 		if ( OOE_UNLIKELY( !socket_read( socket, buffer, preserve ) ) )
 			break;
 
@@ -67,14 +66,13 @@ void* servlet::call( void* pointer )
 			break;
 		}
 
-		buffer.force( true );
 		switchboard::size_type size = switchboard.execute( index, buffer, pool );
 
 		length = size._1 ? size._1 : size._0;
 		error_t error = size._1 ? error::exception : error::none;
-		stream_write< length_t, error_t >::call( data, length, error );
+		stream_write< length_t, error_t >::call( header, length, error );
 
-		if ( OOE_UNLIKELY( !socket_write( socket, data, preserve ) ) )
+		if ( OOE_UNLIKELY( !socket_write( socket, header, preserve ) ) )
 			break;
 		else if ( length && OOE_UNLIKELY( !socket_write( socket, buffer.get(), length ) ) )
 			break;

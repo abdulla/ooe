@@ -147,7 +147,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	result_type operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
 	{
 		heap_allocator allocator;
-		io_buffer buffer( 0, 0, allocator );
+		io_buffer buffer( client.get(), client.size(), allocator );
 
 		up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 			call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );

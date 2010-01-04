@@ -36,7 +36,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 //--- client ---------------------------------------------------------------------------------------
 client::client( const address& address )
 	: platform::ipc::socket::client(), connect( address ), map(), in( 0 ), out( 0 ), notify( 0 ),
-	mutex(), condition(), thread( make_function( *this, &client::call ), 0 )
+	mutex(), condition(), thread( make_function( *this, &client::call ), 0 ), scratch()
 {
 }
 
@@ -86,10 +86,20 @@ client::iterator client::insert( void )
 	return map.insert( map.end(), map_type::value_type( ++out, map_tuple() ) );
 }
 
-void client::write( const u8* data, up_t size )
+u8* client::get( void ) const
 {
-	if ( connect.send( data, size ) != size )
-		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size << " bytes";
+	return scratch;
+}
+
+up_t client::size( void ) const
+{
+	return sizeof( scratch );
+}
+
+void client::write( const u8* data, up_t size_ )
+{
+	if ( connect.send( data, size_ ) != size_ )
+		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
 }
 
 void* client::call( void* )
@@ -101,20 +111,17 @@ void* client::call( void* )
 	io_buffer buffer( 0, 0, allocator );
 	ipc::pool pool;
 
-	u8 data[ 16 ];
+	u8 header[ sizeof( length_t ) + sizeof( index_t ) ];
 	length_t length;
 	error_t error;
 	up_t preserve = stream_size< length_t, error_t >::call( length, error );
 
 	while ( true )
 	{
-		buffer.set( data, sizeof( data ) );
-
-		if ( OOE_UNLIKELY( !socket_read( connect, buffer, preserve ) ) )
+		if ( OOE_UNLIKELY( connect.receive( header, preserve ) != preserve ) )
 			break;
 
-		stream_read< length_t, error_t >::call( buffer.get(), length, error );
-		buffer.set( 0, 0 );
+		stream_read< length_t, error_t >::call( header, length, error );
 		bool do_splice = false;
 		bool do_notify;
 

@@ -33,6 +33,8 @@ public:
 	void erase( const iterator& );
 	iterator insert( void );
 
+	u8* get( void ) const;
+	up_t size( void ) const;
 	void write( const u8*, up_t );
 
 private:
@@ -46,6 +48,8 @@ private:
 	ooe::mutex mutex;
 	ooe::condition condition;
 	ooe::thread thread;
+
+	mutable u8 scratch[ executable::static_page_size ];
 
 	void* call( void* ) OOE_HIDDEN;
 };
