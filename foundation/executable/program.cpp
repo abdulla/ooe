@@ -9,6 +9,7 @@
 
 #include <fcntl.h>
 
+#include "foundation/executable/environment.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
@@ -98,6 +99,9 @@ namespace ooe
 			else if ( open( log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600 ) != STDERR_FILENO )
 				throw error::runtime( "executable::launch: " ) <<
 					"Unable to override standard error: " << error::number( errno );
+			else if ( executable::page_size() != executable::static_page_size )
+				throw error::runtime( "executable::launch: " ) << "Incorrect static page size: " <<
+					executable::page_size() << " != " << executable::static_page_size;
 			else if ( platform::launch( launch, path._0, path._1, argc, argv ) )
 				status = EXIT_SUCCESS;
 		}
