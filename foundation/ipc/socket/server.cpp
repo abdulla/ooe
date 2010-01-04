@@ -76,7 +76,7 @@ void* servlet::call( void* pointer )
 
 		if ( OOE_UNLIKELY( !socket_write( socket, data, preserve ) ) )
 			break;
-		else if ( OOE_UNLIKELY( !socket_write( socket, buffer.get(), length ) ) )
+		else if ( length && OOE_UNLIKELY( !socket_write( socket, buffer.get(), length ) ) )
 			break;
 	}
 
