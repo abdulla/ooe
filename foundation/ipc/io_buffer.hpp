@@ -4,7 +4,6 @@
 #ifndef OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 #define OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 
-#include "foundation/ipc/error.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/shared_memory.hpp"
 
@@ -15,7 +14,7 @@ struct buffer_allocator
 {
 	virtual ~buffer_allocator( void ) {}
 	virtual bool empty( void ) = 0;
-	virtual void allocate( up_t, up_t ) = 0;
+	virtual void allocate( up_t ) = 0;
 	virtual u8* get( up_t ) const = 0;
 };
 
@@ -36,14 +35,19 @@ public:
 
 	// TODO: round allocations to page-sizes and reuse previous allocations
 	// TODO: better yet, use vmsplice to gift pages and accelerate transfer
-	virtual void allocate( up_t size, up_t preserved )
+	virtual void allocate( up_t size )
 	{
-		scoped_array< u8 >( new u8[ size + preserved ] ).swap( memory );
+		scoped_array< u8 >( new u8[ size ] ).swap( memory );
 	}
 
 	virtual u8* get( up_t preserved ) const
 	{
 		return memory + preserved;
+	}
+
+	u8* release( void )
+	{
+		return memory.release();
 	}
 
 private:
@@ -65,7 +69,7 @@ public:
 		return !memory;
 	}
 
-	virtual void allocate( up_t size, up_t )
+	virtual void allocate( up_t size )
 	{
 		scoped_ptr< shared_memory >
 			( new shared_memory( unique_name(), shared_memory::create, size ) ).swap( memory );
@@ -97,10 +101,12 @@ private:
 
 //--- io_buffer ------------------------------------------------------------------------------------
 class io_buffer
+	: private noncopyable
 {
 public:
 	io_buffer( u8* data_, up_t size_, buffer_allocator& allocator_ )
-		: preserved( 0 ), internal( true ), data( data_ ), size( size_ ), allocator( allocator_ )
+		: preserved( 0 ), internal( true ), forced( false ), data( data_ ), size( size_ ),
+		allocator( allocator_ )
 	{
 	}
 
@@ -120,15 +126,26 @@ public:
 		internal = true;
 	}
 
+	void force( bool forced_ )
+	{
+		forced = forced_;
+	}
+
 	void allocate( up_t request )
 	{
-		if ( OOE_LIKELY( request + preserved <= size ) )
+		if ( !forced && request + preserved <= size )
 			internal = true;
 		else
 		{
-			allocator.allocate( request, preserved );
+			allocator.allocate( request );
 			internal = false;
 		}
+	}
+
+	void set( u8* data_, up_t size_ )
+	{
+		data = data_;
+		size = size_;
 	}
 
 	u8* get( void ) const
@@ -144,9 +161,10 @@ public:
 private:
 	up_t preserved;
 	bool internal;
+	bool forced;
 
-	u8* const data;
-	const up_t size;
+	u8* data;
+	up_t size;
 
 	buffer_allocator& allocator;
 };
