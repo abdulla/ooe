@@ -177,6 +177,17 @@ template<>
 	u32 value = find( "print_construct", typeid( print_construct ).name() )();
 	std::cout << "find = " << value << '\n';
 
+	//--- find_all ---------------------------------------------------------------------------------
+	typedef ipc::socket::find_all::result_type::return_type::const_iterator find_iterator;
+	ipc::socket::find_all find_all( client );
+	ipc::socket::find_all::parameter_type parameter;
+	parameter.push_back( make_tuple( "print_construct", typeid( print_construct ).name() ) );
+	parameter.push_back( make_tuple( "print_destruct", typeid( print_destruct ).name() ) );
+	ipc::socket::find_all::result_type result_2 = find_all( parameter );
+
+	for ( find_iterator i = result_2().begin(), end = result_2().end(); i != end; ++i )
+		std::cout << "find_all = " << *i << '\n';
+
 	//--- call -------------------------------------------------------------------------------------
 	ipc::socket::call< construct_ptr< print > ( const std::string& ) >
 		print_construct( client, "print_construct" );
@@ -242,6 +253,10 @@ template<>
 
 	ipc::socket::find find( client );
 	except( "find non-existant function", find( "no_function", "no_type" )() );
+
+	ipc::socket::find_all find_all( client );
+	ipc::socket::find_all::parameter_type parameter( 2, make_tuple( "no_function", "no_type" ) );
+	except( "find-all non-existant functions", find_all( parameter )() );
 
 	ipc::socket::call< void ( print* ) > print_show( client, "print_show" );
 	except( "null-pointer argument", print_show( 0 )() );

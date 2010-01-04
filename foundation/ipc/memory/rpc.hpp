@@ -50,11 +50,9 @@ struct list
 
 //--- find_all -------------------------------------------------------------------------------------
 struct find_all
-	: private
-	rpc< std::vector< index_t > ( const std::vector< tuple< std::string, std::string > >& ) >
+	: private rpc< std::vector< index_t > ( const std::vector< tuple< const c8*, const c8* > >& ) >
 {
-	typedef tuple< std::string, std::string > tuple_type;
-	typedef std::vector< tuple_type > parameter_type;
+	typedef std::vector< tuple< const c8*, const c8* > > parameter_type;
 	typedef rpc< result_type ( const parameter_type& ) > base_type;
 	using base_type::result_type;
 

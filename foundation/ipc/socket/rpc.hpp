@@ -18,7 +18,9 @@ template< typename >
 class find_result
 {
 public:
-	find_result( socket::result< index_t > result_, const c8* name_, const c8* type_ )
+	typedef socket::result< index_t > result_type;
+
+	find_result( result_type result_, const c8* name_, const c8* type_ )
 		: result( result_ ), name( name_ ), type( type_ )
 	{
 	}
@@ -35,7 +37,7 @@ public:
 	}
 
 private:
-	socket::result< index_t > result;
+	result_type result;
 	const c8* name;
 	const c8* type;
 };
@@ -64,6 +66,63 @@ struct list
 	list( socket::client& client_ )
 		: rpc< std::vector< tuple< std::string, std::string > > ( void ) >( client_, 2 )
 	{
+	}
+};
+
+//--- find_all_result ------------------------------------------------------------------------------
+class find_all_result
+{
+public:
+	typedef socket::result< std::vector< index_t > > result_type;
+	typedef std::vector< tuple< const c8*, const c8* > > parameter_type;
+	typedef result_type::return_type return_type;
+
+	find_all_result( result_type result_ )
+		: result( result_ ), state( false )
+	{
+	}
+
+	return_type& operator ()( void ) const
+	{
+		if ( state )
+			return result();
+
+		return_type& value = result();
+
+		for ( up_t i = 0, end = value.size(); i != end; ++i )
+		{
+			if ( value[ i ] != ~index_t( 0 ) )
+				continue;
+
+			throw error::runtime( "ipc::socket::find_all: " ) <<
+				"Unable to find function at index: " << i;
+		}
+
+		state = true;
+		return value;
+	}
+
+private:
+	result_type result;
+	mutable bool state;
+};
+
+//--- find_all -------------------------------------------------------------------------------------
+struct find_all
+	: private rpc< std::vector< index_t > ( const std::vector< tuple< const c8*, const c8* > >& ) >
+{
+	typedef find_all_result result_type;
+	typedef std::vector< tuple< const c8*, const c8* > > parameter_type;
+	typedef rpc< std::vector< index_t > ( const parameter_type& ) > base_type;
+
+	find_all( socket::client& client_ )
+		: base_type( client_, 3 )
+	{
+	}
+
+	result_type operator ()( const parameter_type& parameter ) const
+	{
+		return base_type::operator ()( parameter );
 	}
 };
 

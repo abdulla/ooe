@@ -177,11 +177,10 @@ template<>
 
 	//--- find_all ---------------------------------------------------------------------------------
 	typedef ipc::memory::find_all::result_type::const_iterator find_iterator;
-	typedef ipc::memory::find_all::tuple_type tuple;
 	ipc::memory::find_all find_all( client );
 	ipc::memory::find_all::parameter_type parameter;
-	parameter.push_back( tuple( "print_construct", typeid( print_construct ).name() ) );
-	parameter.push_back( tuple( "print_destruct", typeid( print_destruct ).name() ) );
+	parameter.push_back( make_tuple( "print_construct", typeid( print_construct ).name() ) );
+	parameter.push_back( make_tuple( "print_destruct", typeid( print_destruct ).name() ) );
 	ipc::memory::find_all::result_type result_2 = find_all( parameter );
 
 	for ( find_iterator i = result_2.begin(), end = result_2.end(); i != end; ++i )
@@ -252,8 +251,7 @@ template<>
 	except( "find non-existant function", find( "no_function", "no_type" ) );
 
 	ipc::memory::find_all find_all( client );
-	ipc::memory::find_all::tuple_type tuple( "no_function", "no_type" );
-	ipc::memory::find_all::parameter_type parameter( 2, tuple );
+	ipc::memory::find_all::parameter_type parameter( 2, make_tuple( "no_function", "no_type" ) );
 	except( "find-all non-existant functions", find_all( parameter ) );
 
 	ipc::memory::call< void ( print* ) > print_show( client, "print_show" );
