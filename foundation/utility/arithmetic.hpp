@@ -21,19 +21,19 @@ inline f32 divide( u32 x, u32 y )
 }
 
 //--- round_up -------------------------------------------------------------------------------------
-template< std::size_t alignment >
+template< std::size_t round >
 	std::size_t round_up( std::size_t size )
 {
-	std::size_t quotient = size / alignment;
-	return ( quotient + 1 ) * alignment;
+	std::size_t quotient = size / round + ( size % round ? 1 : 0 );
+	return quotient * round;
 }
 
 //--- round_down -----------------------------------------------------------------------------------
-template< std::size_t alignment >
+template< std::size_t round >
 	std::size_t round_down( std::size_t size )
 {
-	std::size_t quotient = size / alignment;
-	return quotient * alignment;
+	std::size_t quotient = size / round;
+	return quotient * round;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
