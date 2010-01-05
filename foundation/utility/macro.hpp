@@ -13,7 +13,6 @@
 	#define OOE_PURE				__attribute__( ( __pure__ ) )
 	#define OOE_CONST				__attribute__( ( __const__ ) )
 	#define OOE_PACKED				__attribute__( ( __packed__ ) )
-	#define OOE_ALIGN( size )		__attribute__( ( __aligned__( size ) ) )
 	#define OOE_VISIBLE				__attribute__( ( __visibility__( "default" ) ) )
 	#define OOE_HIDDEN				__attribute__( ( __visibility__( "hidden" ) ) )
 	#define OOE_LIKELY( boolean )	__builtin_expect( ( boolean ), 1 )
@@ -29,7 +28,6 @@
 	#define OOE_PURE
 	#define OOE_CONST
 	#define OOE_PACKED
-	#define OOE_ALIGN( size )
 	#define OOE_VISIBLE
 	#define OOE_HIDDEN
 	#define OOE_LIKELY( boolean )
