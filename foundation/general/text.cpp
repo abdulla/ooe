@@ -5,9 +5,9 @@
 #include <cctype>
 
 #include "foundation/general/text.hpp"
+#include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/miscellany.hpp"
 
 namespace
 {
