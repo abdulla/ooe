@@ -9,7 +9,6 @@
 #include "foundation/executable/environment.hpp"
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
-#include "foundation/utility/align.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 
@@ -21,7 +20,7 @@ class OOE_VISIBLE client
 	: private platform::ipc::socket::client
 {
 public:
-	typedef shared_aligned< u8 > array_type;
+	typedef shared_array< u8 > array_type;
 	typedef tuple< array_type, bool > map_tuple;
 	typedef std::map< u64, map_tuple > map_type;
 	typedef map_type::iterator iterator;

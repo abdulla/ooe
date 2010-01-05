@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 #define OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 
-#include "foundation/executable/environment.hpp"
+#include "foundation/ipc/io_buffer_forward.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/shared_memory.hpp"
 #include "foundation/utility/align.hpp"
@@ -31,29 +31,28 @@ public:
 
 	virtual bool empty( void )
 	{
-		return !memory;
+		return !memory.as< u8 >();
 	}
 
 	// TODO: round allocations to page-sizes and reuse previous allocations
 	// TODO: better yet, use vmsplice to gift pages and accelerate transfer
 	virtual void allocate( up_t size )
 	{
-		scoped_aligned< u8 >
-			( new( align_to( executable::static_page_size ) ) u8[ size ] ).swap( memory );
+		aligned_ptr< static_alignment >( aligned< static_alignment >( size ) ).swap( memory );
 	}
 
 	virtual u8* get( up_t preserved ) const
 	{
-		return memory + preserved;
+		return memory.as< u8 >() + preserved;
 	}
 
 	u8* release( void )
 	{
-		return memory.release();
+		return memory.release< u8 >();
 	}
 
 private:
-	scoped_aligned< u8 > memory;
+	aligned_ptr< static_alignment > memory;
 };
 
 //--- shared_allocator -----------------------------------------------------------------------------
