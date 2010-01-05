@@ -5,24 +5,9 @@
 	#ifndef OOE_FOUNDATION_UTILITY_MISCELLANY_HPP
 	#define OOE_FOUNDATION_UTILITY_MISCELLANY_HPP
 
-#include <algorithm>
-
 #include "foundation/utility/traits.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
-
-//--- clamp ----------------------------------------------------------------------------------------
-template< typename type >
-	type clamp( type value, type min, type max )
-{
-	return std::max( min, std::min( value, max ) );
-}
-
-//--- divide ---------------------------------------------------------------------------------------
-inline f32 divide( u32 x, u32 y )
-{
-	return static_cast< f32 >( x ) / static_cast< f32 >( y );
-}
 
 //--- add ------------------------------------------------------------------------------------------
 template< typename type >
@@ -41,7 +26,7 @@ template< typename type >
 template< typename in_t, typename out_t, typename skip_t >
 	out_t skip_out( in_t i, in_t end, out_t j, skip_t x )
 {
-	for ( ; i != end; ++i, std::advance( j, x ) )
+	for ( ; i != end; ++i, j += x )
 		*j = *i;
 
 	return j;
@@ -51,7 +36,7 @@ template< typename in_t, typename out_t, typename skip_t >
 template< typename in_t, typename out_t, typename skip_t >
 	out_t skip_in( in_t i, in_t end, out_t j, skip_t x )
 {
-	for ( ; i != end; std::advance( i, x ), ++j )
+	for ( ; i != end; i += x, ++j )
 		*j = *i;
 
 	return j;

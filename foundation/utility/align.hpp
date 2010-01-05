@@ -3,11 +3,11 @@
 #ifndef OOE_FOUNDATION_UTILITY_ALIGN_HPP
 #define OOE_FOUNDATION_UTILITY_ALIGN_HPP
 
-#include <new>
-
+#include <cerrno>
 #include <cstdlib>
 
-#include "foundation/utility/pointer.hpp"
+#include "foundation/utility/arithmetic.hpp"
+#include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -17,85 +17,78 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 	#define OOE_ALIGN( size )
 #endif
 
-template< std::size_t alignment >
-	std::size_t align_by( std::size_t size )
+//--- aligned --------------------------------------------------------------------------------------
+template< up_t a >
+	class aligned
 {
-	std::size_t quotient = size / alignment;
-	return ( quotient + 1 ) * alignment;
-}
-
-struct align_to
-{
-	std::size_t alignment;
-
-	align_to( std::size_t alignment_ = sizeof( void* ) )
-		: alignment( alignment_ )
+public:
+	aligned( up_t size )
+		: pointer()
 	{
-	}
-};
+		size = round_up< a >( size );
 
-inline void* aligned_allocate( std::size_t size, std::size_t alignment )
-{
+		if ( posix_memalign( &pointer, a, size ) )
+			throw error::runtime( "aligned: " ) << "Unable to allocate " << size <<
+				" bytes, aligned to " << a << " bytes: " << error::number( errno );
+	}
+
+	void deallocate( void )
+	{
+		std::free( pointer );
+	}
+
+	void* get( void ) const
+	{
+		return pointer;
+	}
+
+	void* release( void )
+	{
+		void* pass_back = pointer;
+		pointer = 0;
+		return pass_back;
+	}
+
+private:
 	void* pointer;
-
-	if ( posix_memalign( &pointer, alignment, size ) )
-		throw std::bad_alloc();
-
-	return pointer;
-}
-
-OOE_NAMESPACE_END( ( ooe ) )
-
-inline void* operator new( std::size_t size, const ooe::align_to& align_to )
-{
-	return ooe::aligned_allocate( size, align_to.alignment );
-}
-
-inline void* operator new[]( std::size_t size, const ooe::align_to& align_to )
-{
-	return ooe::aligned_allocate( size, align_to.alignment );
-}
-
-inline void operator delete( void* pointer, const ooe::align_to& )
-{
-	std::free( pointer );
-}
-
-inline void operator delete[]( void* pointer, const ooe::align_to& )
-{
-	std::free( pointer );
-}
-
-OOE_NAMESPACE_BEGIN( ( ooe ) )
-
-//--- deallocate_aligned ---------------------------------------------------------------------------
-template< typename type >
-	void deallocate_aligned( type* value )
-{
-	value->~type();
-	std::free( value );
-}
-
-//--- scoped_aligned -------------------------------------------------------------------------------
-template< typename type >
-	struct scoped_aligned
-	: public scoped_dereference< type, deallocate_aligned< type > >
-{
-	scoped_aligned( type* value_ )
-		: scoped_dereference< type, deallocate_aligned< type > >( value_ )
-	{
-	}
 };
 
-//--- shared_aligned -------------------------------------------------------------------------------
-template< typename type >
-	struct shared_aligned
-	: public shared_dereference< type, deallocate_aligned< type >, unsigned >
+//--- aligned_ptr ----------------------------------------------------------------------------------
+template< up_t a >
+	class aligned_ptr
 {
-	shared_aligned( type* value = 0 )
-		: shared_dereference< type, deallocate_aligned< type >, unsigned >( value )
+public:
+	aligned_ptr( aligned< a > value_ )
+		: value( value_ )
 	{
 	}
+
+	~aligned_ptr( void )
+	{
+		value.deallocate();
+	}
+
+	template< typename to >
+		to* as( void ) const
+	{
+		return reinterpret_cast< to* >( value.get() );
+	}
+
+	template< typename to >
+		to* release( void )
+	{
+		return reinterpret_cast< to* >( value.release() );
+	}
+
+	void swap( aligned_ptr& exchange )
+	{
+		aligned< a > save = value;
+		value = exchange.value;
+		exchange.value = save;
+	}
+
+private:
+	aligned< a > value;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
