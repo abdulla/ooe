@@ -34,8 +34,6 @@ public:
 		return !memory.as< u8 >();
 	}
 
-	// TODO: round allocations to page-sizes and reuse previous allocations
-	// TODO: better yet, use vmsplice to gift pages and accelerate transfer
 	virtual void allocate( up_t size )
 	{
 		aligned_ptr< static_alignment >( aligned< static_alignment >( size ) ).swap( memory );

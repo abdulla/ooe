@@ -98,6 +98,7 @@ up_t client::size( void ) const
 
 void client::write( const u8* data, up_t size_ )
 {
+	// TODO: need to use vmsplice() here
 	if ( connect.send( data, size_ ) != size_ )
 		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
 }

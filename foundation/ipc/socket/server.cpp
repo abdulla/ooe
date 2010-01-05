@@ -74,6 +74,7 @@ void* servlet::call( void* pointer )
 
 		if ( OOE_UNLIKELY( !socket_write( socket, header, preserve ) ) )
 			break;
+		// TODO: need to use vmsplice() here
 		else if ( length && OOE_UNLIKELY( !socket_write( socket, buffer.get(), length ) ) )
 			break;
 	}
