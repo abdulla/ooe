@@ -4,6 +4,7 @@
 
 #include "external/scene/chunked.hpp"
 #include "foundation/image/jpeg.hpp"
+#include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 

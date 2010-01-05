@@ -7,6 +7,7 @@
 #include "foundation/executable/program.hpp"
 #include "foundation/general/sight.hpp"
 #include "foundation/image/jpeg.hpp"
+#include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
