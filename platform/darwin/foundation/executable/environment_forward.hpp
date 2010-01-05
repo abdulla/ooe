@@ -7,12 +7,10 @@
 
 #include "foundation/utility/fundamental.hpp"
 
-namespace ooe
-{
-	namespace executable
-	{
-		const up_t static_page_size = PAGE_SIZE;
-	}
-}
+OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
+
+const up_t static_page_size = PAGE_SIZE;
+
+OOE_NAMESPACE_END( ( ooe )( executable ) )
 
 #endif	// OOE_FOUNDATION_EXECUTABLE_ENVIRONMENT_FORWARD_HPP
