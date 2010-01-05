@@ -9,13 +9,13 @@
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_NAMESPACE_BEGIN( ( ooe ) )
-
 #ifdef __GNUC__
 	#define OOE_ALIGN( size ) __attribute__( ( __aligned__( size ) ) )
 #else
 	#define OOE_ALIGN( size )
 #endif
+
+OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- aligned --------------------------------------------------------------------------------------
 template< up_t a >
