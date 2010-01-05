@@ -3,22 +3,22 @@
 #ifndef OOE_FOUNDATION_IO_DESCRIPTOR_FORWARD_HPP
 #define OOE_FOUNDATION_IO_DESCRIPTOR_FORWARD_HPP
 
-#include "foundation/utility/fundamental.hpp"
-#include "foundation/utility/macro.hpp"
+#include "foundation/executable/environment.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+class descriptor;
+
+OOE_NAMESPACE_END( ( ooe ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+struct OOE_VISIBLE descriptor
 {
-	class descriptor;
+	up_t splice( const ooe::descriptor&, up_t );
+	up_t splice( aligned< executable::static_page_size >, up_t );
+};
 
-	namespace platform
-	{
-		struct descriptor;
-	}
-
-	struct OOE_VISIBLE platform::descriptor
-	{
-		up_t splice( const ooe::descriptor&, up_t );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform ) )
 
 #endif	// OOE_FOUNDATION_IO_DESCRIPTOR_FORWARD_HPP

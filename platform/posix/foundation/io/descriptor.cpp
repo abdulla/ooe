@@ -7,18 +7,32 @@
 #include "foundation/io/descriptor.hpp"
 #include "foundation/io/error.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+//--- platform::descriptor -------------------------------------------------------------------------
+up_t descriptor::splice( const ooe::descriptor& desc, up_t size )
 {
-//--- platform::descriptor -----------------------------------------------------
-	up_t platform::descriptor::splice( const ooe::descriptor& desc, up_t size )
-	{
-		ooe::descriptor& self = *static_cast< ooe::descriptor* >( this );
-		sp_t spliced = ::splice( self.get(), 0, desc.get(), 0, size, SPLICE_F_MOVE );
+	ooe::descriptor& self = *static_cast< ooe::descriptor* >( this );
+	sp_t spliced = ::splice( self.get(), 0, desc.get(), 0, size, SPLICE_F_MOVE );
 
-		if ( spliced == -1 )
-			throw error::io( "descriptor: " ) <<
-				"Unable to splice " << size << " bytes: " << error::number( errno );
+	if ( spliced == -1 )
+		throw error::io( "descriptor: " ) <<
+			"Unable to splice " << size << " bytes: " << error::number( errno );
 
-		return spliced;
-	}
+	return spliced;
 }
+
+up_t descriptor::splice( void* data, up_t size )
+{
+	ooe::descriptor& self = *static_cast< ooe::descriptor* >( this );
+	iovec vector = { data, size };
+	sp_t spliced = vmsplice( self.get(), &vector, 1, SPLICE_F_GIFT );
+
+	if ( spliced == -1 )
+		throw error::io( "descriptor: " ) <<
+			"Unable to splice " << size << " bytes: " << error::number( errno );
+
+	return spliced;
+}
+
+OOE_NAMESPACE_END( ( ooe )( platform ) )
