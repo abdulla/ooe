@@ -22,10 +22,10 @@ up_t descriptor::splice( const ooe::descriptor& desc, up_t size )
 	return spliced;
 }
 
-up_t descriptor::splice( void* data, up_t size )
+up_t descriptor::splice( aligned< executable::static_page_size > data, up_t size )
 {
 	ooe::descriptor& self = *static_cast< ooe::descriptor* >( this );
-	iovec vector = { data, size };
+	iovec vector = { data.get(), size };
 	sp_t spliced = vmsplice( self.get(), &vector, 1, SPLICE_F_GIFT );
 
 	if ( spliced == -1 )

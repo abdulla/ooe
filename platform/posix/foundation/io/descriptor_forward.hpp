@@ -4,6 +4,7 @@
 #define OOE_FOUNDATION_IO_DESCRIPTOR_FORWARD_HPP
 
 #include "foundation/executable/environment.hpp"
+#include "foundation/utility/align.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
