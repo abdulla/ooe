@@ -1,11 +1,12 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-
 #ifndef OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 #define OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 
+#include "foundation/executable/environment.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/shared_memory.hpp"
+#include "foundation/utility/align.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
@@ -37,7 +38,8 @@ public:
 	// TODO: better yet, use vmsplice to gift pages and accelerate transfer
 	virtual void allocate( up_t size )
 	{
-		scoped_array< u8 >( new u8[ size ] ).swap( memory );
+		scoped_aligned< u8 >
+			( new( align_to( executable::static_page_size ) ) u8[ size ] ).swap( memory );
 	}
 
 	virtual u8* get( up_t preserved ) const
@@ -51,7 +53,7 @@ public:
 	}
 
 private:
-	scoped_array< u8 > memory;
+	scoped_aligned< u8 > memory;
 };
 
 //--- shared_allocator -----------------------------------------------------------------------------
