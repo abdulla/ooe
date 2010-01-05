@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include <objc/message.h>
 #include <QTKit/QTKit.h>

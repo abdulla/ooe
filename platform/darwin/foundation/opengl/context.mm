@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include <AppKit/AppKit.h>
 #include <OpenGL/OpenGL.h>
