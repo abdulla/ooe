@@ -61,9 +61,9 @@ void print_destruct( destruct_ptr< print > print )
 }
 
 //--- stdvector_test -------------------------------------------------------------------------------
-void stdvector_test( const std_vector& svector )
+std_vector stdvector_test( const std_vector& svector )
 {
-	if ( svector.size() != 64 )
+	if ( svector.size() != executable::static_page_size )
 		throw error::runtime( "stdvector_test: " ) << "Incorrect size";
 
 	for ( std_vector::const_iterator i = svector.begin(), end = svector.end(); i != end; ++i )
@@ -71,6 +71,8 @@ void stdvector_test( const std_vector& svector )
 		if ( *i != '.' )
 			throw error::runtime( "stdvector_test: " ) << "Incorrect data";
 	}
+
+	return svector;
 }
 
 //--- ipcvector_test -------------------------------------------------------------------------------
@@ -205,9 +207,9 @@ template<>
 	std::cerr << "test std::vector, ipc::vector, and ipc::jumbo\n";
 
 	//--- std::vector ------------------------------------------------------------------------------
-	std_vector svector( 64, '.' );
+	std_vector svector( executable::static_page_size, '.' );
 
-	ipc::socket::call< void ( const std_vector& ) >( client, "stdvector_test" )( svector );
+	ipc::socket::call< std_vector ( const std_vector& ) >( client, "stdvector_test" )( svector );
 
 	//--- ipc::vector ------------------------------------------------------------------------------
 	ipc_vector ivector;
