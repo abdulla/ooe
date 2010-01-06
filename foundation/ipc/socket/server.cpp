@@ -44,7 +44,7 @@ void servlet::join( void )
 void* servlet::call( void* pointer )
 {
 	u8 data[ executable::static_page_size ];
-	heap_allocator allocator;
+	aligned_allocator allocator;
 	io_buffer buffer( data, sizeof( data ), allocator );
 	ipc::pool pool;
 

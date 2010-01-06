@@ -140,8 +140,10 @@ void* client::call( void* )
 				i->second = map_tuple( allocator.release(), error == error::none );
 		}
 
+		// data not needed, splice out of stream
 		if ( do_splice )
-			splice( connect, length );	// data not needed, splice out of stream
+			splice( connect, length );
+		// otherwise, notify any waiting results
 		else if ( do_notify )
 			condition.notify_one();
 	}

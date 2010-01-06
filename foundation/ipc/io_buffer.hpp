@@ -31,6 +31,40 @@ public:
 
 	virtual bool empty( void )
 	{
+		return !memory;
+	}
+
+	virtual void allocate( up_t size )
+	{
+		scoped_array< u8 >( new u8[ size ] ).swap( memory );
+	}
+
+	virtual u8* get( up_t ) const
+	{
+		return memory;
+	}
+
+	u8* release( void )
+	{
+		return memory.release();
+	}
+
+private:
+	scoped_array< u8 > memory;
+};
+
+//--- aligned_allocator ----------------------------------------------------------------------------
+class aligned_allocator
+	: public buffer_allocator
+{
+public:
+	aligned_allocator( void )
+		: memory( 0 )
+	{
+	}
+
+	virtual bool empty( void )
+	{
 		return !memory.as< u8 >();
 	}
 
