@@ -36,6 +36,7 @@ public:
 	u8* get( void ) const;
 	up_t size( void ) const;
 	void write( const u8*, up_t );
+	void write( aligned< io_alignment >, up_t );
 
 private:
 	ooe::connect connect;

@@ -13,6 +13,11 @@ bool socket_read( ooe::socket& socket, io_buffer& buffer, up_t size )
 	return socket.receive( buffer.get(), size ) == size;
 }
 
+bool socket_read( ooe::socket& socket, u8* data, up_t size )
+{
+	return socket.receive( data, size ) == size;
+}
+
 void error_set( u64& notify, mutex& mutex, condition& condition )
 {
 	{
@@ -98,8 +103,13 @@ up_t client::size( void ) const
 
 void client::write( const u8* data, up_t size_ )
 {
-	// TODO: need to use vmsplice() here
 	if ( connect.send( data, size_ ) != size_ )
+		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
+}
+
+void client::write( aligned< io_alignment > data, up_t size_ )
+{
+	if ( connect.splice( data, size_ ) != size_ )
 		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
 }
 
@@ -119,7 +129,7 @@ void* client::call( void* )
 
 	while ( true )
 	{
-		if ( OOE_UNLIKELY( connect.receive( header, preserve ) != preserve ) )
+		if ( OOE_UNLIKELY( !socket_read( connect, header, preserve ) ) )
 			break;
 
 		stream_read< length_t, error_t >::call( header, length, error );

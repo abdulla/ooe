@@ -5,28 +5,19 @@
 
 #include "foundation/io/socket.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( socket ) )
+
+class client
 {
-	namespace platform
-	{
-		namespace ipc
-		{
-			namespace socket
-			{
-				class client;
-			}
-		}
-	}
+protected:
+	client( void );
 
-	class platform::ipc::socket::client
-	{
-	protected:
-		ooe::descriptor null;
+	void splice( ooe::socket&, up_t );
 
-		client( void );
+private:
+	ooe::descriptor null;
+};
 
-		void splice( ooe::socket&, up_t );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( socket ) )
 
 #endif	// OOE_FOUNDATION_IPC_SOCKET_CLIENT_FORWARD_HPP
