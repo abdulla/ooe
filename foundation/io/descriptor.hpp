@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_IO_DESCRIPTOR_HPP
 #define OOE_FOUNDATION_IO_DESCRIPTOR_HPP
 
-#include "foundation/executable/environment.hpp"
+#include "foundation/io/descriptor_forward.hpp"
 #include "foundation/utility/align.hpp"
 #include "foundation/utility/pointer.hpp"
 
@@ -15,7 +15,7 @@ struct descriptor_id
 
 	descriptor_id( s32 );
 	descriptor_id( const std::string&, s32 );
-	~descriptor_id( void ) OOE_VISIBLE;
+	~descriptor_id( void );
 };
 
 class OOE_VISIBLE descriptor
@@ -48,6 +48,7 @@ public:
 
 	explicit descriptor( s32 );
 	descriptor( const std::string&, u8 = read );
+	~descriptor( void );
 
 	node_type type( void ) const;
 	up_t size( void ) const;
@@ -55,7 +56,7 @@ public:
 	void resize( up_t );
 	void control( u32, void* );
 	up_t splice( const ooe::descriptor&, up_t );
-	up_t splice( aligned< executable::static_page_size >, up_t );
+	up_t splice( aligned< io_alignment >, up_t );
 
 	s32 get( void ) const;
 

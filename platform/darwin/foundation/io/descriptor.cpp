@@ -22,9 +22,9 @@ up_t descriptor::splice( const ooe::descriptor& desc, up_t bytes )
 	return spliced;
 }
 
-up_t descriptor::splice( aligned< executable::static_page_size > buffer, up_t bytes )
+up_t descriptor::splice( aligned< io_alignment > data, up_t bytes )
 {
-	sp_t spliced = ::write( get(), buffer.get(), bytes );
+	sp_t spliced = ::write( get(), data.get(), bytes );
 
 	if ( spliced == -1 )
 		throw error::io( "file: " ) <<
