@@ -5,30 +5,24 @@
 
 #include "foundation/ipc/semaphore.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+struct socket;
+
+OOE_NAMESPACE_END( ( ooe ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
+
+class transport
 {
-	struct socket;
+protected:
+	ooe::ipc::semaphore in;
+	ooe::ipc::semaphore out;
 
-	namespace platform
-	{
-		namespace ipc
-		{
-			namespace memory
-			{
-				class transport;
-			}
-		}
-	}
+	transport( const std::string&, bool );
+	transport( ooe::socket& );
+};
 
-	class platform::ipc::memory::transport
-	{
-	protected:
-		ooe::ipc::semaphore in;
-		ooe::ipc::semaphore out;
-
-		transport( const std::string&, u8 );
-		transport( ooe::socket& );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_FORWARD_HPP

@@ -6,6 +6,7 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
+//--- cast -----------------------------------------------------------------------------------------
 inline shared_memory::type cast( bool create )
 {
 	return create ? shared_memory::create : shared_memory::open;
@@ -28,7 +29,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( const std::string& name_, type mode )
 	: platform::ipc::memory::transport( mode == create ),
-	memory( name_, cast( mode ), executable::static_page_size )
+	memory( name_, cast( mode == create ), executable::static_page_size )
 {
 	BOOST_STATIC_ASSERT( executable::static_page_size >
 		sizeof( platform::ipc::unnamed_semaphore ) * 2 + private_size );

@@ -5,115 +5,121 @@
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/utility/error.hpp"
 
-namespace
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+
+//--- cast_sem -------------------------------------------------------------------------------------
+inline semaphore::type cast_sem( bool create )
 {
-	using namespace ooe;
-
-	inline ipc::semaphore::type cast_sem( u8 mode )
-	{
-		return mode == ipc::memory::transport::open ?
-			ipc::semaphore::open : ipc::semaphore::create;
-	}
-
-	inline ipc::shared_memory::type cast_shm( u8 mode )
-	{
-		return mode == ipc::memory::transport::open ?
-			ipc::shared_memory::open : ipc::shared_memory::create;
-	}
-
-	inline std::string receive_name( socket& socket )
-	{
-		u32 size;
-
-		if ( socket.receive( &size, sizeof( size ) ) != sizeof( size ) )
-			throw error::runtime( "ipc::memory::transport: " ) << "Unable to receive size";
-
-		std::string name( size, 0 );
-
-		if ( socket.receive( &name[ 0 ], size ) != size )
-			throw error::runtime( "ipc::memroy::transport: " ) << "Unable to receive name";
-
-		return name;
-	}
-
-	inline void send_name( socket& socket, const std::string& name )
-	{
-		u32 size = name.size();
-
-		if ( socket.send( &size, sizeof( size ) ) != sizeof( size ) )
-			throw error::runtime( "ipc::memory::transport: " ) << "Unable to send size";
-		else if ( socket.send( name.c_str(), size ) != size )
-			throw error::runtime( "ipc::memory::transport: " ) << "Unable to send name";
-	}
+	return create ? semaphore::create : semaphore::open;
 }
 
-namespace ooe
+//--- cast_shm -------------------------------------------------------------------------------------
+inline shared_memory::type cast_shm( bool create )
 {
-//--- platform::ipc::memory::transport -----------------------------------------
-	platform::ipc::memory::transport::transport( const std::string& name_, u8 mode )
-		: in( name_ + ".i", cast_sem( mode ), 0 ), out( name_ + ".o", cast_sem( mode ), 0 )
-	{
-	}
-
-	platform::ipc::memory::transport::transport( ooe::socket& socket )
-		: in( receive_name( socket ) ), out( receive_name( socket ) )
-	{
-	}
-
-//--- ipc::memory::transport ---------------------------------------------------
-	ipc::memory::transport::transport( const std::string& name_, transport::type mode )
-		: platform::ipc::memory::transport( name_, mode ),
-		memory( name_, cast_shm( mode ), executable::static_page_size )
-	{
-		BOOST_STATIC_ASSERT( executable::static_page_size > private_size );
-	}
-
-	ipc::memory::transport::transport( ooe::socket& socket )
-		: platform::ipc::memory::transport( socket ), memory( std::string(), socket.receive() )
-	{
-	}
-
-	ipc::memory::transport::~transport( void )
-	{
-	}
-
-	void ipc::memory::transport::wait( wait_type function, const void* pointer )
-	{
-		in.down();
-		function( pointer );
-		out.up();
-	}
-
-	void ipc::memory::transport::notify( void )
-	{
-		in.up();
-		out.down();
-	}
-
-	void ipc::memory::transport::wake_wait( void )
-	{
-		in.up();
-	}
-
-	void ipc::memory::transport::wake_notify( void )
-	{
-		out.up();
-	}
-
-	u8* ipc::memory::transport::get( void ) const
-	{
-		return memory.as< u8 >();
-	}
-
-	up_t ipc::memory::transport::size( void ) const
-	{
-		return memory.size() - private_size;
-	}
-
-	void ipc::memory::transport::migrate( ooe::socket& socket )
-	{
-		send_name( socket, in.name() );
-		send_name( socket, out.name() );
-		socket.send( memory );
-	}
+	return create ? shared_memory::create : shared_memory::open;
 }
+
+//--- receive_name ---------------------------------------------------------------------------------
+inline std::string receive_name( socket& socket )
+{
+	u32 size;
+
+	if ( socket.receive( &size, sizeof( size ) ) != sizeof( size ) )
+		throw error::runtime( "ipc::memory::transport: " ) << "Unable to receive size";
+
+	std::string name( size, 0 );
+
+	if ( socket.receive( &name[ 0 ], size ) != size )
+		throw error::runtime( "ipc::memroy::transport: " ) << "Unable to receive name";
+
+	return name;
+}
+
+//--- send_name ------------------------------------------------------------------------------------
+inline void send_name( socket& socket, const std::string& name )
+{
+	u32 size = name.size();
+
+	if ( socket.send( &size, sizeof( size ) ) != sizeof( size ) )
+		throw error::runtime( "ipc::memory::transport: " ) << "Unable to send size";
+	else if ( socket.send( name.c_str(), size ) != size )
+		throw error::runtime( "ipc::memory::transport: " ) << "Unable to send name";
+}
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
+
+//--- transport ------------------------------------------------------------------------------------
+transport::transport( const std::string& name_, bool create )
+	: in( name_ + ".i", cast_sem( create ), 0 ), out( name_ + ".o", cast_sem( create ), 0 )
+{
+}
+
+transport::transport( ooe::socket& socket )
+	: in( receive_name( socket ) ), out( receive_name( socket ) )
+{
+}
+
+OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+//--- transport ------------------------------------------------------------------------------------
+transport::transport( const std::string& name_, type mode )
+	: platform::ipc::memory::transport( name_, mode == create ),
+	memory( name_, cast_shm( mode ), executable::static_page_size )
+{
+	BOOST_STATIC_ASSERT( executable::static_page_size > private_size );
+}
+
+transport::transport( ooe::socket& socket )
+	: platform::ipc::memory::transport( socket ), memory( std::string(), socket.receive() )
+{
+}
+
+transport::~transport( void )
+{
+}
+
+void transport::wait( wait_type function, const void* pointer )
+{
+	in.down();
+	function( pointer );
+	out.up();
+}
+
+void transport::notify( void )
+{
+	in.up();
+	out.down();
+}
+
+void transport::wake_wait( void )
+{
+	in.up();
+}
+
+void transport::wake_notify( void )
+{
+	out.up();
+}
+
+u8* transport::get( void ) const
+{
+	return memory.as< u8 >();
+}
+
+up_t transport::size( void ) const
+{
+	return memory.size() - private_size;
+}
+
+void transport::migrate( ooe::socket& socket )
+{
+	send_name( socket, in.name() );
+	send_name( socket, out.name() );
+	socket.send( memory );
+}
+
+OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
