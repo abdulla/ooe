@@ -68,6 +68,11 @@ public:
 		value.deallocate();
 	}
 
+	operator aligned< a >( void ) const
+	{
+		return value;
+	}
+
 	template< typename to >
 		to* as( void ) const
 	{
