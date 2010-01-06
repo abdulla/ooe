@@ -93,6 +93,11 @@ namespace ooe
 		{
 		}
 
+		type* operator ->( void ) const
+		{
+			return static_cast< type* >( this->get() );
+		}
+
 		operator type*( void ) const
 		{
 			return static_cast< type* >( this->get() );
