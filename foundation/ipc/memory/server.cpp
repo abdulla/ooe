@@ -115,7 +115,7 @@ servlet::~servlet( void )
 {
 	if ( state != move )
 	{
-		// wake for arguments, indicating that the servlet should exit and calling null
+		// wake for arguments, indicating that the servlet should call null and exit
 		state = idle;
 		stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
 		transport.wake_wait();
