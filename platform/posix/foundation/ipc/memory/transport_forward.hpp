@@ -5,28 +5,18 @@
 
 #include "foundation/ipc/semaphore.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
+
+class transport
 {
-	namespace platform
-	{
-		namespace ipc
-		{
-			namespace memory
-			{
-				class transport;
-			}
-		}
-	}
+protected:
+	bool create;
+	unnamed_semaphore* in;
+	unnamed_semaphore* out;
 
-	class platform::ipc::memory::transport
-	{
-	protected:
-		u8 mode;
-		unnamed_semaphore* in;
-		unnamed_semaphore* out;
+	transport( bool );
+};
 
-		transport( u8 mode );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_TRANSPORT_FORWARD_HPP
