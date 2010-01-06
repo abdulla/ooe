@@ -10,7 +10,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 class transport
 {
 protected:
-	bool create_;
+	bool created;
 	unnamed_semaphore* in;
 	unnamed_semaphore* out;
 

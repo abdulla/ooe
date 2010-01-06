@@ -16,8 +16,8 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 
 //--- transport ------------------------------------------------------------------------------------
-transport::transport( bool create )
-	: create_( create ), in(), out()
+transport::transport( bool created_ )
+	: created( created_ ), in(), out()
 {
 }
 
@@ -34,7 +34,7 @@ transport::transport( const std::string& name_, type mode )
 		sizeof( platform::ipc::unnamed_semaphore ) * 2 + private_size );
 	platform::ipc::unnamed_semaphore* pointer = memory.as< platform::ipc::unnamed_semaphore >();
 
-	if ( create_ )
+	if ( created )
 	{
 		in = new( pointer + 0 ) platform::ipc::unnamed_semaphore( 0 );
 		out = new( pointer + 1 ) platform::ipc::unnamed_semaphore( 0 );
@@ -57,7 +57,7 @@ transport::transport( ooe::socket& socket )
 
 transport::~transport( void )
 {
-	if ( create_ )
+	if ( created )
 	{
 		out->~unnamed_semaphore();
 		in->~unnamed_semaphore();
@@ -100,7 +100,7 @@ up_t transport::size( void ) const
 void transport::migrate( ooe::socket& socket )
 {
 	socket.send( memory );
-	create_ = false;
+	created = false;
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
