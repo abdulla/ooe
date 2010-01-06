@@ -124,6 +124,13 @@ servlet::~servlet( void )
 	thread.join();
 }
 
+void servlet::migrate( socket& socket )
+{
+	transport.migrate( socket );
+	link_server->migrate( socket );
+	state = move;
+}
+
 void* servlet::call( void* pointer )
 {
 	shared_allocator allocator;
@@ -150,17 +157,10 @@ void* servlet::call( void* pointer )
 	return 0;
 }
 
-void servlet::migrate( socket& socket )
-{
-	transport.migrate( socket );
-	link_server->migrate( socket );
-	state = move;
-}
-
 //--- server ---------------------------------------------------------------------------------------
 server::server( const std::string& name_, const switchboard& external_ )
-	: semaphore( name_, semaphore::create ), internal(), external( external_ ),
-	transport( name_, transport::create ), seed(), servlets()
+	: semaphore( name_, semaphore::create ), transport( name_, transport::create ),
+	external( external_ ), internal(), seed(), servlets()
 {
 	if ( name_.size() + 1 > sizeof( client_data ) - sizeof( link_t ) )
 		throw error::runtime( "ipc::memory::server: " ) << '"' << name_ << "\" is too long";
@@ -214,7 +214,7 @@ void server::relink( socket& socket )
 
 void server::migrate( socket& socket )
 {
-	( *servlet_tls ).migrate( socket );
+	servlet_tls->migrate( socket );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

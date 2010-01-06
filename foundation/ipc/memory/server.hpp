@@ -58,9 +58,9 @@ private:
 	typedef std::map< link_t, shared_ptr< servlet > > servlet_map;
 
 	ipc::semaphore semaphore;
-	switchboard internal;
-	const switchboard& external;
 	memory::transport transport;
+	const switchboard& external;
+	switchboard internal;
 
 	link_t seed;
 	servlet_map servlets;
