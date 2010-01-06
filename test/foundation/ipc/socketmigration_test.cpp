@@ -111,7 +111,7 @@ template<>
 {
 	std::cerr << "migrate between servers\n";
 
-	ipc::socket::client client( local_address( ipc::local_name( "/ooe.test.socket-migration" ) ) );
+	ipc::socket::client client( local_address( ipc::local_name( "ooe.test.socket-migration" ) ) );
 	ipc::socket::call< void ( void ) > migrate( client, "migrate" );
 	ipc::socket::call< pid_t ( void ) > server_pid( client, "server_pid" );
 

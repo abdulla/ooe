@@ -148,7 +148,7 @@ class data
 {
 public:
 	data( void )
-		: client( local_address( ipc::local_name( "/ooe.test.socket-rpc" ) ) )
+		: client( local_address( ipc::local_name( "ooe.test.socket-rpc" ) ) )
 	{
 	}
 
