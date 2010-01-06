@@ -8,6 +8,8 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 
+OOE_TLS( ipc::socket::servlet* ) servlet_tls;
+
 bool socket_read( ooe::socket& socket, io_buffer& buffer, up_t size )
 {
 	buffer.allocate( size );
@@ -47,7 +49,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 //--- servlet --------------------------------------------------------------------------------------
 servlet::servlet( const servlet_iterator& iterator_, ooe::socket& socket_,
 	const ipc::switchboard& switchboard_, server& server )
-	: iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ),
+	: iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ), state( true ),
 	thread( make_function( *this, &servlet::call ), &server )
 {
 }
@@ -56,6 +58,12 @@ void servlet::join( void )
 {
 	socket.shutdown( ooe::socket::read_write );
 	thread.join();
+}
+
+void servlet::migrate( ooe::socket& outgoing )
+{
+	outgoing.send( socket );
+	state = false;
 }
 
 void* servlet::call( void* pointer )
@@ -69,8 +77,9 @@ void* servlet::call( void* pointer )
 	length_t length;
 	index_t index;
 	up_t preserve = stream_size< length_t, index_t >::call( length, index );
+	servlet_tls = this;
 
-	while ( true )
+	while ( state )
 	{
 		if ( OOE_UNLIKELY( !socket_read( socket, buffer, preserve ) ) )
 			break;
@@ -100,8 +109,8 @@ void* servlet::call( void* pointer )
 }
 
 //--- server ---------------------------------------------------------------------------------------
-server::server( const address& address )
-	: listen( address ), mutex(), list()
+server::server( const address& address, const ipc::switchboard& switchboard_ )
+	: listen( address ), switchboard( switchboard_ ), mutex(), list()
 {
 }
 
@@ -111,7 +120,7 @@ server::~server( void )
 		( *i )->join();
 }
 
-void server::accept( const switchboard& switchboard )
+void server::accept( void )
 {
 	ooe::socket socket = listen.accept();
 
@@ -124,6 +133,20 @@ void server::erase( const servlet_list::iterator& iterator )
 {
 	lock lock( mutex );
 	list.erase( iterator );
+}
+
+void server::relink( ooe::socket& incoming )
+{
+	ooe::socket socket = incoming.receive();
+
+	lock lock( mutex );
+	list.push_back( servlet_list::value_type() );
+	list.back() = new servlet( --list.end(), socket, switchboard, *this );
+}
+
+void server::migrate( ooe::socket& outgoing )
+{
+	servlet_tls->migrate( outgoing );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )

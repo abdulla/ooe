@@ -26,11 +26,14 @@ public:
 	servlet( const servlet_iterator&, ooe::socket&, const ipc::switchboard&, server& );
 
 	void join( void );
+	void migrate( ooe::socket& );
 
 private:
 	servlet_iterator iterator;
 	ooe::socket socket;
 	const ipc::switchboard& switchboard;
+
+	bool state;
 	ooe::thread thread;
 
 	void* call( void* );
@@ -40,14 +43,19 @@ private:
 class OOE_VISIBLE server
 {
 public:
-	server( const address& );
+	server( const address&, const switchboard& );
 	~server( void );
 
-	void accept( const switchboard& );
+	void accept( void );
 	void erase( const servlet_iterator& ) OOE_HIDDEN;
+
+	void relink( ooe::socket& );
+	void migrate( ooe::socket& );
 
 private:
 	ooe::listen listen;
+	const ipc::switchboard& switchboard;
+
 	ooe::mutex mutex;
 	servlet_list list;
 };
