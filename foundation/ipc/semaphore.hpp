@@ -39,7 +39,7 @@ namespace ooe
 		void unlink( void );
 
 	private:
-		const std::string name_;
+		std::string name_;
 		bool unlinkable;
 		sem_t* const sem;
 	};

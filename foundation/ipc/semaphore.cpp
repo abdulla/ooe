@@ -16,20 +16,20 @@ namespace
 	void sem_remove( const std::string& name )
 	{
 		if ( sem_unlink( name.c_str() ) && errno != OOE_NOEXIST )
-			throw error::runtime( "semaphore: " ) <<
+			throw error::runtime( "ipc::semaphore: " ) <<
 				"Unable to unlink semaphore \"" << name << "\": " << error::number( errno );
 	}
 
-	sem_t* sem_create( const std::string& name, ipc::semaphore::type mode, u32 value )
+	sem_t* sem_create( const std::string& name, bool create, u32 value )
 	{
-		if ( mode == ipc::semaphore::create )
+		if ( create )
 			sem_remove( name );
 
-		s32 flags = mode == ipc::semaphore::open ? 0 : O_CREAT | O_EXCL;
+		s32 flags = create ? O_CREAT | O_EXCL: 0;
 		sem_t* sem = sem_open( name.c_str(), flags, 0600, value );
 
 		if ( sem == SEM_FAILED )
-			throw error::runtime( "semaphore: " ) <<
+			throw error::runtime( "ipc::semaphore: " ) <<
 				"Unable to open semaphore \"" << name << "\": " << error::number( errno );
 
 		return sem;
@@ -38,11 +38,11 @@ namespace
 	void sem_destroy( const std::string& name, bool unlinkable, sem_t* sem )
 	{
 		if ( sem_close( sem ) )
-			OOE_WARNING( "semaphore",
+			OOE_WARNING( "ipc::semaphore",
 				"Unable to close semaphore \"" << name << "\": " << error::number( errno ) );
 
 		if ( unlinkable && sem_unlink( name.c_str() ) && errno != OOE_NOEXIST )
-			OOE_WARNING( "semaphore",
+			OOE_WARNING( "ipc::semaphore",
 				"Unable to unlink semaphore \"" << name << "\": " << error::number( errno ) );
 	}
 }
@@ -51,7 +51,8 @@ namespace ooe
 {
 //--- ipc::semaphore -----------------------------------------------------------
 	ipc::semaphore::semaphore( const std::string& sem_name, type mode, u32 value )
-		: name_( sem_name ), unlinkable( mode == create ), sem( sem_create( name_, mode, value ) )
+		: name_( sem_name ), unlinkable( mode == create ),
+		sem( sem_create( name_, mode == create, value ) )
 	{
 	}
 
@@ -63,14 +64,14 @@ namespace ooe
 	void ipc::semaphore::up( void )
 	{
 		if ( sem_post( sem ) )
-			throw error::runtime( "semaphore: " ) <<
+			throw error::runtime( "ipc::semaphore: " ) <<
 				"Unable to increment semaphore: " << error::number( errno );
 	}
 
 	void ipc::semaphore::down( void )
 	{
 		if ( sem_wait( sem ) )
-			throw error::runtime( "semaphore: " ) <<
+			throw error::runtime( "ipc::semaphore: " ) <<
 				"Unable to decrement semaphore: " << error::number( errno );
 	}
 
@@ -84,6 +85,7 @@ namespace ooe
 		if ( unlinkable )
 		{
 			sem_remove( name_ );
+			name_ = std::string();
 			unlinkable = false;
 		}
 	}
