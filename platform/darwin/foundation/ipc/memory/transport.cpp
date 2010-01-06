@@ -69,7 +69,7 @@ namespace ooe
 	}
 
 	ipc::memory::transport::transport( ooe::socket& socket )
-		: platform::ipc::memory::transport( socket ), memory( socket.receive() )
+		: platform::ipc::memory::transport( socket ), memory( std::string(), socket.receive() )
 	{
 	}
 
