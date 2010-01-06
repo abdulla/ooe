@@ -157,9 +157,11 @@ namespace ooe
 
 	#define SIZE( z, n, _ ) + size< t ## n >::call( a ## n )
 	#define READ( z, n, _ )\
-		OOE_PREFETCH( data );\
+		OOE_PREFETCH_READ( data );\
 		data += read< typename no_ref< t ## n >::type >::call( data, a ## n );
-	#define WRITE( z, n, _ ) data += write< t ## n >::call( data, a ## n );
+	#define WRITE( z, n, _ )\
+		OOE_PREFETCH_WRITE( data );\
+		data += write< t ## n >::call( data, a ## n );
 
 	#define TUPLE_SIZE( z, n, d ) +\
 		size< typename tuple_element< n, t >::type >::call( value._ ## n )
