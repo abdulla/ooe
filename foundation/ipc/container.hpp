@@ -77,7 +77,10 @@ namespace ooe
 
 		std::string name( void ) const
 		{
-			return memory ? memory->name() : std::string();
+			if ( !memory )
+				throw error::runtime( "ipc::allocator: " ) << "Empty, no name available";
+
+			return memory->name();
 		}
 
 		storage_type storage( void ) const
