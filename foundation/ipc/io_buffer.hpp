@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 #define OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 
-#include "foundation/ipc/io_buffer_forward.hpp"
+#include "foundation/io/descriptor.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/shared_memory.hpp"
 #include "foundation/utility/align.hpp"
@@ -70,12 +70,17 @@ public:
 
 	virtual void allocate( up_t size )
 	{
-		aligned_ptr< static_alignment >( aligned< static_alignment >( size ) ).swap( memory );
+		aligned_ptr< io_alignment >( aligned< io_alignment >( size ) ).swap( memory );
 	}
 
 	virtual u8* get( up_t preserved ) const
 	{
 		return memory.as< u8 >() + preserved;
+	}
+
+	aligned< io_alignment > get( void ) const
+	{
+		return memory;
 	}
 
 	u8* release( void )
@@ -84,7 +89,7 @@ public:
 	}
 
 private:
-	aligned_ptr< static_alignment > memory;
+	aligned_ptr< io_alignment > memory;
 };
 
 //--- shared_allocator -----------------------------------------------------------------------------
