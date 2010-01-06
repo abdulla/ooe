@@ -28,7 +28,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( const std::string& name_, type mode )
 	: platform::ipc::memory::transport( mode == create ),
-	memory( name_, mode == create, executable::static_page_size )
+	memory( name_, cast( mode ), executable::static_page_size )
 {
 	BOOST_STATIC_ASSERT( executable::static_page_size >
 		sizeof( platform::ipc::unnamed_semaphore ) * 2 + private_size );
@@ -101,7 +101,6 @@ void transport::migrate( ooe::socket& socket )
 {
 	socket.send( memory );
 	create = false;
-}
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
