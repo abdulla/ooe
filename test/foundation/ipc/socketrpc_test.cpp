@@ -76,9 +76,9 @@ std_vector stdvector_test( const std_vector& svector )
 }
 
 //--- ipcvector_test -------------------------------------------------------------------------------
-void ipcvector_test( const ipc_vector& ivector )
+ipc_vector ipcvector_test( const ipc_vector& ivector )
 {
-	if ( ivector.size() != 64 )
+	if ( ivector.size() != executable::static_page_size )
 		throw error::runtime( "ipcvector_test: " ) << "Incorrect size";
 
 	for ( ipc_vector::const_iterator i = ivector.begin(), end = ivector.end(); i != end; ++i )
@@ -86,13 +86,17 @@ void ipcvector_test( const ipc_vector& ivector )
 		if ( *i != '.' )
 			throw error::runtime( "ipcvector_test: " ) << "Incorrect data";
 	}
+
+	return ivector;
 }
 
 //--- jumbo_test -----------------------------------------------------------------------------------
-void jumbo_test( const jumbo_type& jumbo )
+jumbo_type jumbo_test( const jumbo_type& jumbo )
 {
 	if ( std::strcmp( jumbo, "a brimful of asha" ) )
 		throw error::runtime( "jumbo_test: " ) << "String mismatch";
+
+	return jumbo;
 }
 
 //--- setup ----------------------------------------------------------------------------------------
@@ -213,10 +217,10 @@ template<>
 
 	//--- ipc::vector ------------------------------------------------------------------------------
 	ipc_vector ivector;
-	ivector.insert( ivector.end(), 64, '.' );
+	ivector.insert( ivector.end(), executable::static_page_size, '.' );
 	std::cout << "vector = " << ivector.get_allocator().name() << '\n';
 
-	ipc::socket::call< void ( const ipc_vector& ) >( client, "ipcvector_test" )( ivector );
+	ipc::socket::call< ipc_vector ( const ipc_vector& ) >( client, "ipcvector_test" )( ivector );
 
 	//--- ipc::jumbo -------------------------------------------------------------------------------
 	jumbo_type jumbo;
@@ -224,7 +228,7 @@ template<>
 	std::cout << "jumbo = " << jumbo.name() << '\n';
 
 	// wait for result, to avoid race with jumbo being destructed before it is mapped by the server
-	ipc::socket::call< void ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo )();
+	ipc::socket::call< jumbo_type ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo )();
 }
 
 template<>

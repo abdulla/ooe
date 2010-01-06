@@ -61,9 +61,9 @@ void print_destruct( destruct_ptr< print > print )
 }
 
 //--- stdvector_test -------------------------------------------------------------------------------
-void stdvector_test( const std_vector& svector )
+std_vector stdvector_test( const std_vector& svector )
 {
-	if ( svector.size() != 64 )
+	if ( svector.size() != executable::static_page_size )
 		throw error::runtime( "stdvector_test: " ) << "Incorrect size";
 
 	for ( std_vector::const_iterator i = svector.begin(), end = svector.end(); i != end; ++i )
@@ -71,12 +71,14 @@ void stdvector_test( const std_vector& svector )
 		if ( *i != '.' )
 			throw error::runtime( "stdvector_test: " ) << "Incorrect data";
 	}
+
+	return svector;
 }
 
 //--- ipcvector_test -------------------------------------------------------------------------------
-void ipcvector_test( const ipc_vector& ivector )
+ipc_vector ipcvector_test( const ipc_vector& ivector )
 {
-	if ( ivector.size() != 64 )
+	if ( ivector.size() != executable::static_page_size )
 		throw error::runtime( "ipcvector_test: " ) << "Incorrect size";
 
 	for ( ipc_vector::const_iterator i = ivector.begin(), end = ivector.end(); i != end; ++i )
@@ -84,13 +86,17 @@ void ipcvector_test( const ipc_vector& ivector )
 		if ( *i != '.' )
 			throw error::runtime( "ipcvector_test: " ) << "Incorrect data";
 	}
+
+	return ivector;
 }
 
 //--- jumbo_test -----------------------------------------------------------------------------------
-void jumbo_test( const jumbo_type& jumbo )
+jumbo_type jumbo_test( const jumbo_type& jumbo )
 {
 	if ( std::strcmp( jumbo, "a brimful of asha" ) )
 		throw error::runtime( "jumbo_test: " ) << "String mismatch";
+
+	return jumbo;
 }
 
 //--- setup ----------------------------------------------------------------------------------------
@@ -202,23 +208,23 @@ template<>
 	std::cerr << "test std::vector, ipc::vector, and ipc::jumbo\n";
 
 	//--- std::vector ------------------------------------------------------------------------------
-	std_vector svector( 64, '.' );
+	std_vector svector( executable::static_page_size, '.' );
 
-	ipc::memory::call< void ( const std_vector& ) >( client, "stdvector_test" )( svector );
+	ipc::memory::call< std_vector ( const std_vector& ) >( client, "stdvector_test" )( svector );
 
 	//--- ipc::vector ------------------------------------------------------------------------------
 	ipc_vector ivector;
-	ivector.insert( ivector.end(), 64, '.' );
+	ivector.insert( ivector.end(), executable::static_page_size, '.' );
 	std::cout << "vector = " << ivector.get_allocator().name() << '\n';
 
-	ipc::memory::call< void ( const ipc_vector& ) >( client, "ipcvector_test" )( ivector );
+	ipc::memory::call< ipc_vector ( const ipc_vector& ) >( client, "ipcvector_test" )( ivector );
 
 	//--- ipc::jumbo -------------------------------------------------------------------------------
 	jumbo_type jumbo;
 	jumbo( "a brimful of asha" );
 	std::cout << "jumbo = " << jumbo.name() << '\n';
 
-	ipc::memory::call< void ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo );
+	ipc::memory::call< jumbo_type ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo );
 }
 
 template<>
