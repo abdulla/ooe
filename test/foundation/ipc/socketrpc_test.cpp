@@ -126,11 +126,11 @@ public:
 
 				std::string local_name = ipc::local_name( "ooe.test.socket-rpc" );
 				unlink( local_name.c_str() );
-				ipc::socket::server server( ( local_address( local_name ) ) );
+				ipc::socket::server server( local_address( local_name ), nameservice );
 				ipc::barrier_notify( name );
 
 				while ( !executable::signal() )
-					server.accept( nameservice );
+					server.accept();
 			);
 
 			fork_io::exit( true );
