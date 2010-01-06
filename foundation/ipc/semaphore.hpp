@@ -8,64 +8,59 @@
 #include "foundation/utility/pointer.hpp"
 #include "foundation/utility/string.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+
+//--- semaphore ------------------------------------------------------------------------------------
+class OOE_VISIBLE semaphore
 {
-	namespace ipc
+public:
+	enum type
 	{
-		class semaphore;
-		class process_lock;
-
-		class barrier_wait;
-		void barrier_notify( const std::string& ) OOE_VISIBLE;
-	}
-
-//--- ipc::semaphore -----------------------------------------------------------
-	class OOE_VISIBLE ipc::semaphore
-	{
-	public:
-		enum type
-		{
-			open,
-			create
-		};
-
-		semaphore( const std::string&, type = open, u32 = 1 );
-		~semaphore( void );
-
-		void up( void );
-		void down( void );
-
-		std::string name( void ) const;
-		void unlink( void );
-
-	private:
-		std::string name_;
-		bool unlinkable;
-		sem_t* const sem;
+		open,
+		create
 	};
 
-//--- ipc::process_lock --------------------------------------------------------
-	class OOE_VISIBLE ipc::process_lock
-		: private noncopyable
-	{
-	public:
-		process_lock( ipc::semaphore& );
-		~process_lock( void );
+	semaphore( const std::string&, type = open, u32 = 1 );
+	~semaphore( void );
 
-	private:
-		ipc::semaphore& semaphore;
-	};
+	void up( void );
+	void down( void );
 
-//--- ipc::barrier_wait --------------------------------------------------------
-	class OOE_VISIBLE ipc::barrier_wait
-	{
-	public:
-		barrier_wait( const std::string& );
-		~barrier_wait( void );
+	std::string name( void ) const;
+	void unlink( void );
 
-	private:
-		ipc::semaphore semaphore;
-	};
-}
+private:
+	std::string name_;
+	bool unlinkable;
+	sem_t* const sem;
+};
+
+//--- process_lock ---------------------------------------------------------------------------------
+class OOE_VISIBLE process_lock
+	: private noncopyable
+{
+public:
+	process_lock( ipc::semaphore& );
+	~process_lock( void );
+
+private:
+	ipc::semaphore& semaphore;
+};
+
+//--- barrier_wait ---------------------------------------------------------------------------------
+class OOE_VISIBLE barrier_wait
+{
+public:
+	barrier_wait( const std::string& );
+	~barrier_wait( void );
+
+private:
+	ipc::semaphore semaphore;
+};
+
+//--- barrier_notify -------------------------------------------------------------------------------
+void barrier_notify( const std::string& ) OOE_VISIBLE;
+
+OOE_NAMESPACE_END( ( ooe )( ipc ) )
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
