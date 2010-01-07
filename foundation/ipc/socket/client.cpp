@@ -49,8 +49,12 @@ client::~client( void )
 {
 	if ( notify != ~u64( 0 ) )
 	{
-		rpc< void ( void ) >( *this, 0 )()();			// call null function to flush pending calls
-		connect.shutdown( ooe::socket::read_write );	// shutdown socket to stop reader thread
+		if ( in != out )
+			// call null function to flush pending calls
+			rpc< void ( void ) >( *this, 0 )()();
+
+		// shutdown socket to stop reader thread
+		connect.shutdown( ooe::socket::read_write );
 	}
 
 	thread.join();
