@@ -21,16 +21,4 @@ up_t descriptor::splice( const ooe::descriptor& desc, up_t bytes )
 	return spliced;
 }
 
-up_t descriptor::splice( aligned< io_alignment > data, up_t bytes )
-{
-	iovec vector = { data.get(), bytes };
-	sp_t spliced = vmsplice( get(), &vector, 1, SPLICE_F_GIFT );
-
-	if ( spliced == -1 )
-		throw error::io( "descriptor: " ) <<
-			"Unable to splice " << bytes << " bytes: " << error::number( errno );
-
-	return spliced;
-}
-
 OOE_NAMESPACE_END( ( ooe ) )

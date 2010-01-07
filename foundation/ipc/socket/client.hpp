@@ -5,8 +5,8 @@
 
 #include <map>
 
-#include "foundation/ipc/socket/client_forward.hpp"
 #include "foundation/executable/environment.hpp"
+#include "foundation/io/socket.hpp"
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
 
@@ -17,7 +17,6 @@ template< typename >
 
 //--- client ---------------------------------------------------------------------------------------
 class OOE_VISIBLE client
-	: private platform::ipc::socket::client
 {
 public:
 	typedef shared_array< u8 > array_type;
@@ -36,7 +35,6 @@ public:
 	u8* get( void ) const;
 	up_t size( void ) const;
 	void write( const u8*, up_t );
-	void write( aligned< io_alignment >, up_t );
 
 private:
 	ooe::connect connect;

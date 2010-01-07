@@ -146,7 +146,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 
 	result_type operator ()( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) ) const
 	{
-		aligned_allocator allocator;
+		heap_allocator allocator;
 		io_buffer buffer( client.get(), client.size(), allocator );
 
 		up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
@@ -158,12 +158,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 		// must insert before write to avoid race, see commit: 00337dc5
 		client::iterator i = client.insert();
 		buffer.preserve( 0 );
-
-		if ( OOE_LIKELY( buffer.is_internal() ) )
-			client.write( buffer.get(), size );
-		else
-			client.write( allocator.get(), size );
-
+		client.write( buffer.get(), size );
 		return result_type( client, i );
 	}
 };

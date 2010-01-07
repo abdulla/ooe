@@ -3,9 +3,9 @@
 #ifndef OOE_FOUNDATION_IO_DESCRIPTOR_HPP
 #define OOE_FOUNDATION_IO_DESCRIPTOR_HPP
 
-#include "foundation/io/descriptor_forward.hpp"
-#include "foundation/utility/align.hpp"
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/pointer.hpp"
+#include "foundation/utility/string.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -56,7 +56,6 @@ public:
 	void resize( up_t );
 	void control( u32, void* );
 	up_t splice( const ooe::descriptor&, up_t );
-	up_t splice( aligned< io_alignment >, up_t );
 
 	s32 get( void ) const;
 

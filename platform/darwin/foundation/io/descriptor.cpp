@@ -2,7 +2,6 @@
 
 #include <cerrno>
 
-#include <unistd.h>
 #include <sys/socket.h>
 
 #include "foundation/io/descriptor.hpp"
@@ -17,17 +16,6 @@ up_t descriptor::splice( const ooe::descriptor& desc, up_t bytes )
 
 	if ( sendfile( get(), desc.get(), 0, &spliced, 0, 0 ) )
 		throw error::io( "descriptor: " ) <<
-			"Unable to splice " << bytes << " bytes: " << error::number( errno );
-
-	return spliced;
-}
-
-up_t descriptor::splice( aligned< io_alignment > data, up_t bytes )
-{
-	sp_t spliced = ::write( get(), data.get(), bytes );
-
-	if ( spliced == -1 )
-		throw error::io( "file: " ) <<
 			"Unable to splice " << bytes << " bytes: " << error::number( errno );
 
 	return spliced;

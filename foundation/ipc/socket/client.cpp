@@ -13,11 +13,6 @@ bool socket_read( ooe::socket& socket, io_buffer& buffer, up_t size )
 	return socket.receive( buffer.get(), size ) == size;
 }
 
-bool socket_read( ooe::socket& socket, u8* data, up_t size )
-{
-	return socket.receive( data, size ) == size;
-}
-
 void error_set( u64& notify, mutex& mutex, condition& condition )
 {
 	{
@@ -40,8 +35,8 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 
 //--- client ---------------------------------------------------------------------------------------
 client::client( const address& address )
-	: platform::ipc::socket::client(), connect( address ), map(), in( 0 ), out( 0 ), notify( 0 ),
-	mutex(), condition(), thread( make_function( *this, &client::call ), 0 ), scratch()
+	: connect( address ), map(), in( 0 ), out( 0 ), notify( 0 ), mutex(), condition(),
+	thread( make_function( *this, &client::call ), 0 ), scratch()
 {
 }
 
@@ -111,12 +106,6 @@ void client::write( const u8* data, up_t size_ )
 		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
 }
 
-void client::write( aligned< io_alignment > data, up_t size_ )
-{
-	if ( connect.splice( data, size_ ) != size_ )
-		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
-}
-
 void* client::call( void* )
 {
 	scoped< void ( u64&, ooe::mutex&, ooe::condition& ) >
@@ -133,11 +122,15 @@ void* client::call( void* )
 
 	while ( true )
 	{
-		if ( OOE_UNLIKELY( !socket_read( connect, header, preserve ) ) )
+		if ( OOE_UNLIKELY( connect.receive( header, preserve ) != preserve ) )
 			break;
 
 		stream_read< length_t, error_t >::call( header, length, error );
-		bool do_splice = false;
+
+		if ( length && OOE_UNLIKELY( !socket_read( connect, buffer, length ) ) )
+				throw error::runtime( "ipc::socket::client: " ) <<
+					"Unable to read " << length << " bytes";
+
 		bool do_notify;
 
 		{
@@ -146,19 +139,15 @@ void* client::call( void* )
 			do_notify = in == notify;
 
 			if ( i == map.end() )
-				do_splice = true;
-			else if ( length && OOE_UNLIKELY( !socket_read( connect, buffer, length ) ) )
-				throw error::runtime( "ipc::socket::client: " ) <<
-					"Unable to read " << length << " bytes";
+				// result has been destructed, free memory
+				delete[] allocator.release();
 			else
+				// result exists, store data within map
 				i->second = map_tuple( allocator.release(), error == error::none );
 		}
 
-		// data not needed, splice out of stream
-		if ( do_splice )
-			splice( connect, length );
-		// otherwise, notify any waiting results
-		else if ( do_notify )
+		// notify any waiting results
+		if ( do_notify )
 			condition.notify_one();
 	}
 

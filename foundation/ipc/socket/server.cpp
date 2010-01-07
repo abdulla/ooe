@@ -16,23 +16,6 @@ bool socket_read( ooe::socket& socket, io_buffer& buffer, up_t size )
 	return socket.receive( buffer.get(), size ) == size;
 }
 
-bool socket_write( ooe::socket& socket, aligned_allocator& allocator, io_buffer& buffer, up_t size )
-{
-	if ( buffer.is_internal() )
-	{
-		if ( socket.send( buffer.get(), size ) == size )
-			return true;
-	}
-	else
-	{
-		if ( socket.splice( allocator.get(), size ) == size )
-			return true;
-	}
-
-	OOE_WARNING( "servlet: ", "Unable to write " << size << " bytes" );
-	return false;
-}
-
 bool socket_write( ooe::socket& socket, u8* data, up_t size )
 {
 	if ( socket.send( data, size ) == size )
@@ -69,7 +52,7 @@ void servlet::migrate( ooe::socket& outgoing )
 void* servlet::call( void* pointer )
 {
 	u8 data[ executable::static_page_size ];
-	aligned_allocator allocator;
+	heap_allocator allocator;
 	io_buffer buffer( data, sizeof( data ), allocator );
 	ipc::pool pool;
 
@@ -100,7 +83,7 @@ void* servlet::call( void* pointer )
 
 		if ( OOE_UNLIKELY( !socket_write( socket, header, preserve ) ) )
 			break;
-		else if ( length && OOE_UNLIKELY( !socket_write( socket, allocator, buffer, length ) ) )
+		else if ( length && OOE_UNLIKELY( !socket_write( socket, buffer.get(), length ) ) )
 			break;
 	}
 
