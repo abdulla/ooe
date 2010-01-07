@@ -5,7 +5,7 @@
 
 #include "foundation/utility/noncopyable.hpp"
 
-#if defined( __linux__ ) && !defined( __THROW )
+#ifdef __linux__
 	#define __THROW throw()
 #else
 	#define __THROW
