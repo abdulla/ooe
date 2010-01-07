@@ -5,7 +5,13 @@
 
 #include "foundation/utility/noncopyable.hpp"
 
-extern "C" void free( void* ) throw();
+#if defined( __linux__ ) && !defined( __THROW )
+	#define __THROW throw()
+#else
+	#define __THROW
+#endif
+
+extern "C" void free( void* ) __THROW;
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
