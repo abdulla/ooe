@@ -12,17 +12,10 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 class servlet
 {
 public:
-	enum type
-	{
-		idle,
-		work,
-		move
-	};
-
 	servlet( const std::string&, link_t, const ipc::switchboard&, server& );
 	servlet( ooe::socket&, link_t, const ipc::switchboard&, server& );
-	~servlet( void );
 
+	void join( void );
 	void migrate( ooe::socket& );
 
 private:
@@ -32,7 +25,7 @@ private:
 
 	scoped_ptr< const memory::link_listen > link_listen;
 	scoped_ptr< memory::link_server > link_server;
-	atom< type > state;
+	atom< bool > state;
 	ooe::thread thread;
 
 	void* call( void* );
@@ -50,6 +43,7 @@ public:
 
 	link_t link( pid_t, time_t );
 	void unlink( link_t );
+	void unlink_locked( link_t );
 
 	void relink( ooe::socket& ) OOE_VISIBLE;
 	void migrate( ooe::socket& ) OOE_VISIBLE;
@@ -63,7 +57,7 @@ private:
 	switchboard internal;
 
 	link_t seed;
-	servlet_map servlets;
+	servlet_map map;
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
