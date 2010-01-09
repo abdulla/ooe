@@ -71,14 +71,8 @@ up_t ipc_unlink( const any& any, io_buffer& buffer, pool& )
 	link_t link;
 	stream_read< link_t >::call( buffer.get(), link );
 
-	static_cast< server* >( any.pointer )->unlink( link );
+	static_cast< server* >( any.pointer )->unlink( link, true );
 	return 0;
-}
-
-//--- release --------------------------------------------------------------------------------------
-void release( scoped_ptr< ipc::memory::link_server >& link )
-{
-	delete link.release();
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( memory ) )
@@ -87,18 +81,18 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- servlet --------------------------------------------------------------------------------------
 servlet::servlet( const std::string& link_name, link_t link_, const ipc::switchboard& switchboard_,
-	server& server )
-	: link( link_ ), transport( link_name, transport::create ), switchboard( switchboard_ ),
-	link_listen( new memory::link_listen( link_name ) ), link_server( 0 ), state( true ),
-	thread( make_function( *this, &servlet::call ), &server )
+	memory::server& server_, servlet_ptr& guard )
+	: transport( link_name, transport::create ), link( link_ ), switchboard( switchboard_ ),
+	server( server_ ), link_listen( new memory::link_listen( link_name ) ), link_server( 0 ),
+	state( true ), thread( make_function( *this, &servlet::call ), &guard )
 {
 }
 
 servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchboard_,
-	server& server )
-	: link( link_ ), transport( socket ), switchboard( switchboard_ ), link_listen( 0 ),
-	link_server( new memory::link_server( socket, link, server ) ), state( true ),
-	thread( make_function( *this, &servlet::call ), &server )
+	memory::server& server_, servlet_ptr& guard )
+	: transport( socket ), link( link_ ), switchboard( switchboard_ ), server( server_ ),
+	link_listen( 0 ), link_server( new memory::link_server( socket.receive(), link, server ) ),
+	state( true ), thread( make_function( *this, &servlet::call ), &guard )
 {
 	client_data& data = *static_cast< client_data* >( transport.private_data() );
 
@@ -117,16 +111,19 @@ void servlet::join( void )
 	thread.join();
 }
 
-void servlet::migrate( socket& socket )
+void servlet::migrate( socket& socket, semaphore& semaphore )
 {
 	transport.migrate( socket );
 	link_server->migrate( socket );
 	state = false;
+
+	process_lock lock( semaphore );
+	server.unlink( link, false );
 }
 
 void* servlet::call( void* pointer )
 {
-	memory::server& server = *static_cast< memory::server* >( pointer );
+	servlet_ptr guard( *static_cast< servlet_ptr* >( pointer ) );
 
 	shared_allocator allocator;
 	io_buffer buffer( transport.get(), transport.size(), allocator );
@@ -142,15 +139,11 @@ void* servlet::call( void* pointer )
 		transport.unlink();
 	}
 
-	{
-		scoped< void ( scoped_ptr< memory::link_server >& ) > scoped( release, link_server );
-		servlet_tls = this;
+	servlet_tls = this;
 
-		while ( OOE_LIKELY( state ) )
-			transport.wait( ipc_decode, &tuple );
-	}
+	while ( OOE_LIKELY( state ) )
+		transport.wait( ipc_decode, &tuple );
 
-	server.unlink_locked( link );
 	return 0;
 }
 
@@ -192,33 +185,40 @@ link_t server::link( pid_t pid, time_t time )
 {
 	link_t id = seed++;
 	std::string link_name = ipc::link_name( pid, time, id );
-	servlet_map::value_type value( id, new servlet( link_name, id, external, *this ) );
-	map.insert( map.end(), value );
+
+	servlet_map::iterator i = map.insert( map.end(), servlet_map::value_type( id, servlet_ptr() ) );
+	i->second = new servlet( link_name, id, external, *this, i->second );
+
 	return id;
 }
 
-void server::unlink( link_t id )
+void server::unlink( link_t id, bool join )
 {
-	map.erase( id );
-}
+	servlet_map::iterator i = map.find( id );
 
-void server::unlink_locked( link_t id )
-{
-	process_lock lock( semaphore );
-	map.erase( id );
+	if ( i == map.end() )
+	{
+		OOE_WARNING( "server", "Unable to unlink: Servlet " << id << " does not exist" );
+		return;
+	}
+	else if ( join )
+		i->second->join();
+
+	map.erase( i );
 }
 
 void server::relink( socket& socket )
 {
-	process_lock lock( semaphore );
 	link_t id = seed++;
-	servlet_map::value_type value( id, new servlet( socket, id, external, *this ) );
-	map.insert( map.end(), value );
+	process_lock lock( semaphore );
+
+	servlet_map::iterator i = map.insert( map.end(), servlet_map::value_type( id, servlet_ptr() ) );
+	i->second = new servlet( socket, id, external, *this, i->second );
 }
 
 void server::migrate( socket& socket )
 {
-	servlet_tls->migrate( socket );
+	servlet_tls->migrate( socket, semaphore );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

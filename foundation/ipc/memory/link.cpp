@@ -68,7 +68,7 @@ void* link_server::call( void* pointer )
 		return 0;
 
 	state = idle;
-	server.unlink( link );
+	server.unlink( link, true );
 	return 0;
 }
 
