@@ -71,9 +71,4 @@ client::operator memory::transport&( void )
 	return *transport;
 }
 
-void disconnect( const std::string& name, link_t link )
-{
-	ipc_disconnect( name, link );
-}
-
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

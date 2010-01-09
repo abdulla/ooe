@@ -31,9 +31,6 @@ struct OOE_PACKED client_data
 	c8 name[ transport::private_size - sizeof( link_t ) ];
 };
 
-//--- disconnect -----------------------------------------------------------------------------------
-void disconnect( const std::string&, link_t );
-
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
 
 #endif	// OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP
