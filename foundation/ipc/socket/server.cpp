@@ -30,7 +30,7 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 
 //--- servlet --------------------------------------------------------------------------------------
-servlet::servlet( const servlet_iterator& iterator_, ooe::socket& socket_,
+servlet::servlet( servlet_iterator iterator_, ooe::socket& socket_,
 	const ipc::switchboard& switchboard_, server& server )
 	: iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ), state( true ),
 	thread( make_function( *this, &servlet::call ), &server )
@@ -112,7 +112,7 @@ void server::accept( void )
 	list.back() = new servlet( --list.end(), socket, switchboard, *this );
 }
 
-void server::erase( const servlet_list::iterator& iterator )
+void server::erase( servlet_iterator iterator )
 {
 	lock lock( mutex );
 	list.erase( iterator );

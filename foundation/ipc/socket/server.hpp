@@ -23,7 +23,7 @@ typedef std::list< servlet_ptr >::iterator servlet_iterator;
 class servlet
 {
 public:
-	servlet( const servlet_iterator&, ooe::socket&, const ipc::switchboard&, server& );
+	servlet( servlet_iterator, ooe::socket&, const ipc::switchboard&, server& );
 
 	void join( void );
 	void migrate( ooe::socket& );
@@ -47,7 +47,7 @@ public:
 	~server( void );
 
 	void accept( void );
-	void erase( const servlet_iterator& ) OOE_HIDDEN;
+	void erase( servlet_iterator ) OOE_HIDDEN;
 
 	void relink( ooe::socket& );
 	void migrate( ooe::socket& );

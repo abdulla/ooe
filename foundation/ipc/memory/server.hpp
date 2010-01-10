@@ -8,24 +8,20 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
-class servlet;
-typedef atom_ptr< servlet > servlet_ptr;
-
 //--- servlet --------------------------------------------------------------------------------------
 class servlet
 {
 public:
-	servlet( const std::string&, link_t, const ipc::switchboard&, server&, servlet_ptr& );
-	servlet( ooe::socket&, link_t, const ipc::switchboard&, server&, servlet_ptr& );
+	servlet( const std::string&, link_t, const ipc::switchboard&, server& );
+	servlet( ooe::socket&, link_t, const ipc::switchboard&, server& );
 
 	void join( void );
-	void migrate( ooe::socket&, semaphore& );
+	void migrate( ooe::socket&, semaphore&, server& );
 
 private:
 	memory::transport transport;
 	const link_t link;
 	const ipc::switchboard& switchboard;
-	memory::server& server;
 
 	scoped_ptr< const memory::link_listen > link_listen;
 	scoped_ptr< memory::link_server > link_server;
@@ -47,14 +43,15 @@ public:
 
 	link_t link( pid_t, time_t );
 	void unlink( link_t, bool );
+	atom_ptr< servlet > find( link_t ) const;
 
 	void relink( ooe::socket& ) OOE_VISIBLE;
 	void migrate( ooe::socket& ) OOE_VISIBLE;
 
 private:
-	typedef std::map< link_t, servlet_ptr > servlet_map;
+	typedef std::map< link_t, atom_ptr< servlet > > servlet_map;
 
-	ipc::semaphore semaphore;
+	mutable ipc::semaphore semaphore;
 	memory::transport transport;
 	const switchboard& external;
 	switchboard internal;
