@@ -22,6 +22,9 @@ def ImageConfigure( platform, setup ):
 def IOConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'z', 'zlib.h', 'c' ): Exit( 1 )
 
+	if platform == 'posix':
+		if not setup.CheckFunc( 'splice', '#include <fcntl.h>' ): Exit( 1 )
+
 def JavaScriptConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'v8', 'v8.h', 'c++' ): Exit( 1 )
 
