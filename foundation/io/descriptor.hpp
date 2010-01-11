@@ -15,7 +15,7 @@ struct descriptor_id
 
 	descriptor_id( s32 );
 	descriptor_id( const std::string&, s32 );
-	~descriptor_id( void );
+	~descriptor_id( void ) OOE_VISIBLE;
 };
 
 class OOE_VISIBLE descriptor

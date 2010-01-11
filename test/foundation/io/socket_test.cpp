@@ -84,12 +84,9 @@ template<>
 {
 	std::cerr << "internet query for localhost\n";
 
-	typedef internet_query::iterator iterator_type;
 	internet_query query( "localhost", "http" );
-	up_t j = 1;
-
-	for ( iterator_type i = query.begin(), end = query.end(); i != end; ++i, ++j )
-		std::cout << j << ": internet family " << i->family() << '\n';
+	std::cout << "Number of addresses for \"localhost\": " <<
+		std::distance( query.begin(), query.end() ) << '\n';
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
