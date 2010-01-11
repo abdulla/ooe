@@ -20,8 +20,7 @@ def ImageConfigure( platform, setup ):
 		if not setup.CheckLib( 'IlmThread', language = 'c++' ): Exit( 1 )
 
 def IOConfigure( platform, setup ):
-	if platform == 'posix':
-		if not setup.CheckFunc( 'splice', '#include <fcntl.h>' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'z', 'zlib.h', 'c' ): Exit( 1 )
 
 def JavaScriptConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'v8', 'v8.h', 'c++' ): Exit( 1 )
