@@ -13,8 +13,8 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- directory_iterator ---------------------------------------------------------------------------
 class directory_iterator
-	: public boost::iterator_facade< directory_iterator, std::string, boost::forward_traversal_tag,
-	std::string >
+	: public boost::iterator_facade< directory_iterator, std::string,
+	boost::single_pass_traversal_tag, std::string >
 {
 private:
 	DIR* dir;
