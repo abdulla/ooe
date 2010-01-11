@@ -32,7 +32,7 @@ namespace
 
 		offset[ 0 ] = buffer.offsets[ 0 ];
 		offset[ 1 ] = buffer.offsets[ 1 ];
-		return memory( desc, memory::read, buffer.size );
+		return memory( desc, memory::read, memory::region( 0, buffer.size ) );
 	}
 }
 
