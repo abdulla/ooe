@@ -3,30 +3,28 @@
 #ifndef OOE_FOUNDATION_GENERAL_SIGHT_FORWARD_HPP
 #define OOE_FOUNDATION_GENERAL_SIGHT_FORWARD_HPP
 
+#include "foundation/io/poll.hpp"
 #include "foundation/parallel/task.hpp"
 #include "foundation/utility/atom.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+class sight
 {
-	namespace platform
-	{
-		class sight;
-	}
+protected:
+	typedef function< void ( const u8* ) > call_type;
 
-	class platform::sight
-	{
-	protected:
-		typedef function< void ( const u8* ) > call_type;
+	sight( const call_type&, u16 width, u16 height );
+	~sight( void ) OOE_VISIBLE;
 
-		sight( const call_type&, u16 width, u16 height );
-		~sight( void ) OOE_VISIBLE;
+private:
+	atom< u32 > state;
+	unique_task< void ( call_type, u16, u16 ) > task;
 
-	private:
-		atom< u32 > state;
-		unique_task< void ( call_type, u16, u16 ) > task;
+	void status( const descriptor&, poll::type );
+	void main( call_type, u16, u16 );
+};
 
-		void main( call_type, u16, u16 );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform ) )
 
 #endif	// OOE_FOUNDATION_GENERAL_SIGHT_FORWARD_HPP
