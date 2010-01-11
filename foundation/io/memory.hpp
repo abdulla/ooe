@@ -9,11 +9,11 @@ namespace ooe
 {
 	struct memory_id
 	{
-		void* const area;
 		const up_t size;
+		void* const area;
 
 		memory_id( u8, up_t, s32 );
-		~memory_id( void ) OOE_VISIBLE;
+		~memory_id( void );
 	};
 
 	class OOE_VISIBLE memory
@@ -39,7 +39,8 @@ namespace ooe
 			dont_need
 		};
 
-		memory( const descriptor&, u8 = read, up_t = 0 );
+		memory( const descriptor&, u8 = read );
+		~memory( void );
 
 		void advise( advise_type ) const;
 		void sync( void ) const;

@@ -13,7 +13,7 @@ namespace ooe
 {
 //--- memory_id ----------------------------------------------------------------
 	memory_id::memory_id( u8 flags, up_t size_, s32 fd )
-		: area( mmap( 0, size_, flags, MAP_SHARED, fd, 0 ) ), size( size_ )
+		: size( size_ ), area( mmap( 0, size, flags, MAP_SHARED, fd, 0 ) )
 	{
 		if ( area == MAP_FAILED )
 			throw error::io( "memory: " ) << "Unable to map memory: " << error::number( errno );
@@ -26,9 +26,14 @@ namespace ooe
 	}
 
 //--- memory -------------------------------------------------------------------
-	memory::memory( const descriptor& desc, u8 flags, up_t size_ )
+	memory::memory( const descriptor& desc, u8 flags )
 		: descriptor( desc ),
-		internal( new memory_id( flags, size_ ? size_ : descriptor::size(), descriptor::get() ) )
+		internal( new memory_id( flags, descriptor::size(), descriptor::get() ) )
+	{
+	}
+
+	// defined so that memory_id::~memory_id() can be hidden
+	memory::~memory( void )
 	{
 	}
 
