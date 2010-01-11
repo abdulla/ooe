@@ -2,9 +2,6 @@ replace maths with eigen2
 	- uses expression templates like blitz++ but is sse optimised
 	- other option is to roll my own, considering my limited needs, it is a possibility
 
-use tr1::array
-	- replace all array usage with tr1:arrays, which keep track of their size without using space
-
 modify fonts to use native font manager
 	- use fontconfig/etc where possible for fonts
 	- multi-texture glyphs that require more than one texture

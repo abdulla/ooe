@@ -1,5 +1,2 @@
 modify runner to have flexible output
 	- can make output in formats that are compatible with other test systems
-
-add runner-level set-up/tear-down
-	- this will enable things like starting a test server

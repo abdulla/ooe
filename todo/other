@@ -1,3 +1,6 @@
+use openctm for models
+	- no need for custom model format
+
 add translate/localisation functions
 	- use gettext or similar
 
