@@ -20,7 +20,7 @@ private:
 	DIR* dir;
 	dirent* entry;
 
-	directory_iterator( DIR*, dirent* );
+	explicit directory_iterator( DIR*, dirent* );
 
 	void increment( void ) OOE_VISIBLE;
 	bool equal( const directory_iterator& ) const OOE_VISIBLE;
