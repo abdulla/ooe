@@ -5,7 +5,6 @@
 #include <cerrno>
 
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <sys/stat.h>
 
 #include "foundation/io/descriptor.hpp"
@@ -141,12 +140,6 @@ void descriptor::resize( up_t length )
 {
 	if ( ftruncate( get(), length ) )
 		throw error::io( "descriptor: " ) << "Unable to resize: " << error::number( errno );
-}
-
-void descriptor::control( u32 request, void* pointer )
-{
-	if ( ioctl( get(), request, pointer ) == -1 )
-		throw error::io( "descriptor: " ) << "Unable to control: " << error::number( errno );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

@@ -54,7 +54,6 @@ public:
 	up_t size( void ) const;
 
 	void resize( up_t );
-	void control( u32, void* );
 	up_t splice( const ooe::descriptor&, up_t );
 
 	s32 get( void ) const;
