@@ -11,13 +11,13 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- add ------------------------------------------------------------------------------------------
 template< typename type >
-	type* add( void* pointer, up_t bytes )
+	type* add( void* pointer, sp_t bytes )
 {
 	return reinterpret_cast< type* >( static_cast< u8* >( pointer ) + bytes );
 }
 
 template< typename type >
-	const type* add( const void* pointer, up_t bytes )
+	const type* add( const void* pointer, sp_t bytes )
 {
 	return reinterpret_cast< const type* >( static_cast< const u8* >( pointer ) + bytes );
 }
