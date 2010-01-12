@@ -116,7 +116,7 @@ descriptor::node_type descriptor::type( void ) const
 		return file;
 
 	case S_IFIFO:
-		return fifo;
+		return pipe;
 
 	case S_IFLNK:
 		return link;

@@ -41,7 +41,7 @@ public:
 		character,
 		block,
 		file,
-		fifo,
+		pipe,
 		link,
 		socket
 	};
