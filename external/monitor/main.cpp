@@ -78,8 +78,8 @@ namespace
 	{
 		std::string directory = ".";
 		up_t percent = 5;
-		u16 width = 320;
-		u16 height = 240;
+		u16 width = 640;
+		u16 height = 480;
 
 		for ( s32 option; ( option = getopt( argc, argv, "d:h:p:w:" ) ) != -1; )
 		{
@@ -103,10 +103,14 @@ namespace
 
 			default:
 				std::cout <<
-					"    -d <path>     Directory to write images to        [default .]\n"
-					"    -p <percent>  Percentage (1-99) change to detect  [default 5]\n"
-					"    -w <width>    Camera width                        [default 320]\n"
-					"    -h <height>   Camera height                       [default 240]\n";
+					"    -d <path>     Directory to write images to        "
+					"[default " << directory << "]\n"
+					"    -p <percent>  Percentage (1-99) change to detect  "
+					"[default " << percent << "]\n"
+					"    -w <width>    Camera width                        "
+					"[default " << width << "]\n"
+					"    -h <height>   Camera height                       "
+					"[default " << height << "]\n";
 
 				return false;
 			}
