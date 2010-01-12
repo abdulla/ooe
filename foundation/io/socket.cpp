@@ -159,12 +159,13 @@ void socket::send( const ooe::descriptor& desc )
 		throw error::io( "socket: " ) << "Unable to send descriptor: " << error::number( errno );
 }
 
+//--- make_pair ------------------------------------------------------------------------------------
 socket_pair make_pair( void )
 {
 	s32 fd[ 2 ];
 
 	if ( socketpair( AF_LOCAL, SOCK_STREAM, 0, fd ) )
-		throw error::runtime( "socket: " ) << "Unable to make pair: " << error::number( errno );
+		throw error::io( "make_pair: " ) << "Unable to create socket: " << error::number( errno );
 
 	return socket_pair( descriptor( fd[ 0 ] ), descriptor( fd[ 1 ] ) );
 }

@@ -37,6 +37,7 @@ struct OOE_VISIBLE socket
 	void send( const ooe::descriptor& );
 };
 
+//--- make_pair ------------------------------------------------------------------------------------
 typedef tuple< socket, socket > socket_pair;
 socket_pair make_pair( void ) OOE_VISIBLE;
 
