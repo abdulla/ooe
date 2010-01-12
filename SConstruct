@@ -15,9 +15,12 @@ def ImageConfigure( platform, setup ):
 	if not setup.CheckLib( 'Half', language = 'c++' ): Exit( 1 )
 	if not setup.CheckLib( 'Iex', language = 'c++' ): Exit( 1 )
 	if not setup.CheckLib( 'IlmImf', language = 'c++' ): Exit( 1 )
+	if not setup.CheckLib( 'IlmThread', language = 'c++' ): Exit( 1 )
 
-	if platform == 'darwin':
-		if not setup.CheckLib( 'IlmThread', language = 'c++' ): Exit( 1 )
+def ExecutableConfigure( platform, setup ):
+	if platform == 'posix':
+		if not setup.CheckLib( 'dl', language = 'c' ): Exit( 1 )
+		if not setup.CheckLib( 'rt', language = 'c' ): Exit( 1 )
 
 def IOConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'z', 'zlib.h', 'c' ): Exit( 1 )
@@ -32,7 +35,8 @@ def GeneralConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
 
 	if platform == 'posix':
-		if not setup.CheckLib( ooe.x11.library ): Exit( 1 )
+		if not setup.CheckLibWithHeader( 'v4lconvert', 'libv4lconvert.h', 'c' ): Exit( 1 )
+		if not setup.CheckLib( 'Xrandr' ): Exit( 1 )
 
 def LuaConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( ooe.lua.library, 'lauxlib.h', 'c' ): Exit( 1 )
@@ -41,7 +45,11 @@ def OpenGLConfigure( platform, setup ):
 	if platform == 'darwin':
 		if not setup.CheckCHeader( 'OpenGL/OpenGL.h' ): Exit( 1 )
 	elif platform == 'posix':
-		if not setup.CheckLibWithHeader( ooe.gl.library, 'GL/glx.h', 'c' ): Exit( 1 )
+		if not setup.CheckLibWithHeader( 'GL', 'GL/glx.h', 'c' ): Exit( 1 )
+
+def ParallelConfigure( platform, setup ):
+	if platform == 'posix':
+		if not setup.CheckLib( 'pthread', language = 'c' ): Exit( 1 )
 
 def UtilityConfigure( platform, setup ):
 	if not setup.CheckCXXHeader( 'boost/call_traits.hpp' ): Exit( 1 )
@@ -58,8 +66,8 @@ exec 'from platform.' + build.platform + ' import *'
 
 #--- foundation ----------------------------------------------------------------
 build.Configurable( configure = UtilityConfigure )
-build.Linkable( 'executable', 'foundation/executable', [ ooe.dl.library, ooe.rt.library ],
-	ooe.appkit.framework )
+build.Linkable( 'executable', 'foundation/executable', frameworks = ooe.appkit.framework,
+	configure = ExecutableConfigure )
 build.Linkable( 'general', 'foundation/general', 'parallel', ooe.qtkit.framework,
 	ooe.freetype.include_path, ooe.freetype.library_path, GeneralConfigure )
 build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.include_path,
@@ -68,7 +76,7 @@ build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
 build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
 build.Linkable( 'maths', 'foundation/maths' )
 build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
-build.Linkable( 'parallel', 'foundation/parallel', ooe.pthread.library )
+build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
 
 #--- component -----------------------------------------------------------------
 build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
