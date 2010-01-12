@@ -4,12 +4,14 @@
 
 #include <cerrno>
 
+#include <libv4lconvert.h>
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 
 #include "foundation/general/sight.hpp"
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/utility/scoped.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -31,7 +33,7 @@ sight::sight( const call_type& call_, u16 width, u16 height )
 
 uncompressed_image::type sight::format( void )
 {
-	return uncompressed_image::bgr_u8;
+	return uncompressed_image::rgb_u8;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
@@ -81,14 +83,21 @@ void sight::main( call_type call, u16 width, u16 height )
 	crop.c = cropcap.defrect;
 	control( desc, VIDIOC_S_CROP, &crop );*/
 
-	v4l2_format format;
-	std::memset( &format, 0, sizeof( format ) );
-	format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	format.fmt.pix.width = width;
-	format.fmt.pix.height = height;
-	format.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB24;
-	format.fmt.pix.field = V4L2_FIELD_INTERLACED;
-	control( desc, VIDIOC_S_FMT, &format );
+	v4l2_format source_format;
+	source_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	control( desc, VIDIOC_G_FMT, &source_format );
+
+	source_format.fmt.pix.width = width;
+	source_format.fmt.pix.height = height;
+	control( desc, VIDIOC_S_FMT, &source_format );
+
+	v4lconvert_data* data = v4lconvert_create( desc.get() );
+	scoped< void ( v4lconvert_data* ) > scoped( v4lconvert_destroy, data );
+	v4l2_format target_format = source_format;
+	target_format.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB24;
+
+	up_t target_size = width * height * 3;
+	scoped_array< u8 > target_data( new u8[ target_size ] );
 
 	v4l2_requestbuffers requestbuffers;
 	std::memset( &requestbuffers, 0, sizeof( requestbuffers ) );
@@ -132,7 +141,14 @@ void sight::main( call_type call, u16 width, u16 height )
 	{
 		poll.wait();
 		control( desc, VIDIOC_DQBUF, &buffer );
-		call( vector[ buffer.index ].as< u8 >() );
+
+		memory& memory = vector[ buffer.index ];
+		up_t source_size = memory.size();
+		u8* source_data = memory.as< u8 >();
+		v4lconvert_convert( data, &source_format, &target_format,
+			source_data, source_size, target_data, target_size );
+		call( target_data );
+
 		control( desc, VIDIOC_QBUF, &buffer );
 	}
 
