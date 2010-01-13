@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <csignal>
 #include <cstdarg>
+#include <cstdlib>
 
 #include <sys/wait.h>
 
