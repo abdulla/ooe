@@ -92,11 +92,11 @@ build.Linkable( 'registry', 'component/registry', 'ipc' )
 #--- test ----------------------------------------------------------------------
 build.Executable( 'registry_test', 'test/component/registry', 'javascript lua registry unit' )
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
-build.Executable( 'io_test', 'test/foundation/io', 'io parallel unit' )
+build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
 build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
 build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
-build.Linkable( 'unit', 'test/unit', 'executable' )
+build.Linkable( 'unit', 'test/unit', 'io executable' )
 
 #--- external ------------------------------------------------------------------
 build.Executable( 'chunked', 'external/chunked', 'executable general parallel scene' )

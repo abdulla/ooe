@@ -9,6 +9,8 @@
 
 #include <fcntl.h>
 
+#include "foundation/io/file.hpp"
+#include "foundation/executable/environment.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
@@ -21,7 +23,7 @@
 namespace
 {
 	using namespace ooe;
-	typedef tuple< up_t, fork_io, timer > list_tuple;
+	typedef tuple< up_t, fork_io, file, timer > list_tuple;
 	typedef std::list< list_tuple > list_type;
 	typedef tuple< bool, std::string > vector_tuple;
 	typedef std::vector< vector_tuple > vector_type;
@@ -56,6 +58,23 @@ namespace
 		fork_io::exit( false );
 	}
 
+	std::string read( file& in )
+	{
+		std::string out;
+		c8 buffer[ executable::static_page_size ];
+		up_t read;
+
+		do
+		{
+			read = in.read( buffer, sizeof( buffer ) );
+			buffer[ read ] = 0;
+			out += buffer;
+		}
+		while ( read == sizeof( buffer ) );
+
+		return out;
+	}
+
 	void collect_tests( vector_type& vector, list_type& list, time_t time_out )
 	{
 		for ( list_type::iterator i = list.begin(), end = list.end(); i != end; ++i )
@@ -67,13 +86,13 @@ namespace
 				passed = true;
 			else if ( status == fork_io::waiting )
 			{
-				if ( i->_2.elapsed() < time_out )
+				if ( i->_3.elapsed() < time_out )
 					continue;
 				else
 					i->_1.signal( SIGKILL );
 			}
 
-			vector[ i->_0 ] = vector_tuple( passed, read( i->_1 ) );
+			vector[ i->_0 ] = vector_tuple( passed, read( i->_2 ) );
 			i = --list.erase( i );
 		}
 	}
@@ -87,10 +106,11 @@ namespace
 
 		for ( unit::group_base::iterator_type i = group.begin(), end = group.end(); i != end; ++i )
 		{
-			fork_io fork_io;
+			file_pair pair = make_pipe();
+			fork_io fork_io( io_triplet( -1, -1, pair._1.get() ) );
 
 			if ( !fork_io.is_child() )
-				list.push_back( list_tuple( j++, fork_io, timer() ) );
+				list.push_back( list_tuple( j++, fork_io, pair._0, timer() ) );
 			else
 				run_test( i, tuple._0, no_stdout );
 		}
