@@ -2,8 +2,8 @@
 
 #include <iostream>
 
+#include "external/scene/scheduler.hpp"
 #include "foundation/executable/environment.hpp"
-#include "foundation/parallel/scheduler.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/error.hpp"
 

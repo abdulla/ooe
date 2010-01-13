@@ -26,8 +26,8 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- sight ----------------------------------------------------------------------------------------
-sight::sight( const call_type& call_, u16 width, u16 height )
-	: platform::sight( call_, width, height )
+sight::sight( const call_type& call_, u16 width_, u16 height_ )
+	: platform::sight( call_, width_, height_ )
 {
 }
 
@@ -41,15 +41,16 @@ OOE_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
 //--- sight ----------------------------------------------------------------------------------------
-sight::sight( const call_type& call, u16 width, u16 height )
-	: state( true ), task( make_function( *this, &sight::main ), call, width, height )
+sight::sight( const call_type& call_, u16 width_, u16 height_ )
+	: call( call_ ), width( width_ ), height( height_ ), state( true ),
+	thread( make_function( *this, &sight::main ), 0 )
 {
 }
 
 sight::~sight( void )
 {
 	state = false;
-	task();
+	thread.join();
 }
 
 void sight::status( const descriptor&, poll::type type )
@@ -58,7 +59,7 @@ void sight::status( const descriptor&, poll::type type )
 		state = false;
 }
 
-void sight::main( call_type call, u16 width, u16 height )
+void* sight::main( void* )
 {
 	descriptor desc( "/dev/video0", descriptor::read_write );
 
@@ -153,6 +154,7 @@ void sight::main( call_type call, u16 width, u16 height )
 	}
 
 	control( desc, VIDIOC_STREAMOFF, &buf_type );
+	return 0;
 }
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )

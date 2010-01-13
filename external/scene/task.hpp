@@ -2,8 +2,8 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_FOUNDATION_PARALLEL_TASK_HPP
-	#define OOE_FOUNDATION_PARALLEL_TASK_HPP
+	#ifndef OOE_EXTERNAL_SCENE_TASK_HPP
+	#define OOE_EXTERNAL_SCENE_TASK_HPP
 
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
@@ -42,12 +42,12 @@ namespace ooe
 }
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "foundation/parallel/task.hpp"
+	#define BOOST_PP_FILENAME_1 "external/scene/task.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
-	#endif	// OOE_FOUNDATION_PARALLEL_TASK_HPP
+	#endif	// OOE_EXTERNAL_SCENE_TASK_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 

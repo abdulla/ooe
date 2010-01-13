@@ -5,8 +5,8 @@
 
 #include "external/scene/cache.hpp"
 #include "external/scene/graph.hpp"
+#include "external/scene/scheduler.hpp"
 #include "foundation/io/memory.hpp"
-#include "foundation/parallel/scheduler.hpp"
 #include "foundation/utility/atom.hpp"
 
 namespace ooe

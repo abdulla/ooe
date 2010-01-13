@@ -2,6 +2,7 @@
 
 #include "external/scene/cache.hpp"
 #include "external/scene/chunked.hpp"
+#include "external/scene/scheduler.hpp"
 #include "foundation/executable/environment.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
@@ -9,7 +10,6 @@
 #include "foundation/general/event_queue.hpp"
 #include "foundation/general/video.hpp"
 #include "foundation/general/view.hpp"
-#include "foundation/parallel/scheduler.hpp"
 
 namespace
 {

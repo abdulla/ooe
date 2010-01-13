@@ -99,7 +99,7 @@ build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 build.Linkable( 'unit', 'test/unit', 'io executable' )
 
 #--- external ------------------------------------------------------------------
-build.Executable( 'chunked', 'external/chunked', 'executable general parallel scene' )
+build.Executable( 'chunked', 'external/chunked', 'executable general scene' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'memoryrpc_input', 'external/memoryrpc/input', 'executable ipc' )
 build.Executable( 'memoryrpc_noop', 'external/memoryrpc/noop', 'executable ipc' )

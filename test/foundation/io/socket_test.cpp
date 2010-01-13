@@ -7,7 +7,7 @@
 #include "foundation/io/file.hpp"
 #include "foundation/io/poll.hpp"
 #include "foundation/io/socket.hpp"
-#include "foundation/parallel/task.hpp"
+#include "foundation/parallel/thread.hpp"
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
@@ -34,6 +34,12 @@ public:
 	socket get( void ) const
 	{
 		return poll._1;
+	}
+
+	void* shutdown( void* )
+	{
+		poll._1.shutdown( socket::read );
+		return 0;
 	}
 
 private:
@@ -70,12 +76,13 @@ template<>
 	std::cerr << "poll on shutdown\n";
 
 	socket poll_socket( setup.get() );
-	unique_task< void ( socket::shutdown_type ) >
-		task( make_function( poll_socket, &socket::shutdown ), socket::read );
+	thread thread( make_function( setup, &setup::shutdown ), 0 );
 
 	poll poll;
 	poll.insert( poll_socket );
 	poll.wait();
+
+	thread.join();
 }
 
 template<>

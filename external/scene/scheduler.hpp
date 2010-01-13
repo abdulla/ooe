@@ -2,12 +2,12 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-	#ifndef OOE_FOUNDATION_PARALLEL_SCHEDULER_HPP
-	#define OOE_FOUNDATION_PARALLEL_SCHEDULER_HPP
+	#ifndef OOE_EXTERNAL_SCENE_SCHEDULER_HPP
+	#define OOE_EXTERNAL_SCENE_SCHEDULER_HPP
 
 #include <list>
 
-#include "foundation/parallel/task.hpp"
+#include "external/scene/task.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/error.hpp"
 
@@ -86,7 +86,7 @@ namespace ooe
 		void resize( up_t );
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "foundation/parallel/scheduler.hpp"
+	#define BOOST_PP_FILENAME_1 "external/scene/scheduler.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
@@ -108,7 +108,7 @@ namespace ooe
 	};
 }
 
-	#endif	// OOE_FOUNDATION_PARALLEL_SCHEDULER_HPP
+	#endif	// OOE_EXTERNAL_SCENE_SCHEDULER_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 
