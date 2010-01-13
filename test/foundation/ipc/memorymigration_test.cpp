@@ -115,7 +115,7 @@ template<>
 	migrate();
 	pid_t migrate_pid1 = server_pid();
 
-	check( "migrate_pid0 != migrate_pid1", migrate_pid0 != migrate_pid1 );
+	check( "different pids after migration", migrate_pid0 != migrate_pid1 );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
