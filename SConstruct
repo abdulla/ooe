@@ -23,6 +23,7 @@ def ExecutableConfigure( platform, setup ):
 		if not setup.CheckLib( 'rt', language = 'c' ): Exit( 1 )
 
 def IOConfigure( platform, setup ):
+	if not setup.CheckCXXHeader( 'boost/iterator/iterator_facade.hpp' ): Exit( 1 )
 	if not setup.CheckLibWithHeader( 'z', 'zlib.h', 'c' ): Exit( 1 )
 
 	if platform == 'posix':
@@ -55,6 +56,7 @@ def UtilityConfigure( platform, setup ):
 	if not setup.CheckCXXHeader( 'boost/call_traits.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/noncopyable.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/preprocessor.hpp' ): Exit( 1 )
+	if not setup.CheckCXXHeader( 'boost/static_assert.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/type_traits.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/mpl/vector.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/utility/enable_if.hpp' ): Exit( 1 )
@@ -104,5 +106,9 @@ build.Executable( 'memoryrpc_noop', 'external/memoryrpc/noop', 'executable ipc' 
 build.Executable( 'memoryrpc_output', 'external/memoryrpc/output', 'executable ipc' )
 build.Executable( 'memoryrpc_server', 'external/memoryrpc/server', 'executable ipc' )
 build.Executable( 'monitor', 'external/monitor', 'executable general image' )
+build.Executable( 'socketrpc_input', 'external/socketrpc/input', 'executable ipc' )
+build.Executable( 'socketrpc_noop', 'external/socketrpc/noop', 'executable ipc' )
+build.Executable( 'socketrpc_output', 'external/socketrpc/output', 'executable ipc' )
+build.Executable( 'socketrpc_server', 'external/socketrpc/server', 'executable ipc' )
 build.Linkable( 'scene', 'external/scene', 'image io maths parallel' )
 build.Linkable( 'hello', 'external/hello', 'javascript lua registry' )
