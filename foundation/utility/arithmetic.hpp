@@ -5,6 +5,8 @@
 
 #include <algorithm>
 
+#include "foundation/utility/fundamental.hpp"
+
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- clamp ----------------------------------------------------------------------------------------

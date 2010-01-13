@@ -3,9 +3,9 @@
 #include <objc/message.h>
 #include <QTKit/QTKit.h>
 
-#include "foundation/general/sight.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
+#include "foundation/video/sight.hpp"
 
 using namespace ooe;
 

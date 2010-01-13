@@ -7,9 +7,9 @@
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
-#include "foundation/general/event_queue.hpp"
-#include "foundation/general/video.hpp"
-#include "foundation/general/view.hpp"
+#include "foundation/video/event_queue.hpp"
+#include "foundation/video/video.hpp"
+#include "foundation/video/view.hpp"
 
 namespace
 {
@@ -141,7 +141,7 @@ namespace
 	bool launch( const std::string& root, const std::string&, s32, c8** )
 	{
 		// video library must be preloaded for linux
-		library libopengl( root + "../library/libopengl" + library::suffix );
+		library libopengl( root + "../library/libopengl" + library::suffix, library::global_lazy );
 		event_queue event_queue;
 		view view( event_queue, width, height, false );
 

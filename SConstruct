@@ -32,13 +32,6 @@ def IOConfigure( platform, setup ):
 def JavaScriptConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'v8', 'v8.h', 'c++' ): Exit( 1 )
 
-def GeneralConfigure( platform, setup ):
-	if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
-
-	if platform == 'posix':
-		if not setup.CheckLibWithHeader( 'v4lconvert', 'libv4lconvert.h', 'c' ): Exit( 1 )
-		if not setup.CheckLib( 'Xrandr' ): Exit( 1 )
-
 def LuaConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( ooe.lua.library, 'lauxlib.h', 'c' ): Exit( 1 )
 
@@ -61,6 +54,13 @@ def UtilityConfigure( platform, setup ):
 	if not setup.CheckCXXHeader( 'boost/mpl/vector.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/utility/enable_if.hpp' ): Exit( 1 )
 
+def VideoConfigure( platform, setup ):
+	if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
+
+	if platform == 'posix':
+		if not setup.CheckLibWithHeader( 'v4lconvert', 'libv4lconvert.h', 'c' ): Exit( 1 )
+		if not setup.CheckLib( 'Xrandr' ): Exit( 1 )
+
 ### build ######################################################################
 build = Build( variables )
 build.Configure( 'release' == ARGUMENTS.get( 'mode', 'debug' ) )
@@ -70,8 +70,6 @@ exec 'from platform.' + build.platform + ' import *'
 build.Configurable( configure = UtilityConfigure )
 build.Linkable( 'executable', 'foundation/executable', frameworks = ooe.appkit.framework,
 	configure = ExecutableConfigure )
-build.Linkable( 'general', 'foundation/general', 'parallel', ooe.qtkit.framework,
-	ooe.freetype.include_path, ooe.freetype.library_path, GeneralConfigure )
 build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.include_path,
 	configure = ImageConfigure )
 build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
@@ -79,6 +77,8 @@ build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/sock
 build.Linkable( 'maths', 'foundation/maths' )
 build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
+build.Linkable( 'video', 'foundation/video', 'parallel', ooe.qtkit.framework,
+	ooe.freetype.include_path, ooe.freetype.library_path, VideoConfigure )
 
 #--- component -----------------------------------------------------------------
 build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
@@ -99,13 +99,13 @@ build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 build.Linkable( 'unit', 'test/unit', 'io executable' )
 
 #--- external ------------------------------------------------------------------
-build.Executable( 'chunked', 'external/chunked', 'executable general scene' )
+build.Executable( 'chunked', 'external/chunked', 'executable scene video' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'memoryrpc_input', 'external/memoryrpc/input', 'executable ipc' )
 build.Executable( 'memoryrpc_noop', 'external/memoryrpc/noop', 'executable ipc' )
 build.Executable( 'memoryrpc_output', 'external/memoryrpc/output', 'executable ipc' )
 build.Executable( 'memoryrpc_server', 'external/memoryrpc/server', 'executable ipc' )
-build.Executable( 'monitor', 'external/monitor', 'executable general image' )
+build.Executable( 'monitor', 'external/monitor', 'executable image video' )
 build.Executable( 'socketrpc_input', 'external/socketrpc/input', 'executable ipc' )
 build.Executable( 'socketrpc_noop', 'external/socketrpc/noop', 'executable ipc' )
 build.Executable( 'socketrpc_output', 'external/socketrpc/output', 'executable ipc' )

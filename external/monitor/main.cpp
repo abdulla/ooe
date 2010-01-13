@@ -5,15 +5,15 @@
 #include <ctime>
 
 #include "foundation/executable/program.hpp"
-#include "foundation/general/sight.hpp"
 #include "foundation/image/jpeg.hpp"
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
+#include "foundation/video/sight.hpp"
 
 #ifdef __APPLE__
-	#include "foundation/general/event_queue.hpp"
+	#include "foundation/video/event_queue.hpp"
 #else
 	#include "foundation/executable/timer.hpp"
 #endif

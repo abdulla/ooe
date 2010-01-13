@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_OPENGL_TEXTURE_HPP
 #define OOE_FOUNDATION_OPENGL_TEXTURE_HPP
 
-#include "foundation/general/video.hpp"
+#include "foundation/video/video.hpp"
 
 namespace ooe
 {

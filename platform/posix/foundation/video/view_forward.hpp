@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_GENERAL_VIEW_FORWARD_HPP
-#define OOE_FOUNDATION_GENERAL_VIEW_FORWARD_HPP
+#ifndef OOE_FOUNDATION_VIDEO_VIEW_FORWARD_HPP
+#define OOE_FOUNDATION_VIDEO_VIEW_FORWARD_HPP
 
 #include "foundation/utility/fundamental.hpp"
 
@@ -53,4 +53,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_GENERAL_VIEW_FORWARD_HPP
+#endif	// OOE_FOUNDATION_VIDEO_VIEW_FORWARD_HPP

@@ -2,8 +2,8 @@
 
 #include <AppKit/AppKit.h>
 
-#include "foundation/general/event_queue.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/video/event_queue.hpp"
 
 namespace ooe
 {

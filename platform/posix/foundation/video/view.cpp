@@ -5,12 +5,12 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/Xrandr.h>
 
-#include "foundation/general/event_queue.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/video/event_queue.hpp"
 
 #define OOE_X_HEADER_INCLUDED
-#include "foundation/general/view.hpp"
+#include "foundation/video/view.hpp"
 #undef OOE_X_HEADER_INCLUDED
 
 namespace

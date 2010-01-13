@@ -8,10 +8,10 @@
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
 
-#include "foundation/general/sight.hpp"
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
+#include "foundation/video/sight.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 

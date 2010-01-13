@@ -3,8 +3,8 @@
 #undef __CONSTANT_CFSTRINGS__
 #include <AppKit/AppKit.h>
 
-#include "foundation/general/view.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/video/view.hpp"
 
 namespace ooe
 {

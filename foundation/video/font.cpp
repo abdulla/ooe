@@ -3,8 +3,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "foundation/general/font.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/video/font.hpp"
 
 namespace ooe
 {

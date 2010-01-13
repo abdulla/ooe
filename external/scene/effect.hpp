@@ -5,8 +5,8 @@
 
 #include <vector>
 
-#include "foundation/general/video.hpp"
 #include "foundation/io/vfs.hpp"
+#include "foundation/video/video.hpp"
 
 namespace ooe
 {

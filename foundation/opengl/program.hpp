@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_OPENGL_PROGRAM_HPP
 #define OOE_FOUNDATION_OPENGL_PROGRAM_HPP
 
-#include "foundation/general/video.hpp"
+#include "foundation/video/video.hpp"
 
 namespace ooe
 {

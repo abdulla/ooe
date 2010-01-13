@@ -54,7 +54,7 @@ namespace
 		if ( error )
 			throw error::runtime( "library: " ) << "Unable to find \"" << name << "\": " << error;
 		else if ( !symbol )	// needed due to gcc visibility
-			throw error::runtime( "library: " ) << "Null symbol found";
+			throw error::runtime( "library: " ) << "Symbol \"" << name << "\" is null";
 
 		return symbol;
 	}
