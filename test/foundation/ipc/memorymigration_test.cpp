@@ -35,17 +35,7 @@ public:
 
 		if ( fork0->is_child() )
 		{
-			OOE_IGNORE
-			(
-				ipc::memory::server server( "/ooe.test.memory-migration", nameservice );
-				semaphore.up();
-				server_ptr = &server;
-				socket_ptr = &pair._0;
-
-				while ( !executable::signal() )
-					server.decode();
-			);
-
+			OOE_IGNORE( server_0( nameservice, semaphore, pair._0 ) );
 			fork_io::exit( true );
 		}
 
@@ -54,16 +44,7 @@ public:
 
 		if ( fork1->is_child() )
 		{
-			OOE_IGNORE
-			(
-				ipc::memory::server server( ipc::unique_name(), nameservice );
-				semaphore.up();
-				server.relink( pair._1 );
-
-				while ( !executable::signal() )
-					server.decode();
-			);
-
+			OOE_IGNORE( server_1( nameservice, semaphore, pair._1 ) );
 			fork_io::exit( true );
 		}
 
@@ -87,6 +68,27 @@ private:
 	static pid_t server_pid( void )
 	{
 		return getpid();
+	}
+
+	void server_0( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
+	{
+		ipc::memory::server server( "/ooe.test.memory-migration", nameservice );
+		semaphore.up();
+		server_ptr = &server;
+		socket_ptr = &socket;
+
+		while ( !executable::signal() )
+			server.decode();
+	}
+
+	void server_1( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
+	{
+		ipc::memory::server server( ipc::unique_name(), nameservice );
+		semaphore.up();
+		server.relink( socket );
+
+		while ( !executable::signal() )
+			server.decode();
 	}
 };
 

@@ -112,27 +112,7 @@ public:
 
 		if ( fork->is_child() )
 		{
-			OOE_IGNORE
-			(
-				executable::null_fd( STDOUT_FILENO );
-				ipc::nameservice nameservice;
-				nameservice.insert( "print_construct", print_construct );
-				nameservice.insert( "print_destruct", print_destruct );
-				nameservice.insert( "print_show", &print::show );
-				nameservice.insert( "print_get", &print::get );
-				nameservice.insert( "stdvector_test", stdvector_test );
-				nameservice.insert( "ipcvector_test", ipcvector_test );
-				nameservice.insert( "jumbo_test", jumbo_test );
-
-				std::string local_name = ipc::local_name( "ooe.test.socket-rpc" );
-				unlink( local_name.c_str() );
-				ipc::socket::server server( local_address( local_name ), nameservice );
-				ipc::barrier_notify( name );
-
-				while ( !executable::signal() )
-					server.accept();
-			);
-
+			OOE_IGNORE( start_server( name ) );
 			fork_io::exit( true );
 		}
 	}
@@ -141,6 +121,27 @@ private:
 	typedef scoped_ptr< scoped_fork > fork_ptr;
 
 	fork_ptr fork;
+
+	void start_server( const std::string& name ) const
+	{
+		executable::null_fd( STDOUT_FILENO );
+		ipc::nameservice nameservice;
+		nameservice.insert( "print_construct", print_construct );
+		nameservice.insert( "print_destruct", print_destruct );
+		nameservice.insert( "print_show", &print::show );
+		nameservice.insert( "print_get", &print::get );
+		nameservice.insert( "stdvector_test", stdvector_test );
+		nameservice.insert( "ipcvector_test", ipcvector_test );
+		nameservice.insert( "jumbo_test", jumbo_test );
+
+		std::string local_name = ipc::local_name( "ooe.test.socket-rpc" );
+		unlink( local_name.c_str() );
+		ipc::socket::server server( local_address( local_name ), nameservice );
+		ipc::barrier_notify( name );
+
+		while ( !executable::signal() )
+			server.accept();
+	}
 };
 
 //--- data -----------------------------------------------------------------------------------------

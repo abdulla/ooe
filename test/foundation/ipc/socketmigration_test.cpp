@@ -35,19 +35,7 @@ public:
 
 		if ( fork0->is_child() )
 		{
-			OOE_IGNORE
-			(
-				std::string local_name = ipc::local_name( "ooe.test.socket-migration" );
-				unlink( local_name.c_str() );
-				ipc::socket::server server( local_address( local_name ), nameservice );
-				semaphore.up();
-				server_ptr = &server;
-				socket_ptr = &pair._0;
-
-				while ( !executable::signal() )
-					server.accept();
-			);
-
+			OOE_IGNORE( server_0( nameservice, semaphore, pair._0 ) );
 			fork_io::exit( true );
 		}
 
@@ -56,18 +44,7 @@ public:
 
 		if ( fork1->is_child() )
 		{
-			OOE_IGNORE
-			(
-				std::string local_name = ipc::local_name( ipc::unique_name() );
-				unlink( local_name.c_str() );
-				ipc::socket::server server( local_address( local_name ), nameservice );
-				semaphore.up();
-				server.relink( pair._1 );
-
-				while ( !executable::signal() )
-					server.accept();
-			);
-
+			OOE_IGNORE( server_1( nameservice, semaphore, pair._1 ) );
 			fork_io::exit( true );
 		}
 
@@ -91,6 +68,31 @@ private:
 	static pid_t server_pid( void )
 	{
 		return getpid();
+	}
+
+	void server_0( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
+	{
+		std::string local_name = ipc::local_name( "ooe.test.socket-migration" );
+		unlink( local_name.c_str() );
+		ipc::socket::server server( local_address( local_name ), nameservice );
+		semaphore.up();
+		server_ptr = &server;
+		socket_ptr = &socket;
+
+		while ( !executable::signal() )
+			server.accept();
+	}
+
+	void server_1( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
+	{
+		std::string local_name = ipc::local_name( ipc::unique_name() );
+		unlink( local_name.c_str() );
+		ipc::socket::server server( local_address( local_name ), nameservice );
+		semaphore.up();
+		server.relink( socket );
+
+		while ( !executable::signal() )
+			server.accept();
 	}
 };
 
