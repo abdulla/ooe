@@ -45,7 +45,7 @@ public:
 
 private:
 	ooe::socket socket;
-	socket_pair migrate_pair;
+	socket_pair pair;
 
 	const link_t link;
 	atom< type > state;

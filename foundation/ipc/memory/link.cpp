@@ -30,7 +30,7 @@ socket link_listen::accept( void ) const
 
 //--- link_server ----------------------------------------------------------------------------------
 link_server::link_server( const ooe::socket& socket_, link_t link_, server& server )
-	: socket( socket_ ), migrate_pair( make_pair() ), link( link_ ), state( work ),
+	: socket( socket_ ), pair( make_pair() ), link( link_ ), state( work ),
 	thread( make_function( *this, &link_server::call ), &server )
 {
 }
@@ -52,7 +52,7 @@ void link_server::migrate( ooe::socket& migrate_socket )
 {
 	state = move;
 	migrate_socket.send( socket );
-	migrate_pair._1.shutdown( socket::write );
+	pair._1.shutdown( socket::write );
 }
 
 void* link_server::call( void* pointer )
@@ -61,7 +61,7 @@ void* link_server::call( void* pointer )
 
 	poll poll;
 	poll.insert( socket );
-	poll.insert( migrate_pair._0 );
+	poll.insert( pair._0 );
 	poll.wait();
 
 	if ( state != work )
