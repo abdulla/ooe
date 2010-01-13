@@ -14,7 +14,7 @@ struct memory_id
 	void* const area;
 
 	memory_id( s32, u8, up_t, up_t );
-	~memory_id( void ) OOE_VISIBLE;
+	~memory_id( void );
 };
 
 //--- memory ---------------------------------------------------------------------------------------
