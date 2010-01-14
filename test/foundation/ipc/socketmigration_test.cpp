@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <csignal>
-
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/nameservice.hpp"
