@@ -6,9 +6,7 @@
 
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/ipc/name.hpp"
 #include "foundation/ipc/nameservice.hpp"
-#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
