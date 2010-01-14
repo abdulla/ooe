@@ -4,8 +4,6 @@
 
 #include <csignal>
 
-#include <paths.h>
-
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
