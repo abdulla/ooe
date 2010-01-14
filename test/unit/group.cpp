@@ -15,7 +15,7 @@ namespace ooe
 		return vector.end();
 	}
 
-	void unit::group_base::push_back( function_type function )
+	void unit::group_base::insert( function_type function )
 	{
 		vector.push_back( function );
 	}

@@ -46,7 +46,7 @@ namespace ooe
 
 		iterator_type begin( void ) const;
 		iterator_type end( void ) const;
-		void push_back( function_type ) OOE_VISIBLE;
+		void insert( function_type ) OOE_VISIBLE;
 
 	private:
 		vector_type vector;
@@ -93,7 +93,7 @@ namespace ooe
 		static void call( group_base& base )
 		{
 			insert_test< group, i - 1 >::call( base );
-			base.push_back( invoke_test< group, &group::fixture_type::template test< i - 1 > > );
+			base.insert( invoke_test< group, &group::fixture_type::template test< i - 1 > > );
 		}
 	};
 
