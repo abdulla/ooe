@@ -45,8 +45,8 @@ public:
 	void unlink( link_t, bool );
 	atom_ptr< servlet > find( link_t ) const;
 
-	void relink( ooe::socket& ) OOE_VISIBLE;
 	void migrate( ooe::socket& ) OOE_VISIBLE;
+	void relink( ooe::socket& ) OOE_VISIBLE;
 
 private:
 	typedef std::map< link_t, atom_ptr< servlet > > servlet_map;

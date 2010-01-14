@@ -216,6 +216,11 @@ atom_ptr< servlet > server::find( link_t id ) const
 	return i->second;
 }
 
+void server::migrate( socket& socket )
+{
+	servlet_tls->migrate( socket, semaphore, *this );
+}
+
 void server::relink( socket& socket )
 {
 	link_t id = seed++;
@@ -223,11 +228,6 @@ void server::relink( socket& socket )
 
 	servlet_map::value_type value( id, new servlet( socket, id, external, *this ) );
 	map.insert( map.end(), value );
-}
-
-void server::migrate( socket& socket )
-{
-	servlet_tls->migrate( socket, semaphore, *this );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
