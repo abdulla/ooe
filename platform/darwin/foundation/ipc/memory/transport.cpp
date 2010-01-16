@@ -76,6 +76,8 @@ transport::transport( const std::string& name_, type mode )
 transport::transport( ooe::socket& socket )
 	: platform::ipc::memory::transport( socket ), memory( std::string(), socket.receive() )
 {
+	in.unlinkable = true;
+	out.unlinkable = true;
 }
 
 transport::~transport( void )
@@ -120,6 +122,9 @@ void transport::migrate( ooe::socket& socket )
 	send_name( socket, in.name() );
 	send_name( socket, out.name() );
 	socket.send( memory );
+
+	in.unlinkable = false;
+	out.unlinkable = false;
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

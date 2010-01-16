@@ -8,6 +8,12 @@
 #include "foundation/utility/pointer.hpp"
 #include "foundation/utility/string.hpp"
 
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+
+class transport;
+
+OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
 //--- semaphore ------------------------------------------------------------------------------------
@@ -33,6 +39,8 @@ private:
 	std::string name_;
 	bool unlinkable;
 	sem_t* const sem;
+
+	friend class memory::transport;
 };
 
 //--- process_lock ---------------------------------------------------------------------------------
