@@ -17,7 +17,7 @@ class setup
 {
 public:
 	setup( void )
-		: fork0( 0 ), fork1( 0 )
+		: fork0( 0 ), fork1( 0 ), fork2( 0 )
 	{
 		ipc::nameservice nameservice;
 		nameservice.insert( "migrate", migrate );
@@ -43,6 +43,15 @@ public:
 		}
 
 		semaphore.down();
+		fork_ptr( new scoped_fork ).swap( fork2 );
+
+		if ( fork2->is_child() )
+		{
+			OOE_IGNORE( server_1( nameservice, semaphore, pair._0 ) );
+			fork_io::exit( true );
+		}
+
+		semaphore.down();
 	}
 
 private:
@@ -50,6 +59,7 @@ private:
 
 	fork_ptr fork0;
 	fork_ptr fork1;
+	fork_ptr fork2;
 
 	static ipc::socket::server* server_ptr;
 	static socket* socket_ptr;
@@ -84,6 +94,8 @@ private:
 		ipc::socket::server server( local_address( local_name ), nameservice );
 		semaphore.up();
 		server.relink( socket );
+		server_ptr = &server;
+		socket_ptr = &socket;
 
 		while ( !executable::signal() )
 			server.accept();
@@ -114,8 +126,11 @@ template<>
 	pid_t migrate_pid0 = server_pid()();
 	migrate();
 	pid_t migrate_pid1 = server_pid()();
+	migrate();
+	pid_t migrate_pid2 = server_pid()();
 
-	check( "different pids after migration", migrate_pid0 != migrate_pid1 );
+	check( "different pids after 1st migration", migrate_pid0 != migrate_pid1 );
+	check( "different pids after 2nd migration", migrate_pid1 != migrate_pid2 );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
