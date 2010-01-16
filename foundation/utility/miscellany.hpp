@@ -79,12 +79,6 @@ template< typename type >
 	object->~type();
 }
 
-//--- constructor ----------------------------------------------------------------------------------
-template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
-	struct constructor
-{
-};
-
 //--- any ------------------------------------------------------------------------------------------
 union any
 {
