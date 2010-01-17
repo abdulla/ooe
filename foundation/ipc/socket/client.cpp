@@ -66,8 +66,13 @@ client::array_type client::wait( result_type& result )
 		if ( result.i->first > in )
 		{
 			notify = result.i->first;
-			condition.wait( lock );
-			error_check( notify );
+
+			do
+			{
+				condition.wait( lock );
+				error_check( notify );
+			}
+			while ( notify != result.i->first );
 		}
 
 		tuple = result.i->second;

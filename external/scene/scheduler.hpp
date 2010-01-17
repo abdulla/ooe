@@ -9,7 +9,6 @@
 
 #include "external/scene/task.hpp"
 #include "foundation/utility/atom.hpp"
-#include "foundation/utility/error.hpp"
 
 namespace ooe
 {
@@ -33,13 +32,8 @@ namespace ooe
 		{
 			lock lock( task->mutex );
 
-			if ( !task->done )
-			{
+			while ( !task->done )
 				task->condition.wait( lock );
-
-				if ( !task->done )
-					throw error::runtime( "result: " ) << "Task not complete";
-			}
 
 			return static_cast< task_value< type >& >( task ).value;
 		}
@@ -61,13 +55,8 @@ namespace ooe
 		{
 			lock lock( task->mutex );
 
-			if ( !task->done )
-			{
+			while ( !task->done )
 				task->condition.wait( lock );
-
-				if ( !task->done )
-					throw error::runtime( "result: " ) << "Task not complete";
-			}
 		}
 
 	private:
