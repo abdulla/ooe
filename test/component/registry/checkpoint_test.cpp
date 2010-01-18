@@ -30,15 +30,6 @@ public:
 		}
 	}
 
-	~setup( void )
-	{
-		if ( !fork_io().is_child() )
-			return;
-
-		OOE_IGNORE( signal_all() );
-		fork_io::exit( true );
-	}
-
 	void signal( void )
 	{
 		fork_ptr( 0 ).swap( fork );
@@ -50,6 +41,8 @@ private:
 	void start_server( const std::string& name ) const
 	{
 		ipc::nameservice nameservice;
+		nameservice.insert( "quit", &executable::quit );
+
 		ipc::memory::server server( "/ooe.test.checkpoint", nameservice );
 		ipc::barrier_notify( name );
 		checkpoint checkpoint;
@@ -59,12 +52,6 @@ private:
 			if ( !server.decode() )
 				checkpoint.update();
 		}
-	}
-
-	void signal_all( void )
-	{
-		std::string name = executable::path()._1;
-		fork_io::execute( "/usr/bin/killall", name.c_str(), NULL );
 	}
 };
 
@@ -84,7 +71,9 @@ template<>
 
 	ipc::memory::client( "/ooe.test.checkpoint" );
 	setup.signal();
-	ipc::memory::client( "/ooe.test.checkpoint" );
+
+	ipc::memory::client client( "/ooe.test.checkpoint" );
+	ipc::memory::call< void ( void ) >( client, "quit" )();
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
