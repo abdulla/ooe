@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 

@@ -16,7 +16,6 @@
 #include "foundation/executable/timer.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
-#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 #include "test/unit/runner.hpp"
 

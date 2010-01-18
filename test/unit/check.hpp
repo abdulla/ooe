@@ -37,12 +37,4 @@ do\
 }\
 while ( false )
 
-namespace ooe
-{
-	namespace unit
-	{
-		void fail( void ) OOE_VISIBLE;
-	}
-}
-
 #endif	// OOE_TEST_UNIT_CHECK_HPP

@@ -1,9 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
-#include <csignal>
-
 #include "component/javascript/facade.hpp"
 #include "component/javascript/vm.hpp"
 #include "component/lua/facade.hpp"

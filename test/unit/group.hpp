@@ -3,6 +3,7 @@
 #ifndef OOE_TEST_UNIT_GROUP_HPP
 #define OOE_TEST_UNIT_GROUP_HPP
 
+#include <iostream>
 #include <vector>
 
 #include "foundation/utility/miscellany.hpp"
@@ -80,9 +81,11 @@ namespace ooe
 		struct unit::fixture
 		: private data
 	{
-		template< up_t >
+		template< up_t i >
 			void test( setup& )
 		{
+			std::cerr << "Fix test group: Test " << i << " is empty\n";
+			fail();
 		}
 	};
 

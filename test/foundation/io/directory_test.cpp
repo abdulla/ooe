@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include "foundation/io/directory.hpp"
 #include "test/unit/group.hpp"
 

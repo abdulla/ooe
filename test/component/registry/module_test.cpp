@@ -1,9 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
-#include <csignal>
-
 #include "component/registry/builder.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/remote.hpp"
