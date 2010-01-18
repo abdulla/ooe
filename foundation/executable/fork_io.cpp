@@ -115,11 +115,12 @@ void fork_io::execute( const std::string& path, ... )
 
 		va_end( list );
 		execv( path.c_str(), const_cast< c8** >( &argument[ 0 ] ) );
-		OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error::number( errno ) );
+		OOE_WARNING( "fork_io",
+			"Unable to execute process \"" << path << "\": " << error::number( errno ) );
 	}
 	catch ( std::exception& error )
 	{
-		OOE_WARNING( "excutable::spawn", "Unable to exec process: " << error.what() );
+		OOE_WARNING( "fork_io", "Unable to execute process \"" << path << "\": " << error.what() );
 	}
 
 	exit( false );

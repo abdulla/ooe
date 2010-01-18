@@ -19,23 +19,18 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- checkpoint -----------------------------------------------------------------------------------
 checkpoint::checkpoint( void )
-	: desc( 0 ), vector()
+	: desc( 0 )
 {
 }
 
-void checkpoint::insert( const function_type& function )
-{
-	vector.push_back( function );
-}
-
-void checkpoint::update( void )
+bool checkpoint::update( void )
 {
 	file pipe = link( desc );
 	fork_io fork;
 
 	// not child, continue
 	if ( !fork.is_child() )
-		return;
+		return true;
 
 	desc_ptr( 0 ).swap( desc );
 	pid_t parent_pid = getppid();
@@ -46,12 +41,7 @@ void checkpoint::update( void )
 	if ( getppid() == parent_pid )
 		fork_io::exit( true );
 
-	// run all post-recovery actions
-	for ( vector_type::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
-		( *i )();
-
-	// create checkpoint for this process
-	update();
+	return false;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
