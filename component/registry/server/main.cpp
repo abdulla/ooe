@@ -8,6 +8,7 @@
 #include "component/registry/module.hpp"
 #include "component/registry/registry.hpp"
 #include "component/registry/remote.hpp"
+#include "foundation/executable/checkpoint.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/nameservice.hpp"
@@ -180,8 +181,13 @@ void registry_launch( const std::string& self_path, const c8* up_name )
 	if ( up_name )
 		ipc::barrier_notify( up_name );
 
+	checkpoint checkpoint;
+
 	while ( !executable::signal() )
-		server.decode();
+	{
+		if ( !server.decode() )
+			checkpoint.update();
+	}
 }
 
 //--- launch ---------------------------------------------------------------------------------------

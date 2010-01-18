@@ -26,10 +26,30 @@ public:
 	setup( void )
 		: path_( executable::path()._0 ), fork( 0 )
 	{
-		start_server();
+		std::string name = ipc::unique_name();
+		ipc::barrier_wait wait( name );
+		fork_ptr( new scoped_fork ).swap( fork );
+
+		if ( fork->is_child() )
+		{
+			OOE_IGNORE( fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL ) );
+			fork_io::exit( true );
+		}
+
 		std::string module_path = path_ + "../library/libhello" + library::suffix;
 		registry registry;
 		registry.insert( registry::library, module_path );
+	}
+
+	~setup( void )
+	{
+		fork_io fork_killall;
+
+		if ( fork_killall.is_child() )
+		{
+			OOE_IGNORE( fork_io::execute( "/usr/bin/killall", "registry", NULL ) );
+			fork_io::exit( true );
+		}
 	}
 
 	std::string path() const
@@ -40,24 +60,6 @@ public:
 private:
 	std::string path_;
 	fork_ptr fork;
-
-	void start_server( void )
-	{
-		std::string name = ipc::unique_name();
-		ipc::barrier_wait wait( name );
-		fork_ptr( new scoped_fork ).swap( fork );
-
-		if ( !fork->is_child() )
-			return;
-
-		OOE_IGNORE
-		(
-			executable::null_fd( STDOUT_FILENO );
-			fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL );
-		);
-
-		fork_io::exit( true );
-	}
 };
 
 typedef unit::group< setup, empty_t, 6 > group_type;
