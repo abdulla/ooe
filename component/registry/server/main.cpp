@@ -149,8 +149,21 @@ std::string surrogate( const std::string& path )
 	return name;
 }
 
-//--- registry -------------------------------------------------------------------------------------
-void registry( const std::string& self_path, const c8* up_name )
+//--- surrogate_launch -----------------------------------------------------------------------------
+void surrogate_launch( const std::string& surrogate_path, const std::string& module_path )
+{
+	library library( module_path );
+	ipc::nameservice nameservice;
+	load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
+
+	ipc::memory::server server( surrogate_path, nameservice );
+	ipc::barrier_notify( surrogate_path + ".g" );
+
+	while ( !executable::signal() && server.decode() ) {}
+}
+
+//--- registry_launch ------------------------------------------------------------------------------
+void registry_launch( const std::string& self_path, const c8* up_name )
 {
 	self = self_path;
 	ipc::switchboard switchboard;
@@ -169,19 +182,6 @@ void registry( const std::string& self_path, const c8* up_name )
 
 	while ( !executable::signal() )
 		server.decode();
-}
-
-//--- surrogate ------------------------------------------------------------------------------------
-void surrogate( const std::string& surrogate_path, const std::string& module_path )
-{
-	library library( module_path );
-	ipc::nameservice nameservice;
-	load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
-
-	ipc::memory::server server( surrogate_path, nameservice );
-	ipc::barrier_notify( surrogate_path + ".g" );
-
-	while ( !executable::signal() && server.decode() ) {}
 }
 
 //--- launch ---------------------------------------------------------------------------------------
@@ -221,9 +221,9 @@ bool launch( const std::string& root, const std::string& name, s32 argc, c8** ar
 	}
 
 	if ( module_path && surrogate_path )
-		surrogate( surrogate_path, module_path );
+		surrogate_launch( surrogate_path, module_path );
 	else
-		registry( root + name, up_name );
+		registry_launch( root + name, up_name );
 
 	return true;
 }
