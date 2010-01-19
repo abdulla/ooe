@@ -30,7 +30,7 @@ namespace
 		bool& state;
 	};
 
-	typedef unit::group< empty_t, data, 2 > group_type;
+	typedef unit::group< anonymous_t, data, 2 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "pointer" );
 }
@@ -41,7 +41,7 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( empty_t& )
+			void fixture_type::test< 0 >( anonymous_t& )
 		{
 			std::cerr << "scoped_ptr\n";
 
@@ -73,7 +73,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 1 >( empty_t& )
+			void fixture_type::test< 1 >( anonymous_t& )
 		{
 			std::cerr << "shared_ptr\n";
 

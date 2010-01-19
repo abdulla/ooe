@@ -22,13 +22,13 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-struct no_t;
+struct void_t;
 struct tuple_tag;
 
 template< unsigned, typename, bool >
 	struct tuple_base;
 
-template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
+template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t ) >
 	struct tuple;
 
 template< typename, typename, typename = void >

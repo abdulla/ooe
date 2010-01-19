@@ -8,7 +8,7 @@ namespace
 {
 	using namespace ooe;
 
-	typedef unit::group< empty_t, empty_t, 7 > group_type;
+	typedef unit::group< anonymous_t, anonymous_t, 7 > group_type;
 	typedef group_type::fixture_type fixture_type;
 	group_type group( "maths" );
 }
@@ -19,7 +19,7 @@ namespace ooe
 	{
 		template<>
 		template<>
-			void fixture_type::test< 0 >( empty_t& )
+			void fixture_type::test< 0 >( anonymous_t& )
 		{
 			std::cerr << "is_equal\n";
 
@@ -29,7 +29,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 1 >( empty_t& )
+			void fixture_type::test< 1 >( anonymous_t& )
 		{
 			std::cerr << "radian\n";
 
@@ -39,7 +39,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 2 >( empty_t& )
+			void fixture_type::test< 2 >( anonymous_t& )
 		{
 			std::cerr << "degree\n";
 
@@ -49,7 +49,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 3 >( empty_t& )
+			void fixture_type::test< 3 >( anonymous_t& )
 		{
 			std::cerr << "vector< 3 >\n";
 
@@ -108,7 +108,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 4 >( empty_t& )
+			void fixture_type::test< 4 >( anonymous_t& )
 		{
 			std::cerr << "matrix< 3 >\n";
 
@@ -200,7 +200,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 5 >( empty_t& )
+			void fixture_type::test< 5 >( anonymous_t& )
 		{
 			std::cerr << "matrix< 4 >\n";
 
@@ -309,7 +309,7 @@ namespace ooe
 
 		template<>
 		template<>
-			void fixture_type::test< 6 >( empty_t& )
+			void fixture_type::test< 6 >( anonymous_t& )
 		{
 			std::cerr << "quaternion\n";
 

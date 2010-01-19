@@ -52,14 +52,14 @@ typedef find_size< float_types, 8 >::type f64;
 typedef find_size< char_types, 1 >::type c8;
 typedef find_size< char_types, 4 >::type c32;
 
-struct no_t;
+struct void_t;
 
 OOE_NAMESPACE_END( ( ooe ) )
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 // must be anonymous so dependent types are unique
-struct empty_t {};
+struct anonymous_t {};
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 

@@ -19,7 +19,7 @@ namespace ooe
 		template< typename t >
 			struct size< t, typename enable_if< is_pair< t > >::type >;
 
-		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
+		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t ) >
 			struct stream_size;
 
 //--- ipc::read ----------------------------------------------------------------
@@ -29,7 +29,7 @@ namespace ooe
 		template< typename t >
 			struct read< t, typename enable_if< is_pair< t > >::type >;
 
-		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
+		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t ) >
 			struct stream_read;
 
 //--- ipc::write ---------------------------------------------------------------
@@ -39,7 +39,7 @@ namespace ooe
 		template< typename t >
 			struct write< t, typename enable_if< is_pair< t > >::type >;
 
-		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, no_t ) >
+		template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t ) >
 			struct stream_write;
 	}
 

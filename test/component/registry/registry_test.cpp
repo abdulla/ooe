@@ -67,7 +67,7 @@ private:
 	}
 };
 
-typedef unit::group< setup, empty_t, 6 > group_type;
+typedef unit::group< setup, anonymous_t, 6 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "registry" );
 

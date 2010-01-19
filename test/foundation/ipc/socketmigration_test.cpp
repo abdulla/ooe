@@ -103,7 +103,7 @@ private:
 ipc::socket::server* setup::server_ptr = 0;
 socket* setup::socket_ptr = 0;
 
-typedef unit::group< setup, empty_t, 1 > group_type;
+typedef unit::group< setup, anonymous_t, 1 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "socket migration" );
 
