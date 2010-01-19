@@ -60,7 +60,7 @@ class Build( object ):
 		self.environment.Replace( variables = variables )
 
 		if not sys.stdout.isatty():
-			for key in COLOURS.iterkeys(): COLOURS[ key ] = ''
+			for key in self.COLOURS.iterkeys(): self.COLOURS[ key ] = ''
 
 		self.environment[ 'CXXCOMSTR' ] =\
 			'\t%s[CC]%s $SOURCE' % ( self.COLOURS[ 'green' ], self.COLOURS[ 'none' ] )
