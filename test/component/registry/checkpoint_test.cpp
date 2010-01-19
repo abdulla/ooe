@@ -1,6 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/executable/checkpoint.hpp"
+#include "component/registry/checkpoint.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/nameservice.hpp"

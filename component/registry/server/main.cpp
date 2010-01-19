@@ -4,11 +4,11 @@
 #include <map>
 #include <set>
 
+#include "component/registry/checkpoint.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/module.hpp"
 #include "component/registry/registry.hpp"
 #include "component/registry/remote.hpp"
-#include "foundation/executable/checkpoint.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/nameservice.hpp"
