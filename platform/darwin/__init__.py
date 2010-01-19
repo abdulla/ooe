@@ -5,7 +5,8 @@ class ooe:
 	include_path = '/sw/include'
 	library_path = '/sw/lib'
 	cxx_flags = '-march=core2'
-	link_flags = '-Wl,-undefined,dynamic_lookup'
+	# disabled link flags: -Wl,-undefined,dynamic_lookup
+	link_flags = ''
 	release_flags = ''
 
 	class appkit:

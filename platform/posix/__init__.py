@@ -5,7 +5,8 @@ class ooe:
 	include_path = ''
 	library_path = ''
 	cxx_flags = '-march=native'
-	link_flags = '-Wl,--allow-shlib-undefined -Wl,--as-needed'
+	# disabled link flags: -Wl,--allow-shlib-undefined
+	link_flags = '-Wl,--as-needed'
 	release_flags = '-Wl,--strip-all -Wl,--gc-sections'
 
 	class appkit:
