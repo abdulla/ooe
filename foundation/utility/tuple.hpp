@@ -298,36 +298,48 @@ OOE_NAMESPACE_END( ( boost )( mpl ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- tuple_base -----------------------------------------------------------------------------------
-template< typename type >
-	struct tuple_base< LIMIT, type, true >
-	: private type
+template< typename t >
+	struct tuple_base< LIMIT, t, true >
+	: private t
 {
-	typedef type BOOST_PP_CAT( t, LIMIT );
+	typedef t BOOST_PP_CAT( t, LIMIT );
 
 	tuple_base( void ) {}
 
-	tuple_base( typename call_traits< type >::param_type t )
-		: type( t )
+	tuple_base( typename call_traits< t >::param_type a )
+		: t( a )
+	{
+	}
+
+	template< typename s >
+		tuple_base( const s& a )
+		: t( a )
 	{
 	}
 };
 
-template< typename type >
-	struct tuple_base< LIMIT, type, false >
+template< typename t >
+	struct tuple_base< LIMIT, t, false >
 {
-	typedef type BOOST_PP_CAT( t, LIMIT );
-	type BOOST_PP_CAT( _, LIMIT );
+	typedef t BOOST_PP_CAT( t, LIMIT );
+	t BOOST_PP_CAT( _, LIMIT );
 
 	tuple_base( void ) {}
 
-	tuple_base( typename call_traits< type >::param_type t )
-		: BOOST_PP_CAT( _, LIMIT )( t )
+	tuple_base( typename call_traits< t >::param_type a )
+		: BOOST_PP_CAT( _, LIMIT )( a )
+	{
+	}
+
+	template< typename s >
+		tuple_base( const s& a )
+		: BOOST_PP_CAT( _, LIMIT )( a )
 	{
 	}
 };
 
 #define INHERIT( z, n, _ ) public tuple_base< n, t ## n, is_empty< t ## n >::value >
-#define CONSTRUCT( z, n, _ ) tuple_base< n, t ## n, is_empty< t ## n >::value >( a ## n )
+#define CONSTRUCT( z, n, d ) tuple_base< n, t ## n, is_empty< t ## n >::value >( d ## n )
 
 //--- tuple ----------------------------------------------------------------------------------------
 template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
@@ -343,27 +355,32 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 
 	static const unsigned size = LIMIT;
 
-#if LIMIT
 	tuple( void ) {}
-#endif
 
+#if LIMIT
 	tuple( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) )
-		BOOST_PP_EXPR_IF( LIMIT, : ) BOOST_PP_ENUM( LIMIT, CONSTRUCT, ~ )
+		BOOST_PP_EXPR_IF( LIMIT, : ) BOOST_PP_ENUM( LIMIT, CONSTRUCT, a )
 	{
 	}
 
-#if LIMIT == 2
-	typedef std::pair< t0, t1 > pair_type;
+	template< BOOST_PP_ENUM_PARAMS( LIMIT, typename s ) >
+		tuple( const tuple< BOOST_PP_ENUM_PARAMS( LIMIT, s ) >& a )
+		BOOST_PP_EXPR_IF( LIMIT, : ) BOOST_PP_ENUM( LIMIT, CONSTRUCT, a._ )
+	{
+	}
+#endif
 
-	tuple( const pair_type& pair )
+#if LIMIT == 2
+	template< typename s0, typename s1 >
+		tuple( const std::pair< s0, s1 >& pair )
 		: tuple_base< 0, t0, is_empty< t0 >::value >( pair.first ),
 		tuple_base< 1, t1, is_empty< t1 >::value >( pair.second )
 	{
 	}
 
-	operator pair_type( void ) const
+	operator std::pair< t0, t1 >( void ) const
 	{
-		return pair_type( this->_0, this->_1 );
+		return std::pair< t0, t1 >( this->_0, this->_1 );
 	}
 #endif
 };
