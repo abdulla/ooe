@@ -21,7 +21,7 @@ template<>
 template<>
 	void fixture_type::test< 0 >( anonymous_t& )
 {
-	std::cerr << "iterate over a directory\n";
+	std::cerr << "iterate through an archive\n";
 
 	std::string path = executable::path()._0;
 	archive archive( descriptor( path + "../resource/test/archive.zip" ) );
