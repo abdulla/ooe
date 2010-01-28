@@ -46,6 +46,7 @@ def ParallelConfigure( platform, setup ):
 		if not setup.CheckLib( 'pthread', language = 'c' ): Exit( 1 )
 
 def UtilityConfigure( platform, setup ):
+	if not setup.CheckCHeader( 'execinfo.h' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/call_traits.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/noncopyable.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/preprocessor.hpp' ): Exit( 1 )
