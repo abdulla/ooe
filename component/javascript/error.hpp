@@ -35,8 +35,17 @@ namespace ooe
 			s32 extent = message->GetEndColumn() - i - 1;
 
 			using ooe::operator <<;
-			*this << *ascii_name << ':' << line << ": " << *ascii_description << "\n    " <<
-				*ascii_source << "\n    " << rep( ' ', i ) << '^' << rep( '-', extent ) << '^';
+			*this << *ascii_name << ':' << line << ": " << *ascii_description <<
+				"\n    " << *ascii_source <<
+				"\n    " << rep( ' ', i ) << '^' << rep( '-', extent ) << '^';
+
+			v8::Handle< v8::Value > trace = try_catch.StackTrace();
+
+			if ( !trace.IsEmpty() )
+			{
+				v8::String::AsciiValue ascii_trace( trace );
+				*this << "\n\nScript stack trace: " << *ascii_trace;
+			}
 		}
 
 		javascript( void )
