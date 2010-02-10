@@ -1,9 +1,8 @@
 binary/
+build/
 library/
 .sconf_temp/
 .sconsign.dblite
-config.log
-*.o
-*.os
-*.pyc
 .*.swp
+*.pyc
+config.log
