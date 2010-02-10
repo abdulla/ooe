@@ -4,14 +4,11 @@
 #include <map>
 #include <set>
 
-#include "component/registry/local.hpp"
 #include "component/registry/module.hpp"
 #include "component/registry/registry.hpp"
-#include "component/registry/remote.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/ipc/nameservice.hpp"
-#include "foundation/ipc/semaphore.hpp"
+#include "foundation/ipc/switchboard.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/parallel/lock.hpp"
@@ -22,14 +19,23 @@ typedef tuple< std::string, std::string > name_tuple;
 typedef tuple< registry::type, std::string > info_tuple;
 typedef std::multimap< name_tuple, info_tuple > module_map;
 typedef std::set< info_tuple > module_set;
-std::string self;
+std::string surrogate_path;
 module_map map;
 module_set set;
 read_write mutex;
 
-void insert( registry::type, const std::string& );
-registry::info_vector find( const interface::vector_type& );
-std::string surrogate( const std::string& );
+//--- surrogate ------------------------------------------------------------------------------------
+std::string surrogate( const std::string& path )
+{
+	std::string name = ipc::unique_name();
+	ipc::barrier_wait wait( name + ".g" );
+	fork_io fork;
+
+	if ( fork.is_child() )
+		fork_io::execute( surrogate_path, "-m", path.c_str(), "-s", name.c_str(), NULL );
+
+	return name;
+}
 
 //--- load_server ----------------------------------------------------------------------------------
 module::vector_type load_server( const std::string& path )
@@ -47,23 +53,6 @@ module::vector_type load_library( const std::string& path )
 
 	// for security, load library as a surrogate
 	return load_server( surrogate( path ) );
-}
-
-//--- load_nameservice -----------------------------------------------------------------------------
-void load_nameservice( ipc::nameservice& nameservice, const module& module )
-{
-	const module::vector_type& names = module.get();
-	const facade::remote::vector_type& remotes = static_cast< const facade::remote* >
-		( module.find( typeid( facade::remote ).name() ) )->get();
-	const facade::local::vector_type& locals = static_cast< const facade::local* >
-		( module.find( typeid( facade::local ).name() ) )->get();
-	up_t size = names.size();
-
-	if ( remotes.size() != size || locals.size() != size )
-		throw error::runtime( "surrogate: " ) << "Incorrect number of callbacks";
-
-	for ( up_t i = 0; i != size; ++i )
-		nameservice.insert_direct( names[ i ]._0, names[ i ]._1, remotes[ i ], locals[ i ] );
 }
 
 //--- insert ---------------------------------------------------------------------------------------
@@ -136,36 +125,33 @@ registry::info_vector find( const interface::vector_type& names )
 	return vector;
 }
 
-//--- surrogate ------------------------------------------------------------------------------------
-std::string surrogate( const std::string& path )
+//--- launch ---------------------------------------------------------------------------------------
+bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
 {
-	std::string name = ipc::unique_name();
-	ipc::barrier_wait wait( name + ".g" );
-	fork_io fork;
+	const c8* up_name = 0;
 
-	if ( fork.is_child() )
-		fork_io::execute( self, "-m", path.c_str(), "-s", name.c_str(), NULL );
+	for ( s32 option; ( option = getopt( argc, argv, "l:m:r:s:u:" ) ) != -1; )
+	{
+		switch ( option )
+		{
+		case 'l':
+			ooe::registry().insert( registry::library, optarg );
+			return true;
 
-	return name;
-}
+		case 'r':
+			ooe::registry().insert( registry::server, optarg );
+			return true;
 
-//--- surrogate_launch -----------------------------------------------------------------------------
-void surrogate_launch( const std::string& surrogate_path, const std::string& module_path )
-{
-	library library( module_path );
-	ipc::nameservice nameservice;
-	load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
+		case 'u':
+			up_name = optarg;
+			break;
 
-	ipc::memory::server server( surrogate_path, nameservice );
-	ipc::barrier_notify( surrogate_path + ".g" );
+		default:
+			return false;
+		}
+	}
 
-	while ( !executable::signal() && server.decode() ) {}
-}
-
-//--- registry_launch ------------------------------------------------------------------------------
-void registry_launch( const std::string& self_path, const c8* up_name )
-{
-	self = self_path;
+	surrogate_path = root + "surrogate";
 	ipc::switchboard switchboard;
 
 	if ( switchboard.insert( find ) != 1 )
@@ -182,48 +168,6 @@ void registry_launch( const std::string& self_path, const c8* up_name )
 
 	while ( !executable::signal() )
 		server.decode();
-}
-
-//--- launch ---------------------------------------------------------------------------------------
-bool launch( const std::string& root, const std::string& name, s32 argc, c8** argv )
-{
-	const c8* module_path = 0;
-	const c8* surrogate_path = 0;
-	const c8* up_name = 0;
-
-	for ( s32 option; ( option = getopt( argc, argv, "l:m:r:s:u:" ) ) != -1; )
-	{
-		switch ( option )
-		{
-		case 'l':
-			ooe::registry().insert( registry::library, optarg );
-			return true;
-
-		case 'm':
-			module_path = optarg;
-			break;
-
-		case 'r':
-			ooe::registry().insert( registry::server, optarg );
-			return true;
-
-		case 's':
-			surrogate_path = optarg;
-			break;
-
-		case 'u':
-			up_name = optarg;
-			break;
-
-		default:
-			return false;
-		}
-	}
-
-	if ( module_path && surrogate_path )
-		surrogate_launch( surrogate_path, module_path );
-	else
-		registry_launch( root + name, up_name );
 
 	return true;
 }

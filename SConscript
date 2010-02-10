@@ -83,6 +83,7 @@ build.Linkable( 'video', 'foundation/video', 'parallel', ooe.qtkit.framework,
 build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'javascript_host', 'component/javascript/host', 'executable javascript registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
+build.Executable( 'surrogate', 'component/registry/surrogate', 'executable registry' )
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
