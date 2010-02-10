@@ -4,7 +4,6 @@
 #include <map>
 #include <set>
 
-#include "component/registry/checkpoint.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/module.hpp"
 #include "component/registry/registry.hpp"
@@ -181,13 +180,8 @@ void registry_launch( const std::string& self_path, const c8* up_name )
 	if ( up_name )
 		ipc::barrier_notify( up_name );
 
-	checkpoint checkpoint;
-
 	while ( !executable::signal() )
-	{
-		if ( !server.decode() )
-			checkpoint.update();
-	}
+		server.decode();
 }
 
 //--- launch ---------------------------------------------------------------------------------------
