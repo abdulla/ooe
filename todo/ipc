@@ -1,5 +1,5 @@
 asynchronous rpc wrapper
-	- have a similar set up to nipc, have a background thread pumping across the transport
+	- have a similar set up to socket, have a background thread pumping across the transport
 	- have an async_client, wraps a client with background thread
 	- have result template that can block on result of async rpc call
 

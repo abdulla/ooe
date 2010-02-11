@@ -1,3 +1,10 @@
+write new generalised main loop
+	- focus on sleeping and coalescing wake ups
+	- make subsystems independent - rendering doesn't rely on main loop, but wakes on animate
+
+make all constructors explicit
+	- something that should have been done a long time ago, but wasn't, due to laziness
+
 use openctm for models
 	- no need for custom model format
 
@@ -11,9 +18,6 @@ two-pass rendering
 	- z-buffer only, then pixels?
 	- sort only by shader/texture (early z-pass)?
 
-scene graph should do all the video resource management
-	- only it should know about screen dimensions
-
 move to xcb for x11
 	- use xcb instead of libx11
 
@@ -25,17 +29,5 @@ extend setup_path
 extend socket descriptor send and receive
 	- use WSADuplicateSocket() under windows
 
-scheduler layered on top of ipc
-	- useful for guaranteeing that no one process can hog processing
-
-multi-thread aware scene graph
-	- able to have multiple threads working on the scene-graph together
-	- no changes are made directly to scene graph, but are requested
-	- before frame is rendered, all requests are applied (perhaps limited by time or depth)
-
 lexical_cast/numeric_cast
 	- used boost *_casts, they are simpler and do more verification
-
-double buffered buffers
-	- double buffering with vbo's in opengl gives a performance boost
-	- rendering from one buffer, while modifying the other, then switch each frame

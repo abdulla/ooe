@@ -1,6 +1,0 @@
-write new generalised main loop
-	- focus on sleeping and coalescing wake ups
-	- make subsystems independent - rendering doesn't rely on main loop, but wakes on animate
-
-make all constructors explicit
-	- something that should have been done a long time ago, but wasn't, due to laziness
