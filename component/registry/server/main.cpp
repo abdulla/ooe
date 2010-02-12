@@ -159,7 +159,7 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
 	else if ( switchboard.insert( insert ) != 2 )
 		throw error::runtime( "registry: " ) << "\"insert\" not at index 2";
 	else if ( switchboard.insert( surrogate ) != 3 )
-		throw error::runtime( "registry: " ) << "\"surrogate\" not at index 4";
+		throw error::runtime( "registry: " ) << "\"surrogate\" not at index 3";
 
 	ipc::memory::server server( "/ooe.registry", switchboard );
 
