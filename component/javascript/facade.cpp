@@ -107,8 +107,8 @@ namespace
 			if ( i )
 				std::cout << '\t';
 
-			v8::String::AsciiValue ascii( arguments[ i ] );
-			std::cout.write( *ascii, ascii.length() );
+			v8::String::Utf8Value utf8( arguments[ i ] );
+			std::cout << *utf8;
 		}
 
 		std::cout << '\n';

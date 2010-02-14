@@ -143,7 +143,7 @@ namespace ooe
 	template< typename NO_SPECIALISATION_DEFINED, typename >
 		struct javascript::to
 	{
-		static void call( const v8::Handle< v8::Value >&, NO_SPECIALISATION_DEFINED )
+		static void call( const v8::Handle< v8::Value >&, NO_SPECIALISATION_DEFINED ) OOE_CONST
 		{
 			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 		}
@@ -212,8 +212,8 @@ namespace ooe
 			if ( !value->IsString() )
 				throw error::javascript() << "Value is not a string";
 
-			v8::String::AsciiValue ascii( value );
-			string = string_make< typename no_ref< t >::type >( *ascii, ascii.length() );
+			v8::String::Utf8Value utf8( value );
+			string = string_make< typename no_ref< t >::type >( *utf8, utf8.length() );
 		}
 	};
 
