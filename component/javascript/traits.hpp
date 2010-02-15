@@ -46,11 +46,11 @@ template< typename t >
 		if ( !value->IsArray() )
 			throw error::javascript() << "Value is not an array";
 
-		typedef typename no_ref< t >::type type;
 		v8::HandleScope scope;
 		v8::Array* array = v8::Array::Cast( *value );
 		up_t array_size = array->Length();
 
+		typedef typename no_ref< t >::type type;
 		type out;
 		reserve( out, array_size );
 
@@ -95,11 +95,11 @@ template< typename t >
 		if ( !value->IsObject() )
 			throw error::javascript() << "Value is not an object";
 
-		typedef typename no_ref< t >::type type;
 		v8::HandleScope scope;
 		v8::Object* object = v8::Object::Cast( *value );
 		v8::Handle< v8::Array > array = object->GetPropertyNames();
 
+		typedef typename no_ref< t >::type type;
 		type out;
 
 		for ( up_t i = 0, end = array->Length(); i != end; ++i )
@@ -138,11 +138,11 @@ template< typename t >
 		if ( !value->IsObject() )
 			throw error::javascript() << "Value is not an object";
 
-		typedef typename no_ref< t >::type type;
 		v8::HandleScope scope;
 		v8::Object* object = v8::Object::Cast( *value );
 		v8::Handle< v8::Array > array = object->GetPropertyNames();
 
+		typedef typename no_ref< t >::type type;
 		type out;
 
 		for ( up_t i = 0, end = array->Length(); i != end; ++i )
@@ -191,8 +191,7 @@ template< typename t >
 		up_t array_size = array->Length();
 
 		if ( array_size != 2 )
-			throw error::javascript() <<
-				"Array is of size " << array_size << ", pair is of size 2";
+			throw error::javascript() << "Array is of size " << array_size << ", pair is of size 2";
 
 		typedef typename no_ref< t >::type type;
 		v8::HandleScope scope;
@@ -259,8 +258,7 @@ template< typename t >
 		up_t array_size = array->Length();
 
 		if ( array_size != LIMIT )
-			throw error::javascript() <<
-				"Array is of size " << array_size << ", tuple is of size " << LIMIT;
+			throw error::javascript() << "Array is of size " << array_size << ", require " << LIMIT;
 
 		v8::HandleScope scope;
 		BOOST_PP_REPEAT( LIMIT, TUPLE_TO, ~ )
