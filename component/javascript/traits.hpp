@@ -8,222 +8,220 @@
 #include "component/javascript/traits_forward.hpp"
 #include "foundation/utility/tuple.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
+
+//--- to -------------------------------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if< is_sequence< t > >::type >;
+
+template< typename t >
+	struct to< t, typename enable_if< is_set< t > >::type >;
+
+template< typename t >
+	struct to< t, typename enable_if< is_map< t > >::type >;
+
+template< typename t >
+	struct to< t, typename enable_if< is_pair< t > >::type >;
+
+//--- from -----------------------------------------------------------------------------------------
+template< typename t >
+	struct from< t, typename enable_if< is_sequence< t > >::type >;
+
+template< typename t >
+	struct from< t, typename enable_if< is_set< t > >::type >;
+
+template< typename t >
+	struct from< t, typename enable_if< is_map< t > >::type >;
+
+template< typename t >
+	struct from< t, typename enable_if< is_pair< t > >::type >;
+
+//--- traits: sequence -----------------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if< is_sequence< t > >::type >
 {
-	namespace javascript
+	static void call( const v8::Handle< v8::Value >& value,
+		typename call_traits< t >::reference container )
 	{
-//--- javascript::to -----------------------------------------------------------
-		template< typename t >
-			struct to< t, typename enable_if< is_sequence< t > >::type >;
+		if ( !value->IsArray() )
+			throw error::javascript() << "Value is not an array";
 
-		template< typename t >
-			struct to< t, typename enable_if< is_set< t > >::type >;
+		typedef typename no_ref< t >::type type;
+		v8::HandleScope scope;
+		v8::Array* array = v8::Array::Cast( *value );
+		up_t array_size = array->Length();
 
-		template< typename t >
-			struct to< t, typename enable_if< is_map< t > >::type >;
+		type out;
+		reserve( out, array_size );
 
-		template< typename t >
-			struct to< t, typename enable_if< is_pair< t > >::type >;
+		for ( up_t i = 0; i != array_size; ++i )
+		{
+			v8::Handle< v8::Value > item = array->Get( from< up_t >::call( i ) );
 
-//--- javascript::from ---------------------------------------------------------
-		template< typename t >
-			struct from< t, typename enable_if< is_sequence< t > >::type >;
+			typename type::value_type element;
+			to< typename type::value_type >::call( item, element );
+			out.push_back( element );
+		}
 
-		template< typename t >
-			struct from< t, typename enable_if< is_set< t > >::type >;
-
-		template< typename t >
-			struct from< t, typename enable_if< is_map< t > >::type >;
-
-		template< typename t >
-			struct from< t, typename enable_if< is_pair< t > >::type >;
+		container.swap( out );
 	}
+};
 
-//--- javascript::traits: sequence ---------------------------------------------
-	template< typename t >
-		struct javascript::to< t, typename enable_if< is_sequence< t > >::type >
+template< typename t >
+	struct from< t, typename enable_if< is_sequence< t > >::type >
+{
+	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type container )
 	{
-		static void call( const v8::Handle< v8::Value >& value,
-			typename call_traits< t >::reference container )
-		{
-			if ( !value->IsArray() )
-				throw error::javascript() << "Value is not an array";
+		typedef typename no_ref< t >::type type;
+		v8::Handle< v8::Array > array = v8::Array::New( container.size() );
+		up_t index = 0;
 
-			typedef typename no_ref< t >::type type;
-			v8::HandleScope scope;
-			v8::Array* array = v8::Array::Cast( *value );
-			up_t array_size = array->Length();
+		for ( typename type::const_iterator i = container.begin(), end = container.end();
+			i != end; ++i, ++index )
+			array->Set( from< up_t >::call( index ),
+				from< typename type::value_type >::call( *i ) );
 
-			type out;
-			reserve( out, array_size );
+		return array;
+	}
+};
 
-			for ( up_t i = 0; i != array_size; ++i )
-			{
-				v8::Handle< v8::Value > item = array->Get( from< up_t >::call( i ) );
-
-				typename type::value_type element;
-				to< typename type::value_type >::call( item, element );
-				out.push_back( element );
-			}
-
-			container.swap( out );
-		}
-	};
-
-	template< typename t >
-		struct javascript::from< t, typename enable_if< is_sequence< t > >::type >
+//--- traits: set ----------------------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if< is_set< t > >::type >
+{
+	static void call( const v8::Handle< v8::Value >& value,
+		typename call_traits< t >::reference set )
 	{
-		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type container )
+		if ( !value->IsObject() )
+			throw error::javascript() << "Value is not an object";
+
+		typedef typename no_ref< t >::type type;
+		v8::HandleScope scope;
+		v8::Object* object = v8::Object::Cast( *value );
+		v8::Handle< v8::Array > array = object->GetPropertyNames();
+
+		type out;
+
+		for ( up_t i = 0, end = array->Length(); i != end; ++i )
 		{
-			typedef typename no_ref< t >::type type;
-			v8::Handle< v8::Array > array = v8::Array::New( container.size() );
-			up_t index = 0;
-
-			for ( typename type::const_iterator i = container.begin(), end = container.end();
-				i != end; ++i, ++index )
-				array->Set( from< up_t >::call( index ),
-					from< typename type::value_type >::call( *i ) );
-
-			return array;
+			typename type::key_type key;
+			to< typename type::key_type >::call( array->Get( from< up_t >::call( i ) ), key );
+			out.insert( key );
 		}
-	};
 
-//--- javascript::traits: set --------------------------------------------------
-	template< typename t >
-		struct javascript::to< t, typename enable_if< is_set< t > >::type >
+		set.swap( out );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_set< t > >::type >
+{
+	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type set )
 	{
-		static void call( const v8::Handle< v8::Value >& value,
-			typename call_traits< t >::reference set )
-		{
-			if ( !value->IsObject() )
-				throw error::javascript() << "Value is not an object";
+		typedef typename no_ref< t >::type type;
+		v8::Handle< v8::Object > object = v8::Object::New();
 
-			typedef typename no_ref< t >::type type;
-			v8::HandleScope scope;
-			v8::Object* object = v8::Object::Cast( *value );
-			v8::Handle< v8::Array > array = object->GetPropertyNames();
+		for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
+			object->Set( from< typename type::key_type >::call( *i ), v8::True() );
 
-			type out;
+		return object;
+	}
+};
 
-			for ( up_t i = 0, end = array->Length(); i != end; ++i )
-			{
-				typename type::key_type key;
-				to< typename type::key_type >::call( array->Get( from< up_t >::call( i ) ), key );
-				out.insert( key );
-			}
-
-			set.swap( out );
-		}
-	};
-
-	template< typename t >
-		struct javascript::from< t, typename enable_if< is_set< t > >::type >
+//--- traits: map ----------------------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if< is_map< t > >::type >
+{
+	static void call( const v8::Handle< v8::Value >& value,
+		typename call_traits< t >::reference map )
 	{
-		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type set )
+		if ( !value->IsObject() )
+			throw error::javascript() << "Value is not an object";
+
+		typedef typename no_ref< t >::type type;
+		v8::HandleScope scope;
+		v8::Object* object = v8::Object::Cast( *value );
+		v8::Handle< v8::Array > array = object->GetPropertyNames();
+
+		type out;
+
+		for ( up_t i = 0, end = array->Length(); i != end; ++i )
 		{
-			typedef typename no_ref< t >::type type;
-			v8::Handle< v8::Object > object = v8::Object::New();
+			v8::Handle< v8::Value > item = array->Get( from< up_t >::call( i ) );
+			v8::Handle< v8::Value > data = object->Get( item );
 
-			for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
-				object->Set( from< typename type::key_type >::call( *i ), v8::True() );
-
-			return object;
+			typename type::key_type key;
+			to< typename type::key_type >::call( item, key );
+			typename type::mapped_type mapped;
+			to< typename type::mapped_type >::call( data, mapped );
+			out.insert( typename type::value_type( key, mapped ) );
 		}
-	};
 
-//--- javascript::traits: map --------------------------------------------------
-	template< typename t >
-		struct javascript::to< t, typename enable_if< is_map< t > >::type >
+		map.swap( out );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_map< t > >::type >
+{
+	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type map )
 	{
-		static void call( const v8::Handle< v8::Value >& value,
-			typename call_traits< t >::reference map )
-		{
-			if ( !value->IsObject() )
-				throw error::javascript() << "Value is not an object";
+		typedef typename no_ref< t >::type type;
+		v8::Handle< v8::Object > object = v8::Object::New();
 
-			typedef typename no_ref< t >::type type;
-			v8::HandleScope scope;
-			v8::Object* object = v8::Object::Cast( *value );
-			v8::Handle< v8::Array > array = object->GetPropertyNames();
+		for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
+			object->Set( from< typename type::key_type >::call( i->first ),
+				from< typename type::mapped_type >::call( i->second ) );
 
-			type out;
+		return object;
+	}
+};
 
-			for ( up_t i = 0, end = array->Length(); i != end; ++i )
-			{
-				v8::Handle< v8::Value > item = array->Get( from< up_t >::call( i ) );
-				v8::Handle< v8::Value > data = object->Get( item );
-
-				typename type::key_type key;
-				to< typename type::key_type >::call( item, key );
-				typename type::mapped_type mapped;
-				to< typename type::mapped_type >::call( data, mapped );
-				out.insert( typename type::value_type( key, mapped ) );
-			}
-
-			map.swap( out );
-		}
-	};
-
-	template< typename t >
-		struct javascript::from< t, typename enable_if< is_map< t > >::type >
+//--- traits: pair ---------------------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if< is_pair< t > >::type >
+{
+	static void call( const v8::Handle< v8::Value >& value,
+		typename call_traits< t >::reference pair )
 	{
-		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type map )
-		{
-			typedef typename no_ref< t >::type type;
-			v8::Handle< v8::Object > object = v8::Object::New();
+		if ( !value->IsArray() )
+			throw error::javascript() << "Value is not an array";
 
-			for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
-				object->Set( from< typename type::key_type >::call( i->first ),
-					from< typename type::mapped_type >::call( i->second ) );
+		v8::Array* array = v8::Array::Cast( *value );
+		up_t array_size = array->Length();
 
-			return object;
-		}
-	};
+		if ( array_size != 2 )
+			throw error::javascript() <<
+				"Array is of size " << array_size << ", pair is of size 2";
 
-//--- javascript::traits: pair -------------------------------------------------
-	template< typename t >
-		struct javascript::to< t, typename enable_if< is_pair< t > >::type >
+		typedef typename no_ref< t >::type type;
+		v8::HandleScope scope;
+
+		to< typename type::first_type >::
+			call( array->Get( from< up_t >::call( 0 ) ), pair.first );
+		to< typename type::second_type >::
+			call( array->Get( from< up_t >::call( 1 ) ), pair.second );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_pair< t > >::type >
+{
+	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pair )
 	{
-		static void call( const v8::Handle< v8::Value >& value,
-			typename call_traits< t >::reference pair )
-		{
-			if ( !value->IsArray() )
-				throw error::javascript() << "Value is not an array";
+		typedef typename no_ref< t >::type type;
+		v8::Handle< v8::Array > array = v8::Array::New( 2 );
 
-			v8::Array* array = v8::Array::Cast( *value );
-			up_t array_size = array->Length();
+		array->Set( from< up_t >::call( 0 ),
+			from< typename type::first_type >::call( pair.first ) );
+		array->Set( from< up_t >::call( 1 ),
+			from< typename type::second_type >::call( pair.second ) );
 
-			if ( array_size != 2 )
-				throw error::javascript() <<
-					"Array is of size " << array_size << ", pair is of size 2";
+		return array;
+	}
+};
 
-			typedef typename no_ref< t >::type type;
-			v8::HandleScope scope;
-
-			to< typename type::first_type >::
-				call( array->Get( from< up_t >::call( 0 ) ), pair.first );
-			to< typename type::second_type >::
-				call( array->Get( from< up_t >::call( 1 ) ), pair.second );
-		}
-	};
-
-	template< typename t >
-		struct javascript::from< t, typename enable_if< is_pair< t > >::type >
-	{
-		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pair )
-		{
-			typedef typename no_ref< t >::type type;
-			v8::Handle< v8::Array > array = v8::Array::New( 2 );
-
-			array->Set( from< up_t >::call( 0 ),
-				from< typename type::first_type >::call( pair.first ) );
-			array->Set( from< up_t >::call( 1 ),
-				from< typename type::second_type >::call( pair.second ) );
-
-			return array;
-		}
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( javascript ) )
 
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "component/javascript/traits.hpp"
@@ -245,50 +243,42 @@ namespace ooe
 		array->Set( from< up_t >::call( n ),\
 			from< typename tuple_element< n, t >::type >::call( tuple._ ## n ) );
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
+
+//--- traits: tuple --------------------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-	namespace javascript
+	static void call( const v8::Handle< v8::Value >& value,
+		typename call_traits< t >::reference tuple )
 	{
-		template< typename t >
-			struct to< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >;
+		if ( !value->IsArray() )
+			throw error::javascript() << "Value is not an array";
 
-		template< typename t >
-			struct from< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >;
+		v8::Array* array = v8::Array::Cast( *value );
+		up_t array_size = array->Length();
+
+		if ( array_size != LIMIT )
+			throw error::javascript() <<
+				"Array is of size " << array_size << ", tuple is of size " << LIMIT;
+
+		v8::HandleScope scope;
+		BOOST_PP_REPEAT( LIMIT, TUPLE_TO, ~ )
 	}
+};
 
-//--- javascript::traits:: tuple -----------------------------------------------
-	template< typename t >
-		struct javascript::to< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
+template< typename t >
+	struct from< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
+{
+	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type tuple )
 	{
-		static void call( const v8::Handle< v8::Value >& value,
-			typename call_traits< t >::reference tuple )
-		{
-			if ( !value->IsArray() )
-				throw error::javascript() << "Value is not an array";
+		v8::Handle< v8::Array > array = v8::Array::New( LIMIT );
+		BOOST_PP_REPEAT( LIMIT, TUPLE_FROM, ~ )
+		return array;
+	}
+};
 
-			v8::Array* array = v8::Array::Cast( *value );
-			up_t array_size = array->Length();
-
-			if ( array_size != LIMIT )
-				throw error::javascript() <<
-					"Array is of size " << array_size << ", tuple is of size " << LIMIT;
-
-			v8::HandleScope scope;
-			BOOST_PP_REPEAT( LIMIT, TUPLE_TO, ~ )
-		}
-	};
-
-	template< typename t >
-		struct javascript::from< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
-	{
-		static v8::Handle< v8::Value > call( typename call_traits< t >::param_type tuple )
-		{
-			v8::Handle< v8::Array > array = v8::Array::New( LIMIT );
-			BOOST_PP_REPEAT( LIMIT, TUPLE_FROM, ~ )
-			return array;
-		}
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( javascript ) )
 
 	#undef TUPLE_FROM
 	#undef TUPLE_TO
