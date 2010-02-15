@@ -4,7 +4,7 @@ from platform.build import *
 
 Import( 'variables variant' )
 
-### configure ##################################################################
+### configure ######################################################################################
 def ImageConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'jpeg', [ 'stdio.h', 'jpeglib.h' ], 'c' ): Exit( 1 )
 	if not setup.CheckLibWithHeader( 'openjpeg', 'openjpeg.h', 'c' ): Exit( 1 )
@@ -43,6 +43,9 @@ def ParallelConfigure( platform, setup ):
 	if platform == 'posix':
 		if not setup.CheckLib( 'pthread', language = 'c' ): Exit( 1 )
 
+def PythonConfigure( platform, setup ):
+	if not setup.CheckLibWithHeader( ooe.python.library, 'Python.h', 'c' ): Exit( 1 )
+
 def UtilityConfigure( platform, setup ):
 	if not setup.CheckCHeader( 'execinfo.h' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/call_traits.hpp' ): Exit( 1 )
@@ -60,12 +63,12 @@ def VideoConfigure( platform, setup ):
 		if not setup.CheckLibWithHeader( 'v4lconvert', 'libv4lconvert.h', 'c' ): Exit( 1 )
 		if not setup.CheckLib( 'Xrandr' ): Exit( 1 )
 
-### build ######################################################################
+### build ##########################################################################################
 build = Build( variables )
 build.Configure( variant == 'release' )
 exec 'from platform.' + build.platform + ' import *'
 
-#--- foundation ----------------------------------------------------------------
+#--- foundation ------------------------------------------------------------------------------------
 build.Configurable( configure = UtilityConfigure )
 build.Linkable( 'executable', 'foundation/executable', frameworks = ooe.appkit.framework,
 	configure = ExecutableConfigure )
@@ -79,7 +82,7 @@ build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure
 build.Linkable( 'video', 'foundation/video', 'parallel', ooe.qtkit.framework,
 	ooe.freetype.include_path, ooe.freetype.library_path, VideoConfigure )
 
-#--- component -----------------------------------------------------------------
+#--- component -------------------------------------------------------------------------------------
 build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'javascript_host', 'component/javascript/host', 'executable javascript registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
@@ -87,10 +90,13 @@ build.Executable( 'surrogate', 'component/registry/surrogate', 'executable regis
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
+build.Linkable( 'python', 'component/python', 'io', include_path = ooe.python.include_path,
+	configure = PythonConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
 
-#--- test ----------------------------------------------------------------------
-build.Executable( 'registry_test', 'test/component/registry', 'javascript lua registry unit' )
+#--- test ------------------------------------------------------------------------------------------
+build.Executable( 'registry_test', 'test/component/registry',
+	'javascript lua python registry unit', include_path = ooe.python.include_path )
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
@@ -98,7 +104,7 @@ build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
 build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 build.Linkable( 'unit', 'test/unit', 'io executable' )
 
-#--- external ------------------------------------------------------------------
+#--- external --------------------------------------------------------------------------------------
 build.Executable( 'chunked', 'external/chunked', 'executable scene video' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'memoryrpc_input', 'external/memoryrpc/input', 'executable ipc' )

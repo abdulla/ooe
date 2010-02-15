@@ -3,8 +3,21 @@
 #ifndef OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP
 #define OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP
 
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+
+#ifndef SIZEOF_SOCKET_T
+#define SIZEOF_SOCKET_T 4
+#endif
+
 #include <Python.h>
 
+#include "component/python/error.hpp"
 #include "foundation/utility/hint.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
@@ -31,6 +44,18 @@ template< typename t >
 template< typename t >
 	struct as< t, typename enable_if< is_pointer< t > >::type >;
 
+template< typename t >
+	struct as< t, typename enable_if< is_class< t > >::type >;
+
+template< typename t >
+	struct as< t, typename enable_if< is_construct< t > >::type >;
+
+template< typename t >
+	struct as< t, typename enable_if< is_destruct< t > >::type >;
+
+template< typename t >
+	struct as< t, typename enable_if< is_array< t > >::type >;
+
 //--- from -----------------------------------------------------------------------------------------
 template< typename, typename = void >
 	struct from;
@@ -52,6 +77,25 @@ template< typename t >
 
 template< typename t >
 	struct from< t, typename enable_if< is_pointer< t > >::type >;
+
+template< typename t >
+	struct from< t, typename enable_if< is_class< t > >::type >;
+
+template< typename t >
+	struct from< t, typename enable_if< is_construct< t > >::type >;
+
+template< typename t >
+	struct from< t, typename enable_if< is_destruct< t > >::type >;
+
+template< typename t >
+	struct from< t, typename enable_if< is_array< t > >::type >;
+
+//--- destroy --------------------------------------------------------------------------------------
+template< typename t >
+	void destroy( PyObject* object )
+{
+	delete ptr_cast< t* >( PyCapsule_GetPointer( object, 0 ) );
+}
 
 //--- traits: default ------------------------------------------------------------------------------
 template< typename NO_SPECIALISATION_DEFINED, typename >
@@ -143,7 +187,7 @@ template< typename t >
 
 //--- traits: floating-point -----------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_string< t > >::type >
+	struct as< t, typename enable_if< is_floating_point< t > >::type >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference floating_point )
 	{
@@ -155,7 +199,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_string< t > >::type >
+	struct from< t, typename enable_if< is_floating_point< t > >::type >
 {
 	static PyObject* call( typename call_traits< t >::param_type floating_point )
 	{
@@ -192,17 +236,7 @@ template< typename t >
 
 	static void convert( PyObject* object, unsigned long long& integral )
 	{
-		integral = PyLong_UnsignedLongLong( object );
-	}
-
-	static void convert( PyObject* object, ssize_t& integral )
-	{
-		integral = PyLong_AsSsize_t( object );
-	}
-
-	static void convert( PyObject* object, size_t& integral )
-	{
-		integral = PyLong_AsSize_t( object );
+		integral = PyLong_AsUnsignedLongLong( object );
 	}
 };
 
@@ -233,16 +267,6 @@ template< typename t >
 	{
 		return PyLong_FromUnsignedLongLong( integral );
 	}
-
-	static PyObject* convert( ssize_t integral )
-	{
-		return PyLong_FromSsize_t( integral );
-	}
-
-	static PyObject* convert( size_t integral )
-	{
-		return PyLong_FromSize_t( integral );
-	}
 };
 
 //--- traits: pointer ------------------------------------------------------------------------------
@@ -254,7 +278,7 @@ template< typename t >
 		if ( !PyCapsule_CheckExact( object ) )
 			throw error::python() << "Object is not a capsule";
 
-		pointer = ptr_cast< typename no_ref< t >::type >( PyCapsule_GetPointer( object, 0 ) );
+		pointer = ptr_cast< t >( PyCapsule_GetPointer( object, 0 ) );
 	}
 };
 
@@ -264,6 +288,112 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type pointer )
 	{
 		return PyCapsule_New( pointer, 0, 0 );
+	}
+};
+
+//--- traits: class --------------------------------------------------------------------------------
+template< typename t >
+	struct as< t, typename enable_if< is_class< t > >::type >
+{
+	static void call( PyObject* object, typename call_traits< t >::reference class_ )
+	{
+		if ( !PyCapsule_CheckExact( object ) )
+			throw error::python() << "Object is not a capsule";
+
+		class_ = *ptr_cast< t >( PyCapsule_GetPointer( object, 0 ) );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_class< t > >::type >
+{
+	static PyObject* call( typename call_traits< t >::param_type class_ )
+	{
+		typedef typename no_ref< t >::type type;
+		return PyCapsule_New( new type( class_ ), 0, destroy< type > );
+	}
+};
+
+//--- traits: construct ----------------------------------------------------------------------------
+template< typename INVALID_USAGE >
+	struct as< INVALID_USAGE, typename enable_if< is_construct< INVALID_USAGE > >::type >
+{
+	static void call( PyObject* object, INVALID_USAGE )
+	{
+		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_construct< t > >::type >
+{
+	static PyObject* call( typename call_traits< t >::param_type construct )
+	{
+		return PyCapsule_New( construct, 0, destroy< typename t::value_type > );
+	}
+};
+
+//--- traits: destruct -----------------------------------------------------------------------------
+template< typename t >
+	struct as< t, typename enable_if< is_destruct< t > >::type >
+{
+	static void call( PyObject* object, typename call_traits< t >::reference class_ )
+	{
+		if ( !PyCapsule_CheckExact( object ) )
+			throw error::python() << "Object is not a capsule";
+
+		class_ = *ptr_cast< t >( PyCapsule_GetPointer( object, 0 ) );
+		PyCapsule_SetDestructor( object, 0 );
+	}
+};
+
+template< typename INVALID_USAGE >
+	struct from< INVALID_USAGE, typename enable_if< is_destruct< INVALID_USAGE > >::type >
+{
+	static PyObject* call( INVALID_USAGE )
+	{
+		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+		return 0;
+	}
+};
+
+//--- traits: array --------------------------------------------------------------------------------
+template< typename t >
+	struct as< t, typename enable_if< is_array< t > >::type >
+{
+	static void call( PyObject* object, typename call_traits< t >::reference array )
+	{
+		if ( !PyList_Check( object ) )
+			throw error::python() << "Object is not a list";
+
+		typedef typename no_ref< t >::type type;
+		up_t py_size = PyList_GET_SIZE( object );
+		up_t array_size = extent< type >::value;
+
+		if ( py_size != array_size )
+			throw error::python() << "Array in python is of size " << py_size <<
+				", array is of size " << array_size;
+
+		for ( up_t i = 0; i != array_size; ++i )
+			as< typename remove_extent< type >::type >::
+				call( PyList_GET_ITEM( object, i ), array[ i ] );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_array< t > >::type >
+{
+	static PyObject* call( typename call_traits< t >::param_type array )
+	{
+		typedef typename no_ref< t >::type type;
+		up_t array_size = extent< type >::value;
+		PyObject* list = PyList_New( array_size );
+
+		for ( up_t i = 0; i != array_size; ++i )
+			PyList_SET_ITEM( list, i,
+				from< typename remove_extent< type >::type >::call( array[ i ] ) );
+
+		return list;
 	}
 };
 
