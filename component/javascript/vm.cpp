@@ -63,7 +63,7 @@ namespace ooe
 		v8::TryCatch try_catch;
 
 		v8::Handle< v8::String > source = v8::String::NewExternal( new mapped( desc ) );
-		v8::Handle< v8::String > origin = v8::String::New( name.c_str(), name.size() );
+		v8::Handle< v8::String > origin = v8::String::New( name.data(), name.size() );
 		v8::Handle< v8::Script > script = v8::Script::Compile( source, origin );
 
 		if ( try_catch.HasCaught() )

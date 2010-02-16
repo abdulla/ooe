@@ -161,7 +161,7 @@ void throw_exception( const c8* what, const c8* where )
 	std::string string;
 	string << what << "\n\nStack trace:" << where << "\n\nSource line:";
 
-	v8::Handle< v8::String > error = v8::String::New( string.c_str(), string.size() );
+	v8::Handle< v8::String > error = v8::String::New( string.data(), string.size() );
 	v8::ThrowException( v8::Exception::Error( error ) );
 }
 
