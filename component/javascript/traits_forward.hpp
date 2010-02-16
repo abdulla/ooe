@@ -6,22 +6,10 @@
 #include <v8.h>
 
 #include "component/javascript/error.hpp"
-#include "foundation/utility/hint.hpp"
+#include "component/registry/traits.hpp"
 #include "foundation/utility/miscellany.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
-
-template< typename >
-	struct is_floating_point;
-
-template< typename >
-	struct is_integral;
-
-template< typename >
-	struct is_pointer;
-
-template< typename >
-	struct is_class;
 
 //--- to -------------------------------------------------------------------------------------------
 template< typename, typename = void >
@@ -31,22 +19,22 @@ template< typename t >
 	struct to< t, typename enable_if< is_empty< t > >::type >;
 
 template< typename t >
-	struct to< t, typename enable_if< is_boolean< t > >::type >;
+	struct to< t, typename enable_if< component::is_boolean< t > >::type >;
 
 template< typename t >
 	struct to< t, typename enable_if< is_string< t > >::type >;
 
 template< typename t >
-	struct to< t, typename enable_if< is_floating_point< t > >::type >;
+	struct to< t, typename enable_if< component::is_integral< t > >::type >;
 
 template< typename t >
-	struct to< t, typename enable_if< is_integral< t > >::type >;
+	struct to< t, typename enable_if< component::is_floating_point< t > >::type >;
 
 template< typename t >
-	struct to< t, typename enable_if< is_pointer< t > >::type >;
+	struct to< t, typename enable_if< component::is_pointer< t > >::type >;
 
 template< typename t >
-	struct to< t, typename enable_if< is_class< t > >::type >;
+	struct to< t, typename enable_if< component::is_class< t > >::type >;
 
 template< typename t >
 	struct to< t, typename enable_if< is_construct< t > >::type >;
@@ -65,22 +53,22 @@ template< typename t >
 	struct from< t, typename enable_if< is_empty< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_boolean< t > >::type >;
+	struct from< t, typename enable_if< component::is_boolean< t > >::type >;
 
 template< typename t >
 	struct from< t, typename enable_if< is_string< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_floating_point< t > >::type >;
+	struct from< t, typename enable_if< component::is_integral< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_integral< t > >::type >;
+	struct from< t, typename enable_if< component::is_floating_point< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_pointer< t > >::type >;
+	struct from< t, typename enable_if< component::is_pointer< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_class< t > >::type >;
+	struct from< t, typename enable_if< component::is_class< t > >::type >;
 
 template< typename t >
 	struct from< t, typename enable_if< is_construct< t > >::type >;
@@ -103,47 +91,6 @@ template< typename t >
 	delete ptr_cast< t* >( object->GetPointerFromInternalField( 0 ) );
 	value.Dispose();
 }
-
-//--- is_floating_point ----------------------------------------------------------------------------
-template< typename t >
-	struct is_floating_point
-	: public ooe::is_floating_point< typename no_ref< t >::type >
-{
-};
-
-//--- is_integral ----------------------------------------------------------------------------------
-template< typename t >
-	struct is_integral
-{
-	static const bool value =
-		!is_boolean< t >::value &&
-		ooe::is_integral< typename no_ref< t >::type >::value;
-};
-
-//--- traits: is_pointer ---------------------------------------------------------------------------
-template< typename t >
-	struct is_pointer
-{
-	static const bool value =
-		!is_cstring< t >::value &&
-		!is_member_pointer< typename no_ref< t >::type >::value &&
-		ooe::is_pointer< typename no_ref< t >::type >::value;
-};
-
-//--- traits: is_class -----------------------------------------------------------------------------
-template< typename t >
-	struct is_class
-{
-	static const bool value =
-		!is_construct< t >::value &&
-		!is_destruct< t >::value &&
-		!is_stdstring< t >::value &&
-		!is_stdcontainer< t >::value &&
-		!is_tuple< t >::value &&
-		( is_member_pointer< typename no_ref< t >::type >::value ||
-		ooe::is_class< typename no_ref< t >::type >::value ||
-		is_union< typename no_ref< t >::type >::value );
-};
 
 //--- traits: default ------------------------------------------------------------------------------
 template< typename NO_SPECIALISATION_DEFINED, typename >
@@ -187,7 +134,7 @@ template< typename t >
 
 //--- traits: boolean ------------------------------------------------------------------------------
 template< typename t >
-	struct to< t, typename enable_if< is_boolean< t > >::type >
+	struct to< t, typename enable_if< component::is_boolean< t > >::type >
 {
 	static void call( const v8::Handle< v8::Value >& value, bool& boolean )
 	{
@@ -199,7 +146,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_boolean< t > >::type >
+	struct from< t, typename enable_if< component::is_boolean< t > >::type >
 {
 	static v8::Handle< v8::Value > call( bool boolean )
 	{
@@ -231,32 +178,9 @@ template< typename t >
 	}
 };
 
-//--- traits: floating-point -----------------------------------------------------------------------
-template< typename t >
-	struct to< t, typename enable_if< is_floating_point< t > >::type >
-{
-	static void call( const v8::Handle< v8::Value >& value,
-		typename call_traits< t >::reference floating_point )
-	{
-		if ( !value->IsNumber() )
-			throw error::javascript() << "Value is not a floating-point number";
-
-		floating_point = value->ToNumber()->Value();
-	}
-};
-
-template< typename t >
-	struct from< t, typename enable_if< is_floating_point< t > >::type >
-{
-	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type floating_point )
-	{
-		return v8::Number::New( floating_point );
-	}
-};
-
 //--- traits: integral -----------------------------------------------------------------------------
 template< typename t >
-	struct to< t, typename enable_if< is_integral< t > >::type >
+	struct to< t, typename enable_if< component::is_integral< t > >::type >
 {
 	static void call( const v8::Handle< v8::Value >& value,
 		typename call_traits< t >::reference integral )
@@ -269,7 +193,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_integral< t > >::type >
+	struct from< t, typename enable_if< component::is_integral< t > >::type >
 {
 	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type integral )
 	{
@@ -277,9 +201,32 @@ template< typename t >
 	}
 };
 
+//--- traits: floating-point -----------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if< component::is_floating_point< t > >::type >
+{
+	static void call( const v8::Handle< v8::Value >& value,
+		typename call_traits< t >::reference floating_point )
+	{
+		if ( !value->IsNumber() )
+			throw error::javascript() << "Value is not a floating-point number";
+
+		floating_point = value->ToNumber()->Value();
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< component::is_floating_point< t > >::type >
+{
+	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type floating_point )
+	{
+		return v8::Number::New( floating_point );
+	}
+};
+
 //--- traits: pointer ------------------------------------------------------------------------------
 template< typename t >
-	struct to< t, typename enable_if< is_pointer< t > >::type >
+	struct to< t, typename enable_if< component::is_pointer< t > >::type >
 {
 	static void call( const v8::Handle< v8::Value >& value,
 		typename call_traits< t >::reference pointer )
@@ -297,7 +244,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_pointer< t > >::type >
+	struct from< t, typename enable_if< component::is_pointer< t > >::type >
 {
 	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pointer )
 	{
@@ -312,7 +259,7 @@ template< typename t >
 
 //--- traits: class --------------------------------------------------------------------------------
 template< typename t >
-	struct to< t, typename enable_if< is_class< t > >::type >
+	struct to< t, typename enable_if< component::is_class< t > >::type >
 {
 	static void call( const v8::Handle< v8::Value >& value,
 		typename call_traits< t >::reference class_ )
@@ -325,7 +272,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_class< t > >::type >
+	struct from< t, typename enable_if< component::is_class< t > >::type >
 {
 	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type class_ )
 	{
