@@ -116,4 +116,4 @@ build.Executable( 'socketrpc_noop', 'external/socketrpc/noop', 'executable ipc' 
 build.Executable( 'socketrpc_output', 'external/socketrpc/output', 'executable ipc' )
 build.Executable( 'socketrpc_server', 'external/socketrpc/server', 'executable ipc' )
 build.Linkable( 'scene', 'external/scene', 'image io maths parallel' )
-build.Linkable( 'hello', 'external/hello', 'javascript lua registry' )
+build.Linkable( 'hello', 'external/hello', 'javascript lua python registry' )
