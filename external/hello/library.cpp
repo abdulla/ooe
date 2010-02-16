@@ -5,6 +5,7 @@
 
 #include "component/javascript/facade.hpp"
 #include "component/lua/facade.hpp"
+#include "component/python/facade.hpp"
 #include "component/registry/builder.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/remote.hpp"
@@ -83,7 +84,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 {
 	module module;
 
-	builder< facade::remote, facade::lua, facade::javascript > builder( module );
+	builder< facade::remote, facade::lua, facade::javascript, facade::python > builder( module );
 	builder.insert( "hello", hello );
 	builder.insert( "allocate", allocate );
 	builder.insert( "deallocate", deallocate );
