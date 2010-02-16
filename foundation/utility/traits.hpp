@@ -154,13 +154,6 @@ template< typename t >
 {
 };
 
-//--- is_boolean -----------------------------------------------------------------------------------
-template< typename t >
-	struct is_boolean
-	: public is_like< t, bool >
-{
-};
-
 //--- is_array -------------------------------------------------------------------------------------
 template< typename t >
 	struct is_array
