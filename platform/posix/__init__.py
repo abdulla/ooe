@@ -27,7 +27,6 @@ class ooe:
 
 	class python:
 		include_path = '/usr/include/python3.1'
-		library = 'python3.1'
 
 	class qtkit:
 		framework = ''

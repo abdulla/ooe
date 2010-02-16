@@ -44,7 +44,7 @@ def ParallelConfigure( platform, setup ):
 		if not setup.CheckLib( 'pthread', language = 'c' ): Exit( 1 )
 
 def PythonConfigure( platform, setup ):
-	if not setup.CheckLibWithHeader( ooe.python.library, 'Python.h', 'c' ): Exit( 1 )
+	if not setup.CheckLibWithHeader( 'python3.1', 'python3.1/Python.h', 'c' ): Exit( 1 )
 
 def UtilityConfigure( platform, setup ):
 	if not setup.CheckCHeader( 'execinfo.h' ): Exit( 1 )
@@ -90,13 +90,12 @@ build.Executable( 'surrogate', 'component/registry/surrogate', 'executable regis
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
-build.Linkable( 'python', 'component/python', 'io', include_path = ooe.python.include_path,
-	configure = PythonConfigure )
+build.Linkable( 'python', 'component/python', 'io', configure = PythonConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
 
 #--- test ------------------------------------------------------------------------------------------
 build.Executable( 'registry_test', 'test/component/registry',
-	'javascript lua python registry unit', include_path = ooe.python.include_path )
+	'javascript lua python registry unit' )
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
