@@ -15,10 +15,11 @@
 #define SIZEOF_SOCKET_T 4
 #endif
 
-#include <Python.h>
+#include <python3.1/Python.h>
 
 #include "component/python/error.hpp"
-#include "foundation/utility/hint.hpp"
+#include "component/registry/traits.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
@@ -30,22 +31,22 @@ template< typename t >
 	struct as< t, typename enable_if< is_empty< t > >::type >;
 
 template< typename t >
-	struct as< t, typename enable_if< is_boolean< t > >::type >;
+	struct as< t, typename enable_if< component::is_boolean< t > >::type >;
 
 template< typename t >
 	struct as< t, typename enable_if< is_string< t > >::type >;
 
 template< typename t >
-	struct as< t, typename enable_if< is_floating_point< t > >::type >;
+	struct as< t, typename enable_if< component::is_integral< t > >::type >;
 
 template< typename t >
-	struct as< t, typename enable_if< is_integral< t > >::type >;
+	struct as< t, typename enable_if< component::is_floating_point< t > >::type >;
 
 template< typename t >
-	struct as< t, typename enable_if< is_pointer< t > >::type >;
+	struct as< t, typename enable_if< component::is_pointer< t > >::type >;
 
 template< typename t >
-	struct as< t, typename enable_if< is_class< t > >::type >;
+	struct as< t, typename enable_if< component::is_class< t > >::type >;
 
 template< typename t >
 	struct as< t, typename enable_if< is_construct< t > >::type >;
@@ -64,22 +65,22 @@ template< typename t >
 	struct from< t, typename enable_if< is_empty< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_boolean< t > >::type >;
+	struct from< t, typename enable_if< component::is_boolean< t > >::type >;
 
 template< typename t >
 	struct from< t, typename enable_if< is_string< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_floating_point< t > >::type >;
+	struct from< t, typename enable_if< component::is_integral< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_integral< t > >::type >;
+	struct from< t, typename enable_if< component::is_floating_point< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_pointer< t > >::type >;
+	struct from< t, typename enable_if< component::is_pointer< t > >::type >;
 
 template< typename t >
-	struct from< t, typename enable_if< is_class< t > >::type >;
+	struct from< t, typename enable_if< component::is_class< t > >::type >;
 
 template< typename t >
 	struct from< t, typename enable_if< is_construct< t > >::type >;
@@ -139,7 +140,7 @@ template< typename t >
 
 //--- traits: boolean ------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_boolean< t > >::type >
+	struct as< t, typename enable_if< component::is_boolean< t > >::type >
 {
 	static void call( PyObject* object, bool& boolean )
 	{
@@ -151,7 +152,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_boolean< t > >::type >
+	struct from< t, typename enable_if< component::is_boolean< t > >::type >
 {
 	static PyObject* call( bool boolean )
 	{
@@ -185,31 +186,9 @@ template< typename t >
 	}
 };
 
-//--- traits: floating-point -----------------------------------------------------------------------
-template< typename t >
-	struct as< t, typename enable_if< is_floating_point< t > >::type >
-{
-	static void call( PyObject* object, typename call_traits< t >::reference floating_point )
-	{
-		if ( !PyFloat_Check( object ) )
-			throw error::python() << "Object is not a floating-point number";
-
-		floating_point = PyFloat_AS_DOUBLE( object );
-	}
-};
-
-template< typename t >
-	struct from< t, typename enable_if< is_floating_point< t > >::type >
-{
-	static PyObject* call( typename call_traits< t >::param_type floating_point )
-	{
-		return PyFloat_FromDouble( floating_point );
-	}
-};
-
 //--- traits: integral -----------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_integral< t > >::type >
+	struct as< t, typename enable_if< component::is_integral< t > >::type >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference integral )
 	{
@@ -241,7 +220,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_integral< t > >::type >
+	struct from< t, typename enable_if< component::is_integral< t > >::type >
 {
 	static PyObject* call( typename call_traits< t >::param_type integral )
 	{
@@ -269,9 +248,31 @@ template< typename t >
 	}
 };
 
+//--- traits: floating-point -----------------------------------------------------------------------
+template< typename t >
+	struct as< t, typename enable_if< component::is_floating_point< t > >::type >
+{
+	static void call( PyObject* object, typename call_traits< t >::reference floating_point )
+	{
+		if ( !PyFloat_Check( object ) )
+			throw error::python() << "Object is not a floating-point number";
+
+		floating_point = PyFloat_AS_DOUBLE( object );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< component::is_floating_point< t > >::type >
+{
+	static PyObject* call( typename call_traits< t >::param_type floating_point )
+	{
+		return PyFloat_FromDouble( floating_point );
+	}
+};
+
 //--- traits: pointer ------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_pointer< t > >::type >
+	struct as< t, typename enable_if< component::is_pointer< t > >::type >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference pointer )
 	{
@@ -283,7 +284,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_pointer< t > >::type >
+	struct from< t, typename enable_if< component::is_pointer< t > >::type >
 {
 	static PyObject* call( typename call_traits< t >::param_type pointer )
 	{
@@ -293,7 +294,7 @@ template< typename t >
 
 //--- traits: class --------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_class< t > >::type >
+	struct as< t, typename enable_if< component::is_class< t > >::type >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference class_ )
 	{
@@ -305,7 +306,7 @@ template< typename t >
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_class< t > >::type >
+	struct from< t, typename enable_if< component::is_class< t > >::type >
 {
 	static PyObject* call( typename call_traits< t >::param_type class_ )
 	{
@@ -342,7 +343,7 @@ template< typename t >
 		if ( !PyCapsule_CheckExact( object ) )
 			throw error::python() << "Object is not a capsule";
 
-		class_ = *ptr_cast< t >( PyCapsule_GetPointer( object, 0 ) );
+		class_ = *ptr_cast< t* >( PyCapsule_GetPointer( object, 0 ) );
 		PyCapsule_SetDestructor( object, 0 );
 	}
 };

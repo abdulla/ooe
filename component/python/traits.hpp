@@ -96,7 +96,7 @@ template< typename t >
 
 		type out;
 
-		while ( item = PyIter_Next( iterator ) )
+		while ( ( item = PyIter_Next( iterator ) ) )
 		{
 			typename type::key_type key;
 			as< typename type::key_type >::call( item, key );
@@ -113,7 +113,7 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type set )
 	{
 		typedef typename no_ref< t >::type type;
-		PyObject* object = PySet_New( set.size() );
+		PyObject* object = PySet_New( 0 );
 
 		for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
 			PySet_Add( object, from< typename type::key_type >::call( *i ) );
