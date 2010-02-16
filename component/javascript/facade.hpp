@@ -180,7 +180,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
+		typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
 		member_type member;
 		to< member_type >::call( arguments.Data(), member );
 
