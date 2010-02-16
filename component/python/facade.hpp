@@ -17,6 +17,8 @@ template< typename >
 template< typename, typename >
 	struct invoke_member;
 
+void throw_exception( const c8*, const c8* ) OOE_VISIBLE;
+
 //--- verify_arguments -----------------------------------------------------------------------------
 inline void verify_arguments( PyObject* arguments, s32 size )
 {
@@ -39,12 +41,15 @@ template< typename type >
 		}
 		catch ( error::runtime& error )
 		{
+			throw_exception( error.what(), error.where() );
 		}
 		catch ( std::exception& error )
 		{
+			throw_exception( error.what(), "\nNo stack trace available" );
 		}
 		catch ( ... )
 		{
+			throw_exception( "An unknown exception was thrown", "\nNo stack trace available" );
 		}
 
 		return 0;

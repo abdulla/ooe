@@ -18,3 +18,15 @@ void python::insert( up_t index, PyCFunction call )
 }
 
 OOE_NAMESPACE_END( ( ooe )( facade ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
+
+//--- throw_exception ------------------------------------------------------------------------------
+void throw_exception( const c8* what, const c8* where )
+{
+	std::string string;
+	string << what << "\n\nStack trace:" << where;
+	PyErr_SetString( PyExc_RuntimeError, string.c_str() );
+}
+
+OOE_NAMESPACE_END( ( ooe )( python ) )
