@@ -1,10 +1,10 @@
 --[[ Copyright (C) 2010 Abdulla Kamar. All rights reserved. ]]
 
---- query registry -------------------------------------------------------------
+--- query registry ---------------------------------------------------------------------------------
 local result = ooe.registry.find{ 'hello/FvvE' }
 local module = ooe.registry.load( result[ 1 ] )
 
---- run functions --------------------------------------------------------------
+--- run functions ----------------------------------------------------------------------------------
 function printer( name )
 	local self = {}
 
@@ -37,5 +37,5 @@ for k, v in pairs( heap.stdset( alphabet ) ) do
 	print( k, v )
 end
 
---- print hello ----------------------------------------------------------------
+--- print hello ------------------------------------------------------------------------------------
 print 'hello lua'

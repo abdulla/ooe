@@ -1,10 +1,10 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-//--- query registry -----------------------------------------------------------
+//--- query registry -------------------------------------------------------------------------------
 var result = ooe.registry.find( [ 'hello/FvvE' ] );
 var module = ooe.registry.load( result[ 0 ] );
 
-//--- run functions ------------------------------------------------------------
+//--- run functions --------------------------------------------------------------------------------
 function printer( name )
 {
 	for ( var i in module )
@@ -38,5 +38,5 @@ alphabet = heap.stdset( alphabet );
 for ( var i in alphabet )
 	print( i, alphabet[ i ] );
 
-//--- print hello --------------------------------------------------------------
+//--- print hello ----------------------------------------------------------------------------------
 print( 'hello javascript' );
