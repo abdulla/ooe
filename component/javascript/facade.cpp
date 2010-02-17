@@ -10,7 +10,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 
 typedef std::vector< std::string > find_vector;
 
-template< v8::Handle< v8::Value > ( * function )( const v8::Arguments& arguments ) >
+template< v8::InvocationCallback function >
 	struct embed
 {
 	struct defer
@@ -140,12 +140,13 @@ void component_setup( v8::Handle< v8::Object > global )
 
 	//--- registry ---------------------------------------------------------
 	v8::Handle< v8::Object > registry = v8::Object::New();
-	ooe->Set( from< const c8* >::call( "registry" ), registry );
 
 	registry->Set( from< const c8* >::call( "find" ),
 		v8::FunctionTemplate::New( embed< find >::call )->GetFunction() );
 	registry->Set( from< const c8* >::call( "load" ),
 		v8::FunctionTemplate::New( embed< load >::call )->GetFunction() );
+
+	ooe->Set( from< const c8* >::call( "registry" ), registry );
 
 	//----------------------------------------------------------------------
 
