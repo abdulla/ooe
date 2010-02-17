@@ -9,7 +9,7 @@ namespace
 	using namespace ooe;
 	typedef std::vector< std::string > find_vector;
 
-	template< s32 ( * function )( lua::state* state ) >
+	template< lua::cfunction function >
 		struct embed
 	{
 		struct defer
