@@ -169,11 +169,12 @@ template< typename t >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference string )
 	{
-		if ( !PyBytes_Check( object ) )
+		if ( !PyUnicode_Check( object ) )
 			throw error::python() << "Object is not a string";
 
-		string = string_make< typename no_ref< t >::type >
-			( PyBytes_AS_STRING( object ), PyBytes_GET_SIZE( object ) );
+		sp_t size;
+		const c8* data = _PyUnicode_AsStringAndSize( object, &size );
+		string = string_make< typename no_ref< t >::type >( data, size );
 	}
 };
 
@@ -182,7 +183,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type string )
 	{
-		return PyBytes_FromStringAndSize( string_data( string ), string_size( string ) );
+		return PyUnicode_FromStringAndSize( string_data( string ), string_size( string ) );
 	}
 };
 
@@ -288,7 +289,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type pointer )
 	{
-		return PyCapsule_New( pointer, 0, 0 );
+		return PyCapsule_New( ptr_cast( pointer ), 0, 0 );
 	}
 };
 

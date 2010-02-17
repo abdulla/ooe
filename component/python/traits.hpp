@@ -131,7 +131,7 @@ template< typename t >
 		if ( !PyDict_Check( object ) )
 			throw error::python() << "Object is not a map";
 
-		ssize_t i = 0;
+		sp_t i = 0;
 		PyObject* key;
 		PyObject* mapped;
 
