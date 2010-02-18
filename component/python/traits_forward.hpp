@@ -3,21 +3,8 @@
 #ifndef OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP
 #define OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP
 
-#ifdef _POSIX_C_SOURCE
-#undef _POSIX_C_SOURCE
-#endif
-
-#ifdef _XOPEN_SOURCE
-#undef _XOPEN_SOURCE
-#endif
-
-#ifndef SIZEOF_SOCKET_T
-#define SIZEOF_SOCKET_T 4
-#endif
-
-#include <python3.1/Python.h>
-
 #include "component/python/error.hpp"
+#include "component/python/header.hpp"
 #include "component/registry/traits.hpp"
 #include "foundation/utility/miscellany.hpp"
 
@@ -339,12 +326,12 @@ template< typename t >
 template< typename t >
 	struct as< t, typename enable_if< is_destruct< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference class_ )
+	static void call( PyObject* object, typename call_traits< t >::reference destruct )
 	{
 		if ( !PyCapsule_CheckExact( object ) )
 			throw error::python() << "Object is not a capsule";
 
-		class_ = *ptr_cast< t* >( PyCapsule_GetPointer( object, 0 ) );
+		destruct = ptr_cast< typename t::pointer >( PyCapsule_GetPointer( object, 0 ) );
 		PyCapsule_SetDestructor( object, 0 );
 	}
 };

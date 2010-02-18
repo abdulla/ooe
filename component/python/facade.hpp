@@ -17,6 +17,7 @@ template< typename >
 template< typename, typename >
 	struct invoke_member;
 
+void component_setup( PyObject* ) OOE_VISIBLE;
 void throw_exception( const c8*, const c8* ) OOE_VISIBLE;
 
 //--- verify_arguments -----------------------------------------------------------------------------
@@ -64,7 +65,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 class python
 {
 public:
-	typedef std::vector< PyCFunction > vector_type;
+	typedef std::vector< PyMethodDef > vector_type;
 
 	const vector_type& get( void ) const OOE_VISIBLE;
 	void insert( up_t, PyCFunction ) OOE_VISIBLE;
