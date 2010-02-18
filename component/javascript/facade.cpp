@@ -93,7 +93,7 @@ v8::Handle< v8::Value > load( const v8::Arguments& arguments )
 		object->Set( key, v8::FunctionTemplate::New( javascript[ i ], data )->GetFunction() );
 	}
 
-	object->Set( from< up_t >::call( 0 ), from< source_ptr >::call( source ) );
+	object->Set( from< const c8* >::call( "" ), from< source_ptr >::call( source ) );
 	return object;
 }
 
