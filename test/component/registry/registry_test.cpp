@@ -4,6 +4,8 @@
 #include "component/javascript/vm.hpp"
 #include "component/lua/facade.hpp"
 #include "component/lua/vm.hpp"
+#include "component/python/facade.hpp"
+#include "component/python/vm.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 #include "component/registry/remote.hpp"
@@ -67,7 +69,7 @@ private:
 	}
 };
 
-typedef unit::group< setup, anonymous_t, 6 > group_type;
+typedef unit::group< setup, anonymous_t, 7 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "registry" );
 
@@ -155,7 +157,7 @@ template<>
 	vm.setup( lua::component_setup );
 
 	std::string path = setup.path() + "../external/hello/script.lua";
-	vm.load( "hello.lua", path );
+	vm.load( "hello/script.lua", path );
 
 	std::cout <<
 		"Lua version: " << vm.version() << "\n"
@@ -172,11 +174,26 @@ template<>
 	vm.setup( javascript::component_setup );
 
 	std::string path = setup.path() + "../external/hello/script.js";
-	vm.load( "hello.js", path );
+	vm.load( "hello/script.js", path );
 
 	std::cout <<
 		"JavaScript version: " << vm.version() << "\n"
 		"JavaScript VM size: " << vm.size() << " bytes\n";
+}
+
+template<>
+template<>
+	void fixture_type::test< 6 >( setup& setup )
+{
+	std::cerr << "load module in to python\n";
+
+	python::vm vm;
+	vm.setup( python::component_setup );
+
+	std::string path = setup.path() + "../external/hello/script.py";
+	vm.load( "hello/script.py", path );
+
+	std::cout << "Python version: " << vm.version() << '\n';
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
