@@ -7,6 +7,7 @@ extern "C"
 }
 
 #include "component/lua/error.hpp"
+#include "component/lua/traits.hpp"
 #include "component/lua/vm.hpp"
 #include "foundation/io/memory.hpp"
 
@@ -52,10 +53,13 @@ namespace ooe
 	std::string lua::vm::version( void ) const
 	{
 		lua::stack stack_( state );
-		stack_.push_lstring( "_VERSION", 8 );
+		push< const c8* >::call( stack_, "_VERSION" );
 		stack_.raw_get( globals_index );
-		std::string string = stack_.to_lstring( -1 );
+
+		std::string string;
+		to< std::string >::call( stack_, string, -1 );
 		stack_.pop( 1 );
+
 		return string;
 	}
 

@@ -316,7 +316,6 @@ template< typename t >
 		typename call_traits< t >::reference destruct )
 	{
 		typedef typename t::pointer pointer;
-		typedef typename t::value_type type;
 		pointer p;
 		to< pointer >::call( value, p );
 		destruct = p;
