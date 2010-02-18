@@ -9,7 +9,7 @@ function printer( name )
 	local self = {}
 
 	for k, v in pairs( module ) do
-		if type( k ) ~= 'number' then
+		if type( v ) == 'function' then
 			self[ k:sub( 1, k:find( '/', 1, true ) - 1 ) ] = v
 		end
 	end
