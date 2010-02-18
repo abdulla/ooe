@@ -5,6 +5,7 @@
 
 #include "component/python/error.hpp"
 #include "component/python/header.hpp"
+#include "component/python/object.hpp"
 #include "component/registry/traits.hpp"
 #include "foundation/utility/miscellany.hpp"
 
@@ -170,7 +171,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type string )
 	{
-		return PyUnicode_FromStringAndSize( string_data( string ), string_size( string ) );
+		return valid( PyUnicode_FromStringAndSize( string_data( string ), string_size( string ) ) );
 	}
 };
 
@@ -212,7 +213,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type integral )
 	{
-		return convert( integral );
+		return valid( convert( integral ) );
 	}
 
 	static PyObject* convert( long integral )
@@ -254,7 +255,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type floating_point )
 	{
-		return PyFloat_FromDouble( floating_point );
+		return valid( PyFloat_FromDouble( floating_point ) );
 	}
 };
 
@@ -276,7 +277,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type pointer )
 	{
-		return PyCapsule_New( ptr_cast( pointer ), 0, 0 );
+		return valid( PyCapsule_New( ptr_cast( pointer ), 0, 0 ) );
 	}
 };
 
@@ -299,7 +300,7 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type class_ )
 	{
 		typedef typename no_ref< t >::type type;
-		return PyCapsule_New( new type( class_ ), 0, destroy< type > );
+		return valid( PyCapsule_New( new type( class_ ), 0, destroy< type > ) );
 	}
 };
 
@@ -318,7 +319,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type construct )
 	{
-		return PyCapsule_New( construct, 0, destroy< typename t::value_type > );
+		return valid( PyCapsule_New( construct, 0, destroy< typename t::value_type > ) );
 	}
 };
 
@@ -376,13 +377,13 @@ template< typename t >
 	{
 		typedef typename no_ref< t >::type type;
 		up_t array_size = extent< type >::value;
-		PyObject* list = PyList_New( array_size );
+		python::object object = valid( PyList_New( array_size ) );
 
 		for ( up_t i = 0; i != array_size; ++i )
-			PyList_SET_ITEM( list, i,
+			PyList_SET_ITEM( object, i,
 				from< typename remove_extent< type >::type >::call( array[ i ] ) );
 
-		return list;
+		return object.release();
 	}
 };
 

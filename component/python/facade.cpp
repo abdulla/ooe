@@ -1,7 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "component/python/facade.hpp"
-#include "component/python/object.hpp"
 #include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 
@@ -26,10 +25,10 @@ template< PyCFunction function >
 	}
 };
 
-PyObject* find( PyObject*, PyObject* object )
+PyObject* find( PyObject*, PyObject* list )
 {
 	find_vector input;
-	as< find_vector >::call( object, input );
+	as< find_vector >::call( list, input );
 	interface interface;
 
 	for ( find_vector::const_iterator i = input.begin(), end = input.end(); i != end; ++i )
@@ -55,10 +54,10 @@ PyObject* find( PyObject*, PyObject* object )
 	return from< find_vector >::call( output );
 }
 
-PyObject* load( PyObject*, PyObject* object )
+PyObject* load( PyObject*, PyObject* string )
 {
 	std::string path;
-	as< std::string >::call( object, path );
+	as< std::string >::call( string, path );
 
 	typedef shared_ptr< ooe::source > source_ptr;
 	source_ptr source = new ooe::source( path );
@@ -69,12 +68,11 @@ PyObject* load( PyObject*, PyObject* object )
 	const facade::python::vector_type& python = static_cast< const facade::python* >
 		( module.find( typeid( facade::python ).name() ) )->get();
 
-	PyObject* dictionary = PyDict_New();
+	object dictionary = valid( PyDict_New() );
 
 	for ( up_t i = 0, end = names.size(); i != end; ++i )
 	{
-		PyObject* key = from< std::string >::call( names[ i ]._0 + '/' + names[ i ]._1 );
-		PyObject* data;
+		object data;
 
 		if ( names[ i ]._1[ 0 ] == 'F' )
 			data = from< void ( * )( void ) >::call( local[ i ].function );
@@ -86,11 +84,14 @@ PyObject* load( PyObject*, PyObject* object )
 
 		PyMethodDef* method = const_cast< PyMethodDef* >( &python[ i ] );
 		method->ml_name = names[ i ]._0.c_str();
-		PyDict_SetItem( dictionary, key, PyCFunction_New( method, data ) );
+
+		std::string key = names[ i ]._0 + '/' + names[ i ]._1;
+		object value = valid( PyCFunction_New( method, data ) );
+		PyDict_SetItemString( dictionary, key.c_str(), value );
 	}
 
-	PyDict_SetItem( dictionary, from< up_t >::call( 0 ), from< source_ptr >::call( source ) );
-	return dictionary;
+	PyDict_SetItemString( dictionary, "", from< source_ptr >::call( source ) );
+	return dictionary.release();
 }
 
 PyMethodDef methods[] =
@@ -125,17 +126,19 @@ OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 //--- component_setup ------------------------------------------------------------------------------
 void component_setup( PyObject* globals )
 {
-	PyObject* ooe = valid( PyModule_New( "ooe" ) );
+	object ooe = valid( PyModule_New( "ooe" ) );
+	Py_INCREF( Py_None );
 	PyModule_AddObject( ooe, "__file__", Py_None );
 
 	//--- registry -------------------------------------------------------------
-	PyObject* registry = valid( PyModule_New( "registry" ) );
+	object registry = valid( PyModule_New( "registry" ) );
+	Py_INCREF( Py_None );
 	PyModule_AddObject( registry, "__file__", Py_None );
 
-	PyModule_AddObject( registry, "find", PyCFunction_New( methods + 0, 0 ) );
-	PyModule_AddObject( registry, "load", PyCFunction_New( methods + 1, 0 ) );
+	PyModule_AddObject( registry, "find", valid( PyCFunction_New( methods + 0, 0 ) ) );
+	PyModule_AddObject( registry, "load", valid( PyCFunction_New( methods + 1, 0 ) ) );
 
-	PyModule_AddObject( ooe, "registry", registry );
+	PyModule_AddObject( ooe, "registry", registry.release() );
 
 	//--------------------------------------------------------------------------
 

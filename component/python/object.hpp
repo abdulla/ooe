@@ -48,19 +48,31 @@ public:
 		return *this;
 	}
 
-	object str( void ) const
-	{
-		return valid( PyObject_Str( py_object ) );
-	}
-
 	PyObject** operator &( void )
 	{
 		return &py_object;
 	}
 
-	operator PyObject*( void )
+	operator PyObject*( void ) const
 	{
 		return py_object;
+	}
+
+	PyObject* get( void ) const
+	{
+		return py_object;
+	}
+
+	object str( void ) const
+	{
+		return valid( PyObject_Str( py_object ) );
+	}
+
+	PyObject* release( void )
+	{
+		PyObject* pass_back = py_object;
+		py_object = 0;
+		return pass_back;
 	}
 
 private:

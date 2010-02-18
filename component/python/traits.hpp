@@ -70,14 +70,14 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type container )
 	{
 		typedef typename no_ref< t >::type type;
-		PyObject* list = PyList_New( container.size() );
+		python::object object = valid( PyList_New( container.size() ) );
 		up_t index = 0;
 
 		for ( typename type::const_iterator i = container.begin(), end = container.end();
 			i != end; ++i, ++index )
-			PyList_SET_ITEM( list, index, from< typename type::value_type >::call( *i ) );
+			PyList_SET_ITEM( object.get(), index, from< typename type::value_type >::call( *i ) );
 
-		return list;
+		return object.release();
 	}
 };
 
@@ -91,8 +91,8 @@ template< typename t >
 			throw error::python() << "Object is not a set";
 
 		typedef typename no_ref< t >::type type;
-		PyObject* iterator = PyObject_GetIter( object );
-		PyObject* item;
+		python::object iterator = valid( PyObject_GetIter( object ) );
+		python::object item;
 
 		type out;
 
@@ -113,12 +113,15 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type set )
 	{
 		typedef typename no_ref< t >::type type;
-		PyObject* object = PySet_New( 0 );
+		python::object object = PySet_New( 0 );
 
 		for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
-			PySet_Add( object, from< typename type::key_type >::call( *i ) );
+		{
+			python::object key = from< typename type::key_type >::call( *i );
+			PySet_Add( object, key );
+		}
 
-		return object;
+		return object.release();
 	}
 };
 
@@ -157,13 +160,18 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type map )
 	{
 		typedef typename no_ref< t >::type type;
-		PyObject* object = PyDict_New();
+		python::object object = valid( PyDict_New() );
 
 		for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
-			PyDict_SetItem( object, from< typename type::key_type >::call( i->first ),
-				from< typename type::mapped_type >::call( i->second ) );
+		{
+			python::object key = from< typename type::key_type >::call( i->first );
+			python::object value = from< typename type::mapped_type >::call( i->second );
 
-		return object;
+			if ( PyDict_SetItem( object, key, value ) )
+				throw error::python() << "Unable to set dictionary item";
+		}
+
+		return object.release();
 	}
 };
 
@@ -193,10 +201,12 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type pair )
 	{
 		typedef typename no_ref< t >::type type;
-		PyObject* object = PyTuple_New( 2 );
-		PyTuple_SET_ITEM( object, 0, from< typename type::first_type >::call( pair.first ) );
-		PyTuple_SET_ITEM( object, 1, from< typename type::second_type >::call( pair.second ) );
-		return object;
+		python::object object = valid( PyTuple_New( 2 ) );
+		PyTuple_SET_ITEM( object.get(), 0,
+			from< typename type::first_type >::call( pair.first ) );
+		PyTuple_SET_ITEM( object.get(), 1,
+			from< typename type::second_type >::call( pair.second ) );
+		return object.release();
 	}
 };
 
@@ -219,7 +229,7 @@ OOE_NAMESPACE_END( ( ooe )( python ) )
 			call( PyTuple_GET_ITEM( object, n ), tuple._ ## n );
 
 	#define TUPLE_FROM( z, n, d )\
-		PyTuple_SET_ITEM( object, n,\
+		PyTuple_SET_ITEM( object.get(), n,\
 			( from< typename tuple_element< n, t >::type >::call( tuple._ ## n ) ) );
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
@@ -247,9 +257,9 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type tuple )
 	{
-		PyObject* object = PyTuple_New( LIMIT );
+		python::object object = valid( PyTuple_New( LIMIT ) );
 		BOOST_PP_REPEAT( LIMIT, TUPLE_FROM, ~ )
-		return object;
+		return object.release();
 	}
 };
 

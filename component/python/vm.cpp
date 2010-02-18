@@ -1,9 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "component/python/object.hpp"
 #include "component/python/traits.hpp"
 #include "component/python/vm.hpp"
 #include "foundation/io/memory.hpp"
+#include "foundation/utility/scoped.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
@@ -12,15 +12,14 @@ vm::vm( void )
 	: globals()
 {
 	Py_InitializeEx( 0 );
-	PyObject* module = PyImport_AddModule( "__main__" );
+	scoped< void ( void ) > scoped( Py_Finalize );
+	PyObject* module = valid( PyImport_AddModule( "__main__" ) );
 
 	if ( !module )
-	{
-		Py_Finalize();
 		throw error::python() << "Unable to import module \"__main__\"";
-	}
 
 	globals = PyModule_GetDict( module );
+	scoped.clear();
 }
 
 vm::~vm( void )
