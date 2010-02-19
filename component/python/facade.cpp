@@ -7,6 +7,7 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( python ) )
 
 typedef std::vector< std::string > find_vector;
+typedef shared_ptr< ooe::source > source_ptr;
 
 template< PyCFunction function >
 	struct embed
@@ -59,7 +60,6 @@ PyObject* load( PyObject*, PyObject* string )
 	std::string path;
 	as< std::string >::call( string, path );
 
-	typedef shared_ptr< ooe::source > source_ptr;
 	source_ptr source = new ooe::source( path );
 	const module& module = source->get();
 	const interface::vector_type& names = module.names();
@@ -96,10 +96,33 @@ PyObject* load( PyObject*, PyObject* string )
 	return dictionary.release();
 }
 
+PyObject* doc( PyObject*, PyObject* arguments )
+{
+	verify_arguments( arguments, 2 );
+	PyObject* object = PyTuple_GET_ITEM( arguments, 0 );
+
+	if ( !PyDict_Check( object ) )
+		throw error::python() << "Object is not a map";
+
+	source_ptr source;
+	std::string value;
+	as< source_ptr >::call( PyDict_GetItemString( object, "" ), source );
+	as< std::string >::call( PyTuple_GET_ITEM( arguments, 1 ), value );
+
+	up_t i = value.find( '/' );
+
+	if ( i == ~up_t( 0 ) )
+		throw error::runtime( "python::doc: " ) << "Invalid function \"" << value << '\"';
+
+	const c8* documentation = source->get().doc( value.substr( 0, i ), value.substr( i + 1 ) );
+	return from< const c8* >::call( documentation );
+}
+
 PyMethodDef methods[] =
 {
 	{ "find", embed< find >::call, METH_O, 0 },
-	{ "load", embed< load >::call, METH_O, 0 }
+	{ "load", embed< load >::call, METH_O, 0 },
+	{ "doc", embed< doc >::call, METH_VARARGS, 0 }
 };
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( python ) )
@@ -139,6 +162,7 @@ void component_setup( PyObject* globals )
 
 	PyModule_AddObject( registry, "find", valid( PyCFunction_New( methods + 0, 0 ) ) );
 	PyModule_AddObject( registry, "load", valid( PyCFunction_New( methods + 1, 0 ) ) );
+	PyModule_AddObject( registry, "doc", valid( PyCFunction_New( methods + 2, 0 ) ) );
 
 	PyModule_AddObject( ooe, "registry", registry.release() );
 

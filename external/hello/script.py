@@ -18,9 +18,12 @@ class printer:
 		self.say( self.value )
 
 heap = printer( 'hello python gc' )
-help( heap.hello )
 heap.said()
 heap.deallocate( heap.allocate( 'hello python delete' ) )
+
+doc = ooe.registry.doc( module, 'hello/FvvE' )
+print( "python-doc( hello ):", doc )
+help( heap.hello )
 
 alphabet = { 'a': 9, 'b': 8, 'c': 7 }
 

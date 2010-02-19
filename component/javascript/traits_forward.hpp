@@ -239,7 +239,8 @@ template< typename t >
 		if ( !object->InternalFieldCount() )
 			throw error::javascript() << "Object has no internal fields";
 
-		pointer = ptr_cast< t >( object->GetPointerFromInternalField( 0 ) );
+		pointer =
+			ptr_cast< typename no_ref< t >::type >( object->GetPointerFromInternalField( 0 ) );
 	}
 };
 

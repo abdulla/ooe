@@ -9,6 +9,7 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 
 typedef std::vector< std::string > find_vector;
+typedef shared_ptr< ooe::source > source_ptr;
 
 template< v8::InvocationCallback function >
 	struct embed
@@ -65,7 +66,6 @@ v8::Handle< v8::Value > load( const v8::Arguments& arguments )
 	std::string path;
 	to< std::string >::call( arguments[ 0 ], path );
 
-	typedef shared_ptr< ooe::source > source_ptr;
 	source_ptr source = new ooe::source( path );
 	const module& module = source->get();
 	const interface::vector_type& names = module.names();
@@ -95,6 +95,29 @@ v8::Handle< v8::Value > load( const v8::Arguments& arguments )
 
 	object->Set( from< const c8* >::call( "" ), from< source_ptr >::call( source ) );
 	return object;
+}
+
+v8::Handle< v8::Value > doc( const v8::Arguments& arguments )
+{
+	verify_arguments( arguments, 2 );
+
+	if ( !arguments[ 0 ]->IsObject() )
+		throw error::javascript() << "Value is not an object";
+
+	v8::Object* object = v8::Object::Cast( *arguments[ 0 ] );
+
+	source_ptr source;
+	std::string value;
+	to< source_ptr >::call( object->Get( from< const c8* >::call( "" ) ), source );
+	to< std::string >::call( arguments[ 1 ], value );
+
+	up_t i = value.find( '/' );
+
+	if ( i == ~up_t( 0 ) )
+		throw error::runtime( "javascript::doc: " ) << "Invalid function \"" << value << '\"';
+
+	const c8* documentation = source->get().doc( value.substr( 0, i ), value.substr( i + 1 ) );
+	return from< const c8* >::call( documentation ); 
 }
 
 v8::Handle< v8::Value > print( const v8::Arguments& arguments )
@@ -145,6 +168,8 @@ void component_setup( v8::Handle< v8::Object > global )
 		v8::FunctionTemplate::New( embed< find >::call )->GetFunction() );
 	registry->Set( from< const c8* >::call( "load" ),
 		v8::FunctionTemplate::New( embed< load >::call )->GetFunction() );
+	registry->Set( from< const c8* >::call( "doc" ),
+		v8::FunctionTemplate::New( embed< doc >::call )->GetFunction() );
 
 	ooe->Set( from< const c8* >::call( "registry" ), registry );
 

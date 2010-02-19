@@ -268,7 +268,7 @@ template< typename t >
 		if ( !PyCapsule_CheckExact( object ) )
 			throw error::python() << "Object is not a capsule";
 
-		pointer = ptr_cast< t >( PyCapsule_GetPointer( object, 0 ) );
+		pointer = ptr_cast< typename no_ref< t >::type >( PyCapsule_GetPointer( object, 0 ) );
 	}
 };
 
@@ -290,7 +290,8 @@ template< typename t >
 		if ( !PyCapsule_CheckExact( object ) )
 			throw error::python() << "Object is not a capsule";
 
-		class_ = *ptr_cast< t >( PyCapsule_GetPointer( object, 0 ) );
+		typedef typename no_ref< t >::type* pointer;
+		class_ = *ptr_cast< pointer >( PyCapsule_GetPointer( object, 0 ) );
 	}
 };
 
@@ -329,10 +330,11 @@ template< typename t >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference destruct )
 	{
-		if ( !PyCapsule_CheckExact( object ) )
-			throw error::python() << "Object is not a capsule";
+		typedef typename t::pointer pointer;
+		pointer p;
+		as< pointer >::call( object, p );
+		destruct = p;
 
-		destruct = ptr_cast< typename t::pointer >( PyCapsule_GetPointer( object, 0 ) );
 		PyCapsule_SetDestructor( object, 0 );
 	}
 };

@@ -27,6 +27,9 @@ heap.hello();
 heap.said();
 heap.deallocate( heap.allocate( 'hello javascript delete' ) );
 
+var doc = ooe.registry.doc( module, 'hello/FvvE' );
+print( "javascript-doc( hello ): " + doc );
+
 var alphabet = { a: 9, b: 8, c: 7 };
 alphabet = heap.stdmap( alphabet );
 
