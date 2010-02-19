@@ -85,7 +85,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 	module module;
 
 	builder< facade::remote, facade::lua, facade::javascript, facade::python > builder( module );
-	builder.insert( "hello", hello );
+	builder.insert( "hello", hello, "A function that prints 'hello library'." );
 	builder.insert( "allocate", allocate );
 	builder.insert( "deallocate", deallocate );
 	builder.insert( "say", &print::say );

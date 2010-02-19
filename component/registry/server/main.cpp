@@ -38,18 +38,18 @@ std::string surrogate( const std::string& path )
 }
 
 //--- load_server ----------------------------------------------------------------------------------
-module::vector_type load_server( const std::string& path )
+interface::vector_type load_server( const std::string& path )
 {
 	ipc::memory::client client( path );
 	return ipc::memory::list( client )();
 }
 
 //--- load_library ---------------------------------------------------------------------------------
-module::vector_type load_library( const std::string& path )
+interface::vector_type load_library( const std::string& path )
 {
 	/*library library( path );
 	ooe::module module = library.find< ooe::module ( void ) >( "module_open" )();
-	return module.get();*/
+	return module.names();*/
 
 	// for security, load library as a surrogate
 	return load_server( surrogate( path ) );
@@ -65,7 +65,7 @@ void insert( registry::type type, const std::string& path )
 	else
 		set.insert( info );
 
-	module::vector_type vector;
+	interface::vector_type vector;
 
 	switch ( type )
 	{
@@ -81,7 +81,7 @@ void insert( registry::type type, const std::string& path )
 		throw error::runtime( "registry: " ) << "Unknown module type: " << type;
 	}
 
-	typedef module::vector_type::const_iterator iterator_type;
+	typedef interface::vector_type::const_iterator iterator_type;
 
 	for ( iterator_type i = vector.begin(), end = vector.end(); i != end; ++i )
 	{

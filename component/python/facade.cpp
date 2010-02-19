@@ -62,7 +62,8 @@ PyObject* load( PyObject*, PyObject* string )
 	typedef shared_ptr< ooe::source > source_ptr;
 	source_ptr source = new ooe::source( path );
 	const module& module = source->get();
-	const module::vector_type& names = module.get();
+	const interface::vector_type& names = module.names();
+	const module::vector_type& docs = module.docs();
 	const facade::local::vector_type& local = static_cast< const facade::local* >
 		( module.find( typeid( facade::local ).name() ) )->get();
 	const facade::python::vector_type& python = static_cast< const facade::python* >
@@ -84,6 +85,7 @@ PyObject* load( PyObject*, PyObject* string )
 
 		PyMethodDef* method = const_cast< PyMethodDef* >( &python[ i ] );
 		method->ml_name = names[ i ]._0.c_str();
+		method->ml_doc = docs[ i ];
 
 		std::string key = names[ i ]._0 + '/' + names[ i ]._1;
 		object value = valid( PyCFunction_New( method, data ) );

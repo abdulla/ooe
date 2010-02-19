@@ -68,7 +68,7 @@ namespace
 		typedef shared_ptr< ooe::source > source_ptr;
 		source_ptr source = new ooe::source( path );
 		const module& module = source->get();
-		const module::vector_type& names = module.get();
+		const interface::vector_type& names = module.names();
 		const facade::local::vector_type& local = static_cast< const facade::local* >
 			( module.find( typeid( facade::local ).name() ) )->get();
 		const facade::lua::vector_type& lua = static_cast< const facade::lua* >

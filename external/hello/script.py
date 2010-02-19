@@ -18,7 +18,7 @@ class printer:
 		self.say( self.value )
 
 heap = printer( 'hello python gc' )
-heap.hello()
+help( heap.hello )
 heap.said()
 heap.deallocate( heap.allocate( 'hello python delete' ) )
 

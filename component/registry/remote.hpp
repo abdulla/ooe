@@ -50,11 +50,18 @@ class remote
 public:
 	remote( const std::string& ) OOE_VISIBLE;
 	bool supports( const interface& ) const OOE_VISIBLE;
+	std::string doc( const std::string&, const std::string& ) const OOE_VISIBLE;
 
 	template< typename type >
 		ipc::memory::rpc< type > find( const c8* name )
 	{
 		return ipc::memory::call< type >( client, name );
+	}
+
+	template< typename type >
+		std::string doc( const std::string& name )
+	{
+		return doc( name, typeid( type ).name() );
 	}
 
 private:

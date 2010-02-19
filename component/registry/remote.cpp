@@ -45,4 +45,9 @@ bool remote::supports( const interface& interface ) const
 	return true;
 }
 
+std::string remote::doc( const std::string& name, const std::string& type ) const
+{
+	return ipc::memory::doc( client )( name, type );
+}
+
 OOE_NAMESPACE_END( ( ooe ) )

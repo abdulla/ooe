@@ -105,6 +105,8 @@ template<>
 	local local( path );
 	local.find< void ( * )( void ) >( "hello" )();
 	check( "local.supports( interface )", local.supports( interface ) );
+
+	std::cout << "local-doc( hello ): " << local.doc< void ( * )( void ) >( "hello" ) << '\n';
 }
 
 template<>
@@ -122,6 +124,8 @@ template<>
 	remote remote( registry.surrogate( path ) );
 	remote.find< void ( void ) >( "hello" )();
 	check( "remote.supports( interface )", remote.supports( interface ) );
+
+	std::cout << "remote-doc( hello ): " << remote.doc< void ( void ) >( "hello" ) << '\n';
 }
 
 template<>

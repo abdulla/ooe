@@ -16,9 +16,9 @@ template< typename >
 
 //--- find -----------------------------------------------------------------------------------------
 struct find
-	: private rpc< index_t ( const c8*, const c8* ) >
+	: private rpc< index_t ( const std::string&, const std::string& ) >
 {
-	typedef rpc< index_t ( const c8*, const c8* ) > base_type;
+	typedef rpc< index_t ( const std::string&, const std::string& ) > base_type;
 	using base_type::result_type;
 
 	find( memory::transport& transport_ )
@@ -26,7 +26,7 @@ struct find
 	{
 	}
 
-	result_type operator ()( const c8* name, const c8* type ) const
+	result_type operator ()( const std::string& name, const std::string& type ) const
 	{
 		index_t i = base_type::operator ()( name, type );
 
@@ -50,9 +50,10 @@ struct list
 
 //--- find_all -------------------------------------------------------------------------------------
 struct find_all
-	: private rpc< std::vector< index_t > ( const std::vector< tuple< const c8*, const c8* > >& ) >
+	: private
+	rpc< std::vector< index_t > ( const std::vector< tuple< std::string, std::string > >& ) >
 {
-	typedef std::vector< tuple< const c8*, const c8* > > parameter_type;
+	typedef std::vector< tuple< std::string, std::string > > parameter_type;
 	typedef rpc< result_type ( const parameter_type& ) > base_type;
 	using base_type::result_type;
 
@@ -75,6 +76,16 @@ struct find_all
 		}
 
 		return result;
+	}
+};
+
+//--- doc ------------------------------------------------------------------------------------------
+struct doc
+	: public rpc< std::string ( const std::string&, const std::string& ) >
+{
+	doc( memory::transport& transport_ )
+		: rpc< std::string ( const std::string&, const std::string& ) >( transport_, 4 )
+	{
 	}
 };
 
@@ -102,7 +113,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	typedef r signature_type( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 	typedef rpc< signature_type > base_type;
 
-	call( memory::transport& transport_, const c8* name )
+	call( memory::transport& transport_, const std::string& name )
 		: base_type( transport_, find( transport_ )( name, typeid( signature_type ).name() ) )
 	{
 	}

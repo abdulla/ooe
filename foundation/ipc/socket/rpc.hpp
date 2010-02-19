@@ -20,7 +20,7 @@ class find_result
 public:
 	typedef socket::result< index_t > result_type;
 
-	find_result( result_type result_, const c8* name_, const c8* type_ )
+	find_result( result_type result_, const std::string& name_, const std::string& type_ )
 		: result( result_ ), name( name_ ), type( type_ )
 	{
 	}
@@ -38,22 +38,22 @@ public:
 
 private:
 	result_type result;
-	const c8* name;
-	const c8* type;
+	const std::string name;
+	const std::string type;
 };
 
 //--- find -----------------------------------------------------------------------------------------
 struct find
-	: private rpc< index_t ( const c8*, const c8* ) >
+	: private rpc< index_t ( const std::string&, const std::string& ) >
 {
-	typedef rpc< index_t ( const c8*, const c8* ) > base_type;
+	typedef rpc< index_t ( const std::string&, const std::string& ) > base_type;
 
 	find( socket::client& client_ )
 		: base_type( client_, 1 )
 	{
 	}
 
-	find_result operator ()( const c8* name, const c8* type ) const
+	find_result operator ()( const std::string& name, const std::string& type ) const
 	{
 		return find_result( base_type::operator ()( name, type ), name, type );
 	}
@@ -74,7 +74,7 @@ class find_all_result
 {
 public:
 	typedef socket::result< std::vector< index_t > > result_type;
-	typedef std::vector< tuple< const c8*, const c8* > > parameter_type;
+	typedef std::vector< tuple< std::string, std::string > > parameter_type;
 	typedef result_type::return_type return_type;
 
 	find_all_result( result_type result_ )
@@ -109,10 +109,11 @@ private:
 
 //--- find_all -------------------------------------------------------------------------------------
 struct find_all
-	: private rpc< std::vector< index_t > ( const std::vector< tuple< const c8*, const c8* > >& ) >
+	: private
+	rpc< std::vector< index_t > ( const std::vector< tuple< std::string, std::string > >& ) >
 {
 	typedef find_all_result result_type;
-	typedef std::vector< tuple< const c8*, const c8* > > parameter_type;
+	typedef std::vector< tuple< std::string, std::string > > parameter_type;
 	typedef rpc< std::vector< index_t > ( const parameter_type& ) > base_type;
 
 	find_all( socket::client& client_ )
@@ -123,6 +124,16 @@ struct find_all
 	result_type operator ()( const parameter_type& parameter ) const
 	{
 		return base_type::operator ()( parameter );
+	}
+};
+
+//--- doc ------------------------------------------------------------------------------------------
+struct doc
+	: public rpc< std::string ( const std::string&, const std::string& ) >
+{
+	doc( socket::client& client_ )
+		: rpc< std::string ( const std::string&, const std::string& ) >( client_, 4 )
+	{
 	}
 };
 
@@ -150,7 +161,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	typedef r signature_type( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
 	typedef rpc< signature_type > base_type;
 
-	call( socket::client& client_, const c8* name )
+	call( socket::client& client_, const std::string& name )
 		: base_type( client_, find( client_ )( name, typeid( signature_type ).name() )() )
 	{
 	}

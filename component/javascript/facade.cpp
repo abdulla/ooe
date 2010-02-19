@@ -68,7 +68,7 @@ v8::Handle< v8::Value > load( const v8::Arguments& arguments )
 	typedef shared_ptr< ooe::source > source_ptr;
 	source_ptr source = new ooe::source( path );
 	const module& module = source->get();
-	const module::vector_type& names = module.get();
+	const interface::vector_type& names = module.names();
 	const facade::local::vector_type& local = static_cast< const facade::local* >
 		( module.find( typeid( facade::local ).name() ) )->get();
 	const facade::javascript::vector_type& javascript = static_cast< const facade::javascript* >

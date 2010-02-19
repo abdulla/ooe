@@ -12,7 +12,8 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 //--- load_nameservice -----------------------------------------------------------------------------
 void load_nameservice( ipc::nameservice& nameservice, const module& module )
 {
-	const module::vector_type& names = module.get();
+	const interface::vector_type& names = module.names();
+	const module::vector_type& docs = module.docs();
 	const facade::remote::vector_type& remotes = static_cast< const facade::remote* >
 		( module.find( typeid( facade::remote ).name() ) )->get();
 	const facade::local::vector_type& locals = static_cast< const facade::local* >
@@ -23,7 +24,8 @@ void load_nameservice( ipc::nameservice& nameservice, const module& module )
 		throw error::runtime( "surrogate: " ) << "Incorrect number of callbacks";
 
 	for ( up_t i = 0; i != size; ++i )
-		nameservice.insert_direct( names[ i ]._0, names[ i ]._1, remotes[ i ], locals[ i ] );
+		nameservice.insert_direct
+			( names[ i ]._0, names[ i ]._1, docs[ i ], remotes[ i ], locals[ i ] );
 }
 
 //--- launch ---------------------------------------------------------------------------------------
