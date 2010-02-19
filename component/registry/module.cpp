@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <algorithm>
+
 #include "component/registry/module.hpp"
 #include "foundation/utility/error.hpp"
 
@@ -27,12 +29,28 @@ const module::vector_type& module::docs( void ) const
 	return vector;
 }
 
-up_t module::insert( const std::string& name, const std::string& type, const c8* doc )
+const c8* module::doc( const std::string& name, const std::string& type ) const
+{
+	const interface::vector_type& faces = face.get();
+	interface::vector_tuple tuple( name, type );
+	interface::vector_type::const_iterator end = faces.end();
+	interface::vector_type::const_iterator i = std::lower_bound( faces.begin(), end, tuple );
+
+	if ( i == end )
+		throw error::runtime( "module: " ) <<
+			"Unable to find documentation for \"" << name << "\" of type \"" << type << '\"';
+
+	vector_type::const_iterator j = vector.begin();
+	std::advance( j, std::distance( faces.begin(), i ) );
+	return *j;
+}
+
+up_t module::insert( const std::string& name, const std::string& type, const c8* doc_ )
 {
 	up_t index = face.insert( name, type );
 	vector_type::iterator i = vector.begin();
 	std::advance( i, index );
-	vector.insert( i, doc );
+	vector.insert( i, doc_ );
 	return index;
 }
 

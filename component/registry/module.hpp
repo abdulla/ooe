@@ -33,6 +33,7 @@ public:
 
 	const interface::vector_type& names( void ) const OOE_VISIBLE;
 	const vector_type& docs( void ) const OOE_VISIBLE;
+	const c8* doc( const std::string&, const std::string& ) const OOE_VISIBLE;
 	up_t insert( const std::string&, const std::string&, const c8* ) OOE_VISIBLE;
 
 	const void* find( const std::string& ) const OOE_VISIBLE;

@@ -5,24 +5,6 @@
 #include "foundation/utility/error.hpp"
 #include "component/registry/local.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
-
-up_t index_of
-	( const interface::vector_type& vector, const std::string& name, const std::string& type )
-{
-	interface::vector_tuple tuple( name, type );
-	interface::vector_type::const_iterator end = vector.end();
-	interface::vector_type::const_iterator i = std::lower_bound( vector.begin(), end, tuple );
-
-	if ( i == end )
-		throw error::runtime( "local: " ) <<
-			"Unable to find \"" << name << "\" of type \"" << type << "\", does not exist";
-
-	return std::distance( vector.begin(), i );
-}
-
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
-
 OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 
 //--- local ----------------------------------------------------------------------------------------
@@ -81,17 +63,18 @@ bool local::supports( const interface& interface ) const
 
 any local::find( const std::string& name, const std::string& type ) const
 {
-	facade::local::vector_type::const_iterator i = vector.begin();
-	std::advance( i, index_of( source.get().names(), name, type ) );
-	return *i;
-}
+	const interface::vector_type& names = source.get().names();
+	interface::vector_tuple tuple( name, type );
+	interface::vector_type::const_iterator end = names.end();
+	interface::vector_type::const_iterator i = std::lower_bound( names.begin(), end, tuple );
 
-const c8* local::doc( const std::string& name, const std::string& type ) const
-{
-	const module& module = source.get();
-	module::vector_type::const_iterator i = module.docs().begin();
-	std::advance( i, index_of( module.names(), name, type ) );
-	return *i;
+	if ( i == end )
+		throw error::runtime( "local: " ) <<
+			"Unable to find \"" << name << "\" of type \"" << type << "\", does not exist";
+
+	facade::local::vector_type::const_iterator j = vector.begin();
+	std::advance( j, std::distance( names.begin(), i ) );
+	return *j;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

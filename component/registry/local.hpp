@@ -45,7 +45,6 @@ public:
 	local( const std::string& ) OOE_VISIBLE;
 	bool supports( const interface& ) const OOE_VISIBLE;
 	any find( const std::string&, const std::string& ) const OOE_VISIBLE;
-	const c8* doc( const std::string&, const std::string& ) const OOE_VISIBLE;
 
 	template< typename type >
 		type find( const std::string& name,
@@ -70,7 +69,7 @@ public:
 		typename enable_if< is_function_pointer< type > >::type* = 0 ) const
 	{
 		typedef typename remove_pointer< type >::type function_type;
-		return doc( name, typeid( function_type ).name() );
+		return source.get().doc( name, typeid( function_type ).name() );
 	}
 
 	template< typename type >
@@ -78,7 +77,7 @@ public:
 		typename enable_if< is_member_function_pointer< type > >::type* = 0 ) const
 	{
 		typedef typename function_of< type >::type signature_type;
-		return doc( name, typeid( signature_type ).name() );
+		return source.get().doc( name, typeid( signature_type ).name() );
 	}
 
 private:
