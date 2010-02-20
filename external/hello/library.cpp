@@ -76,9 +76,9 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 
 	builder< facade::remote, facade::lua, facade::javascript, facade::python > builder( module );
 	builder.insert( "hello", hello, "A function that prints 'hello library'." );
-	builder.insert( "construct", construct< print, const std::string& > );
-	builder.insert( "destruct", destruct< print > );
-	builder.insert( "say", &print::say );
+	builder.insert( "construct", construct< print, const std::string& >, "Constructs a 'print'." );
+	builder.insert( "destruct", destruct< print >, "Destructs a 'print'." );
+	builder.insert( "say", &print::say, "Calls the 'say' member function on a 'print'." );
 	builder.insert( "gauntlet", gauntlet );
 	builder.insert( "mismatch", mismatch );
 	builder.insert( "stdmap", stdmap );
