@@ -135,7 +135,7 @@ private:
 		ipc::socket::server server( local_address( local_name ), nameservice );
 		ipc::barrier_notify( name );
 
-		while ( !executable::signal() )
+		while ( !executable::has_signal() )
 			server.accept();
 	}
 };

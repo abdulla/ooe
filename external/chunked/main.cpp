@@ -166,7 +166,7 @@ namespace
 
 		timer timer;
 
-		while ( !executable::signal() )
+		while ( !executable::has_signal() )
 		{
 			video->clear();
 			setup_frame( *video, chunked, render_queue, camera, rotate, translate );

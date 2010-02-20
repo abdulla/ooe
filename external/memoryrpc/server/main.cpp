@@ -36,7 +36,7 @@ bool launch( const std::string&, const std::string&, s32, c8** )
 
 	ipc::memory::server server( "/ooe", nameservice );
 
-	while ( !executable::signal() )
+	while ( !executable::has_signal() )
 		server.decode();
 
 	return true;

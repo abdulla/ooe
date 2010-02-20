@@ -133,7 +133,7 @@ private:
 		ipc::memory::server server( "/ooe.test.memory-rpc", nameservice );
 		ipc::barrier_notify( name );
 
-		while ( !executable::signal() )
+		while ( !executable::has_signal() )
 			server.decode();
 	}
 };

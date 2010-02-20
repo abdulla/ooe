@@ -18,7 +18,7 @@ namespace ooe
 		typedef tuple< std::string, std::string > path_tuple;
 
 		signal_handler_type signal( struct sigaction&, signal_handler_type, s32 ) OOE_VISIBLE;
-		s32 signal( void ) OOE_VISIBLE;
+		s32 has_signal( void ) OOE_VISIBLE;
 		void quit( void ) OOE_VISIBLE;
 
 		s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;

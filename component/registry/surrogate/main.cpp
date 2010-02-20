@@ -61,7 +61,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 	ipc::memory::server server( surrogate_path, nameservice );
 	ipc::barrier_notify( std::string( surrogate_path ) + ".g" );
 
-	while ( !executable::signal() && server.decode() ) {}
+	while ( !executable::has_signal() && server.decode() ) {}
 
 	return true;
 }

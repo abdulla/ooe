@@ -79,7 +79,7 @@ private:
 		server_ptr = &server;
 		socket_ptr = &socket;
 
-		while ( !executable::signal() )
+		while ( !executable::has_signal() )
 			server.decode();
 	}
 
@@ -91,7 +91,7 @@ private:
 		server_ptr = &server;
 		socket_ptr = &socket;
 
-		while ( !executable::signal() )
+		while ( !executable::has_signal() )
 			server.decode();
 	}
 };

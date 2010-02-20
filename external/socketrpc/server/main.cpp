@@ -38,7 +38,7 @@ bool launch( const std::string&, const std::string&, s32, c8** )
 	unlink( local_name.c_str() );
 	ipc::socket::server server( local_address( local_name ), nameservice );
 
-	while ( !executable::signal() )
+	while ( !executable::has_signal() )
 		server.accept();
 
 	return true;

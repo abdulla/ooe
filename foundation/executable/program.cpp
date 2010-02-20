@@ -66,7 +66,7 @@ namespace ooe
 		return 0;
 	}
 
-	s32 executable::signal( void )
+	s32 executable::has_signal( void )
 	{
 		return signal_code;
 	}

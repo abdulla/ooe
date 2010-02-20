@@ -166,7 +166,7 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
 	if ( up_name )
 		ipc::barrier_notify( up_name );
 
-	while ( !executable::signal() )
+	while ( !executable::has_signal() )
 		server.decode();
 
 	return true;
