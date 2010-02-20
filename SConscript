@@ -91,7 +91,8 @@ build.Executable( 'surrogate', 'component/registry/surrogate', 'executable regis
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
-build.Linkable( 'python', 'component/python', 'io', configure = PythonConfigure )
+build.Linkable( 'python', 'component/python', 'io', library_path = ooe.python.library_path,
+	configure = PythonConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
 
 #--- test ------------------------------------------------------------------------------------------

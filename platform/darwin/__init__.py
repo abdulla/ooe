@@ -23,7 +23,7 @@ class ooe:
 		library = 'lua.5.1'
 
 	class python:
-		include_path = '/usr/local/include/python3.1'
+		library_path = '/sw/lib/python3.1/config'
 
 	class qtkit:
 		framework = 'QTKit'

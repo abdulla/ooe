@@ -26,7 +26,7 @@ class ooe:
 		library = 'pthread'
 
 	class python:
-		include_path = '/usr/include/python3.1'
+		library_path = ''
 
 	class qtkit:
 		framework = ''
