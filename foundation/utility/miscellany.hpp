@@ -149,21 +149,19 @@ union bound_any
 	}
 };
 
-OOE_NAMESPACE_END( ( ooe ) )
-
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/utility/miscellany.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
 
+OOE_NAMESPACE_END( ( ooe ) )
+
 	#endif	// OOE_FOUNDATION_UTILITY_MISCELLANY_HPP
 
 #else	// BOOST_PP_IS_ITERATING
 
 	#define LIMIT BOOST_PP_ITERATION()
-
-OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- create ---------------------------------------------------------------------------------------
 template< typename type BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
@@ -186,8 +184,6 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 {
 	return function;
 }
-
-OOE_NAMESPACE_END( ( ooe ) )
 
 	#undef LIMIT
 

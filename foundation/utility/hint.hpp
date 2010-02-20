@@ -1,7 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_UTILITY_HINT_HPP
-#define OOE_FOUNDATION_UTILITY_HINT_HPP
+#ifndef BOOST_PP_IS_ITERATING
+
+	#ifndef OOE_FOUNDATION_UTILITY_HINT_HPP
+	#define OOE_FOUNDATION_UTILITY_HINT_HPP
 
 #include "foundation/utility/traits.hpp"
 
@@ -77,6 +79,34 @@ template< typename t >
 {
 };
 
+//--- destruct -------------------------------------------------------------------------------------
+template< typename t >
+	void destruct( destruct_ptr< t > value )
+{
+	delete value;
+}
+
+	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
+	#define BOOST_PP_FILENAME_1 "foundation/utility/hint.hpp"
+	#include BOOST_PP_ITERATE()
+	#undef BOOST_PP_FILENAME_1
+	#undef BOOST_PP_ITERATION_LIMITS
+
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_UTILITY_HINT_HPP
+	#endif	// OOE_FOUNDATION_UTILITY_HINT_HPP
+
+#else	// BOOST_PP_IS_ITERATING
+
+	#define LIMIT BOOST_PP_ITERATION()
+
+//--- construct ------------------------------------------------------------------------------------
+template< typename t BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+	construct_ptr< t > construct( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, t, a ) )
+{
+	return new BOOST_PP_IF( LIMIT, t( BOOST_PP_ENUM_PARAMS( LIMIT, a ) ), t );
+}
+
+	#undef LIMIT
+
+#endif	// BOOST_PP_IS_ITERATING
