@@ -1,8 +1,8 @@
 --[[ Copyright (C) 2010 Abdulla Kamar. All rights reserved. ]]
 
 --- query registry ---------------------------------------------------------------------------------
-local result = ooe.registry.find{ 'hello/FvvE' }
-local module = ooe.registry.load( result[ 1 ] )
+local result = ooe.component.find{ 'hello/FvvE' }
+local module = ooe.component.load( result[ 1 ] )
 
 --- run functions ----------------------------------------------------------------------------------
 function printer( name )
@@ -14,7 +14,7 @@ function printer( name )
 		end
 	end
 
-	self.value = self.allocate( name )
+	self.value = self.construct( name )
 	self.said = function( self )
 		self.say( self.value )
 	end
@@ -25,7 +25,10 @@ end
 local heap = printer( 'hello lua gc' )
 heap.hello()
 heap:said()
-heap.deallocate( heap.allocate( 'hello lua delete' ) )
+heap.destruct( heap.construct( 'hello lua delete' ) )
+
+local doc = ooe.component.doc( module, 'hello/FvvE' )
+print( "lua-doc( hello ): " .. doc )
 
 local alphabet = { a = 9, b = 8, c = 7 }
 

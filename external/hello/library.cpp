@@ -41,16 +41,6 @@ namespace
 		std::cout << "hello library\n";
 	}
 
-	construct_ptr< print > allocate( const std::string& value )
-	{
-		return new print( value );
-	}
-
-	void deallocate( destruct_ptr< print > value )
-	{
-		delete value;
-	}
-
 	tuple< bool, f32 > gauntlet( bool b, f32 f )
 	{
 		return make_tuple( b, f );
@@ -86,8 +76,8 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 
 	builder< facade::remote, facade::lua, facade::javascript, facade::python > builder( module );
 	builder.insert( "hello", hello, "A function that prints 'hello library'." );
-	builder.insert( "allocate", allocate );
-	builder.insert( "deallocate", deallocate );
+	builder.insert( "construct", construct< print, const std::string& > );
+	builder.insert( "destruct", destruct< print > );
 	builder.insert( "say", &print::say );
 	builder.insert( "gauntlet", gauntlet );
 	builder.insert( "mismatch", mismatch );

@@ -1,8 +1,8 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 //--- query registry -------------------------------------------------------------------------------
-var result = ooe.registry.find( [ 'hello/FvvE' ] );
-var module = ooe.registry.load( result[ 0 ] );
+var result = ooe.component.find( [ 'hello/FvvE' ] );
+var module = ooe.component.load( result[ 0 ] );
 
 //--- run functions --------------------------------------------------------------------------------
 function printer( name )
@@ -15,7 +15,7 @@ function printer( name )
 			this[ i.substr( 0, i.indexOf( '/' ) ) ] = value;
 	}
 
-	this.value = this.allocate( name );
+	this.value = this.construct( name );
 	this.said = function()
 	{
 		this.say( this.value );
@@ -25,9 +25,9 @@ function printer( name )
 var heap = new printer( 'hello javascript gc' );
 heap.hello();
 heap.said();
-heap.deallocate( heap.allocate( 'hello javascript delete' ) );
+heap.destruct( heap.construct( 'hello javascript delete' ) );
 
-var doc = ooe.registry.doc( module, 'hello/FvvE' );
+var doc = ooe.component.doc( module, 'hello/FvvE' );
 print( "javascript-doc( hello ): " + doc );
 
 var alphabet = { a: 9, b: 8, c: 7 };

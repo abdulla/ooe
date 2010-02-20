@@ -2,8 +2,8 @@
 from types import BuiltinFunctionType
 
 #--- query registry --------------------------------------------------------------------------------
-result = ooe.registry.find( [ 'hello/FvvE' ] )
-module = ooe.registry.load( result[ 0 ] )
+result = ooe.component.find( [ 'hello/FvvE' ] )
+module = ooe.component.load( result[ 0 ] )
 
 #--- run functions ---------------------------------------------------------------------------------
 class printer:
@@ -12,16 +12,16 @@ class printer:
 			if type( v ) is BuiltinFunctionType:
 				setattr( self, k[ : k.find( '/' ) ], v )
 
-		self.value = self.allocate( name )
+		self.value = self.construct( name )
 
 	def said( self ):
 		self.say( self.value )
 
 heap = printer( 'hello python gc' )
 heap.said()
-heap.deallocate( heap.allocate( 'hello python delete' ) )
+heap.destruct( heap.construct( 'hello python delete' ) )
 
-doc = ooe.registry.doc( module, 'hello/FvvE' )
+doc = ooe.component.doc( module, 'hello/FvvE' )
 print( "python-doc( hello ):", doc )
 help( heap.hello )
 
