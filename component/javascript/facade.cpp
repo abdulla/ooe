@@ -114,7 +114,7 @@ v8::Handle< v8::Value > doc( const v8::Arguments& arguments )
 	up_t i = value.find( '/' );
 
 	if ( i == ~up_t( 0 ) )
-		throw error::runtime( "javascript::doc: " ) << "Invalid function \"" << value << '\"';
+		throw error::runtime( "javascript::doc: " ) << "Function \"" << value << "\" has no type";
 
 	const c8* documentation = source->get().doc( value.substr( 0, i ), value.substr( i + 1 ) );
 	return from< const c8* >::call( documentation ); 
@@ -171,7 +171,7 @@ void component_setup( v8::Handle< v8::Object > global )
 	registry->Set( from< const c8* >::call( "doc" ),
 		v8::FunctionTemplate::New( embed< doc >::call )->GetFunction() );
 
-	ooe->Set( from< const c8* >::call( "registry" ), registry );
+	ooe->Set( from< const c8* >::call( "component" ), registry );
 
 	//----------------------------------------------------------------------
 

@@ -112,7 +112,7 @@ PyObject* doc( PyObject*, PyObject* arguments )
 	up_t i = value.find( '/' );
 
 	if ( i == ~up_t( 0 ) )
-		throw error::runtime( "python::doc: " ) << "Invalid function \"" << value << '\"';
+		throw error::runtime( "python::doc: " ) << "Function \"" << value << "\" has no type";
 
 	const c8* documentation = source->get().doc( value.substr( 0, i ), value.substr( i + 1 ) );
 	return from< const c8* >::call( documentation );
@@ -156,7 +156,7 @@ void component_setup( PyObject* globals )
 	PyModule_AddObject( ooe, "__file__", Py_None );
 
 	//--- registry -------------------------------------------------------------
-	object registry = valid( PyModule_New( "registry" ) );
+	object registry = valid( PyModule_New( "component" ) );
 	Py_INCREF( Py_None );
 	PyModule_AddObject( registry, "__file__", Py_None );
 
@@ -164,7 +164,7 @@ void component_setup( PyObject* globals )
 	PyModule_AddObject( registry, "load", valid( PyCFunction_New( methods + 1, 0 ) ) );
 	PyModule_AddObject( registry, "doc", valid( PyCFunction_New( methods + 2, 0 ) ) );
 
-	PyModule_AddObject( ooe, "registry", registry.release() );
+	PyModule_AddObject( ooe, "component", registry.release() );
 
 	//--------------------------------------------------------------------------
 
