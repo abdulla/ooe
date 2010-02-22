@@ -125,12 +125,11 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-		function_type function;
-		to< function_type >::call( arguments.Data(), function );
+		dual_function< void ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
+		to< void ( * )( void ) >::call( arguments.Data(), function.in );
 
 		BOOST_PP_REPEAT( LIMIT, TO, ~ )
-		function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+		function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 		return v8::Undefined();
 	}
 };
@@ -142,12 +141,11 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-		function_type function;
-		to< function_type >::call( arguments.Data(), function );
+		dual_function< r ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
+		to< void ( * )( void ) >::call( arguments.Data(), function.in );
 
 		BOOST_PP_REPEAT( LIMIT, TO, ~ )
-		r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+		r value = function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 		return from< r >::call( value );
 	}
 };
@@ -161,14 +159,13 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
-		member_type member;
-		to< member_type >::call( arguments.Data(), member );
+		dual_member< void ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
+		to< void ( any::* )( void ) >::call( arguments.Data(), member.in );
 
 		t0* a0;
 		to< t0* >::call( arguments[ 0 ], a0 );
 		BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
-		( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+		( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 		return v8::Undefined();
 	}
 };
@@ -180,14 +177,13 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
-		member_type member;
-		to< member_type >::call( arguments.Data(), member );
+		dual_member< r ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
+		to< void ( any::* )( void ) >::call( arguments.Data(), member.in );
 
 		t0* a0;
 		to< t0* >::call( arguments[ 0 ], a0 );
 		BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
-		r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+		r value = ( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 		return from< r >::call( value );
 	}
 };

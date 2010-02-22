@@ -3,9 +3,8 @@
 #ifndef OOE_COMPONENT_JAVASCRIPT_TRAITS_FORWARD_HPP
 #define OOE_COMPONENT_JAVASCRIPT_TRAITS_FORWARD_HPP
 
-#include <v8.h>
-
 #include "component/javascript/error.hpp"
+#include "component/javascript/vm.hpp"
 #include "component/registry/traits.hpp"
 #include "foundation/utility/miscellany.hpp"
 
@@ -236,8 +235,16 @@ template< typename t >
 
 		v8::Object* object = v8::Object::Cast( *value );
 
-		if ( !object->InternalFieldCount() )
-			throw error::javascript() << "Object has no internal fields";
+		if ( object->InternalFieldCount() != 2 )
+			throw error::javascript() << "Object does not have required internal fields";
+
+		const std::type_info& type_x = typeid( typename no_ptr< t >::type );
+		const std::type_info& type_y =
+			*static_cast< std::type_info* >( object->GetPointerFromInternalField( 1 ) );
+
+		if ( type_x != type_y )
+			throw error::javascript() << "Types do not match, \"" << demangle( type_x.name() ) <<
+				"\" != \"" << demangle( type_y.name() ) << '\"';
 
 		pointer =
 			ptr_cast< typename no_ref< t >::type >( object->GetPointerFromInternalField( 0 ) );
@@ -249,12 +256,7 @@ template< typename t >
 {
 	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pointer )
 	{
-		v8::Handle< v8::ObjectTemplate > template_ = v8::ObjectTemplate::New();
-		template_->SetInternalFieldCount( 1 );
-
-		v8::Handle< v8::Object > object = template_->NewInstance();
-		object->SetPointerInInternalField( 0, ptr_cast( pointer ) );
-		return object;
+		return make_object( ptr_cast( pointer ), typeid( typename no_ptr< t >::type ) );
 	}
 };
 
@@ -298,12 +300,8 @@ template< typename t >
 	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type construct )
 	{
 		typedef typename t::value_type type;
-		v8::Handle< v8::ObjectTemplate > template_ = v8::ObjectTemplate::New();
-		template_->SetInternalFieldCount( 1 );
-
 		v8::Persistent< v8::Object > object =
-			v8::Persistent< v8::Object >::New( template_->NewInstance() );
-		object->SetPointerInInternalField( 0, construct );
+			v8::Persistent< v8::Object >::New( make_object( construct, typeid( type ) ) );
 		object.MakeWeak( 0, destroy< type > );
 		return object;
 	}

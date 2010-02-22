@@ -4,7 +4,7 @@
 #include "component/javascript/vm.hpp"
 #include "foundation/io/memory.hpp"
 
-OOE_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- mapped ---------------------------------------------------------------------------------------
 class mapped
@@ -40,7 +40,10 @@ up_t mapped::length( void ) const
 	return memory.size();
 }
 
-OOE_NAMESPACE_END( ( ooe ) )
+//--- object_template ------------------------------------------------------------------------------
+v8::Handle< v8::ObjectTemplate >* object_template;
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 
@@ -61,6 +64,10 @@ void vm::load( const std::string& name, const descriptor& desc )
 	v8::Context::Scope context_scope( context );
 	v8::HandleScope handle_scope;
 	v8::TryCatch try_catch;
+
+	v8::Handle< v8::ObjectTemplate > local_template = v8::ObjectTemplate::New();
+	local_template->SetInternalFieldCount( 2 );
+	object_template = &local_template;
 
 	v8::Handle< v8::String > source = v8::String::NewExternal( new mapped( desc ) );
 	v8::Handle< v8::String > origin = v8::String::New( name.data(), name.size() );
@@ -103,6 +110,14 @@ void vm::setup( function_type function )
 
 	if ( try_catch.HasCaught() )
 		throw error::javascript( try_catch );
+}
+
+v8::Handle< v8::Object > make_object( void* pointer, const std::type_info& type_info )
+{
+	v8::Handle< v8::Object > object = ( *object_template )->NewInstance();
+	object->SetPointerInInternalField( 0, pointer );
+	object->SetPointerInInternalField( 1, const_cast< std::type_info* >( &type_info ) );
+	return object;
 }
 
 OOE_NAMESPACE_END( ( ooe )( javascript ) )

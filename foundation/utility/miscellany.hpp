@@ -149,6 +149,22 @@ union bound_any
 	}
 };
 
+//--- dual_function --------------------------------------------------------------------------------
+template< typename t >
+	union dual_function
+{
+	void ( * in )( void );
+	t out;
+};
+
+//--- dual_member ----------------------------------------------------------------------------------
+template< typename t >
+	union dual_member
+{
+	void ( any::* in )( void );
+	t out;
+};
+
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/utility/miscellany.hpp"
 	#include BOOST_PP_ITERATE()

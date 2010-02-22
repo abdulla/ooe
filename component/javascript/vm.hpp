@@ -30,6 +30,9 @@ private:
 	v8::Persistent< v8::Context > context;
 };
 
+//--- object_instance ------------------------------------------------------------------------------
+v8::Handle< v8::Object > make_object( void*, const std::type_info& ) OOE_VISIBLE;
+
 OOE_NAMESPACE_END( ( ooe )( javascript ) )
 
 #endif	// OOE_COMPONENT_JAVASCRIPT_VM_HPP
