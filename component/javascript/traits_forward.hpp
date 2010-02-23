@@ -10,74 +10,6 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 
-//--- to -------------------------------------------------------------------------------------------
-template< typename, typename = void >
-	struct to;
-
-template< typename t >
-	struct to< t, typename enable_if< is_empty< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< component::is_boolean< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_string< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< component::is_integral< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< component::is_floating_point< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< component::is_pointer< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< component::is_class< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_construct< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_destruct< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_array< t > >::type >;
-
-//--- from -----------------------------------------------------------------------------------------
-template< typename, typename = void >
-	struct from;
-
-template< typename t >
-	struct from< t, typename enable_if< is_empty< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_boolean< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_string< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_integral< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_floating_point< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_pointer< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_class< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_construct< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_destruct< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_array< t > >::type >;
-
 //--- destroy --------------------------------------------------------------------------------------
 template< typename t >
 	void destroy( v8::Persistent< v8::Value > value, void* )
@@ -92,7 +24,7 @@ template< typename t >
 }
 
 //--- traits: default ------------------------------------------------------------------------------
-template< typename NO_SPECIALISATION_DEFINED, typename >
+template< typename NO_SPECIALISATION_DEFINED, typename = void >
 	struct to
 {
 	static void call( const v8::Handle< v8::Value >&, NO_SPECIALISATION_DEFINED ) OOE_CONST
@@ -101,7 +33,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename >
 	}
 };
 
-template< typename NO_SPECIALISATION_DEFINED, typename >
+template< typename NO_SPECIALISATION_DEFINED, typename = void >
 	struct from
 {
 	static v8::Handle< v8::Value > call( NO_SPECIALISATION_DEFINED ) OOE_CONST
@@ -153,30 +85,6 @@ template< typename t >
 	}
 };
 
-//--- traits: string -------------------------------------------------------------------------------
-template< typename t >
-	struct to< t, typename enable_if< is_string< t > >::type >
-{
-	static void call( const v8::Handle< v8::Value >& value,
-		typename call_traits< t >::reference string )
-	{
-		if ( !value->IsString() )
-			throw error::javascript() << "Value is not a string";
-
-		v8::String::Utf8Value utf8( value );
-		string = string_make< typename no_ref< t >::type >( *utf8, utf8.length() );
-	}
-};
-
-template< typename t >
-	struct from< t, typename enable_if< is_string< t > >::type >
-{
-	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type string )
-	{
-		return v8::String::New( string_data( string ), string_size( string ) );
-	}
-};
-
 //--- traits: integral -----------------------------------------------------------------------------
 template< typename t >
 	struct to< t, typename enable_if< component::is_integral< t > >::type >
@@ -220,6 +128,30 @@ template< typename t >
 	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type floating_point )
 	{
 		return v8::Number::New( floating_point );
+	}
+};
+
+//--- traits: string -------------------------------------------------------------------------------
+template< typename t >
+	struct to< t, typename enable_if< is_string< t > >::type >
+{
+	static void call( const v8::Handle< v8::Value >& value,
+		typename call_traits< t >::reference string )
+	{
+		if ( !value->IsString() )
+			throw error::javascript() << "Value is not a string";
+
+		v8::String::Utf8Value utf8( value );
+		string = string_make< typename no_ref< t >::type >( *utf8, utf8.length() );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_string< t > >::type >
+{
+	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type string )
+	{
+		return v8::String::New( string_data( string ), string_size( string ) );
 	}
 };
 
