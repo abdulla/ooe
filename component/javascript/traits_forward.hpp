@@ -170,9 +170,13 @@ template< typename t >
 		if ( object->InternalFieldCount() != 2 )
 			throw error::javascript() << "Object does not have required internal fields";
 
+		void* type_info = object->GetPointerFromInternalField( 1 );
+
+		if ( !type_info )
+			throw error::javascript() << "Object does not contain type information";
+
 		const std::type_info& type_x = typeid( typename no_qual< t >::type );
-		const std::type_info& type_y =
-			*static_cast< std::type_info* >( object->GetPointerFromInternalField( 1 ) );
+		const std::type_info& type_y = *static_cast< std::type_info* >( type_info );
 
 		if ( type_x != type_y )
 			throw error::javascript() << "Types do not match, \"" << demangle( type_x.name() ) <<

@@ -32,8 +32,12 @@ inline void* get_pointer( PyObject* object, const std::type_info& type_x )
 	if ( !PyCapsule_CheckExact( object ) )
 		throw error::python() << "Object is not a capsule";
 
-	const std::type_info& type_y =
-		*static_cast< std::type_info* >( PyCapsule_GetContext( object ) );
+	void* type_info = PyCapsule_GetContext( object );
+
+	if ( !type_info )
+		throw error::python() << "Object does not contain type information";
+
+	const std::type_info& type_y = *static_cast< std::type_info* >( type_info );
 
 	if ( type_x != type_y )
 		throw error::python() << "Types do not match, \"" << demangle( type_x.name() ) <<
