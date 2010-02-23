@@ -90,6 +90,11 @@ namespace ooe
 		lua_pushboolean( state, boolean );
 	}
 
+	void lua::stack::push_lightuserdata( const void* pointer )
+	{
+		lua_pushlightuserdata( state, const_cast< void* >( pointer ) );
+	}
+
 	void lua::stack::raw_get( s32 index )
 	{
 		lua_rawget( state, index );
@@ -138,11 +143,6 @@ namespace ooe
 	bool lua::stack::next( s32 index )
 	{
 		return lua_next( state, index );
-	}
-
-	bool lua::stack::new_metatable( const c8* name )
-	{
-		return luaL_newmetatable( state, name );
 	}
 
 	void lua::stack::where( void )

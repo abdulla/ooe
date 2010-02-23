@@ -103,7 +103,7 @@ s32 doc( state* state )
 {
 	stack stack = verify_arguments( state, 2 );
 
-	type_check( stack, 1, typeid( std::map< std::string, cfunction > ), type::table );
+	type_check( stack, 1, type::table );
 	stack.raw_geti( 1, 1 );
 
 	source_ptr source;

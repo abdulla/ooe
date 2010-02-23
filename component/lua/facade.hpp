@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "component/lua/traits.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
 
@@ -125,12 +126,11 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 	{
 		stack stack = verify_arguments( state, LIMIT );
 
-		typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-		function_type function;
-		to< function_type >::call( stack, function, upvalue( 1 ) );
+		dual_function< void ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
+		to< void ( * )( void ) >::call( stack, function.in, upvalue( 1 ) );
 
 		BOOST_PP_REPEAT( LIMIT, TO, ~ )
-		function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+		function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 
 		return 0;
 	}
@@ -143,12 +143,11 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	{
 		stack stack = verify_arguments( state, LIMIT );
 
-		typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-		function_type function;
-		to< function_type >::call( stack, function, upvalue( 1 ) );
+		dual_function< r ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
+		to< void ( * )( void ) >::call( stack, function.in, upvalue( 1 ) );
 
 		BOOST_PP_REPEAT( LIMIT, TO, ~ )
-		r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+		r value = function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 		push< r >::call( stack, value );
 
 		return 1;
@@ -164,14 +163,13 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 	{
 		stack stack = verify_arguments( state, LIMIT );
 
-		typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
-		member_type member;
-		to< member_type >::call( stack, member, upvalue( 1 ) );
+		dual_member< void ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
+		to< void ( any::* )( void ) >::call( stack, member.in, upvalue( 1 ) );
 
 		t0* a0;
 		to< t0* >::call( stack, a0, 1 );
 		BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
-		( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+		( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 
 		return 0;
 	}
@@ -184,14 +182,13 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	{
 		stack stack = verify_arguments( state, LIMIT );
 
-		typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
-		member_type member;
-		to< member_type >::call( stack, member, upvalue( 1 ) );
+		dual_member< r ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
+		to< void ( any::* )( void ) >::call( stack, member.in, upvalue( 1 ) );
 
 		t0* a0;
 		to< t0* >::call( stack, a0, 1 );
 		BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, TO, ~ )
-		r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+		r value = ( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 		push< r >::call( stack, value );
 
 		return 1;

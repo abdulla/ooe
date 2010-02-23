@@ -9,110 +9,9 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
 
-template< typename >
-	struct is_arithmetic;
-
-template< typename >
-	struct is_pointer;
-
-template< typename >
-	struct is_pod;
-
-template< typename >
-	struct is_class;
-
-inline void meta_set( stack&, s32, const std::type_info&, cfunction );
-
-//--- to -------------------------------------------------------------------------------------------
-template< typename, typename = void >
-	struct to;
-
-template< typename t >
-	struct to< t, typename enable_if< is_empty< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< component::is_boolean< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_arithmetic< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_pointer< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_string< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_pod< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_class< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_construct< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_destruct< t > >::type >;
-
-template< typename t >
-	struct to< t, typename enable_if< is_array< t > >::type >;
-
-//--- push -----------------------------------------------------------------------------------------
-template< typename, typename = void >
-	struct push;
-
-template< typename t >
-	struct push< t, typename enable_if< is_empty< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< component::is_boolean< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_arithmetic< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_pointer< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_string< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_pod< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_class< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_construct< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_destruct< t > >::type >;
-
-template< typename t >
-	struct push< t, typename enable_if< is_array< t > >::type >;
-
-//--- type_check -----------------------------------------------------------------------------------
-inline void type_check( stack& stack, s32 index, const std::type_info& type_info, type::id id )
-{
-	type::id type = stack.type( index );
-
-	if ( type == id )
-		return;
-
-	stack.where();
-	throw error::lua( stack ) << "bad argument at index " << index << " for type \"" <<
-		demangle( type_info.name() ) << "\" (" << stack.type_name( id ) << " expected, got " <<
-		stack.type_name( type ) << ')';
-}
-
-//--- destruct -------------------------------------------------------------------------------------
-template< typename t >
-	s32 destruct( state* state )
-{
-	stack stack( state );
-	static_cast< t* >( stack.to_userdata( 1 ) )->~t();
-	return 0;
-}
+inline void meta_set( stack&, s32, const std::type_info&, cfunction = 0 );
+inline void type_check( stack&, s32, type::id );
+inline void type_check( stack&, s32, const std::type_info& );
 
 //--- destroy --------------------------------------------------------------------------------------
 template< typename t >
@@ -133,45 +32,8 @@ template< typename t >
 		is_enum< typename no_ref< t >::type >::value );
 };
 
-//--- is_pointer -----------------------------------------------------------------------------------
-template< typename t >
-	struct is_pointer
-{
-	static const bool value =
-		!is_cstring< t >::value &&
-		ooe::is_pointer< typename no_ref< t >::type >::value;
-};
-
-//--- is_pod ---------------------------------------------------------------------------------------
-template< typename t >
-	struct is_pod
-{
-	static const bool value =
-		!component::is_boolean< t >::value &&
-		!is_arithmetic< t >::value &&
-		!is_cstring< t >::value &&
-		!is_pointer< t >::value &&
-		( ooe::is_pod< typename no_ref< t >::type >::value ||
-		has_trivial_copy< typename no_ref< t >::type >::value );
-};
-
-//--- is_class -------------------------------------------------------------------------------------
-template< typename t >
-	struct is_class
-{
-	static const bool value =
-		!is_construct< t >::value &&
-		!is_destruct< t >::value &&
-		!is_stdstring< t >::value &&
-		!is_stdcontainer< t >::value &&
-		!is_tuple< t >::value &&
-		!has_trivial_copy< typename no_ref< t >::type >::value &&
-		( ooe::is_class< typename no_ref< t >::type >::value ||
-		is_union< typename no_ref< t >::type >::value );
-};
-
 //--- traits: default ------------------------------------------------------------------------------
-template< typename NO_SPECIALISATION_DEFINED, typename >
+template< typename NO_SPECIALISATION_DEFINED, typename = void >
 	struct to
 {
 	static void call( stack&, NO_SPECIALISATION_DEFINED, s32 ) OOE_CONST
@@ -180,7 +42,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename >
 	}
 };
 
-template< typename NO_SPECIALISATION_DEFINED, typename >
+template< typename NO_SPECIALISATION_DEFINED, typename = void >
 	struct push
 {
 	static void call( stack&, NO_SPECIALISATION_DEFINED ) OOE_CONST
@@ -196,7 +58,7 @@ template< typename t >
 	static void call( stack& stack, typename call_traits< t >::reference, s32 index )
 	{
 		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::nil );
+		type_check( stack, index, lua::type::nil );
 	}
 };
 
@@ -216,7 +78,7 @@ template< typename t >
 	static void call( stack& stack, bool& boolean, s32 index )
 	{
 		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::boolean );
+		type_check( stack, index, lua::type::boolean );
 		boolean = stack.to_boolean( index );
 	}
 };
@@ -237,7 +99,7 @@ template< typename t >
 	static void call( stack& stack, typename call_traits< t >::reference number, s32 index )
 	{
 		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::number );
+		type_check( stack, index, lua::type::number );
 		number = stack.to_number( index );
 	}
 };
@@ -251,28 +113,6 @@ template< typename t >
 	}
 };
 
-//--- traits: pointer ------------------------------------------------------------------------------
-template< typename t >
-	struct to< t, typename enable_if< is_pointer< t > >::type >
-{
-	static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
-	{
-		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::userdata );
-		pointer = *static_cast< type* >( stack.to_userdata( index ) );
-	}
-};
-
-template< typename t >
-	struct push< t, typename enable_if< is_pointer< t > >::type >
-{
-	static void call( stack& stack, typename call_traits< t >::param_type pointer )
-	{
-		typedef typename no_ref< t >::type type;
-		new( stack.new_userdata( sizeof( type ) ) ) type( pointer );
-	}
-};
-
 //--- traits: string -------------------------------------------------------------------------------
 template< typename t >
 	struct to< t, typename enable_if< is_string< t > >::type >
@@ -280,7 +120,7 @@ template< typename t >
 	static void call( stack& stack, typename call_traits< t >::reference string, s32 index )
 	{
 		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::string );
+		type_check( stack, index, lua::type::string );
 
 		up_t size;
 		const c8* data = stack.to_lstring( index, &size );
@@ -297,48 +137,47 @@ template< typename t >
 	}
 };
 
-//--- traits: pod ----------------------------------------------------------------------------------
+//--- traits: pointer ------------------------------------------------------------------------------
 template< typename t >
-	struct to< t, typename enable_if< is_pod< t > >::type >
+	struct to< t, typename enable_if< component::is_pointer< t > >::type >
 {
-	static void call( stack& stack, typename call_traits< t >::reference pod, s32 index )
+	static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
 	{
-		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::userdata );
-		std::memcpy( &pod, stack.to_userdata( index ), sizeof( type ) );
+		type_check( stack, index, typeid( typename no_qual< t >::type ) );
+		pointer = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
 	}
 };
 
 template< typename t >
-	struct push< t, typename enable_if< is_pod< t > >::type >
+	struct push< t, typename enable_if< component::is_pointer< t > >::type >
 {
-	static void call( stack& stack, typename call_traits< t >::param_type pod )
+	static void call( stack& stack, typename call_traits< t >::param_type pointer )
 	{
-		typedef typename no_ref< t >::type type;
-		std::memcpy( stack.new_userdata( sizeof( type ) ), &pod, sizeof( type ) );
+		new( stack.new_userdata( sizeof( void* ) ) ) typename no_ref< t >::type( pointer );
+		meta_set( stack, -1, typeid( typename no_qual< t >::type ) );
 	}
 };
 
 //--- traits: class --------------------------------------------------------------------------------
 template< typename t >
-	struct to< t, typename enable_if< is_class< t > >::type >
+	struct to< t, typename enable_if< component::is_class< t > >::type >
 {
 	static void call( stack& stack, typename call_traits< t >::reference class_, s32 index )
 	{
 		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::userdata );
-		class_ = *static_cast< type* >( stack.to_userdata( index ) );
+		type_check( stack, index, typeid( type ) );
+		class_ = **static_cast< type** >( stack.to_userdata( index ) );
 	}
 };
 
 template< typename t >
-	struct push< t, typename enable_if< is_class< t > >::type >
+	struct push< t, typename enable_if< component::is_class< t > >::type >
 {
 	static void call( stack& stack, typename call_traits< t >::param_type class_ )
 	{
 		typedef typename no_ref< t >::type type;
-		new( stack.new_userdata( sizeof( type ) ) ) type( class_ );
-		meta_set( stack, -2, typeid( type ), destruct< type > );
+		new( stack.new_userdata( sizeof( void* ) ) ) type*( new type( class_ ) );
+		meta_set( stack, -1, typeid( type ), destroy< type > );
 	}
 };
 
@@ -357,10 +196,9 @@ template< typename t >
 {
 	static void call( stack& stack, typename call_traits< t >::param_type construct )
 	{
-		typedef typename no_ref< t >::type type;
-		typedef typename type::pointer pointer;
-		new( stack.new_userdata( sizeof( pointer ) ) ) pointer( construct );
-		meta_set( stack, -2, typeid( type ), destroy< typename type::value_type > );
+		typedef typename no_ref< t >::type::value_type type;
+		new( stack.new_userdata( sizeof( void* ) ) ) type*( construct );
+		meta_set( stack, -1, typeid( type ), destroy< type > );
 	}
 };
 
@@ -370,10 +208,10 @@ template< typename t >
 {
 	static void call( stack& stack, typename call_traits< t >::reference destruct, s32 index )
 	{
-		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::userdata );
+		typedef typename no_ref< t >::type::value_type type;
+		type_check( stack, index, typeid( type ) );
 
-		destruct = *static_cast< typename type::pointer* >( stack.to_userdata( index ) );
+		destruct = *static_cast< type** >( stack.to_userdata( index ) );
 		stack.push_nil();
 		stack.set_metatable( index );
 	}
@@ -395,7 +233,7 @@ template< typename t >
 	static void call( stack& stack, typename call_traits< t >::reference array, s32 index )
 	{
 		typedef typename no_ref< t >::type type;
-		type_check( stack, index, typeid( type ), lua::type::table );
+		type_check( stack, index, lua::type::table );
 
 		up_t table_size = stack.objlen( index );
 		up_t array_size = extent< type >::value;
@@ -433,14 +271,49 @@ template< typename t >
 //--- meta_set -------------------------------------------------------------------------------------
 inline void meta_set( stack& stack, s32 index, const std::type_info& type_info, cfunction gc )
 {
-	if ( stack.new_metatable( type_info.name() ) )
+	stack.create_table( 1, gc ? 1 : 0 );
+
+	stack.push_lightuserdata( &type_info );
+	stack.raw_seti( -2, 1 );
+
+	if ( gc )
 	{
 		push< const c8* >::call( stack, "__gc" );
 		stack.push_cclosure( gc );
 		stack.raw_set( -3 );
 	}
 
-	stack.set_metatable( index );
+	stack.set_metatable( index - 1 );
+}
+
+//--- type_check -----------------------------------------------------------------------------------
+inline void type_check( stack& stack, s32 index, type::id id )
+{
+	type::id type = stack.type( index );
+
+	if ( type == id )
+		return;
+
+	stack.where();
+	throw error::lua( stack ) << "bad argument at index " << index << " (" <<
+		stack.type_name( id ) << " expected, got " << stack.type_name( type ) << ')';
+}
+
+inline void type_check( stack& stack, s32 index, const std::type_info& type_x )
+{
+	type_check( stack, index, lua::type::userdata );
+
+	stack.get_metatable( index );
+	stack.raw_geti( -1, 1 );
+	const std::type_info& type_y = *static_cast< std::type_info* >( stack.to_userdata( -1 ) );
+	stack.pop( 2 );
+
+	if ( type_x == type_y )
+		return;
+
+	stack.where();
+	throw error::lua( stack ) << "Types do not match, \"" << demangle( type_x.name() ) <<
+		"\" != \"" << demangle( type_y.name() ) << '\"';
 }
 
 OOE_NAMESPACE_END( ( ooe )( lua ) )

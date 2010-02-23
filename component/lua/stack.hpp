@@ -28,11 +28,7 @@ namespace ooe
 			};
 		}
 
-		enum
-		{
-			registry_index	= -10000,
-			globals_index	= -10002
-		};
+		const s32 globals_index = -10002;
 
 		typedef lua_State state;
 		typedef s32 ( * cfunction )( state* );
@@ -65,6 +61,7 @@ namespace ooe
 		void push_lstring( const c8*, up_t );
 		void push_cclosure( cfunction, u32 = 0 );
 		void push_boolean( bool );
+		void push_lightuserdata( const void* );
 
 		void raw_get( s32 );
 		void raw_geti( s32, u32 );
@@ -78,7 +75,6 @@ namespace ooe
 
 		void error( void );
 		bool next( s32 );
-		bool new_metatable( const c8* );
 		void where( void );
 
 	private:

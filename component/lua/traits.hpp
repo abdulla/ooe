@@ -46,7 +46,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::reference container, s32 index )
 		{
 			typedef typename no_ref< t >::type type;
-			type_check( stack, index, typeid( type ), lua::type::table );
+			type_check( stack, index, lua::type::table );
 
 			up_t table_size = stack.objlen( index );
 			type out;
@@ -92,7 +92,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::reference set, s32 index )
 		{
 			typedef typename no_ref< t >::type type;
-			type_check( stack, index, typeid( type ), lua::type::table );
+			type_check( stack, index, lua::type::table );
 
 			type out;
 			stack.push_nil();
@@ -132,7 +132,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::reference map, s32 index )
 		{
 			typedef typename no_ref< t >::type type;
-			type_check( stack, index, typeid( type ), lua::type::table );
+			type_check( stack, index, lua::type::table );
 
 			type out;
 			stack.push_nil();
@@ -174,7 +174,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::reference pair, s32 index )
 		{
 			typedef typename no_ref< t >::type type;
-			type_check( stack, index, typeid( type ), lua::type::table );
+			type_check( stack, index, lua::type::table );
 			up_t table_size = stack.objlen( index );
 
 			if ( table_size != 2 )
@@ -245,7 +245,7 @@ namespace ooe
 		static void call( stack& stack, typename call_traits< t >::reference tuple, s32 index )
 		{
 			typedef typename no_ref< t >::type type;
-			type_check( stack, index, typeid( type ), lua::type::table );
+			type_check( stack, index, lua::type::table );
 
 			up_t table_size = stack.objlen( index );
 
