@@ -170,7 +170,7 @@ template< typename t >
 		if ( object->InternalFieldCount() != 2 )
 			throw error::javascript() << "Object does not have required internal fields";
 
-		const std::type_info& type_x = typeid( typename no_ptr< t >::type );
+		const std::type_info& type_x = typeid( typename no_qual< t >::type );
 		const std::type_info& type_y =
 			*static_cast< std::type_info* >( object->GetPointerFromInternalField( 1 ) );
 
@@ -188,7 +188,7 @@ template< typename t >
 {
 	static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pointer )
 	{
-		return make_object( ptr_cast( pointer ), typeid( typename no_ptr< t >::type ) );
+		return make_object( ptr_cast( pointer ), typeid( typename no_qual< t >::type ) );
 	}
 };
 
