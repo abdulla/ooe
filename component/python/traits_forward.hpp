@@ -11,73 +11,36 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
-//--- as -------------------------------------------------------------------------------------------
-template< typename, typename = void >
-	struct as;
+typedef tuple< std::string /* value */, std::string /* backtrace */ > exception_tuple;
+exception_tuple get_exception( void );
 
-template< typename t >
-	struct as< t, typename enable_if< is_empty< t > >::type >;
+//--- make_capsule ---------------------------------------------------------------------------------
+inline PyObject* make_capsule
+	( void* pointer, const std::type_info& type, PyCapsule_Destructor gc = 0 )
+{
+	PyObject* object = valid( PyCapsule_New( pointer, 0, gc ) );
 
-template< typename t >
-	struct as< t, typename enable_if< component::is_boolean< t > >::type >;
+	if ( PyCapsule_SetContext( object, const_cast< std::type_info* >( &type ) ) )
+		throw error::python() << "Unable to set context of capsule";
 
-template< typename t >
-	struct as< t, typename enable_if< is_string< t > >::type >;
+	return object;
+}
 
-template< typename t >
-	struct as< t, typename enable_if< component::is_integral< t > >::type >;
+//--- get_pointer ----------------------------------------------------------------------------------
+inline void* get_pointer( PyObject* object, const std::type_info& type_x )
+{
+	if ( !PyCapsule_CheckExact( object ) )
+		throw error::python() << "Object is not a capsule";
 
-template< typename t >
-	struct as< t, typename enable_if< component::is_floating_point< t > >::type >;
+	const std::type_info& type_y =
+		*static_cast< std::type_info* >( PyCapsule_GetContext( object ) );
 
-template< typename t >
-	struct as< t, typename enable_if< component::is_pointer< t > >::type >;
+	if ( type_x != type_y )
+		throw error::python() << "Types do not match, \"" << demangle( type_x.name() ) <<
+			"\" != \"" << demangle( type_y.name() ) << '\"';
 
-template< typename t >
-	struct as< t, typename enable_if< component::is_class< t > >::type >;
-
-template< typename t >
-	struct as< t, typename enable_if< is_construct< t > >::type >;
-
-template< typename t >
-	struct as< t, typename enable_if< is_destruct< t > >::type >;
-
-template< typename t >
-	struct as< t, typename enable_if< is_array< t > >::type >;
-
-//--- from -----------------------------------------------------------------------------------------
-template< typename, typename = void >
-	struct from;
-
-template< typename t >
-	struct from< t, typename enable_if< is_empty< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_boolean< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_string< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_integral< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_floating_point< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_pointer< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< component::is_class< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_construct< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_destruct< t > >::type >;
-
-template< typename t >
-	struct from< t, typename enable_if< is_array< t > >::type >;
+	return PyCapsule_GetPointer( object, 0 );
+}
 
 //--- destroy --------------------------------------------------------------------------------------
 template< typename t >
@@ -87,7 +50,7 @@ template< typename t >
 }
 
 //--- traits: default ------------------------------------------------------------------------------
-template< typename NO_SPECIALISATION_DEFINED, typename >
+template< typename NO_SPECIALISATION_DEFINED, typename = void >
 	struct as
 {
 	static void call( PyObject*, NO_SPECIALISATION_DEFINED ) OOE_CONST
@@ -96,7 +59,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename >
 	}
 };
 
-template< typename NO_SPECIALISATION_DEFINED, typename >
+template< typename NO_SPECIALISATION_DEFINED, typename = void >
 	struct from
 {
 	static PyObject* call( NO_SPECIALISATION_DEFINED ) OOE_CONST
@@ -148,30 +111,6 @@ template< typename t >
 			Py_RETURN_TRUE;
 		else
 			Py_RETURN_FALSE;
-	}
-};
-
-//--- traits: string -------------------------------------------------------------------------------
-template< typename t >
-	struct as< t, typename enable_if< is_string< t > >::type >
-{
-	static void call( PyObject* object, typename call_traits< t >::reference string )
-	{
-		if ( !PyUnicode_Check( object ) )
-			throw error::python() << "Object is not a string";
-
-		sp_t size;
-		const c8* data = _PyUnicode_AsStringAndSize( object, &size );
-		string = string_make< typename no_ref< t >::type >( data, size );
-	}
-};
-
-template< typename t >
-	struct from< t, typename enable_if< is_string< t > >::type >
-{
-	static PyObject* call( typename call_traits< t >::param_type string )
-	{
-		return valid( PyUnicode_FromStringAndSize( string_data( string ), string_size( string ) ) );
 	}
 };
 
@@ -259,16 +198,38 @@ template< typename t >
 	}
 };
 
+//--- traits: string -------------------------------------------------------------------------------
+template< typename t >
+	struct as< t, typename enable_if< is_string< t > >::type >
+{
+	static void call( PyObject* object, typename call_traits< t >::reference string )
+	{
+		if ( !PyUnicode_Check( object ) )
+			throw error::python() << "Object is not a string";
+
+		sp_t size;
+		const c8* data = _PyUnicode_AsStringAndSize( object, &size );
+		string = string_make< typename no_ref< t >::type >( data, size );
+	}
+};
+
+template< typename t >
+	struct from< t, typename enable_if< is_string< t > >::type >
+{
+	static PyObject* call( typename call_traits< t >::param_type string )
+	{
+		return valid( PyUnicode_FromStringAndSize( string_data( string ), string_size( string ) ) );
+	}
+};
+
 //--- traits: pointer ------------------------------------------------------------------------------
 template< typename t >
 	struct as< t, typename enable_if< component::is_pointer< t > >::type >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference pointer )
 	{
-		if ( !PyCapsule_CheckExact( object ) )
-			throw error::python() << "Object is not a capsule";
-
-		pointer = ptr_cast< typename no_ref< t >::type >( PyCapsule_GetPointer( object, 0 ) );
+		pointer = ptr_cast< typename no_ref< t >::type >
+			( get_pointer( object, typeid( typename no_qual< t >::type ) ) );
 	}
 };
 
@@ -277,7 +238,7 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type pointer )
 	{
-		return valid( PyCapsule_New( ptr_cast( pointer ), 0, 0 ) );
+		return make_capsule( ptr_cast( pointer ), typeid( typename no_qual< t >::type ) );
 	}
 };
 
@@ -287,11 +248,8 @@ template< typename t >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference class_ )
 	{
-		if ( !PyCapsule_CheckExact( object ) )
-			throw error::python() << "Object is not a capsule";
-
-		typedef typename no_ref< t >::type* pointer;
-		class_ = *ptr_cast< pointer >( PyCapsule_GetPointer( object, 0 ) );
+		typedef typename no_ref< t >::type type;
+		class_ = *ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
 	}
 };
 
@@ -301,7 +259,7 @@ template< typename t >
 	static PyObject* call( typename call_traits< t >::param_type class_ )
 	{
 		typedef typename no_ref< t >::type type;
-		return valid( PyCapsule_New( new type( class_ ), 0, destroy< type > ) );
+		return make_capsule( new type( class_ ), typeid( type ), destroy< type > );
 	}
 };
 
@@ -320,7 +278,8 @@ template< typename t >
 {
 	static PyObject* call( typename call_traits< t >::param_type construct )
 	{
-		return valid( PyCapsule_New( construct, 0, destroy< typename t::value_type > ) );
+		typedef typename t::value_type type;
+		return make_capsule( construct, typeid( type ), destroy< type > );
 	}
 };
 
@@ -330,12 +289,14 @@ template< typename t >
 {
 	static void call( PyObject* object, typename call_traits< t >::reference destruct )
 	{
-		typedef typename t::pointer pointer;
-		pointer p;
-		as< pointer >::call( object, p );
-		destruct = p;
+		typedef typename t::value_type type;
+		destruct = ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
 
-		PyCapsule_SetDestructor( object, 0 );
+		if (PyCapsule_SetDestructor( object, 0 ) )
+			throw error::python() << "Unable to set destructor of capsule";
+
+		if ( PyCapsule_SetContext( object, 0 ) )
+			throw error::python() << "Unable to set context of capsule";
 	}
 };
 
@@ -388,6 +349,26 @@ template< typename t >
 		return object.release();
 	}
 };
+
+//--- get_exception --------------------------------------------------------------------------------
+inline exception_tuple get_exception( void )
+{
+	object py_type;
+	object py_value;
+	object py_backtrace;
+	PyErr_Fetch( &py_type, &py_value, &py_backtrace );
+	PyErr_NormalizeException( &py_type, &py_value, &py_backtrace );
+
+	object str_value = py_value.str();
+	object str_backtrace = py_value.str();
+
+	std::string value;
+	std::string backtrace;
+	as< std::string >::call( str_value, value );
+	as< std::string >::call( str_backtrace, backtrace );
+
+	return exception_tuple( value, backtrace );
+}
 
 OOE_NAMESPACE_END( ( ooe )( python ) )
 

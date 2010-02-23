@@ -122,12 +122,11 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef void ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-		function_type function;
-		as< function_type >::call( self, function );
+		dual_function< void ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
+		as< void ( * )( void ) >::call( self, function.in );
 
 		BOOST_PP_REPEAT( LIMIT, AS, ~ )
-		function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+		function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 		Py_RETURN_NONE;
 	}
 };
@@ -139,12 +138,11 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef r ( * function_type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
-		function_type function;
-		as< function_type >::call( self, function );
+		dual_function< r ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
+		as< void ( * )( void ) >::call( self, function.in );
 
 		BOOST_PP_REPEAT( LIMIT, AS, ~ )
-		r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+		r value = function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
 		return from< r >::call( value );
 	}
 };
@@ -158,14 +156,13 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef void ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
-		member_type member;
-		as< member_type >::call( self, member );
+		dual_member< void ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
+		as< void ( any::* )( void ) >::call( self, member.in );
 
 		t0* a0;
 		as< t0* >::call( PyTuple_GET_ITEM( arguments, 0 ), a0 );
 		BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, AS, ~ )
-		( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+		( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 		Py_RETURN_NONE;
 	}
 };
@@ -177,14 +174,13 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	{
 		verify_arguments( arguments, LIMIT );
 
-		typedef r ( t0::* member_type )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
-		member_type member;
-		as< member_type >::call( self, member );
+		dual_member< r ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
+		as< void ( any::* )( void ) >::call( self, member.in );
 
 		t0* a0;
 		as< t0* >::call( PyTuple_GET_ITEM( arguments, 0 ), a0 );
 		BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, AS, ~ )
-		r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+		r value = ( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
 		return from< r >::call( value );
 	}
 };

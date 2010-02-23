@@ -36,22 +36,9 @@ void vm::load( const std::string& name, const descriptor& desc )
 	if ( result )
 		return;
 
-	object py_type;
-	object py_value;
-	object py_backtrace;
-	PyErr_Fetch( &py_type, &py_value, &py_backtrace );
-	PyErr_NormalizeException( &py_type, &py_value, &py_backtrace );
-
-	object str_value = py_value.str();
-	object str_backtrace = py_value.str();
-
-	std::string value;
-	std::string backtrace;
-	as< std::string >::call( str_value, value );
-	as< std::string >::call( str_backtrace, backtrace );
-
+	exception_tuple tuple = get_exception();
 	throw error::python() <<
-		"Unable to load \"" << name << "\": " << value << "\nPython backtrace:\n" << backtrace;
+		"Unable to load \"" << name << "\": " << tuple._0 << "\nPython backtrace:\n" << tuple._1;
 }
 
 void vm::collect( void )

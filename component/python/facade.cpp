@@ -175,7 +175,14 @@ void component_setup( PyObject* globals )
 void throw_exception( const c8* what, const c8* where )
 {
 	std::string string;
-	string << what << "\n\nStack trace:" << where;
+
+	if ( PyErr_Occurred() )
+	{
+		exception_tuple tuple = get_exception();
+		string << tuple._0 << "\n\nStack trace: " << tuple._1;
+	}
+
+	string << what << "\n\nStack trace: " << where;
 	PyErr_SetString( PyExc_RuntimeError, string.c_str() );
 }
 
