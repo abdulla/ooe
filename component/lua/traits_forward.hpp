@@ -302,9 +302,11 @@ inline void type_check( stack& stack, s32 index, type::id id )
 inline void type_check( stack& stack, s32 index, const std::type_info& type_x )
 {
 	type_check( stack, index, lua::type::userdata );
-
 	stack.get_metatable( index );
+	type_check( stack, -1, lua::type::table );
 	stack.raw_geti( -1, 1 );
+	type_check( stack, -1, lua::type::lightuserdata );
+
 	const std::type_info& type_y = *static_cast< std::type_info* >( stack.to_userdata( -1 ) );
 	stack.pop( 2 );
 
