@@ -252,6 +252,7 @@ template< typename t >
 		destruct = p;
 
 		v8::Object::Cast( *value )->SetPointerInInternalField( 0, 0 );
+		v8::Object::Cast( *value )->SetPointerInInternalField( 1, 0 );
 	}
 };
 
