@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <iostream>
+
 #include "component/registry/local.hpp"
 #include "component/registry/module.hpp"
 #include "component/registry/remote.hpp"
@@ -31,15 +33,15 @@ void load_nameservice( ipc::nameservice& nameservice, const module& module )
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
-	const c8* module_path = 0;
+	const c8* library_path = 0;
 	const c8* surrogate_path = 0;
 
-	for ( s32 option; ( option = getopt( argc, argv, "l:m:r:s:u:" ) ) != -1; )
+	for ( s32 option; ( option = getopt( argc, argv, "l:s:" ) ) != -1; )
 	{
 		switch ( option )
 		{
-		case 'm':
-			module_path = optarg;
+		case 'l':
+			library_path = optarg;
 			break;
 
 		case 's':
@@ -47,14 +49,18 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 			break;
 
 		default:
+			std::cout <<
+				"    -l <path>  Path of library module to load in to surrogate\n"
+				"    -s <path>  Path to use for surrogate\n";
+
 			return false;
 		}
 	}
 
-	if ( !module_path || !surrogate_path )
+	if ( !library_path || !surrogate_path )
 		return false;
 
-	library library( module_path );
+	library library( library_path );
 	ipc::nameservice nameservice;
 	load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
 

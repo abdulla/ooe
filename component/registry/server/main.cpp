@@ -24,6 +24,8 @@ module_map map;
 module_set set;
 read_write mutex;
 
+interface::vector_type load_server( const std::string& );
+
 //--- surrogate ------------------------------------------------------------------------------------
 std::string surrogate( const std::string& path )
 {
@@ -32,16 +34,9 @@ std::string surrogate( const std::string& path )
 	fork_io fork;
 
 	if ( fork.is_child() )
-		fork_io::execute( surrogate_path, "-m", path.c_str(), "-s", name.c_str(), NULL );
+		fork_io::execute( surrogate_path, "-l", path.c_str(), "-s", name.c_str(), NULL );
 
 	return name;
-}
-
-//--- load_server ----------------------------------------------------------------------------------
-interface::vector_type load_server( const std::string& path )
-{
-	ipc::memory::client client( path );
-	return ipc::memory::list( client )();
 }
 
 //--- load_library ---------------------------------------------------------------------------------
@@ -53,6 +48,13 @@ interface::vector_type load_library( const std::string& path )
 
 	// for security, load library as a surrogate
 	return load_server( surrogate( path ) );
+}
+
+//--- load_server ----------------------------------------------------------------------------------
+interface::vector_type load_server( const std::string& path )
+{
+	ipc::memory::client client( path );
+	return ipc::memory::list( client )();
 }
 
 //--- insert ---------------------------------------------------------------------------------------
@@ -69,12 +71,12 @@ void insert( registry::type type, const std::string& path )
 
 	switch ( type )
 	{
-	case registry::server:
-		vector = load_server( path );
-		break;
-
 	case registry::library:
 		vector = load_library( path );
+		break;
+
+	case registry::server:
+		vector = load_server( path );
 		break;
 
 	default:
@@ -130,7 +132,7 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
 {
 	const c8* up_name = 0;
 
-	for ( s32 option; ( option = getopt( argc, argv, "l:m:r:s:u:" ) ) != -1; )
+	for ( s32 option; ( option = getopt( argc, argv, "l:s:u:" ) ) != -1; )
 	{
 		switch ( option )
 		{
@@ -138,7 +140,7 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
 			ooe::registry().insert( registry::library, optarg );
 			return true;
 
-		case 'r':
+		case 's':
 			ooe::registry().insert( registry::server, optarg );
 			return true;
 
@@ -147,6 +149,11 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
 			break;
 
 		default:
+			std::cout <<
+				"    -l <path>  Path of library module to insert in to registry\n"
+				"    -s <path>  Path of server module to insert in to registry\n"
+				"    -u <path>  Path of semaphore to increment\n";
+
 			return false;
 		}
 	}
