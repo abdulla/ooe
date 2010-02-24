@@ -31,7 +31,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 	}
 
 	ipc::nameservice nameservice;
-	nameservice.insert( "hello", hello );
+	nameservice.insert( "hello", hello, "A function that prints 'hello server'" );
 
 	ipc::memory::server server( "/ooe.hello", nameservice );
 
