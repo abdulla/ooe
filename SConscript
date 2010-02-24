@@ -83,6 +83,7 @@ build.Linkable( 'video', 'foundation/video', 'parallel', ooe.qtkit.framework,
 	ooe.freetype.include_path, ooe.freetype.library_path, VideoConfigure )
 
 #--- component -------------------------------------------------------------------------------------
+build.Executable( 'doc', 'component/registry/doc', 'executable registry' )
 build.Executable( 'javascript_host', 'component/javascript/host', 'executable javascript registry' )
 build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'python_host', 'component/python/host', 'executable python registry' )
