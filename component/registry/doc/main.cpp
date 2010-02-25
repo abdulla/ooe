@@ -23,14 +23,15 @@ std::string module_doc( const module& module, const std::string& name, const std
 //--- print_docs -----------------------------------------------------------------------------------
 void print_docs( const interface::vector_type names, function_type doc )
 {
-	for ( iterator_type i = names.begin(), end = names.end(); i != end; ++i )
+	for ( iterator_type first = names.begin(), i = first, end = names.end(); i != end; ++i )
 	{
-		if ( i != names.begin() )
+		if ( i != first )
 			std::cout << '\n';
 
 		std::cout <<
 			"Name: " << i->_0 << "\n"
-			"Type: " << i->_1 << '\n';
+			"Type: " << i->_1 << "\n"
+			"      " << demangle( i->_1 ) << '\n';
 
 		std::string documentation = doc( i->_0, i->_1 );
 
