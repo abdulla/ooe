@@ -77,9 +77,10 @@ private:
 		std::string local_name = ipc::local_name( "ooe.test.socket-migration" );
 		unlink( local_name.c_str() );
 		ipc::socket::server server( local_address( local_name ), nameservice );
-		semaphore.up();
 		server_ptr = &server;
 		socket_ptr = &socket;
+
+		semaphore.up();
 
 		while ( !executable::has_signal() )
 			server.accept();
@@ -90,10 +91,11 @@ private:
 		std::string local_name = ipc::local_name( ipc::unique_name() );
 		unlink( local_name.c_str() );
 		ipc::socket::server server( local_address( local_name ), nameservice );
-		semaphore.up();
-		server.relink( socket );
 		server_ptr = &server;
 		socket_ptr = &socket;
+
+		semaphore.up();
+		server.relink( socket );
 
 		while ( !executable::has_signal() )
 			server.accept();

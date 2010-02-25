@@ -75,9 +75,10 @@ private:
 	void server_0( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
 	{
 		ipc::memory::server server( "/ooe.test.memory-migration", nameservice );
-		semaphore.up();
 		server_ptr = &server;
 		socket_ptr = &socket;
+
+		semaphore.up();
 
 		while ( !executable::has_signal() )
 			server.decode();
@@ -86,10 +87,11 @@ private:
 	void server_1( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
 	{
 		ipc::memory::server server( ipc::unique_name(), nameservice );
-		semaphore.up();
-		server.relink( socket );
 		server_ptr = &server;
 		socket_ptr = &socket;
+
+		semaphore.up();
+		server.relink( socket );
 
 		while ( !executable::has_signal() )
 			server.decode();
