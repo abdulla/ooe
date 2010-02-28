@@ -38,7 +38,8 @@ void print_docs( const interface::vector_type names, function_type doc )
 		if ( documentation.empty() )
 			continue;
 
-		std::cout << "\n    " << documentation << '\n';
+		std::cout << "\n"
+			"      " << documentation << '\n';
 	}
 }
 
