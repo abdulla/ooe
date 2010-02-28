@@ -5,6 +5,6 @@
 
 #include <boost/preprocessor.hpp>
 
-#define OOE_PP_LIMIT 9
+#define OOE_PP_LIMIT 7
 
 #endif	// OOE_FOUNDATION_UTILITY_PREPROCESSOR_HPP
