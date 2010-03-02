@@ -25,7 +25,7 @@ private:
 
 //--- shared_memory --------------------------------------------------------------------------------
 struct OOE_VISIBLE shared_memory
-	: public shared_memory_base, public ooe::memory
+	: public shared_memory_base, public descriptor, public ooe::memory
 {
 	enum type
 	{
@@ -36,6 +36,9 @@ struct OOE_VISIBLE shared_memory
 	shared_memory( const std::string&, type = open, up_t = 0 );
 	shared_memory( const std::string&, const ooe::descriptor& );
 	~shared_memory( void );
+
+	using memory::get;
+	using memory::size;
 };
 
 //--- locked_memory --------------------------------------------------------------------------------

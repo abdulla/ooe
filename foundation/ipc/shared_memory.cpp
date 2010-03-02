@@ -76,12 +76,12 @@ void shared_memory_base::unlink( void )
 //--- shared_memory --------------------------------------------------------------------------------
 shared_memory::shared_memory( const std::string& shm_name, type mode, up_t size_ )
 	: shared_memory_base( shm_name, mode == create ),
-	memory( shm_create( shm_name, mode == create, size_ ), memory::read_write )
+	descriptor( shm_create( shm_name, mode == create, size_ ) ), memory( *this, memory::read_write )
 {
 }
 
 shared_memory::shared_memory( const std::string& shm_name, const ooe::descriptor& desc )
-	: shared_memory_base( shm_name, false ), memory( desc, memory::read_write )
+	: shared_memory_base( shm_name, false ), descriptor( desc ), memory( *this, memory::read_write )
 {
 }
 
