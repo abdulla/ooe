@@ -15,8 +15,7 @@ namespace
 
 	bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** argv )
 	{
-		struct sigaction action;
-		executable::signal( action, SIG_DFL, SIGCHLD );
+		::signal( SIGCHLD, SIG_DFL );
 		time_t time_out = 60;
 		bool no_stdout = true;
 
