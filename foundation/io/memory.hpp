@@ -50,7 +50,7 @@ public:
 	void advise( advise_type ) const;
 	void sync( void ) const;
 
-	void protect( u8 );
+	void protect( u8, region );
 
 	up_t size( void ) const;
 	void* get( void ) const;

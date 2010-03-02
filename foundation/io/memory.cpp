@@ -55,9 +55,13 @@ void memory::sync( void ) const
 		throw error::io( "memory: " ) << "Unable to sync: " << error::number( errno );
 }
 
-void memory::protect( u8 flags )
+void memory::protect( u8 flags, region window )
 {
-	if ( mprotect( get(), size(), flags ) )
+	up_t size_ = size();
+
+	if ( window._0 + window._1 > size_ )
+		throw error::io( "memory: " ) << "Invalid region, " << window << " > " << size_;
+	else if ( mprotect( as< u8 >() + window._0, window._1, flags ) )
 		throw error::io( "memory: " ) << "Unable to protect: " << error::number( errno );
 }
 
