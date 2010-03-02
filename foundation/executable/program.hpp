@@ -7,30 +7,30 @@
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 
+struct siginfo;
 struct sigaction;
 
-namespace ooe
-{
-	namespace executable
-	{
-		typedef void ( * signal_handler_type )( s32 );
-		typedef bool ( * launch_type )( const std::string&, const std::string&, s32, c8** );
-		typedef tuple< std::string, std::string > path_tuple;
+OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
 
-		signal_handler_type signal( struct sigaction&, signal_handler_type, s32 ) OOE_VISIBLE;
-		s32 has_signal( void ) OOE_VISIBLE;
-		void quit( void ) OOE_VISIBLE;
+typedef void ( * signal_handler_type )( s32, siginfo*, void* );
+typedef bool ( * launch_type )( const std::string&, const std::string&, s32, c8** );
+typedef tuple< std::string, std::string > path_tuple;
 
-		s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
-		void null_fd( s32 ) OOE_VISIBLE;
-		path_tuple path( void ) OOE_VISIBLE;
-		bool path( c8*, up_t );
-	}
+signal_handler_type signal( struct sigaction&, signal_handler_type, s32 ) OOE_VISIBLE;
+s32 has_signal( void ) OOE_VISIBLE;
+void quit( void ) OOE_VISIBLE;
 
-	namespace platform
-	{
-		bool launch( executable::launch_type, const std::string&, const std::string&, s32, c8** );
-	}
-}
+s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
+void null_fd( s32 ) OOE_VISIBLE;
+path_tuple path( void ) OOE_VISIBLE;
+bool path( c8*, up_t );
+
+OOE_NAMESPACE_END( ( ooe )( executable ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+bool launch( executable::launch_type, const std::string&, const std::string&, s32, c8** );
+
+OOE_NAMESPACE_END( ( ooe )( platform ) )
 
 #endif	// OOE_FOUNDATION_EXECUTABLE_PROGRAM_HPP
