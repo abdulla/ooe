@@ -27,14 +27,12 @@ memory_id::~memory_id( void )
 
 //--- memory -------------------------------------------------------------------
 memory::memory( const descriptor& desc, u8 flags )
-	: descriptor( desc ),
-	internal( new memory_id( descriptor::get(), flags, 0, descriptor::size() ) )
+	: internal( new memory_id( desc.get(), flags, 0, desc.size() ) )
 {
 }
 
 memory::memory( const descriptor& desc, u8 flags, region window )
-	: descriptor( desc ),
-	internal( new memory_id( descriptor::get(), flags, window._0, window._1 ) )
+	: internal( new memory_id( desc.get(), flags, window._0, window._1 ) )
 {
 }
 

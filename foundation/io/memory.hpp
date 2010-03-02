@@ -19,7 +19,6 @@ struct memory_id
 
 //--- memory ---------------------------------------------------------------------------------------
 class OOE_VISIBLE memory
-	: public descriptor
 {
 public:
 	enum
