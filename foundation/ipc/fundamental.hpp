@@ -17,9 +17,9 @@ typedef u32 length_t;
  * ________________________
  * MEMORY: ARGUMENTS HEADER
  *
- *  --------------------------------
+ * +-----------+------------+-------
  * | 1: bool_t | 2: index_t | 3: ...
- * --------------------------------
+ * +-----------+------------+-------
  * 1: Describes whether the data is stored internally, or externally in additional shared memory.
  * 2: The index of the function to execute.
  * 3: This is the data to pass to the function, if it is stored internally; or the name of the
@@ -28,9 +28,9 @@ typedef u32 length_t;
  * ______________________
  * MEMORY: RESULTS HEADER
  *
- *  --------------------------------
+ * +-----------+------------+-------
  * | 1: bool_t | 2: error_t | 3: ...
- * --------------------------------
+ * +-----------+------------+-------
  * 1: Describes whether the data is stored internally, or externally in additional shared memory.
  * 2: Indicates whether there was an error, and if so what type of error.
  * 3: This is the data for the result of the function, or the error strings if an error occurred.
@@ -43,9 +43,9 @@ typedef u32 length_t;
  * ________________________
  * SOCKET: ARGUMENTS HEADER
  *
- *  ----------------------------------
+ * +-------------+------------+-------
  * | 1: length_t | 2: index_t | 3: ...
- * ----------------------------------
+ * +-------------+------------+-------
  * 1: The length of the additional data.
  * 2: The index of the function to call.
  * 3: The rest of the data to pass to the function.
@@ -53,9 +53,9 @@ typedef u32 length_t;
  * ________________________
  * SOCKET: RESULTS HEADER
  *
- *  ----------------------------------
+ * +-------------+------------+-------
  * | 1: length_t | 2: error_t | 3: ...
- * ----------------------------------
+ * +-------------+------------+-------
  * 1: The length of the additional data.
  * 2: Indication of whether the data is the result, or an error message.
  * 3: The rest of the data, either the result of the function, or an error message.
