@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <csetjmp>
-
 #include <openjpeg.h>
 
 #include "foundation/image/jpeg2000.hpp"
