@@ -12,8 +12,7 @@ enum ipc
 {
 	none,
 	exception,
-	link,
-	canary
+	link
 };
 
 //--- rpc ------------------------------------------------------------------------------------------
@@ -60,21 +59,6 @@ struct OOE_VISIBLE connection
 	}
 
 	virtual ~connection( void ) throw()
-	{
-	}
-};
-
-//--- violation ------------------------------------------------------------------------------------
-struct OOE_VISIBLE violation
-	: virtual public runtime
-{
-	violation( void )
-		: runtime( "ipc: " )
-	{
-		*this << "Data violation";
-	}
-
-	virtual ~violation( void ) throw()
 	{
 	}
 };

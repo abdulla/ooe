@@ -27,8 +27,9 @@ void signal_handler( s32 code, siginfo_t* info, void* context )
 }
 
 //--- ipc_decode -----------------------------------------------------------------------------------
-void ipc_decode( const tuple_type& tuple )
+void ipc_decode( const void* pointer )
 {
+	const tuple_type& tuple = *static_cast< const tuple_type* >( pointer );
 	shared_allocator& allocator = tuple._1;
 	io_buffer& buffer = tuple._2;
 	buffer.reset();
@@ -63,22 +64,6 @@ void ipc_decode( const tuple_type& tuple )
 	{
 		stream_write< bool_t, ipc::error_t >::call( data, internal, error );
 		allocator.deallocate();
-	}
-}
-
-//--- ipc_catch ------------------------------------------------------------------------------------
-void ipc_catch( const void* pointer )
-{
-	const tuple_type& tuple = *static_cast< const tuple_type* >( pointer );
-
-	try
-	{
-		ipc_decode( tuple );
-	}
-	catch ( error::violation& error )
-	{
-		// indicate that there was a data violation error
-		stream_write< bool_t, error_t, const c8* >::call( tuple._2.get(), true, error::canary, "" );
 	}
 }
 
@@ -157,7 +142,7 @@ void servlet::verify( const void* pointer )
 		buffer.is_internal() ? transport.in_canary( pointer ) : allocator.in_canary( pointer );
 
 	if ( inside )
-		throw error::violation();
+		OOE_WARNING( "servlet", "Data violation at " << pointer );
 }
 
 void* servlet::call( void* pointer )
@@ -179,7 +164,7 @@ void* servlet::call( void* pointer )
 	servlet_tls = this;
 
 	while ( OOE_LIKELY( state ) )
-		transport.wait( ipc_catch, &tuple );
+		transport.wait( ipc_decode, &tuple );
 
 	return 0;
 }
@@ -219,7 +204,7 @@ bool server::decode( void )
 	shared_allocator allocator;
 	io_buffer buffer( transport.get(), transport.size(), allocator );
 	tuple_type tuple( internal, allocator, buffer, 0 );
-	transport.wait( ipc_catch, &tuple );
+	transport.wait( ipc_decode, &tuple );
 	return !map.empty();
 }
 

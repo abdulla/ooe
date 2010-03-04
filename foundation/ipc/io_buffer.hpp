@@ -161,12 +161,6 @@ public:
 		return internal;
 	}
 
-	template< typename type >
-		type& get_allocator( void )
-	{
-		return static_cast< type& >( allocator );
-	}
-
 private:
 	up_t preserved;
 	bool internal;
