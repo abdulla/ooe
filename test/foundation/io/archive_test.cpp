@@ -28,8 +28,8 @@ template<>
 	archive::file stored = archive.open( "stored" );
 	archive::file deflated = archive.open( "deflated" );
 
-	check( "sizes of match", stored.size() == deflated.size() );
-	check( "data matches", !std::memcmp( stored.get(), deflated.get(), stored.size() ) );
+	OOE_CHECK( "sizes of match", stored.size() == deflated.size() );
+	OOE_CHECK( "data matches", !std::memcmp( stored.get(), deflated.get(), stored.size() ) );
 
 	up_t j = 1;
 

@@ -3,36 +3,39 @@
 #ifndef OOE_TEST_UNIT_CHECK_HPP
 #define OOE_TEST_UNIT_CHECK_HPP
 
-#include "foundation/utility/macro.hpp"
-
-#define check( reason, boolean )\
+#define OOE_FAIL( reason, detail )\
 do\
 {\
-	if ( !( boolean ) )\
-	{\
-		ooe::unit::fail();\
-		std::cerr <<\
-			reason "\n"\
-			"\tFile \"" __FILE__ "\", Line " << __LINE__ << ":\n"\
-			"\t" #boolean "\n";\
-	}\
+	ooe::unit::fail();\
+	std::cerr <<\
+		reason "\n"\
+		"\tFile \"" __FILE__ "\", Line " << __LINE__ << ":\n"\
+		"\t" detail "\n";\
 }\
 while ( false )
 
-#define except( reason, raise )\
+#define OOE_CHECK( reason, boolean )\
+do\
+{\
+	if ( !( boolean ) )\
+		OOE_FAIL( reason, #boolean );\
+}\
+while ( false )
+
+#define OOE_EXCEPT( reason, exception, raise )\
 do\
 {\
 	try\
 	{\
 		raise;\
-		ooe::unit::fail();\
-		std::cerr <<\
-			reason "\n"\
-			"\tFile \"" __FILE__ "\", Line " << __LINE__ << ":\n"\
-			"\t" #raise "\n";\
+		OOE_FAIL( reason, #raise );\
+	}\
+	catch ( exception& error )\
+	{\
 	}\
 	catch ( ... )\
 	{\
+		OOE_FAIL( "Caught unexpected exception", #raise );\
 	}\
 }\
 while ( false )

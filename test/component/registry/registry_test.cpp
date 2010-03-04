@@ -88,7 +88,7 @@ template<>
 
 	registry registry;
 	registry::info_vector vector = registry.find( interface );
-	check( "vector.size()", vector.size() );
+	OOE_CHECK( "vector.size()", vector.size() );
 }
 
 template<>
@@ -104,7 +104,7 @@ template<>
 
 	local local( path );
 	local.find< void ( * )( void ) >( "hello" )();
-	check( "local.supports( interface )", local.supports( interface ) );
+	OOE_CHECK( "local.supports( interface )", local.supports( interface ) );
 
 	std::cout << "local-doc( hello ): " << local.doc< void ( * )( void ) >( "hello" ) << '\n';
 }
@@ -123,7 +123,7 @@ template<>
 	registry registry;
 	remote remote( registry.surrogate( path ) );
 	remote.find< void ( void ) >( "hello" )();
-	check( "remote.supports( interface )", remote.supports( interface ) );
+	OOE_CHECK( "remote.supports( interface )", remote.supports( interface ) );
 
 	std::cout << "remote-doc( hello ): " << remote.doc< void ( void ) >( "hello" ) << '\n';
 }

@@ -25,7 +25,7 @@ template<>
 	ipc::shared_memory memory_1( path, ipc::shared_memory::create, executable::static_page_size );
 	ipc::shared_memory memory_2( path );
 
-	check( "memory_1 != memory_2", memory_1.get() != memory_2.get() );
+	OOE_CHECK( "memory_1 != memory_2", memory_1.get() != memory_2.get() );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

@@ -49,26 +49,26 @@ namespace ooe
 			{
 				scoped_ptr< destruct_test > ptr( new destruct_test( did_destruct ) );
 			}
-			check( "destruct_test::~destruct_test()", did_destruct );
+			OOE_CHECK( "destruct_test::~destruct_test()", did_destruct );
 
 			up_t* value = new up_t( 7 );
 			scoped_ptr< up_t > ptr( value );
-			check( "*ptr == *value", *ptr == *value );
-			check( "ptr == value", ptr == value );
-			check( "ptr.get() == value", ptr.get() == value );
-			check( "ptr.operator ->() == value", ptr.operator ->() == value );
-			check( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
+			OOE_CHECK( "*ptr == *value", *ptr == *value );
+			OOE_CHECK( "ptr == value", ptr == value );
+			OOE_CHECK( "ptr.get() == value", ptr.get() == value );
+			OOE_CHECK( "ptr.operator ->() == value", ptr.operator ->() == value );
+			OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
 			scoped_ptr< up_t > other( value );
-			check( "other.release() == value", other.release() == value );
+			OOE_CHECK( "other.release() == value", other.release() == value );
 
 			ptr.swap( other );
-			check( "ptr.get() == 0", ptr.get() == 0 );
-			check( "other.get() == value", other.get() == value );
+			OOE_CHECK( "ptr.get() == 0", ptr.get() == 0 );
+			OOE_CHECK( "other.get() == value", other.get() == value );
 
 			other.swap( ptr );
-			check( "ptr.get() == value", ptr.get() == value );
-			check( "other.get() == 0", other.get() == 0 );
+			OOE_CHECK( "ptr.get() == value", ptr.get() == value );
+			OOE_CHECK( "other.get() == 0", other.get() == 0 );
 		}
 
 		template<>
@@ -81,30 +81,30 @@ namespace ooe
 			{
 				shared_ptr< destruct_test > ptr( new destruct_test( did_destruct ) );
 			}
-			check( "destruct_test::~destruct_test()", did_destruct );
+			OOE_CHECK( "destruct_test::~destruct_test()", did_destruct );
 
 			up_t* value = new up_t( 7 );
 			shared_ptr< up_t > ptr( value );
-			check( "*ptr == *value", *ptr == *value );
-			check( "ptr == value", ptr == value );
-			check( "ptr.get() == value", ptr.get() == value );
-			check( "ptr.operator ->() == value", ptr.operator ->() == value );
-			check( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
+			OOE_CHECK( "*ptr == *value", *ptr == *value );
+			OOE_CHECK( "ptr == value", ptr == value );
+			OOE_CHECK( "ptr.get() == value", ptr.get() == value );
+			OOE_CHECK( "ptr.operator ->() == value", ptr.operator ->() == value );
+			OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
 			shared_ptr< up_t > other( 0 );
 			ptr.swap( other );
-			check( "ptr.get() == 0", ptr.get() == 0 );
-			check( "other.get() == value", other.get() == value );
+			OOE_CHECK( "ptr.get() == 0", ptr.get() == 0 );
+			OOE_CHECK( "other.get() == value", other.get() == value );
 
 			other.swap( ptr );
-			check( "ptr.get() == value", ptr.get() == value );
-			check( "other.get() == 0", other.get() == 0 );
+			OOE_CHECK( "ptr.get() == value", ptr.get() == value );
+			OOE_CHECK( "other.get() == 0", other.get() == 0 );
 
 			{
 				shared_ptr< up_t > copy( ptr );
-				check( "copy.get() == value", copy.get() == value );
+				OOE_CHECK( "copy.get() == value", copy.get() == value );
 			}
-			check( "copy: ptr.get() == value", ptr.get() == value );
+			OOE_CHECK( "copy: ptr.get() == value", ptr.get() == value );
 		}
 	}
 }

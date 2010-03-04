@@ -252,21 +252,21 @@ template<>
 	std::cerr << "test exceptions\n";
 
 	ipc::socket::rpc< void ( void ) > out_of_range( client, ~u32( 0 ) );
-	except( "out-of-range index", out_of_range()() );
+	OOE_EXCEPT( "out-of-range index", error::runtime, out_of_range()() );
 
 	ipc::socket::find find( client );
-	except( "find non-existant function", find( "no_function", "no_type" )() );
+	OOE_EXCEPT( "find non-existant function", error::runtime, find( "no_function", "no_type" )() );
 
 	ipc::socket::find_all find_all( client );
 	ipc::socket::find_all::parameter_type parameter( 2, make_tuple( "no_function", "no_type" ) );
-	except( "find-all non-existant functions", find_all( parameter )() );
+	OOE_EXCEPT( "find-all non-existant functions", error::runtime, find_all( parameter )() );
 
 	ipc::socket::call< void ( print* ) > print_show( client, "print_show" );
-	except( "null-pointer argument", print_show( 0 )() );
+	OOE_EXCEPT( "null-pointer argument", error::runtime, print_show( 0 )() );
 
 	ipc::socket::call< void ( destruct_ptr< print > ) >
 		print_destruct( client, "print_destruct" );
-	except( "unknown destruct_ptr argument", print_destruct( 0 )() );
+	OOE_EXCEPT( "unknown destruct_ptr argument", error::runtime, print_destruct( 0 )() );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
