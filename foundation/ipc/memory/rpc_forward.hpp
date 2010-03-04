@@ -46,13 +46,16 @@ inline void validate( error_t error, const u8* data )
 	case error::link:
 		throw error::connection();
 
+	case error::canary:
+		throw error::violation();
+
 	default:
 		throw error::rpc( false ) << "Unknown error: " << error;
 	}
 }
 
 //--- store_header ---------------------------------------------------------------------------------
-inline void store_header( shared_allocator& allocator, io_buffer& buffer, up_t size, index_t index )
+inline void store_header( io_buffer& buffer, up_t size, index_t index )
 {
 	u8* data = buffer.get();
 	up_t preserve = stream_size< bool_t, index_t >::call( true, index );
@@ -66,13 +69,13 @@ inline void store_header( shared_allocator& allocator, io_buffer& buffer, up_t s
 	else
 	{
 		stream_write< bool_t, index_t, std::string >::
-			call( data, internal, index, allocator.name() );
+			call( data, internal, index, buffer.get_allocator< shared_allocator >().name() );
 		buffer.preserve( 0 );
 	}
 }
 
 //--- load_header ----------------------------------------------------------------------------------
-inline void load_header( shared_allocator& allocator, io_buffer& buffer )
+inline void load_header( io_buffer& buffer )
 {
 	buffer.reset();
 
@@ -88,7 +91,7 @@ inline void load_header( shared_allocator& allocator, io_buffer& buffer )
 
 	if ( OOE_UNLIKELY( !internal ) )
 	{
-		allocator.set( name );
+		buffer.get_allocator< shared_allocator >().set( name );
 		buffer.external();
 	}
 }
@@ -129,13 +132,13 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 
 		up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 			call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-		store_header( allocator, buffer, size, index );
+		store_header( buffer, size, index );
 		stream_write< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 			call( buffer.get() BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 		transport.notify();
 
-		load_header( allocator, buffer );
+		load_header( buffer );
 	}
 };
 
@@ -158,13 +161,13 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 
 		up_t size = stream_size< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 			call( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-		store_header( allocator, buffer, size, index );
+		store_header( buffer, size, index );
 		stream_write< BOOST_PP_ENUM_PARAMS( LIMIT, t ) >::
 			call( buffer.get() BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) );
 
 		transport.notify();
 
-		load_header( allocator, buffer );
+		load_header( buffer );
 		result_type value;
 		stream_read< result_type >::call( buffer.get(), value );
 		return value;

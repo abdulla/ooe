@@ -41,6 +41,7 @@ public:
 	up_t size( void ) const;
 	void* private_data( void ) const;
 	std::string name( void ) const;
+	bool in_canary( const void* ) const;
 
 	void unlink( void );
 	void migrate( ooe::socket& );

@@ -3,8 +3,10 @@
 #ifndef OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 #define OOE_FOUNDATION_IPC_IO_BUFFER_HPP
 
+#include "foundation/executable/environment.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/shared_memory.hpp"
+#include "foundation/utility/arithmetic.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
@@ -68,8 +70,13 @@ public:
 
 	virtual void allocate( up_t size )
 	{
+		size = round_up< executable::static_page_size >( size + executable::static_page_size );
 		scoped_ptr< shared_memory >
 			( new shared_memory( unique_name(), shared_memory::create, size ) ).swap( memory );
+
+		ooe::memory::region
+			window( size - executable::static_page_size, executable::static_page_size );
+		memory->protect( ooe::memory::none, window );
 	}
 
 	virtual u8* get( up_t ) const
@@ -85,11 +92,22 @@ public:
 	void set( const std::string& name_ )
 	{
 		scoped_ptr< shared_memory >( new shared_memory( name_ ) ).swap( memory );
+
+		ooe::memory::region
+			window( memory->size() - executable::static_page_size, executable::static_page_size );
+		memory->protect( ooe::memory::none, window );
 	}
 
 	std::string name( void ) const
 	{
 		return memory->name();
+	}
+
+	bool in_canary( const void* pointer ) const
+	{
+		const u8* end = memory->as< u8 >() + memory->size();
+		const u8* begin = end - executable::static_page_size;
+		return pointer >= begin && pointer < end;
 	}
 
 private:
@@ -141,6 +159,12 @@ public:
 	bool is_internal( void ) const
 	{
 		return internal;
+	}
+
+	template< typename type >
+		type& get_allocator( void )
+	{
+		return static_cast< type& >( allocator );
 	}
 
 private:

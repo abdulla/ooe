@@ -3,6 +3,7 @@
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
@@ -22,6 +23,9 @@ transport::transport( bool created_ )
 {
 }
 
+BOOST_STATIC_ASSERT( executable::static_page_size >
+	sizeof( unnamed_semaphore ) * 2 + ooe::ipc::memory::transport::private_size );
+
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
@@ -29,11 +33,13 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( const std::string& name_, type mode )
 	: platform::ipc::memory::transport( mode == create ),
-	memory( name_, cast( mode == create ), executable::static_page_size )
+	memory( name_, cast( mode == create ), executable::static_page_size * 2 )
 {
-	BOOST_STATIC_ASSERT( executable::static_page_size >
-		sizeof( platform::ipc::unnamed_semaphore ) * 2 + private_size );
-	platform::ipc::unnamed_semaphore* pointer = memory.as< platform::ipc::unnamed_semaphore >();
+	ooe::memory::region window( executable::static_page_size, executable::static_page_size );
+	memory.protect( ooe::memory::none, window );
+
+	platform::ipc::unnamed_semaphore* pointer =
+		add< platform::ipc::unnamed_semaphore >( memory.get(), private_size );
 
 	if ( created )
 	{
@@ -51,7 +57,11 @@ transport::transport( ooe::socket& socket )
 	: platform::ipc::memory::transport( shared_memory::open ),
 	memory( std::string(), socket.receive() )
 {
-	platform::ipc::unnamed_semaphore* pointer = memory.as< platform::ipc::unnamed_semaphore >();
+	ooe::memory::region window( executable::static_page_size, executable::static_page_size );
+	memory.protect( ooe::memory::none, window );
+
+	platform::ipc::unnamed_semaphore* pointer =
+		add< platform::ipc::unnamed_semaphore >( memory.get(), private_size );
 	in = pointer + 0;
 	out = pointer + 1;
 }
@@ -90,12 +100,13 @@ void transport::wake_notify( void )
 
 u8* transport::get( void ) const
 {
-	return memory.as< u8 >() + sizeof( platform::ipc::unnamed_semaphore ) * 2;
+	return memory.as< u8 >() + sizeof( platform::ipc::unnamed_semaphore ) * 2 + private_size;
 }
 
 up_t transport::size( void ) const
 {
-	return memory.size() - sizeof( platform::ipc::unnamed_semaphore ) * 2 - private_size;
+	return memory.size() - sizeof( platform::ipc::unnamed_semaphore ) * 2 - private_size -
+		executable::static_page_size;
 }
 
 void transport::migrate( ooe::socket& socket )

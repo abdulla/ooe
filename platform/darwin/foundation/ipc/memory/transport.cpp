@@ -61,6 +61,8 @@ transport::transport( ooe::socket& socket )
 {
 }
 
+BOOST_STATIC_ASSERT( executable::static_page_size > ooe::ipc::memory::transport::private_size );
+
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
@@ -68,14 +70,18 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( const std::string& name_, type mode )
 	: platform::ipc::memory::transport( name_, mode == create ),
-	memory( name_, cast_shm( mode ), executable::static_page_size )
+	memory( name_, cast_shm( mode ), executable::static_page_size * 2 )
 {
-	BOOST_STATIC_ASSERT( executable::static_page_size > private_size );
+	ooe::memory::region window( executable::static_page_size, executable::static_page_size );
+	memory.protect( ooe::memory::none, window );
 }
 
 transport::transport( ooe::socket& socket )
 	: platform::ipc::memory::transport( socket ), memory( std::string(), socket.receive() )
 {
+	ooe::memory::region window( executable::static_page_size, executable::static_page_size );
+	memory.protect( ooe::memory::none, window );
+
 	in.unlinkable = true;
 	out.unlinkable = true;
 }
@@ -109,12 +115,12 @@ void transport::wake_notify( void )
 
 u8* transport::get( void ) const
 {
-	return memory.as< u8 >();
+	return memory.as< u8 >() + private_size;
 }
 
 up_t transport::size( void ) const
 {
-	return memory.size() - private_size;
+	return memory.size() - private_size - executable::static_page_size;
 }
 
 void transport::migrate( ooe::socket& socket )

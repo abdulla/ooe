@@ -46,6 +46,10 @@ switchboard::size_type switchboard::execute( index_t index, io_buffer& buffer, p
 		executed = true;
 		result_size = tuple._0( tuple._1, buffer, pool );
 	}
+	catch ( error::violation& error )
+	{
+		throw;
+	}
 	catch ( error::verification& error )
 	{
 		error_size = return_error( buffer, false, error.what(), error.where() );

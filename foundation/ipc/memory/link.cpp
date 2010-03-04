@@ -106,7 +106,7 @@ void* link_client::call( void* pointer )
 		return 0;
 
 	// wake for result, indicating that an error in the link has occurred
-	stream_write< bool_t, error_t >::call( transport.get(), true, error::link );
+	stream_write< bool_t, error_t, const c8* >::call( transport.get(), true, error::link, "" );
 	transport.wake_notify();
 	state = false;
 	return 0;

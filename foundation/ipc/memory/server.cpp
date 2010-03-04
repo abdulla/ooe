@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#include <csignal>
+
+#include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/server.hpp"
@@ -9,14 +12,25 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
-OOE_TLS( ipc::memory::servlet* ) servlet_tls;
-
 typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool* > tuple_type;
 
-//--- ipc_decode -----------------------------------------------------------------------------------
-void ipc_decode( const void* pointer )
+OOE_TLS( servlet* ) servlet_tls;
+executable::signal_handler_type prior_handler;
+
+//--- signal_handler -------------------------------------------------------------------------------
+void signal_handler( s32 code, siginfo* info, void* context )
 {
-	const tuple_type& tuple = *static_cast< const tuple_type* >( pointer );
+	servlet* servlet = servlet_tls;
+
+	if ( servlet )
+		servlet->verify( info->si_addr );
+
+	prior_handler( code, info, context );
+}
+
+//--- ipc_decode -----------------------------------------------------------------------------------
+void ipc_decode( const tuple_type& tuple )
+{
 	shared_allocator& allocator = tuple._1;
 	io_buffer& buffer = tuple._2;
 	buffer.reset();
@@ -54,6 +68,22 @@ void ipc_decode( const void* pointer )
 	}
 }
 
+//--- ipc_catch ------------------------------------------------------------------------------------
+void ipc_catch( const void* pointer )
+{
+	const tuple_type& tuple = *static_cast< const tuple_type* >( pointer );
+
+	try
+	{
+		ipc_decode( tuple );
+	}
+	catch ( error::violation& error )
+	{
+		// indicate that there was a data violation error
+		stream_write< bool_t, error_t, const c8* >::call( tuple._2.get(), true, error::canary, "" );
+	}
+}
+
 //--- ipc_link -------------------------------------------------------------------------------------
 up_t ipc_link( const any& any, io_buffer& buffer, pool& pool )
 {
@@ -83,7 +113,8 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 servlet::servlet( const std::string& link_name, link_t link_, const ipc::switchboard& switchboard_,
 	server& server )
 	: transport( link_name, transport::create ), link( link_ ), switchboard( switchboard_ ),
-	link_listen( new memory::link_listen( link_name ) ), link_server( 0 ), state( true ),
+	link_listen( new memory::link_listen( link_name ) ), link_server( 0 ), allocator(),
+	buffer( transport.get(), transport.size(), allocator ), state( true ),
 	thread( make_function( *this, &servlet::call ), &server )
 {
 }
@@ -91,7 +122,8 @@ servlet::servlet( const std::string& link_name, link_t link_, const ipc::switchb
 servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchboard_,
 	server& server )
 	: transport( socket ), link( link_ ), switchboard( switchboard_ ), link_listen( 0 ),
-	link_server( new memory::link_server( socket.receive(), link, server ) ), state( true ),
+	link_server( new memory::link_server( socket.receive(), link, server ) ), allocator(),
+	buffer( transport.get(), transport.size(), allocator ), state( true ),
 	thread( make_function( *this, &servlet::call ), &server )
 {
 	client_data& data = *static_cast< client_data* >( transport.private_data() );
@@ -121,15 +153,19 @@ void servlet::migrate( socket& socket, semaphore& semaphore, server& server )
 	server.unlink( link, false );
 }
 
+void servlet::verify( const void* pointer )
+{
+	bool inside =
+		buffer.is_internal() ? transport.in_canary( pointer ) : allocator.in_canary( pointer );
+
+	if ( inside )
+		throw error::violation();
+}
+
 void* servlet::call( void* pointer )
 {
 	memory::server& server = *static_cast< memory::server* >( pointer );
 	atom_ptr< servlet > guard = server.find( link );
-
-	shared_allocator allocator;
-	io_buffer buffer( transport.get(), transport.size(), allocator );
-	pool pool;
-	tuple_type tuple( switchboard, allocator, buffer, &pool );
 
 	if ( link_listen )
 	{
@@ -140,10 +176,12 @@ void* servlet::call( void* pointer )
 		transport.unlink();
 	}
 
+	pool pool;
+	tuple_type tuple( switchboard, allocator, buffer, &pool );
 	servlet_tls = this;
 
 	while ( OOE_LIKELY( state ) )
-		transport.wait( ipc_decode, &tuple );
+		transport.wait( ipc_catch, &tuple );
 
 	return 0;
 }
@@ -159,6 +197,12 @@ server::server( const std::string& name_, const switchboard& external_ )
 		throw error::runtime( "ipc::memory::server: " ) << "\"link\" not at index 1";
 	else if ( internal.insert_direct( ipc_unlink, this ) != 2 )
 		throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
+
+	struct sigaction action;
+	executable::signal_handler_type prior = executable::signal( action, signal_handler, SIGSEGV );
+
+	if ( prior != signal_handler )
+		prior_handler = prior;
 }
 
 server::~server( void )
@@ -177,7 +221,7 @@ bool server::decode( void )
 	shared_allocator allocator;
 	io_buffer buffer( transport.get(), transport.size(), allocator );
 	tuple_type tuple( internal, allocator, buffer, 0 );
-	transport.wait( ipc_decode, &tuple );
+	transport.wait( ipc_catch, &tuple );
 	return !map.empty();
 }
 

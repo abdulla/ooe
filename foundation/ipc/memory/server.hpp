@@ -17,6 +17,7 @@ public:
 
 	void join( void );
 	void migrate( ooe::socket&, semaphore&, server& );
+	void verify( const void* );
 
 private:
 	memory::transport transport;
@@ -25,6 +26,10 @@ private:
 
 	scoped_ptr< const memory::link_listen > link_listen;
 	scoped_ptr< memory::link_server > link_server;
+
+	shared_allocator allocator;
+	io_buffer buffer;
+
 	atom< bool > state;
 	ooe::thread thread;
 
