@@ -3,16 +3,15 @@
 #ifndef OOE_FOUNDATION_EXECUTABLE_PROGRAM_HPP
 #define OOE_FOUNDATION_EXECUTABLE_PROGRAM_HPP
 
+#include <csignal>
+
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 
-struct siginfo;
-struct sigaction;
-
 OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
 
-typedef void ( * signal_handler_type )( s32, siginfo*, void* );
+typedef void ( * signal_handler_type )( s32, siginfo_t*, void* );
 typedef bool ( * launch_type )( const std::string&, const std::string&, s32, c8** );
 typedef tuple< std::string, std::string > path_tuple;
 

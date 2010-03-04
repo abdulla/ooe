@@ -4,7 +4,6 @@
 #include <iostream>
 #include <list>
 
-#include <csignal>
 #include <cstdlib>
 
 #include <fcntl.h>

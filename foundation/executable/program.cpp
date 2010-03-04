@@ -4,7 +4,6 @@
 
 #include <cerrno>
 #include <climits>
-#include <csignal>
 #include <cstdlib>
 
 #include <fcntl.h>
@@ -18,7 +17,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 s32 signal_code = 0;
 
-void signal_handler( s32 code, siginfo* info, void* )
+void signal_handler( s32 code, siginfo_t* info, void* )
 {
 	const c8* description;
 	std::string trace;

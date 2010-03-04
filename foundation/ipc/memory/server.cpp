@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <csignal>
-
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/client.hpp"
@@ -18,7 +16,7 @@ OOE_TLS( servlet* ) servlet_tls;
 executable::signal_handler_type prior_handler;
 
 //--- signal_handler -------------------------------------------------------------------------------
-void signal_handler( s32 code, siginfo* info, void* context )
+void signal_handler( s32 code, siginfo_t* info, void* context )
 {
 	servlet* servlet = servlet_tls;
 

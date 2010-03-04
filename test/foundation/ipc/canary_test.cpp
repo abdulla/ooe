@@ -44,7 +44,7 @@ private:
 
 	void start_server( const std::string& name ) const
 	{
-	//	executable::null_fd( STDOUT_FILENO );
+		executable::null_fd( STDOUT_FILENO );
 		ipc::nameservice nameservice;
 		nameservice.insert( "print", print );
 

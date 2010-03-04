@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include <csignal>
 #include <cstdlib>
 
 #include "foundation/executable/program.hpp"
