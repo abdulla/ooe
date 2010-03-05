@@ -13,6 +13,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool* > tuple_type;
 
 OOE_TLS( servlet* ) servlet_tls;
+atom< u32 > active_servers;
 executable::signal_handler_type prior_handler;
 
 //--- signal_handler -------------------------------------------------------------------------------
@@ -181,15 +182,21 @@ server::server( const std::string& name_, const switchboard& external_ )
 	else if ( internal.insert_direct( ipc_unlink, this ) != 2 )
 		throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
 
-	struct sigaction action;
-	executable::signal_handler_type prior = executable::signal( action, signal_handler, SIGSEGV );
-
-	if ( prior != signal_handler )
-		prior_handler = prior;
+	if ( !active_servers++ )
+	{
+		struct sigaction action;
+		prior_handler = executable::signal( action, signal_handler, OOE_SIGFAULT );
+	}
 }
 
 server::~server( void )
 {
+	if ( !--active_servers )
+	{
+		struct sigaction action;
+		executable::signal( action, prior_handler, OOE_SIGFAULT );
+	}
+
 	for ( servlet_map::iterator i = map.begin(), end = map.end(); i != end; ++i )
 		i->second->join();
 }
