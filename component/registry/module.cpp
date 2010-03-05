@@ -7,17 +7,6 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- facade_id ------------------------------------------------------------------------------------
-facade_id::facade_id( const void* pointer_, function_type function_ )
-	: pointer( pointer_ ), function( function_ )
-{
-}
-
-facade_id::~facade_id( void )
-{
-	function( pointer );
-}
-
 //--- module ---------------------------------------------------------------------------------------
 const interface::vector_type& module::names( void ) const
 {
@@ -61,10 +50,10 @@ const void* module::find( const std::string& name ) const
 	if ( i == map.end() || i->first != name )
 		throw error::runtime( "module: " ) << "Unable to find \"" << name << "\", does not exist";
 
-	return i->second->pointer;
+	return i->second;
 }
 
-void module::insert( const std::string& name, const map_ptr& pointer )
+void module::insert( const std::string& name, const opaque_ptr& pointer )
 {
 	map_type::const_iterator i = map.find( name );
 

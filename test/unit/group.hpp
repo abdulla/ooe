@@ -40,10 +40,9 @@ namespace ooe
 		typedef void ( * function_type )( void* );
 		typedef std::vector< function_type > vector_type;
 		typedef vector_type::const_iterator iterator_type;
-		typedef tuple< void*, void ( * )( const void* ) > setup_tuple;
 
 		virtual ~group_base( void ) {}
-		virtual setup_tuple create_setup( void ) = 0;
+		virtual opaque_ptr create_setup( void ) = 0;
 
 		iterator_type begin( void ) const;
 		iterator_type end( void ) const;
@@ -70,9 +69,9 @@ namespace ooe
 		}
 
 	private:
-		virtual setup_tuple create_setup( void )
+		virtual opaque_ptr create_setup( void )
 		{
-			return setup_tuple( new setup_type, destroy< setup_type > );
+			return opaque_ptr( new setup_type, destroy< setup_type > );
 		}
 	};
 

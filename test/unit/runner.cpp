@@ -97,8 +97,7 @@ namespace
 
 	vector_type run_group( unit::group_base& group, time_t time_out, bool no_stdout )
 	{
-		unit::group_base::setup_tuple tuple = group.create_setup();
-		scoped< void ( const void* ) > scoped_setup( tuple._1, tuple._0 );
+		opaque_ptr pointer = group.create_setup();
 		list_type list;
 		up_t j = 0;
 
@@ -110,7 +109,7 @@ namespace
 			if ( !fork_io.is_child() )
 				list.push_back( list_tuple( j++, fork_io, pair._0, timer() ) );
 			else
-				run_test( i, tuple._0, no_stdout );
+				run_test( i, pointer, no_stdout );
 		}
 
 		vector_type vector( j );

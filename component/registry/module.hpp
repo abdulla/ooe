@@ -11,25 +11,12 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- facade_id ------------------------------------------------------------------------------------
-struct OOE_VISIBLE facade_id
-{
-	typedef void ( * function_type )( const void* );
-
-	const void* pointer;
-	function_type function;
-
-	facade_id( const void*, function_type );
-	~facade_id( void );
-};
-
 //--- module ---------------------------------------------------------------------------------------
 class module
 {
 public:
 	typedef std::vector< const c8* > vector_type;
-	typedef shared_ptr< facade_id > map_ptr;
-	typedef std::map< std::string, map_ptr > map_type;
+	typedef std::map< std::string, opaque_ptr > map_type;
 
 	const interface::vector_type& names( void ) const OOE_VISIBLE;
 	const vector_type& docs( void ) const OOE_VISIBLE;
@@ -37,14 +24,7 @@ public:
 	up_t insert( const std::string&, const std::string&, const c8* ) OOE_VISIBLE;
 
 	const void* find( const std::string& ) const OOE_VISIBLE;
-	void insert( const std::string&, const map_ptr& ) OOE_VISIBLE;
-
-	template< typename type >
-		void insert( const std::string& name, scoped_ptr< type >& pointer )
-	{
-		insert( name, new facade_id( pointer, destroy< type > ) );
-		pointer.release();
-	}
+	void insert( const std::string&, const opaque_ptr& ) OOE_VISIBLE;
 
 private:
 	interface face;
