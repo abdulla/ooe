@@ -315,6 +315,99 @@ template< typename type >
 	}
 };
 
+//--- opaque_ref -----------------------------------------------------------------------------------
+class opaque_ref
+{
+public:
+	typedef void ( * function_type )( const void* );
+
+	opaque_ref( void* value_, function_type function_ )
+		: refs( 1 ), value( value_ ), function( function_ )
+	{
+	}
+
+	void increment( void )
+	{
+		++refs;
+	}
+
+	void decrement( void )
+	{
+		if ( --refs )
+			return;
+
+		function( value );
+		delete this;
+	}
+
+	void* get( void ) const
+	{
+		return value;
+	}
+
+private:
+	unsigned refs;
+	void* const value;
+	const function_type function;
+};
+
+//--- opaque_ptr -----------------------------------------------------------------------------------
+class opaque_ptr
+{
+public:
+	typedef void ( * function_type )( const void* );
+
+	opaque_ptr( void* value, function_type function )
+		: ref( new opaque_ref( value, function ) )
+	{
+	}
+
+	opaque_ptr( const opaque_ptr& copy )
+		: ref( copy.ref )
+	{
+		ref->increment();
+	}
+
+	~opaque_ptr( void )
+	{
+		ref->decrement();
+	}
+
+	opaque_ptr& operator =( const opaque_ptr& copy )
+	{
+		copy.ref->increment();
+		ref->decrement();
+		ref = copy.ref;
+		return *this;
+	}
+
+	operator void*( void ) const
+	{
+		return ref->get();
+	}
+
+	void* get( void ) const
+	{
+		return ref->get();
+	}
+
+	template< typename to >
+		to* as( void ) const
+	{
+		return reinterpret_cast< to* >( ref->get() );
+	}
+
+	void swap( opaque_ptr& exchange )
+	{
+		opaque_ref* save = ref;
+		ref = exchange.ref;
+		exchange.ref = save;
+	}
+
+private:
+	opaque_ref* ref;
+};
+
 OOE_NAMESPACE_END( ( ooe ) )
 
 #endif	// OOE_FOUNDATION_UTILITY_POINTER_HPP
