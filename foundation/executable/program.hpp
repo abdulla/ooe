@@ -5,6 +5,7 @@
 
 #include <csignal>
 
+#include "foundation/executable/program_forward.hpp"
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"

@@ -24,9 +24,8 @@ void signal_handler( s32 code, siginfo_t* info, void* )
 
 	switch ( code )
 	{
+	case OOE_SIGFAULT:
 	case SIGFPE:
-	case SIGBUS:
-	case SIGSEGV:
 	case SIGABRT:
 		description = strsignal( code );
 		trace = stack_trace();
@@ -78,9 +77,8 @@ s32 launch( launch_type launch, s32 argc, c8** argv )
 	::signal( SIGCHLD, SIG_IGN );
 
 	struct sigaction action;
+	signal( action, signal_handler, OOE_SIGFAULT );
 	signal( action, signal_handler, SIGFPE );
-	signal( action, signal_handler, SIGBUS );
-	signal( action, signal_handler, SIGSEGV );
 	signal( action, signal_handler, SIGTERM );
 
 	s32 status = EXIT_FAILURE;
