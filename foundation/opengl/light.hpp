@@ -27,4 +27,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_OPENGL_LIGHT_GL_HPP
+#endif	// OOE_FOUNDATION_OPENGL_LIGHT_HPP

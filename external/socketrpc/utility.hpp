@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_EXTERNAL_SOCKETRPC_CONSTANTS_HPP
-#define OOE_EXTERNAL_SOCKETRPC_CONSTANTS_HPP
+#ifndef OOE_EXTERNAL_SOCKETRPC_UTILITY_HPP
+#define OOE_EXTERNAL_SOCKETRPC_UTILITY_HPP
 
 #include <cstdlib>
 
@@ -28,4 +28,4 @@ inline up_t parse( s32 argc, c8** argv )
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_EXTERNAL_SOCKETRPC_CONSTANTS_HPP
+#endif	// OOE_EXTERNAL_SOCKETRPC_UTILITY_HPP

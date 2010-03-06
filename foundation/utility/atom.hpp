@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_UTILITY_ATOMIC_HPP
-#define OOE_FOUNDATION_UTILITY_ATOMIC_HPP
+#ifndef OOE_FOUNDATION_UTILITY_ATOM_HPP
+#define OOE_FOUNDATION_UTILITY_ATOM_HPP
 
 #include "foundation/utility/pointer.hpp"
 
@@ -125,4 +125,4 @@ template< typename type >
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_UTILITY_ATOMIC_HPP
+#endif	// OOE_FOUNDATION_UTILITY_ATOM_HPP

@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
-#define OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
+#ifndef OOE_FOUNDATION_IPC_SEMAPHORE_HPP
+#define OOE_FOUNDATION_IPC_SEMAPHORE_HPP
 
 #include "foundation/ipc/semaphore_forward.hpp"
 #include "foundation/utility/noncopyable.hpp"
@@ -71,4 +71,4 @@ void barrier_notify( const std::string& ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_SEMAPHORE_HPP
+#endif	// OOE_FOUNDATION_IPC_SEMAPHORE_HPP

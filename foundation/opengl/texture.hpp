@@ -30,4 +30,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_OPENGL_TEXTURE_GL_HPP
+#endif	// OOE_FOUNDATION_OPENGL_TEXTURE_HPP
