@@ -30,8 +30,14 @@ vm::~vm( void )
 
 void vm::load( const std::string& name, const descriptor& desc )
 {
-	memory memory( desc );
-	object result = PyRun_String( memory.as< c8 >(), Py_file_input, globals, globals );
+	std::string script;
+
+	{
+		memory memory( desc );
+		script = std::string( memory.as< c8 >(), memory.size() );
+	}
+
+	object result = PyRun_String( script.c_str(), Py_file_input, globals, globals );
 
 	if ( result )
 		return;
