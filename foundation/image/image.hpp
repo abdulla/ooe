@@ -17,41 +17,13 @@ namespace ooe
 	public:
 		enum
 		{
-			uncompressed = 127,
+			uncompressed = 0,
 			compressed = 128
 		};
 
-		const u32 width;
-		const u32 height;
-		const u8 format;
-
-		template< typename to >
-			to* as( void ) const
-		{
-			return data.as< to >();
-		}
-
-		void* get( void ) const
-		{
-			return data.get();
-		}
-
-	protected:
-		typedef up_t ( image::* function_type )( void );
-
-		image( u32, u32, u8, function_type );
-
-	private:
-		const shared_free< void > data;
-	};
-
-//--- uncompressed_image -------------------------------------------------------
-	struct OOE_VISIBLE uncompressed_image
-		: public image
-	{
 		enum type
 		{
-			bgr_u8,
+			bgr_u8		= uncompressed,
 			bgra_u8,
 
 			rgb_u8,
@@ -70,9 +42,46 @@ namespace ooe
 			rgba_f32,
 			a_f32,
 			y_f32,
-			ya_f32
+			ya_f32,
+
+			rgba_dxt1	= compressed,
+			rgba_dxt3,
+			rgba_dxt5
 		};
 
+		const u32 width;
+		const u32 height;
+		const type format;
+
+		template< typename to >
+			to* as( void ) const
+		{
+			return data.as< to >();
+		}
+
+		void* get( void ) const
+		{
+			return data.get();
+		}
+
+		shared_free< void > ptr( void ) const
+		{
+			return data;
+		}
+
+	protected:
+		typedef up_t ( image::* function_type )( void );
+
+		image( u32, u32, type, function_type );
+
+	private:
+		const shared_free< void > data;
+	};
+
+//--- uncompressed_image -------------------------------------------------------
+	struct OOE_VISIBLE uncompressed_image
+		: public image
+	{
 		uncompressed_image( u32, u32, type );
 		uncompressed_image( const image& );
 
@@ -87,13 +96,6 @@ namespace ooe
 	struct OOE_VISIBLE compressed_image
 		: public image
 	{
-		enum type
-		{
-			rgba_dxt1 = compressed,
-			rgba_dxt3,
-			rgba_dxt5
-		};
-
 		compressed_image( u32, u32, type );
 		compressed_image( const image& );
 

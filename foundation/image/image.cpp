@@ -5,10 +5,23 @@
 #include "foundation/image/image.hpp"
 #include "foundation/utility/error.hpp"
 
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+
+image::type validate( image::type format, bool compressed )
+{
+	if ( ( format >= image::type( image::compressed ) ) == compressed )
+		return format;
+
+	throw error::runtime( "image: " ) << "Format mismatch, " <<
+		( compressed ? "compressed" : "uncompressed" ) << " image expected";
+}
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+
 namespace ooe
 {
 //--- image --------------------------------------------------------------------
-	image::image( u32 width_, u32 height_, u8 format_, function_type byte_size )
+	image::image( u32 width_, u32 height_, type format_, function_type byte_size )
 		: width( width_ ), height( height_ ), format( format_ ),
 		data( std::malloc( ( this->*byte_size )() ) )
 	{
@@ -16,7 +29,7 @@ namespace ooe
 
 //--- uncompressed_image -------------------------------------------------------
 	uncompressed_image::uncompressed_image( u32 width_, u32 height_, type format_ )
-		: image( width_, height_, format_,
+		: image( width_, height_, validate( format_, false ),
 		reinterpret_cast< function_type >( &uncompressed_image::byte_size ) )
 	{
 	}
@@ -24,8 +37,7 @@ namespace ooe
 	uncompressed_image::uncompressed_image( const image& image_ )
 		: image( image_ )
 	{
-		if ( image_.format > uncompressed )
-			throw error::runtime( "uncompressed_image: " ) << "Image is compressed";
+		validate( format, false );
 	}
 
 	u8 uncompressed_image::channels( void ) const
@@ -111,7 +123,7 @@ namespace ooe
 
 //--- compressed_image ---------------------------------------------------------
 	compressed_image::compressed_image( u32 width_, u32 height_, type format_ )
-		: image( width_, height_, format_,
+		: image( width_, height_, validate( format_, true ),
 		reinterpret_cast< function_type >( &compressed_image::byte_size ) )
 	{
 	}
@@ -119,8 +131,7 @@ namespace ooe
 	compressed_image::compressed_image( const image& image_ )
 		: image( image_ )
 	{
-		if ( image_.format < compressed )
-			throw error::runtime( "compressed_image: " ) << "Image is uncompressed";
+		validate( format, true );
 	}
 
 	u8 compressed_image::channels( void ) const
