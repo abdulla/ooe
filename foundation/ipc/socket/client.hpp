@@ -5,7 +5,6 @@
 
 #include <map>
 
-#include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/parallel/lock.hpp"
 #include "foundation/parallel/thread.hpp"
@@ -48,7 +47,7 @@ private:
 	ooe::condition condition;
 	ooe::thread thread;
 
-	mutable u8 scratch[ executable::static_page_size ];
+	scoped_array< u8 > scratch;
 
 	void* call( void* ) OOE_HIDDEN;
 };

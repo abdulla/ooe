@@ -20,7 +20,7 @@ namespace
 
 	typedef u8 buffer_type[ executable::static_page_size ];
 	typedef tuple< std::jmp_buf, std::string, const u8*, up_t > read_tuple;
-	typedef tuple< std::jmp_buf, std::string, buffer_type, file* > write_tuple;
+	typedef tuple< std::jmp_buf, std::string, u8*, file* > write_tuple;
 
 	//--- error manager functions ----------------------------------------------
 	template< typename type >
@@ -69,7 +69,7 @@ namespace
 	{
 		write_struct->dest->next_output_byte =
 			static_cast< write_tuple* >( write_struct->client_data )->_2;
-		write_struct->dest->free_in_buffer = executable::static_page_size;
+		write_struct->dest->free_in_buffer = sizeof( buffer_type );
 	}
 
 	void jpeg_write( jpeg_compress_struct* write_struct, up_t size )
@@ -86,17 +86,16 @@ namespace
 
 	s32 jpeg_empty( jpeg_compress_struct* write_struct )
 	{
-		jpeg_write( write_struct, executable::static_page_size );
+		jpeg_write( write_struct, sizeof( buffer_type ) );
 		write_struct->dest->next_output_byte =
 			static_cast< write_tuple* >( write_struct->client_data )->_2;
-		write_struct->dest->free_in_buffer = executable::static_page_size;
+		write_struct->dest->free_in_buffer = sizeof( buffer_type );
 		return true;
 	}
 
 	void jpeg_term( jpeg_compress_struct* write_struct )
 	{
-		jpeg_write
-			( write_struct, executable::static_page_size - write_struct->dest->free_in_buffer );
+		jpeg_write( write_struct, sizeof( buffer_type ) - write_struct->dest->free_in_buffer );
 	}
 
 	//--- image format functions -----------------------------------------------
@@ -219,8 +218,10 @@ namespace ooe
 		error_struct.error_exit = jpeg_error< write_tuple >;
 		error_struct.output_message = jpeg_warning;
 
+		buffer_type buffer;
 		file file( desc );
 		write_tuple tuple;
+		tuple._2 = buffer;
 		tuple._3 = &file;
 		write_struct.client_data = &tuple;
 
