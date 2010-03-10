@@ -29,7 +29,7 @@ class Build( object ):
 	WARNING_FLAGS	= Split( '-Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wnon-virtual-dtor '
 		'-Wcast-align -Woverloaded-virtual -Wreorder -Wpointer-arith -Wwrite-strings '
 		'-Wno-long-long -Wformat=2 -Wstrict-aliasing -Wmissing-include-dirs -Wswitch-default '
-		'-Wlarger-than=4096 -Wundef' )
+		'-Wlarger-than-4096 -Wundef' )
 
 	COLOURS = {
 		'cyan':		'\033[46m',
