@@ -1,31 +1,15 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <vector>
-
 #include <cstring>
 
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/video/video_ng.hpp"
+#include "foundation/video/video_forward_ng.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- texture_handle -------------------------------------------------------------------------------
-struct texture_handle
-{
-	typedef std::vector< shared_free< void > > vector_type;
-
-	u32 width;
-	u32 height;
-	image::type format;
-	vector_type vector;
-
-	texture_handle( u32 width_, u32 height_, image::type format_ )
-		: width( width_ ), height( height_ ), format( format_ ), vector()
-	{
-	}
-};
-
+//--- texture_function -----------------------------------------------------------------------------
 void texture_function( opaque_ptr& pointer, const image& image, u8 level )
 {
 	texture_handle& handle = *pointer.as< texture_handle >();
@@ -48,16 +32,7 @@ void texture_function( opaque_ptr& pointer, const image& image, u8 level )
 	vector[ level ] = image.ptr();
 }
 
-//--- variable_handle ------------------------------------------------------------------------------
-struct variable_handle
-{
-	typedef u8 data_type[ sizeof( f32 ) * 4 * 4 ];
-	typedef tuple< std::string, variable::type, data_type > tuple_type;
-	typedef std::vector< tuple_type > vector_type;
-
-	vector_type vector;
-};
-
+//--- variable_function ----------------------------------------------------------------------------
 void variable_function
 	( opaque_ptr& pointer, const std::string& name, variable::type mode, const void* data, u8 size )
 {
@@ -68,35 +43,24 @@ void variable_function
 	pointer.as< variable_handle >()->vector.push_back( tuple );
 }
 
-//--- shader_handle --------------------------------------------------------------------------------
-struct shader_handle
+//--- texture_handle -------------------------------------------------------------------------------
+texture_handle::texture_handle( u32 width_, u32 height_, image::type format_ )
+	: width( width_ ), height( height_ ), format( format_ ), vector()
 {
-	shader::type type;
-	std::string text;
+}
 
-	shader_handle( shader::type type_, const std::string& text_ )
-		: type( type_ ), text( text_ )
-	{
-	}
-};
+//--- shader_handle --------------------------------------------------------------------------------
+shader_handle::shader_handle( shader::type type_, const std::string& text_ )
+	: type( type_ ), text( text_ )
+{
+}
 
 //--- buffer_handle --------------------------------------------------------------------------------
-struct buffer_handle
+buffer_handle::buffer_handle( buffer::type type_, const void* data_, up_t size_ )
+	: type( type_ ), size( size_ ), data( new u8[ size ] )
 {
-	buffer::type type;
-	up_t size;
-	scoped_array< u8 > data;
-
-	buffer_handle( buffer::type type_, const void* data_, up_t size_ )
-		: type( type_ ), size( size_ ), data( new u8[ size ] )
-	{
-		std::memcpy( data, data_, size );
-	}
-};
-
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
-
-OOE_NAMESPACE_BEGIN( ( ooe ) )
+	std::memcpy( data, data_, size );
+}
 
 //--- texture --------------------------------------------------------------------------------------
 texture::texture( u32 width, u32 height, image::type format )

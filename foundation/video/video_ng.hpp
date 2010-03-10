@@ -3,6 +3,8 @@
 #ifndef OOE_FOUNDATION_VIDEO_VIDEO_NG_HPP
 #define OOE_FOUNDATION_VIDEO_VIDEO_NG_HPP
 
+#include <vector>
+
 #include "foundation/image/image.hpp"
 #include "foundation/utility/string.hpp"
 
@@ -83,6 +85,15 @@ public:
 	};
 
 	buffer( type, const void*, up_t );
+
+private:
+	opaque_ptr pointer;
+};
+
+//--- frame ----------------------------------------------------------------------------------------
+class frame
+{
+public:
 
 private:
 	opaque_ptr pointer;
