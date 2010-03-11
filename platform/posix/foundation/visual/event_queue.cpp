@@ -7,7 +7,7 @@
 #include "foundation/utility/error.hpp"
 
 #define OOE_X_HEADER_INCLUDED
-#include "foundation/video/event_queue.hpp"
+#include "foundation/visual/event_queue.hpp"
 #undef OOE_X_HEADER_INCLUDED
 
 namespace ooe

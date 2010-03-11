@@ -7,9 +7,9 @@
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
-#include "foundation/video/event_queue.hpp"
-#include "foundation/video/video.hpp"
-#include "foundation/video/view.hpp"
+#include "foundation/visual/event_queue.hpp"
+#include "foundation/visual/video.hpp"
+#include "foundation/visual/view.hpp"
 
 namespace
 {

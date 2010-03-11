@@ -1,11 +1,11 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_VIDEO_VIEW_HPP
-#define OOE_FOUNDATION_VIDEO_VIEW_HPP
+#ifndef OOE_FOUNDATION_VISUAL_VIEW_HPP
+#define OOE_FOUNDATION_VISUAL_VIEW_HPP
 
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/noncopyable.hpp"
-#include "foundation/video/view_forward.hpp"
+#include "foundation/visual/view_forward.hpp"
 
 namespace ooe
 {
@@ -29,4 +29,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_VIDEO_VIEW_HPP
+#endif	// OOE_FOUNDATION_VISUAL_VIEW_HPP

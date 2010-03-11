@@ -1,11 +1,11 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_VIDEO_TEXT_HPP
-#define OOE_FOUNDATION_VIDEO_TEXT_HPP
+#ifndef OOE_FOUNDATION_VISUAL_TEXT_HPP
+#define OOE_FOUNDATION_VISUAL_TEXT_HPP
 
 #include "foundation/utility/pointer.hpp"
-#include "foundation/video/font.hpp"
-#include "foundation/video/video.hpp"
+#include "foundation/visual/font.hpp"
+#include "foundation/visual/video.hpp"
 
 namespace ooe
 {
@@ -34,4 +34,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_VIDEO_TEXT_HPP
+#endif	// OOE_FOUNDATION_VISUAL_TEXT_HPP

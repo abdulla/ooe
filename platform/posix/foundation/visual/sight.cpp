@@ -11,7 +11,7 @@
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
-#include "foundation/video/sight.hpp"
+#include "foundation/visual/sight.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 

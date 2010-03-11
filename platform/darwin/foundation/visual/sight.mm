@@ -5,7 +5,7 @@
 
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
-#include "foundation/video/sight.hpp"
+#include "foundation/visual/sight.hpp"
 
 using namespace ooe;
 

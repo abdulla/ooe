@@ -4,8 +4,8 @@
 
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
-#include "foundation/video/video_ng.hpp"
-#include "foundation/video/video_forward_ng.hpp"
+#include "foundation/visual/graphics.hpp"
+#include "foundation/visual/graphics_forward.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

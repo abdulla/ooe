@@ -1,11 +1,11 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_VIDEO_EVENT_QUEUE_HPP
-#define OOE_FOUNDATION_VIDEO_EVENT_QUEUE_HPP
+#ifndef OOE_FOUNDATION_VISUAL_EVENT_QUEUE_HPP
+#define OOE_FOUNDATION_VISUAL_EVENT_QUEUE_HPP
 
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/noncopyable.hpp"
-#include "foundation/video/event_queue_forward.hpp"
+#include "foundation/visual/event_queue_forward.hpp"
 
 namespace ooe
 {
@@ -46,4 +46,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_VIDEO_EVENT_QUEUE_HPP
+#endif	// OOE_FOUNDATION_VISUAL_EVENT_QUEUE_HPP

@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_VIDEO_VIDEO_NG_HPP
-#define OOE_FOUNDATION_VIDEO_VIDEO_NG_HPP
+#ifndef OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
+#define OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
 
 #include <vector>
 
@@ -80,8 +80,7 @@ public:
 		point,
 		index,
 		pixel_pack,
-		pixel_unpack,
-		frame
+		pixel_unpack
 	};
 
 	buffer( type, const void*, up_t );
@@ -114,4 +113,4 @@ private:
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_VIDEO_VIDEO_NG_HPP
+#endif	// OOE_FOUNDATION_VISUAL_GRAPHICS_HPP

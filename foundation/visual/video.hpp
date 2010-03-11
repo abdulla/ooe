@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_VIDEO_VIDEO_HPP
-#define OOE_FOUNDATION_VIDEO_VIDEO_HPP
+#ifndef OOE_FOUNDATION_VISUAL_VIDEO_HPP
+#define OOE_FOUNDATION_VISUAL_VIDEO_HPP
 
 #include "foundation/image/image.hpp"
 
@@ -365,4 +365,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_VIDEO_VIDEO_HPP
+#endif	// OOE_FOUNDATION_VISUAL_VIDEO_HPP

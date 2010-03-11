@@ -70,6 +70,7 @@ exec 'from platform.' + build.platform + ' import *'
 
 #--- foundation ------------------------------------------------------------------------------------
 build.Configurable( configure = UtilityConfigure )
+
 build.Linkable( 'executable', 'foundation/executable', frameworks = ooe.appkit.framework,
 	configure = ExecutableConfigure )
 build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.include_path,
@@ -78,8 +79,9 @@ build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
 build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
 build.Linkable( 'maths', 'foundation/maths' )
 build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
+build.Linkable( 'opengl_ng', 'foundation/opengl_ng', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
-build.Linkable( 'video', 'foundation/video', 'parallel', ooe.qtkit.framework,
+build.Linkable( 'visual', 'foundation/visual', 'parallel', ooe.qtkit.framework,
 	ooe.freetype.include_path, ooe.freetype.library_path, VideoConfigure )
 
 #--- component -------------------------------------------------------------------------------------
@@ -89,6 +91,8 @@ build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'python_host', 'component/python/host', 'executable python registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Executable( 'surrogate', 'component/registry/surrogate', 'executable registry' )
+build.Executable( 'ui', 'component/ui', 'executable ipc opengl_ng visual' )
+
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
 	configure = LuaConfigure )
@@ -104,19 +108,21 @@ build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
 build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
 build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
+
 build.Linkable( 'unit', 'test/unit', 'io executable' )
 
 #--- external --------------------------------------------------------------------------------------
-build.Executable( 'chunked', 'external/chunked', 'executable scene video' )
+build.Executable( 'chunked', 'external/chunked', 'executable scene visual' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'memoryrpc_input', 'external/memoryrpc/input', 'executable ipc' )
 build.Executable( 'memoryrpc_noop', 'external/memoryrpc/noop', 'executable ipc' )
 build.Executable( 'memoryrpc_output', 'external/memoryrpc/output', 'executable ipc' )
 build.Executable( 'memoryrpc_server', 'external/memoryrpc/server', 'executable ipc' )
-build.Executable( 'monitor', 'external/monitor', 'executable image video' )
+build.Executable( 'monitor', 'external/monitor', 'executable image visual' )
 build.Executable( 'socketrpc_input', 'external/socketrpc/input', 'executable ipc' )
 build.Executable( 'socketrpc_noop', 'external/socketrpc/noop', 'executable ipc' )
 build.Executable( 'socketrpc_output', 'external/socketrpc/output', 'executable ipc' )
 build.Executable( 'socketrpc_server', 'external/socketrpc/server', 'executable ipc' )
+
 build.Linkable( 'scene', 'external/scene', 'image io maths parallel' )
 build.Linkable( 'hello', 'external/hello', 'javascript lua python registry' )

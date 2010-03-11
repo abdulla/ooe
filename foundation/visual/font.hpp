@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_VIDEO_FONT_HPP
-#define OOE_FOUNDATION_VIDEO_FONT_HPP
+#ifndef OOE_FOUNDATION_VISUAL_FONT_HPP
+#define OOE_FOUNDATION_VISUAL_FONT_HPP
 
 #include "foundation/io/memory.hpp"
 
@@ -79,4 +79,4 @@ namespace ooe
 	};
 }
 
-#endif	// OOE_FOUNDATION_VIDEO_FONT_HPP
+#endif	// OOE_FOUNDATION_VISUAL_FONT_HPP

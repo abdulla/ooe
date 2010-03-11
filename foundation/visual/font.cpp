@@ -4,7 +4,7 @@
 #include FT_FREETYPE_H
 
 #include "foundation/utility/error.hpp"
-#include "foundation/video/font.hpp"
+#include "foundation/visual/font.hpp"
 
 namespace ooe
 {

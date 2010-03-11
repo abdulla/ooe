@@ -7,10 +7,10 @@
 
 #include "foundation/executable/library.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/video/event_queue.hpp"
+#include "foundation/visual/event_queue.hpp"
 
 #define OOE_X_HEADER_INCLUDED
-#include "foundation/video/view.hpp"
+#include "foundation/visual/view.hpp"
 #undef OOE_X_HEADER_INCLUDED
 
 namespace

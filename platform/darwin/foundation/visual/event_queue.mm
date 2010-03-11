@@ -3,7 +3,7 @@
 #include <AppKit/AppKit.h>
 
 #include "foundation/utility/error.hpp"
-#include "foundation/video/event_queue.hpp"
+#include "foundation/visual/event_queue.hpp"
 
 namespace ooe
 {

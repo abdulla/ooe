@@ -10,10 +10,10 @@
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
-#include "foundation/video/sight.hpp"
+#include "foundation/visual/sight.hpp"
 
 #ifdef __APPLE__
-	#include "foundation/video/event_queue.hpp"
+	#include "foundation/visual/event_queue.hpp"
 #else
 	#include "foundation/executable/timer.hpp"
 #endif

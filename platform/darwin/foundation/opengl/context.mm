@@ -5,7 +5,7 @@
 
 #include "foundation/opengl/context.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/video/view.hpp"
+#include "foundation/visual/view.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 

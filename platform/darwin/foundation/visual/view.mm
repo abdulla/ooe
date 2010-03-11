@@ -4,7 +4,7 @@
 #include <AppKit/AppKit.h>
 
 #include "foundation/utility/error.hpp"
-#include "foundation/video/view.hpp"
+#include "foundation/visual/view.hpp"
 
 namespace ooe
 {
