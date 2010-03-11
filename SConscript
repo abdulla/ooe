@@ -79,7 +79,7 @@ build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
 build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
 build.Linkable( 'maths', 'foundation/maths' )
 build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
-build.Linkable( 'opengl_ng', 'foundation/opengl_ng', configure = OpenGLConfigure )
+build.Linkable( 'opengl_next', 'foundation/opengl_next', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
 build.Linkable( 'visual', 'foundation/visual', 'parallel', ooe.qtkit.framework,
 	ooe.freetype.include_path, ooe.freetype.library_path, VideoConfigure )
@@ -91,7 +91,7 @@ build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'python_host', 'component/python/host', 'executable python registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Executable( 'surrogate', 'component/registry/surrogate', 'executable registry' )
-build.Executable( 'ui', 'component/ui', 'executable ipc opengl_ng visual' )
+build.Executable( 'ui', 'component/ui', 'executable opengl_next visual' )
 
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
