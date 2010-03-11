@@ -345,6 +345,11 @@ public:
 		return value;
 	}
 
+	function_type destructor( void ) const
+	{
+		return function;
+	}
+
 private:
 	unsigned refs;
 	void* const value;
@@ -355,7 +360,7 @@ private:
 class opaque_ptr
 {
 public:
-	typedef void ( * function_type )( const void* );
+	typedef opaque_ref::function_type function_type;
 
 	opaque_ptr( void* value, function_type function )
 		: ref( new opaque_ref( value, function ) )
@@ -395,6 +400,11 @@ public:
 		to* as( void ) const
 	{
 		return reinterpret_cast< to* >( ref->get() );
+	}
+
+	function_type destructor( void )
+	{
+		return ref->destructor();
 	}
 
 	void swap( opaque_ptr& exchange )
