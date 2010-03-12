@@ -10,7 +10,8 @@ graphics::graphics( const ooe::view_data& view_ )
 try
 	: view( view_ ), context( context_construct( view ) )
 {
-	setup_context( view, context );
+	context_current( view, context );
+	context_sync( view, context, true );
 	load_symbols();
 }
 catch ( ... )
@@ -18,9 +19,20 @@ catch ( ... )
 	this->~graphics();
 }
 
+graphics::~graphics( void )
+{
+	context_current( view, 0 );
+	context_destruct( view, context );
+}
+
+void graphics::draw( frame&, batch& )
+{
+}
+
 void graphics::swap( void )
 {
 	context_swap( view, context );
+	Clear( DEPTH_BUFFER_BIT | STENCIL_BUFFER_BIT | COLOR_BUFFER_BIT );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

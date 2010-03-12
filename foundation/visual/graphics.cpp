@@ -74,6 +74,12 @@ void texture::load( const image& image, u8 level )
 	function( pointer, image, level );
 }
 
+bool texture::transformed( void )
+{
+	return pointer.destructor() ==
+		static_cast< opaque_ptr::function_type >( destroy< texture_handle > );
+}
+
 //--- shader ---------------------------------------------------------------------------------------
 shader::shader( type mode, const std::string& text )
 	: pointer( new shader_handle( mode, text ), destroy< shader_handle > )
@@ -95,6 +101,22 @@ void variable::insert( const std::string& name, type mode, const void* data, u8 
 buffer::buffer( type mode, const void* data, up_t size )
 	: pointer( new buffer_handle( mode, data, size ), destroy< buffer_handle > )
 {
+}
+
+//--- batch ----------------------------------------------------------------------------------------
+void batch::insert( const texture& texture )
+{
+	textures.push_back( texture );
+}
+
+void batch::insert( const shader& shader )
+{
+	shaders.push_back( shader );
+}
+
+void batch::insert( const buffer& buffer )
+{
+	buffers.push_back( buffer );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

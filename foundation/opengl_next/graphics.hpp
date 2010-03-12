@@ -14,8 +14,9 @@ class OOE_VISIBLE graphics
 {
 public:
 	graphics( const ooe::view_data& );
+	~graphics( void );
 
-	void draw( batch& );
+	void draw( frame&, batch& );
 	void swap( void );
 
 private:
@@ -25,4 +26,4 @@ private:
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NG_GRAPHICS_HPP
+#endif	// OOE_FOUNDATION_OPENGL_NEXT_GRAPHICS_HPP

@@ -31,25 +31,21 @@ void context_destruct( const ooe::view_data& view, platform::context_type glx )
 	glXDestroyContext( view.queue.display, glx );
 }
 
-bool context_current( const ooe::view_data& view, platform::context_type glx )
+void context_current( const ooe::view_data& view, platform::context_type glx )
 {
-	return glXMakeCurrent( view.queue.display, !glx ? 0 : view.window, glx );
+	if ( !glXMakeCurrent( view.queue.display, !glx ? 0 : view.window, glx ) )
+		throw error::runtime( "opengl: " ) << "Unable to set current context";
 }
 
-bool context_sync( const ooe::view_data&, platform::context_type, bool vsync )
+void context_sync( const ooe::view_data&, platform::context_type, bool vsync )
 {
-	return !glXSwapIntervalSGI( vsync );
+	if ( glXSwapIntervalSGI( vsync ) )
+		throw error::runtime( "opengl: " ) << "Unable to set vertical sync";
 }
 
 void context_swap( const ooe::view_data& view, platform::context_type )
 {
 	glXSwapBuffers( view.queue.display, view.window );
-}
-
-void setup_context( const ooe::view_data& view, platform::context_type glx )
-{
-	if ( !context_current( view, glx ) )
-		throw error::runtime( "opengl: " ) << "Unable to capture context";
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

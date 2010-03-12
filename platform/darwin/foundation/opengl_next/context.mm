@@ -48,6 +48,11 @@ platform::context_type context_construct( const ooe::view_data& )
 	if ( !nsgl )
 		throw error::runtime( "opengl: " ) << "Unable to create context";
 
+	if ( view.window )
+		[ nsgl setView: view.window.contentView ];
+	else
+		[ nsgl setFullScreen ];
+
 	return nsgl;
 }
 
@@ -56,33 +61,21 @@ void context_destruct( const ooe::view_data&, platform::context_type nsgl )
 	[ nsgl release ];
 }
 
-bool context_current( const ooe::view_data&, platform::context_type nsgl )
+void context_current( const ooe::view_data&, platform::context_type nsgl )
 {
 	[ nsgl makeCurrentContext ];
-	return true;
 }
 
-bool context_sync( const ooe::view_data&, platform::context_type nsgl, bool vsync )
+void context_sync( const ooe::view_data&, platform::context_type nsgl, bool vsync )
 {
 	context_multithread( nsgl, !vsync );
 	const s32 value = vsync;
 	[ nsgl setValues: &value forParameter: NSOpenGLCPSwapInterval ];
-	return true;
 }
 
 void context_swap( const ooe::view_data&, platform::context_type nsgl )
 {
 	[ nsgl flushBuffer ];
-}
-
-void setup_context( const ooe::view_data& view, platform::context_type nsgl )
-{
-	[ nsgl makeCurrentContext ];
-
-	if ( view.window )
-		[ nsgl setView: view.window.contentView ];
-	else
-		[ nsgl setFullScreen ];
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

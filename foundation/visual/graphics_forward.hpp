@@ -10,9 +10,9 @@ struct texture_handle
 {
 	typedef std::vector< shared_free< void > > vector_type;
 
-	u32 width;
-	u32 height;
-	image::type format;
+	const u32 width;
+	const u32 height;
+	const image::type format;
 	vector_type vector;
 
 	texture_handle( u32, u32, image::type );

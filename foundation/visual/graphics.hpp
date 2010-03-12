@@ -19,7 +19,9 @@ public:
 	texture( u32, u32, image::type );
 	void load( const image&, u8 );
 
-private:
+	bool transformed( void );
+
+protected:
 	opaque_ptr pointer;
 	function_type function;
 };
@@ -50,7 +52,7 @@ public:
 	variable( void );
 	void insert( const std::string&, type, const void*, u8 );
 
-private:
+protected:
 	opaque_ptr pointer;
 	function_type function;
 };
@@ -67,7 +69,7 @@ public:
 
 	shader( type, const std::string& );
 
-private:
+protected:
 	opaque_ptr pointer;
 };
 
@@ -85,7 +87,7 @@ public:
 
 	buffer( type, const void*, up_t );
 
-private:
+protected:
 	opaque_ptr pointer;
 };
 
@@ -93,8 +95,9 @@ private:
 class frame
 {
 public:
+	frame( void );
 
-private:
+protected:
 	opaque_ptr pointer;
 };
 
@@ -102,11 +105,16 @@ private:
 class batch
 {
 public:
+	void insert( const texture& );
+	void insert( const shader& );
+	void insert( const buffer& );
 
-private:
+protected:
+	typedef std::vector< texture > texture_vector;
 	typedef std::vector< shader > shader_vector;
 	typedef std::vector< buffer > buffer_vector;
 
+	texture_vector textures;
 	shader_vector shaders;
 	buffer_vector buffers;
 };
