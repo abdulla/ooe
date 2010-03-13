@@ -19,7 +19,7 @@ public:
 	texture( u32, u32, image::type );
 	void load( const image&, u8 );
 
-	bool transformed( void );
+	bool is_generic( void );
 
 protected:
 	opaque_ptr pointer;

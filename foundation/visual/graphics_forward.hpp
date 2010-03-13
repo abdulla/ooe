@@ -5,8 +5,8 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- texture_handle -------------------------------------------------------------------------------
-struct texture_handle
+//--- texture_generic ------------------------------------------------------------------------------
+struct texture_generic
 {
 	typedef std::vector< shared_free< void > > vector_type;
 
@@ -15,11 +15,28 @@ struct texture_handle
 	const image::type format;
 	vector_type vector;
 
-	texture_handle( u32, u32, image::type );
+	texture_generic( u32, u32, image::type );
 };
 
-//--- variable_handle ------------------------------------------------------------------------------
-struct variable_handle
+template< typename type >
+	void texture_verify( const type& texture, const image& image, u8 level )
+{
+	u32 width = texture.width >> level;
+	u32 height = texture.height >> level;
+
+	if ( !width || !height )
+		throw error::runtime( "texture: " ) << "Invalid mipmap level: " << level;
+	else if ( image.width != width || image.height != width )
+		throw error::runtime( "texture: " ) <<
+			"Image size does not match texture size for mipmap level " << level << ": expected " <<
+			width << 'x' << height << ", got " << image.width << 'x' << image.height;
+	else if ( image.format != texture.format )
+		throw error::runtime( "texture: " ) << "Image format does not match texture format: " <<
+			image.format << " != " << texture.format;
+}
+
+//--- variable_generic -----------------------------------------------------------------------------
+struct variable_generic
 {
 	typedef u8 data_type[ sizeof( f32 ) * 4 * 4 ];
 	typedef tuple< std::string, variable::type, data_type > tuple_type;
@@ -28,23 +45,23 @@ struct variable_handle
 	vector_type vector;
 };
 
-//--- shader_handle --------------------------------------------------------------------------------
-struct shader_handle
+//--- shader_generic -------------------------------------------------------------------------------
+struct shader_generic
 {
 	shader::type type;
 	std::string text;
 
-	shader_handle( shader::type, const std::string& );
+	shader_generic( shader::type, const std::string& );
 };
 
-//--- buffer_handle --------------------------------------------------------------------------------
-struct buffer_handle
+//--- buffer_generic -------------------------------------------------------------------------------
+struct buffer_generic
 {
 	buffer::type type;
 	up_t size;
 	scoped_array< u8 > data;
 
-	buffer_handle( buffer::type, const void*, up_t );
+	buffer_generic( buffer::type, const void*, up_t );
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
