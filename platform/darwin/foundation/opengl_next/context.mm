@@ -22,7 +22,7 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-platform::context_type context_construct( const ooe::view_data& )
+platform::context_type context_construct( const ooe::view_data& view )
 {
 	NSOpenGLPixelFormatAttribute attribute[] =
 	{
