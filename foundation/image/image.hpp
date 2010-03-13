@@ -78,6 +78,11 @@ namespace ooe
 		const shared_free< void > data;
 	};
 
+	inline bool is_compressed( image::type format )
+	{
+		return format >= image::type( image::compressed );
+	}
+
 //--- uncompressed_image -------------------------------------------------------
 	struct OOE_VISIBLE uncompressed_image
 		: public image

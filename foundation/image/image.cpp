@@ -9,7 +9,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 image::type validate( image::type format, bool compressed )
 {
-	if ( ( format >= image::type( image::compressed ) ) == compressed )
+	if ( is_compressed( format ) == compressed )
 		return format;
 
 	throw error::runtime( "image: " ) << "Format mismatch, " <<
