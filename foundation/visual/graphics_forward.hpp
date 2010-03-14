@@ -13,9 +13,11 @@ struct texture_generic
 	const u32 width;
 	const u32 height;
 	const image::type format;
+	const texture::type filter;
+	bool generate_mipmap;
 	vector_type vector;
 
-	texture_generic( u32, u32, image::type );
+	texture_generic( u32, u32, image::type, texture::type );
 };
 
 template< typename type >

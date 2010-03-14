@@ -10,11 +10,6 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 typedef tuple< u32, u32 > compressed_tuple;
 typedef tuple< u32, u32, u32 > uncompressed_tuple;
-struct texture_compressed;
-struct texture_uncompressed;
-
-void load_compressed( const texture_compressed&, const shared_free< void >&, u8 );
-void load_uncompressed( const texture_uncompressed&, const shared_free< void >&, u8 );
 
 //--- open_texture ---------------------------------------------------------------------------------
 struct open_texture
@@ -43,7 +38,7 @@ compressed_tuple format_compressed( const texture_generic& texture )
 
 	//--------------------------------------------------------------------------
 	default:
-		throw error::runtime( "opengl::expand_format: " ) <<
+		throw error::runtime( "opengl::texture: " ) <<
 			"Unknown compressed image format: " << texture.format;
 	}
 }
@@ -109,9 +104,35 @@ uncompressed_tuple format_uncompressed( image::type format )
 
 	//--------------------------------------------------------------------------
 	default:
-		throw error::runtime( "opengl::expand_format: " ) <<
+		throw error::runtime( "opengl::texture: " ) <<
 			"Unknown uncompressed image format: " << format;
 	}
+}
+
+//--- set_filter -----------------------------------------------------------------------------------
+void set_filter( texture::type filter )
+{
+	u32 min_filter;
+	u32 mag_filter;
+
+	switch ( filter )
+	{
+	case texture::nearest:
+		min_filter = NEAREST_MIPMAP_NEAREST;
+		mag_filter = NEAREST;
+		break;
+
+	case texture::linear:
+		min_filter = LINEAR_MIPMAP_LINEAR;
+		mag_filter = LINEAR;
+		break;
+
+	default:
+		throw error::runtime( "opengl::texture: " ) << "Unknown filter type: " << filter;
+	}
+
+	TexParameteri( TEXTURE_2D, TEXTURE_MIN_FILTER, min_filter );
+	TexParameteri( TEXTURE_2D, TEXTURE_MAG_FILTER, mag_filter );
 }
 
 //--- texture_api ----------------------------------------------------------------------------------
@@ -122,14 +143,17 @@ struct texture_api
 	const u32 width;
 	const u32 height;
 	const image::type format;
-
-	const u32 internal;
+	const u32 levels;
 
 	texture_api( const texture_generic& texture )
 		: id(), width( texture.width ), height( texture.height ), format( texture.format ),
-		internal()
+		levels( texture.vector.size() )
 	{
 		GenTextures( 1, const_cast< u32* >( &id ) );
+
+		BindTexture( TEXTURE_2D, id );
+		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, levels - 1 );
+		set_filter( texture.filter );
 	}
 
 	~texture_api( void )
@@ -142,23 +166,19 @@ struct texture_api
 struct texture_compressed
 	: public texture_api
 {
+	const u32 internal;
 	const u32 size;
 
 	texture_compressed( const texture_generic& texture )
-		: texture_api( texture ), size()
+		: texture_api( texture ), internal(), size()
 	{
 		compressed_tuple tuple = format_compressed( texture );
 		const_cast< u32& >( internal ) = tuple._0;
 		const_cast< u32& >( size ) = tuple._1;
-
-		BindTexture( TEXTURE_2D, id );
 		const texture_generic::vector_type& vector = texture.vector;
 
 		for ( u32 i = 0, end = vector.size(); i != end; ++i )
-		{
-			if ( vector[ i ] )
-				load_compressed( *this, vector[ i ], i );
-		}
+			CompressedTexImage2D( TEXTURE_2D, i, internal, width, height, 0, size, vector[ i ] );
 	}
 };
 
@@ -173,50 +193,43 @@ struct texture_uncompressed
 		: texture_api( texture ), external(), type()
 	{
 		uncompressed_tuple tuple = format_uncompressed( format );
-		const_cast< u32& >( internal ) = tuple._0;
 		const_cast< u32& >( external ) = tuple._1;
 		const_cast< u32& >( type ) = tuple._2;
-
-		BindTexture( TEXTURE_2D, id );
 		const texture_generic::vector_type& vector = texture.vector;
 
 		for ( u32 i = 0, end = vector.size(); i != end; ++i )
-		{
-			if ( vector[ i ] )
-				load_uncompressed( *this, vector[ i ], i );
-		}
+			TexImage2D( TEXTURE_2D, i, tuple._0, width, height, 0, external, type, vector[ i ] );
 	}
 };
 
-//--- load_compressed ------------------------------------------------------------------------------
-void load_compressed( const texture_compressed& texture, const shared_free< void >& data, u8 level )
+//--- mipmap_verify --------------------------------------------------------------------------------
+void mipmap_verify( texture_api& texture, u8 level )
 {
-	CompressedTexImage2D( TEXTURE_2D, level, texture.internal, texture.width, texture.height, 0,
-		texture.size, data );
+	if ( level < texture.levels )
+		throw error::runtime( "opengl::texture: " ) << "Mipmap level " << level <<
+			" is outside the maximum number of levels: " << texture.levels;
 }
 
+//--- load_compressed ------------------------------------------------------------------------------
 void load_compressed( opaque_ptr& pointer, const image& image, u8 level )
 {
 	texture_compressed& texture = *pointer.as< texture_compressed >();
 	texture_verify( texture, image, level );
+	mipmap_verify( texture, level );
 	BindTexture( TEXTURE_2D, texture.id );
-	load_compressed( texture, image.ptr(), level );
+	CompressedTexSubImage2D( TEXTURE_2D, level, 0, 0, texture.width, texture.height,
+		texture.internal, texture.size, image.ptr() );
 }
 
 //--- load_uncompressed ----------------------------------------------------------------------------
-void load_uncompressed
-	( const texture_uncompressed& texture, const shared_free< void >& data, u8 level )
-{
-	TexImage2D( TEXTURE_2D, level, texture.internal, texture.width, texture.height, 0,
-		texture.external, texture.type, data );
-}
-
 void load_uncompressed( opaque_ptr& pointer, const image& image, u8 level )
 {
 	texture_uncompressed& texture = *pointer.as< texture_uncompressed >();
 	texture_verify( texture, image, level );
+	mipmap_verify( texture, level );
 	BindTexture( TEXTURE_2D, texture.id );
-	load_uncompressed( texture, image.ptr(), level );
+	TexSubImage2D( TEXTURE_2D, level, 0, 0, texture.width, texture.height, texture.external,
+		texture.type, image.ptr() );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -233,9 +246,8 @@ void transform_texture( texture& closed )
 	texture_generic& texture = *open.pointer.as< texture_generic >();
 
 	if ( texture.vector.empty() )
-		throw error::runtime( "opengl::transform_texture: " ) << "Texture of size " <<
-			texture.width << 'x' << texture.height << " and format " << texture.format <<
-			" contains no image data";
+		throw error::runtime( "opengl::texture: " ) << "Texture of size " << texture.width << 'x' <<
+			texture.height << " and format " << texture.format << " contains no image data";
 
 	if ( is_compressed( texture.format ) )
 	{
@@ -249,6 +261,9 @@ void transform_texture( texture& closed )
 		open.pointer.swap( pointer );
 		open.function = load_uncompressed;
 	}
+
+	if ( texture.generate_mipmap )
+		GenerateMipmap( TEXTURE_2D );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

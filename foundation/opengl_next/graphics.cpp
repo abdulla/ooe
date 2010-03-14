@@ -13,6 +13,9 @@ try
 	context_current( view, context );
 	context_sync( view, context, true );
 	load_symbols();
+
+	PixelStorei( PACK_ALIGNMENT, 1 );
+	PixelStorei( UNPACK_ALIGNMENT, 1 );
 }
 catch ( ... )
 {

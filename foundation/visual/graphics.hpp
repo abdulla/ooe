@@ -14,10 +14,18 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 class texture
 {
 public:
-	typedef void ( * function_type )( opaque_ptr&, const image&, u8 );
+	enum type
+	{
+		nearest,
+		linear
+	};
 
-	texture( u32, u32, image::type );
-	void load( const image&, u8 );
+	static const u8 generate_mipmap = ~u8( 0 );
+	typedef void ( * function_type )( opaque_ptr&, const image&, /*u32, u32,*/ u8 );
+
+	texture( u32, u32, image::type, type = linear );
+	void load( const image&, u8 = generate_mipmap );
+	// void load( const image&, u32, u32, u8 = 0 );
 
 	bool is_generic( void );
 

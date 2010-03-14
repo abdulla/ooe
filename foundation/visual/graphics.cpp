@@ -16,8 +16,20 @@ void texture_function( opaque_ptr& pointer, const image& image, u8 level )
 	texture_verify( texture, image, level );
 	texture_generic::vector_type& vector = texture.vector;
 
-	if ( vector.size() <= level )
+	if ( level == texture::generate_mipmap )
+	{
+		texture.generate_mipmap = true;
+		level = 0;
+	}
+	else if ( texture.generate_mipmap )
+		throw error::runtime( "texture: " ) << "Can not set mipmap level " << level <<
+			", automatic mipmap generation has been specified";
+
+	if ( level == vector.size() )
 		vector.resize( level + 1 );
+	else if ( level > vector.size() )
+		throw error::runtime( "texture: " ) <<
+			"Mipmap levels below " << level << " must be filled first";
 
 	vector[ level ] = image.ptr();
 }
@@ -34,8 +46,10 @@ void variable_function
 }
 
 //--- texture_generic ------------------------------------------------------------------------------
-texture_generic::texture_generic( u32 width_, u32 height_, image::type format_ )
-	: width( width_ ), height( height_ ), format( format_ ), vector()
+texture_generic::
+	texture_generic( u32 width_, u32 height_, image::type format_, texture::type filter_ )
+	: width( width_ ), height( height_ ), format( format_ ), filter( filter_ ),
+	generate_mipmap( false ), vector()
 {
 }
 
@@ -53,8 +67,8 @@ buffer_generic::buffer_generic( buffer::type type_, const void* data_, up_t size
 }
 
 //--- texture --------------------------------------------------------------------------------------
-texture::texture( u32 width, u32 height, image::type format )
-	: pointer( new texture_generic( width, height, format ), destroy< texture_generic > ),
+texture::texture( u32 width, u32 height, image::type format, type filter )
+	: pointer( new texture_generic( width, height, format, filter ), destroy< texture_generic > ),
 	function( texture_function )
 {
 }

@@ -13,7 +13,9 @@ void load_symbols( void );
 //--- constants ------------------------------------------------------------------------------------
 enum
 {
-	
+	UNPACK_ALIGNMENT			= 0x0CF5,
+	PACK_ALIGNMENT				= 0x0D05,
+
 	TEXTURE_2D					= 0x0DE1,
 
 	UNSIGNED_BYTE				= 0x1401,
@@ -30,6 +32,14 @@ enum
 
 	EXTENSIONS					= 0x1F03,
 
+	NEAREST						= 0x2600,
+	LINEAR						= 0x2601,
+	NEAREST_MIPMAP_NEAREST		= 0x2700,
+	LINEAR_MIPMAP_LINEAR		= 0x2703,
+
+	TEXTURE_MAG_FILTER			= 0x2800,
+	TEXTURE_MIN_FILTER			= 0x2801,
+
 	UNSIGNED_INT_8_8_8_8		= 0x8035,
 	ALPHA8						= 0x803C,
 	LUMINANCE8					= 0x8040,
@@ -39,6 +49,8 @@ enum
 
 	BGR							= 0x80E0,
 	BGRA						= 0x80E1,
+
+	TEXTURE_MAX_LEVEL			= 0x813D,
 
 	COMPRESSED_RGBA_S3TC_DXT1	= 0x83F1,
 	COMPRESSED_RGBA_S3TC_DXT3	= 0x83F2,
@@ -63,22 +75,32 @@ enum
 //--- typedefs -------------------------------------------------------------------------------------
 typedef const c8* ( GetString_t )( u32 );
 typedef void ( Clear_t )( u32 );
+typedef void ( PixelStorei_t )( u32, s32 );
 
 typedef void ( GenTextures_t )( s32, u32* );
 typedef void ( DeleteTextures_t )( s32, const u32* );
 typedef void ( BindTexture_t )( u32, u32 );
 typedef void ( TexImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
+typedef void ( TexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
 typedef void ( CompressedTexImage2D_t )( u32, s32, u32, s32, s32, s32, s32, const void* );
+typedef void ( CompressedTexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, s32, const void* );
+typedef void ( TexParameteri_t )( u32, u32, s32 );
+typedef void ( GenerateMipmap_t )( u32 );
 
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
 extern Clear_t* Clear;
+extern PixelStorei_t* PixelStorei;
 
 extern GenTextures_t* GenTextures;
 extern DeleteTextures_t* DeleteTextures;
 extern BindTexture_t* BindTexture;
 extern TexImage2D_t* TexImage2D;
+extern TexSubImage2D_t* TexSubImage2D;
 extern CompressedTexImage2D_t* CompressedTexImage2D;
+extern CompressedTexSubImage2D_t* CompressedTexSubImage2D;
+extern TexParameteri_t* TexParameteri;
+extern GenerateMipmap_t* GenerateMipmap;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
