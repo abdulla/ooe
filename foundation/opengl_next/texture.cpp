@@ -152,7 +152,6 @@ struct texture_api
 		GenTextures( 1, const_cast< u32* >( &id ) );
 
 		BindTexture( TEXTURE_2D, id );
-		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, levels - 1 );
 		set_filter( texture.filter );
 	}
 
@@ -264,6 +263,8 @@ void transform_texture( texture& closed )
 
 	if ( texture.generate_mipmap )
 		GenerateMipmap( TEXTURE_2D );
+	else
+		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, texture.vector.size() - 1 );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
