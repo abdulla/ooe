@@ -1,10 +1,10 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/executable/environment.hpp"
+#include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/ipc/switchboard.hpp"
-#include "foundation/ipc/memory/server.hpp"
-#include "foundation/opengl_next/graphics.hpp"
 #include "foundation/visual/event_queue.hpp"
+#include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
@@ -42,16 +42,19 @@ void process_events( event_queue& event_queue )
 }
 
 //--- launch ---------------------------------------------------------------------------------------
-bool launch( const std::string&, const std::string&, s32, c8** )
+bool launch( const std::string& root, const std::string&, s32, c8** )
 {
+	// graphics library must be preloaded for linux
+	library library( root + "../library/libopengl_next" + library::suffix, library::global_lazy );
+
 	event_queue event_queue;
 	view view( event_queue, width, height, false );
-	opengl::graphics graphics( view );
+	driver_type driver = library.find< driver_type ( const view_data& ) >( "driver_open" )( view );
 
 	while ( !executable::has_signal() )
 	{
 		executable::yield();
-		graphics.swap();
+		driver->swap();
 
 		process_events( event_queue );
 	}
