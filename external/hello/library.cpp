@@ -70,7 +70,7 @@ namespace
 	}
 }
 
-extern "C" ooe::module OOE_VISIBLE module_open( void )
+extern "C" ooe::module module_open( void )
 {
 	module module;
 
