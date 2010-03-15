@@ -1,7 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
-#define OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
+#ifndef BOOST_PP_IS_ITERATING
+
+	#ifndef OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
+	#define OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
 
 #include <vector>
 
@@ -10,34 +12,79 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- texture --------------------------------------------------------------------------------------
-class texture
+//--- image_pyramid --------------------------------------------------------------------------------
+class image_pyramid
 {
 public:
+	typedef std::vector< shared_free< void > > vector_type;
+
+	const u32 width;
+	const u32 height;
+	const image::type format;
+
+	image_pyramid( const image& );
+
+	void insert( const image& );
+	const vector_type& get( void ) const;
+
+private:
+	vector_type vector;
+};
+
+//--- texture --------------------------------------------------------------------------------------
+struct texture
+{
 	enum type
 	{
 		nearest,
 		linear
 	};
 
-	static const u8 generate_mipmap = ~u8( 0 );
-	typedef void ( * function_type )( opaque_ptr&, const image&, /*u32, u32,*/ u8 );
-
-	texture( u32, u32, image::type, type = linear );
-	void load( const image&, u8 = generate_mipmap );
-	// void load( const image&, u32, u32, u8 = 0 );
-
-	bool is_generic( void );
-
-protected:
-	opaque_ptr pointer;
-	function_type function;
+	virtual ~texture( void ) {}
+	virtual void load( const image&, u32, u32, u8 = 0 ) = 0;
 };
 
-//--- variable -------------------------------------------------------------------------------------
-class variable
+typedef shared_ptr< texture > texture_type;
+
+//--- shader ---------------------------------------------------------------------------------------
+struct shader
 {
-public:
+	enum type
+	{
+		vertex,
+		fragment
+	};
+};
+
+typedef shared_ptr< shader > shader_type;
+
+//--- slang_type -----------------------------------------------------------------------------------
+template< typename, typename, u8 >
+	struct slang_type;
+
+	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
+	#define BOOST_PP_FILENAME_1 "foundation/visual/graphics.hpp"
+	#include BOOST_PP_ITERATE()
+	#undef BOOST_PP_FILENAME_1
+	#undef BOOST_PP_ITERATION_LIMITS
+
+struct vec_tag;
+struct ivec_tag;
+struct mat_tag;
+
+typedef slang_type< vec_tag, f32, 2 > slang_vec2;
+typedef slang_type< vec_tag, f32, 3 > slang_vec3;
+typedef slang_type< vec_tag, f32, 4 > slang_vec4;
+typedef slang_type< ivec_tag, s32, 2 > slang_ivec2;
+typedef slang_type< ivec_tag, s32, 3 > slang_ivec3;
+typedef slang_type< ivec_tag, s32, 4 > slang_ivec4;
+typedef slang_type< mat_tag, f32, 4 > slang_mat2;
+typedef slang_type< mat_tag, f32, 9 > slang_mat3;
+typedef slang_type< mat_tag, f32, 16 > slang_mat4;
+
+//--- variable -------------------------------------------------------------------------------------
+struct variable
+{
 	enum type
 	{
 		float_1,	// float
@@ -55,30 +102,10 @@ public:
 		mat_4		// mat4
 	};
 
-	typedef void ( * function_type )( opaque_ptr&, const std::string&, type, const void*, u8 );
+	virtual ~variable( void ) {};
 
-	variable( void );
-	void insert( const std::string&, type, const void*, u8 );
-
-protected:
-	opaque_ptr pointer;
-	function_type function;
-};
-
-//--- shader ---------------------------------------------------------------------------------------
-class shader
-{
-public:
-	enum type
-	{
-		vertex,
-		fragment
-	};
-
-	shader( type, const std::string& );
-
-protected:
-	opaque_ptr pointer;
+	virtual void insert( const std::string&, f32 ) = 0;
+	virtual void insert( const std::string&, s32 ) = 0;
 };
 
 //--- buffer ---------------------------------------------------------------------------------------
@@ -127,6 +154,56 @@ protected:
 	buffer_vector buffers;
 };
 
+//--- driver ---------------------------------------------------------------------------------------
+struct driver
+{
+	virtual ~driver( void ) {}
+	virtual void draw( frame&, const batch& ) = 0;
+	virtual void swap( void ) = 0;
+
+	virtual texture_type
+		texture( const image_pyramid&, texture::type = texture::linear, bool = true ) = 0;
+	virtual shader_type shader( const std::string&, shader::type );
+};
+
+typedef shared_ptr< driver > driver_type;
+
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
+	#endif	// OOE_FOUNDATION_VISUAL_GRAPHICS_HPP
+
+#else	// BOOST_PP_IS_ITERATING
+
+	#define LIMIT BOOST_PP_ITERATION()
+	#define ASSIGN_PARAMETER( z, n, _ ) data[ n ] = a ## n;
+	#define ASSIGN_ARRAY( z, n, _ ) data[ n ] = array[ n ];
+
+#if LIMIT
+
+//--- slang_type -----------------------------------------------------------------------------------
+template< typename tag, typename type >
+	struct slang_type< tag, type, LIMIT >
+{
+	type data[ LIMIT ];
+
+	slang_type( BOOST_PP_ENUM_PARAMS( LIMIT, type a ) )
+		: data()
+	{
+		BOOST_PP_REPEAT( LIMIT, ASSIGN_PARAMETER, ~ )
+	}
+
+	template< typename t >
+		slang_type( const t& array )
+		: data()
+	{
+		BOOST_PP_REPEAT( LIMIT, ASSIGN_ARRAY, ~ )
+	}
+};
+
+#endif
+
+	#undef ASSIGN_ARRAY
+	#undef ASSIGN_PARAMETER
+	#undef LIMIT
+
+#endif	// BOOST_PP_IS_ITERATING
