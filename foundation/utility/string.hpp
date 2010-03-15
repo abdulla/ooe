@@ -86,13 +86,13 @@ template< typename t >
 	return data;
 }
 
-OOE_NAMESPACE_END( ( ooe ) )
-
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/utility/string.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 	#endif	// OOE_FOUNDATION_UTILITY_STRING_HPP
 
@@ -103,7 +103,6 @@ OOE_NAMESPACE_END( ( ooe ) )
 	#define COMMA BOOST_PP_COMMA_IF( MINUS )
 
 #if LIMIT
-OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- tuple_less -----------------------------------------------------------------------------------
 template< BOOST_PP_ENUM_PARAMS( MINUS, typename s )
@@ -124,7 +123,6 @@ template< BOOST_PP_ENUM_PARAMS( MINUS, typename s )
 	}
 };
 
-OOE_NAMESPACE_END( ( ooe ) )
 #endif
 
 	#undef COMMA
