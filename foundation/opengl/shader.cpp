@@ -1,6 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/io/memory.hpp"
 #include "foundation/opengl/shader.hpp"
 #include "foundation/opengl/symbol.hpp"
 #include "foundation/utility/error.hpp"
