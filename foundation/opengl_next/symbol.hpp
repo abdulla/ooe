@@ -153,6 +153,17 @@ extern GetProgramiv_t* GetProgramiv;
 extern GetProgramInfoLog_t* GetProgramInfoLog;
 
 extern GetUniformLocation_t* GetUniformLocation;
+extern Uniform1fv_t* Uniform1fv;
+extern Uniform2fv_t* Uniform2fv;
+extern Uniform3fv_t* Uniform3fv;
+extern Uniform4fv_t* Uniform4fv;
+extern Uniform1iv_t* Uniform1iv;
+extern Uniform2iv_t* Uniform2iv;
+extern Uniform3iv_t* Uniform3iv;
+extern Uniform4iv_t* Uniform4iv;
+extern UniformMatrix2fv_t* UniformMatrix2fv;
+extern UniformMatrix3fv_t* UniformMatrix3fv;
+extern UniformMatrix4fv_t* UniformMatrix4fv;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 

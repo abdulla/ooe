@@ -14,6 +14,8 @@ struct program
 
 	program( const shader_vector& );
 	virtual ~program( void );
+
+	virtual uniform_type uniform( void ) const;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

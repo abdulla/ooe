@@ -48,6 +48,17 @@ void load_symbols( void )
 	GetProgramInfoLog = find< GetProgramInfoLog_t >( "glGetProgramInfoLog" );
 
 	GetUniformLocation = find< GetUniformLocation_t >( "glGetUniformLocation" );
+	Uniform1fv = find< Uniform1fv_t >( "glUniform1fv" );
+	Uniform2fv = find< Uniform2fv_t >( "glUniform2fv" );
+	Uniform3fv = find< Uniform3fv_t >( "glUniform3fv" );
+	Uniform4fv = find< Uniform4fv_t >( "glUniform4fv" );
+	Uniform1iv = find< Uniform1iv_t >( "glUniform1iv" );
+	Uniform2iv = find< Uniform2iv_t >( "glUniform2iv" );
+	Uniform3iv = find< Uniform3iv_t >( "glUniform3iv" );
+	Uniform4iv = find< Uniform4iv_t >( "glUniform4iv" );
+	UniformMatrix2fv = find< UniformMatrix2fv_t >( "glUniformMatrix2fv" );
+	UniformMatrix3fv = find< UniformMatrix3fv_t >( "glUniformMatrix3fv" );
+	UniformMatrix4fv = find< UniformMatrix4fv_t >( "glUniformMatrix4fv" );
 
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
@@ -83,5 +94,16 @@ GetProgramiv_t* GetProgramiv;
 GetProgramInfoLog_t* GetProgramInfoLog;
 
 GetUniformLocation_t* GetUniformLocation;
+Uniform1fv_t* Uniform1fv;
+Uniform2fv_t* Uniform2fv;
+Uniform3fv_t* Uniform3fv;
+Uniform4fv_t* Uniform4fv;
+Uniform1iv_t* Uniform1iv;
+Uniform2iv_t* Uniform2iv;
+Uniform3iv_t* Uniform3iv;
+Uniform4iv_t* Uniform4iv;
+UniformMatrix2fv_t* UniformMatrix2fv;
+UniformMatrix3fv_t* UniformMatrix3fv;
+UniformMatrix4fv_t* UniformMatrix4fv;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

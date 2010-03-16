@@ -61,21 +61,11 @@ struct shader
 typedef shared_ptr< shader > shader_type;
 typedef std::vector< shader_type > shader_vector;
 
-//--- program --------------------------------------------------------------------------------------
-struct program
-{
-	virtual ~program( void ) {}
-
-	// need virtual variable() const
-};
-
-typedef shared_ptr< program > program_type;
-
 //--- slang_type -----------------------------------------------------------------------------------
 template< typename, typename, u8 >
 	struct slang_type;
 
-	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
+	#define BOOST_PP_ITERATION_LIMITS ( 1, 16 )
 	#define BOOST_PP_FILENAME_1 "foundation/visual/graphics.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
@@ -95,31 +85,34 @@ typedef slang_type< mat_tag, f32, 4 > slang_mat2;
 typedef slang_type< mat_tag, f32, 9 > slang_mat3;
 typedef slang_type< mat_tag, f32, 16 > slang_mat4;
 
-//--- variable -------------------------------------------------------------------------------------
-struct variable
+//--- uniform --------------------------------------------------------------------------------------
+struct uniform
 {
-	enum type
-	{
-		float_1,	// float
-		float_2,	// vec2
-		float_3,	// vec3
-		float_4,	// vec4
-
-		int_1,		// int
-		int_2,		// ivec2
-		int_3,		// ivec3
-		int_4,		// ivec4
-
-		mat_2,		// mat2
-		mat_3,		// mat3
-		mat_4		// mat4
-	};
-
-	virtual ~variable( void ) {};
+	virtual ~uniform( void ) {};
 
 	virtual void insert( const std::string&, f32 ) = 0;
+	virtual void insert( const std::string&, const slang_vec2& ) = 0;
+	virtual void insert( const std::string&, const slang_vec3& ) = 0;
+	virtual void insert( const std::string&, const slang_vec4& ) = 0;
 	virtual void insert( const std::string&, s32 ) = 0;
+	virtual void insert( const std::string&, const slang_ivec2& ) = 0;
+	virtual void insert( const std::string&, const slang_ivec3& ) = 0;
+	virtual void insert( const std::string&, const slang_ivec4& ) = 0;
+	virtual void insert( const std::string&, const slang_mat2& ) = 0;
+	virtual void insert( const std::string&, const slang_mat3& ) = 0;
+	virtual void insert( const std::string&, const slang_mat4& ) = 0;
 };
+
+typedef shared_ptr< uniform > uniform_type;
+
+//--- program --------------------------------------------------------------------------------------
+struct program
+{
+	virtual ~program( void ) {}
+	virtual uniform_type uniform( void ) const = 0;
+};
+
+typedef shared_ptr< program > program_type;
 
 //--- buffer ---------------------------------------------------------------------------------------
 struct buffer
@@ -189,8 +182,6 @@ OOE_NAMESPACE_END( ( ooe ) )
 	#define ASSIGN_PARAMETER( z, n, _ ) data[ n ] = a ## n;
 	#define ASSIGN_ARRAY( z, n, _ ) data[ n ] = array[ n ];
 
-#if LIMIT
-
 //--- slang_type -----------------------------------------------------------------------------------
 template< typename tag, typename type >
 	struct slang_type< tag, type, LIMIT >
@@ -210,8 +201,6 @@ template< typename tag, typename type >
 		BOOST_PP_REPEAT( LIMIT, ASSIGN_ARRAY, ~ )
 	}
 };
-
-#endif
 
 	#undef ASSIGN_ARRAY
 	#undef ASSIGN_PARAMETER

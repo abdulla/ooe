@@ -3,6 +3,7 @@
 #include "foundation/opengl_next/program.hpp"
 #include "foundation/opengl_next/shader.hpp"
 #include "foundation/opengl_next/symbol.hpp"
+#include "foundation/opengl_next/uniform.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -32,6 +33,11 @@ program::program( const shader_vector& vector )
 program::~program( void )
 {
 	DeleteProgram( id );
+}
+
+uniform_type program::uniform( void ) const
+{
+	return new opengl::uniform( id );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
