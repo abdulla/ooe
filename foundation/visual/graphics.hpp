@@ -54,9 +54,22 @@ struct shader
 		vertex,
 		fragment
 	};
+
+	virtual ~shader( void ) {}
 };
 
 typedef shared_ptr< shader > shader_type;
+typedef std::vector< shader_type > shader_vector;
+
+//--- program --------------------------------------------------------------------------------------
+struct program
+{
+	virtual ~program( void ) {}
+
+	// need virtual variable() const
+};
+
+typedef shared_ptr< program > program_type;
 
 //--- slang_type -----------------------------------------------------------------------------------
 template< typename, typename, u8 >
@@ -109,9 +122,8 @@ struct variable
 };
 
 //--- buffer ---------------------------------------------------------------------------------------
-class buffer
+struct buffer
 {
-public:
 	enum type
 	{
 		point,
@@ -121,9 +133,7 @@ public:
 	};
 
 	buffer( type, const void*, up_t );
-
-protected:
-	opaque_ptr pointer;
+	virtual ~buffer( void );
 };
 
 //--- frame ----------------------------------------------------------------------------------------
@@ -162,8 +172,9 @@ struct driver
 	virtual void swap( void ) = 0;
 
 	virtual texture_type
-		texture( const image_pyramid&, texture::type = texture::linear, bool = true ) = 0;
-	virtual shader_type shader( const std::string&, shader::type );
+		texture( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
+	virtual shader_type shader( const std::string&, shader::type ) const = 0;
+	virtual program_type program( const shader_vector& ) const = 0;
 };
 
 typedef shared_ptr< driver > driver_type;

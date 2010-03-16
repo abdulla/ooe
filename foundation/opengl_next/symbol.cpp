@@ -32,6 +32,23 @@ void load_symbols( void )
 	TexParameteri = find< TexParameteri_t >( "glTexParameteri" );
 	GenerateMipmap = find< GenerateMipmap_t >( "glGenerateMipmapEXT" );
 
+	CreateShader = find< CreateShader_t >( "glCreateShader" );
+	DeleteShader = find< DeleteShader_t >( "glDeleteShader" );
+	ShaderSource = find< ShaderSource_t >( "glShaderSource" );
+	CompileShader = find< CompileShader_t >( "glCompileShader" );
+	GetShaderiv = find< GetShaderiv_t >( "glGetShaderiv" );
+	GetShaderInfoLog = find< GetShaderInfoLog_t >( "glGetShaderInfoLog" );
+
+	CreateProgram = find< CreateProgram_t >( "glCreateProgram" );
+	DeleteProgram = find< DeleteProgram_t >( "glDeleteProgram" );
+	AttachShader = find< AttachShader_t >( "glAttachShader" );
+	LinkProgram = find< LinkProgram_t >( "glLinkProgram" );
+	UseProgram = find< UseProgram_t >( "glUseProgram" );
+	GetProgramiv = find< GetProgramiv_t >( "glGetProgramiv" );
+	GetProgramInfoLog = find< GetProgramInfoLog_t >( "glGetProgramInfoLog" );
+
+	GetUniformLocation = find< GetUniformLocation_t >( "glGetUniformLocation" );
+
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
 
@@ -49,5 +66,22 @@ CompressedTexImage2D_t* CompressedTexImage2D;
 CompressedTexSubImage2D_t* CompressedTexSubImage2D;
 TexParameteri_t* TexParameteri;
 GenerateMipmap_t* GenerateMipmap;
+
+CreateShader_t* CreateShader;
+DeleteShader_t* DeleteShader;
+ShaderSource_t* ShaderSource;
+CompileShader_t* CompileShader;
+GetShaderiv_t* GetShaderiv;
+GetShaderInfoLog_t* GetShaderInfoLog;
+
+CreateProgram_t* CreateProgram;
+DeleteProgram_t* DeleteProgram;
+AttachShader_t* AttachShader;
+LinkProgram_t* LinkProgram;
+UseProgram_t* UseProgram;
+GetProgramiv_t* GetProgramiv;
+GetProgramInfoLog_t* GetProgramInfoLog;
+
+GetUniformLocation_t* GetUniformLocation;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

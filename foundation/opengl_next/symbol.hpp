@@ -67,6 +67,13 @@ enum
 	LUMINANCE16F				= 0x881E,
 	LUMINANCE_ALPHA16F			= 0x881F,
 
+	FRAGMENT_SHADER				= 0x8B30,
+	VERTEX_SHADER				= 0x8B31,
+	COMPILE_STATUS				= 0x8B81,
+	LINK_STATUS					= 0x8B82,
+	VALIDATE_STATUS				= 0x8B83,
+	INFO_LOG_LENGTH				= 0x8B84,
+
 	DEPTH_BUFFER_BIT			= 0x00000100,
 	STENCIL_BUFFER_BIT			= 0x00000400,
 	COLOR_BUFFER_BIT			= 0x00004000
@@ -87,6 +94,34 @@ typedef void ( CompressedTexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, s
 typedef void ( TexParameteri_t )( u32, u32, s32 );
 typedef void ( GenerateMipmap_t )( u32 );
 
+typedef u32 ( CreateShader_t )( u32 );
+typedef void ( DeleteShader_t )( u32 );
+typedef void ( ShaderSource_t )( u32, s32, const c8**, const s32* );
+typedef void ( CompileShader_t )( u32 );
+typedef void ( GetShaderiv_t )( u32, u32, s32* );
+typedef void ( GetShaderInfoLog_t )( u32, s32, s32*, c8* );
+
+typedef u32 ( CreateProgram_t )( void );
+typedef void ( DeleteProgram_t )( u32 );
+typedef void ( AttachShader_t )( u32, u32 );
+typedef void ( LinkProgram_t )( u32 );
+typedef void ( UseProgram_t )( u32 );
+typedef void ( GetProgramiv_t )( u32, u32, s32* );
+typedef void ( GetProgramInfoLog_t )( u32, s32, s32*, c8* );
+
+typedef s32 ( GetUniformLocation_t )( u32, const c8* );
+typedef void ( Uniform1fv_t )( s32, s32, const f32* );
+typedef void ( Uniform2fv_t )( s32, s32, const f32* );
+typedef void ( Uniform3fv_t )( s32, s32, const f32* );
+typedef void ( Uniform4fv_t )( s32, s32, const f32* );
+typedef void ( Uniform1iv_t )( s32, s32, const s32* );
+typedef void ( Uniform2iv_t )( s32, s32, const s32* );
+typedef void ( Uniform3iv_t )( s32, s32, const s32* );
+typedef void ( Uniform4iv_t )( s32, s32, const s32* );
+typedef void ( UniformMatrix2fv_t )( s32, s32, u8, const f32* );
+typedef void ( UniformMatrix3fv_t )( s32, s32, u8, const f32* );
+typedef void ( UniformMatrix4fv_t )( s32, s32, u8, const f32* );
+
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
 extern Clear_t* Clear;
@@ -101,6 +136,23 @@ extern CompressedTexImage2D_t* CompressedTexImage2D;
 extern CompressedTexSubImage2D_t* CompressedTexSubImage2D;
 extern TexParameteri_t* TexParameteri;
 extern GenerateMipmap_t* GenerateMipmap;
+
+extern CreateShader_t* CreateShader;
+extern DeleteShader_t* DeleteShader;
+extern ShaderSource_t* ShaderSource;
+extern CompileShader_t* CompileShader;
+extern GetShaderiv_t* GetShaderiv;
+extern GetShaderInfoLog_t* GetShaderInfoLog;
+
+extern CreateProgram_t* CreateProgram;
+extern DeleteProgram_t* DeleteProgram;
+extern AttachShader_t* AttachShader;
+extern LinkProgram_t* LinkProgram;
+extern UseProgram_t* UseProgram;
+extern GetProgramiv_t* GetProgramiv;
+extern GetProgramInfoLog_t* GetProgramInfoLog;
+
+extern GetUniformLocation_t* GetUniformLocation;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 

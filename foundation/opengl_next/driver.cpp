@@ -1,6 +1,8 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/opengl_next/context.hpp"
+#include "foundation/opengl_next/program.hpp"
+#include "foundation/opengl_next/shader.hpp"
 #include "foundation/opengl_next/symbol.hpp"
 #include "foundation/opengl_next/texture.hpp"
 
@@ -17,7 +19,9 @@ public:
 	virtual void draw( frame&, const batch& );
 	virtual void swap( void );
 
-	virtual texture_type texture( const image_pyramid&, texture::type, bool );
+	virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
+	virtual shader_type shader( const std::string&, shader::type ) const;
+	virtual program_type program( const shader_vector& ) const;
 
 private:
 	const view_data& view;
@@ -57,12 +61,22 @@ void driver::swap( void )
 }
 
 texture_type driver::
-	texture( const image_pyramid& pyramid, texture::type filter, bool generate_mipmap )
+	texture( const image_pyramid& pyramid, texture::type filter, bool generate_mipmap ) const
 {
 	if ( is_compressed( pyramid.format ) )
 		return new compressed_texture( pyramid, filter, generate_mipmap );
 	else
 		return new uncompressed_texture( pyramid, filter, generate_mipmap );
+}
+
+shader_type driver::shader( const std::string& source, shader::type type ) const
+{
+	return new opengl::shader( source, type );
+}
+
+program_type driver::program( const shader_vector& vector ) const
+{
+	return new opengl::program( vector );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

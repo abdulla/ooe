@@ -29,7 +29,7 @@ class compressed_texture
 	: public texture
 {
 public:
-	compressed_texture( const image_pyramid&, texture::type, bool );
+	compressed_texture( const image_pyramid&, type, bool );
 
 	virtual void load( const image&, u32, u32, u8 );
 
@@ -42,7 +42,7 @@ class uncompressed_texture
 	: public texture
 {
 public:
-	uncompressed_texture( const image_pyramid&, texture::type, bool );
+	uncompressed_texture( const image_pyramid&, type, bool );
 
 	virtual void load( const image&, u32, u32, u8 );
 
