@@ -33,4 +33,10 @@ const image_pyramid::vector_type& image_pyramid::get( void ) const
 	return vector;
 }
 
+//--- map ------------------------------------------------------------------------------------------
+map::map( void* data_, up_t size_ )
+	: data( data_ ), size( size_ )
+{
+}
+
 OOE_NAMESPACE_END( ( ooe ) )

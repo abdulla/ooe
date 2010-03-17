@@ -41,7 +41,7 @@ struct texture
 	};
 
 	virtual ~texture( void ) {}
-	virtual void load( const image&, u32, u32, u8 = 0 ) = 0;
+	virtual void write( const image&, u32, u32, u8 = 0 ) = 0;
 };
 
 typedef shared_ptr< texture > texture_type;
@@ -88,8 +88,7 @@ typedef slang_type< mat_tag, f32, 16 > slang_mat4;
 //--- uniform --------------------------------------------------------------------------------------
 struct uniform
 {
-	virtual ~uniform( void ) {};
-
+	virtual ~uniform( void ) {}
 	virtual void insert( const std::string&, f32 ) = 0;
 	virtual void insert( const std::string&, const slang_vec2& ) = 0;
 	virtual void insert( const std::string&, const slang_vec3& ) = 0;
@@ -114,6 +113,18 @@ struct program
 
 typedef shared_ptr< program > program_type;
 
+//--- map ------------------------------------------------------------------------------------------
+struct map
+{
+	void* const data;
+	const up_t size;
+
+	map( void*, up_t );
+	virtual ~map( void ) {}
+};
+
+typedef shared_ptr< map > map_type;
+
 //--- buffer ---------------------------------------------------------------------------------------
 struct buffer
 {
@@ -125,9 +136,26 @@ struct buffer
 		pixel_unpack
 	};
 
-	buffer( type, const void*, up_t );
-	virtual ~buffer( void );
+	enum usage_type
+	{
+		static_read,
+		static_write,
+		stream_read,
+		stream_write
+	};
+
+	enum access_type
+	{
+		read,
+		write,
+		read_write
+	};
+
+	virtual ~buffer( void ) {}
+	virtual map_type map( access_type ) const = 0;
 };
+
+typedef shared_ptr< buffer > buffer_type;
 
 //--- frame ----------------------------------------------------------------------------------------
 class frame
@@ -164,10 +192,12 @@ struct driver
 	virtual void draw( frame&, const batch& ) = 0;
 	virtual void swap( void ) = 0;
 
-	virtual texture_type
-		texture( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
+	virtual texture_type texture
+		( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
 	virtual shader_type shader( const std::string&, shader::type ) const = 0;
 	virtual program_type program( const shader_vector& ) const = 0;
+	virtual buffer_type buffer
+		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
 };
 
 typedef shared_ptr< driver > driver_type;

@@ -43,14 +43,14 @@ uncompressed_tuple uncompressed_format( const image_pyramid& pyramid )
 		return uncompressed_tuple( RGB8, BGR, UNSIGNED_BYTE );
 
 	case uncompressed_image::bgra_u8:
-		return uncompressed_tuple( RGBA8, BGRA, UNSIGNED_INT_8_8_8_8 );
+		return uncompressed_tuple( RGBA8, BGRA, UNSIGNED_BYTE );
 
 	//--- u8 -------------------------------------------------------------------
 	case uncompressed_image::rgb_u8:
 		return uncompressed_tuple( RGB8, RGB, UNSIGNED_BYTE );
 
 	case uncompressed_image::rgba_u8:
-		return uncompressed_tuple( RGBA8, RGBA, UNSIGNED_INT_8_8_8_8 );
+		return uncompressed_tuple( RGBA8, RGBA, UNSIGNED_BYTE );
 
 	case uncompressed_image::a_u8:
 		return uncompressed_tuple( ALPHA8, ALPHA, UNSIGNED_BYTE );
@@ -189,7 +189,7 @@ compressed_texture::
 	set_levels( generate_mipmap, levels );
 }
 
-void compressed_texture::load( const image& image, u32 x, u32 y, u8 level )
+void compressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 {
 	verify( image, x, y, level );
 	BindTexture( TEXTURE_2D, id );
@@ -217,7 +217,7 @@ uncompressed_texture::
 	set_levels( generate_mipmap, levels );
 }
 
-void uncompressed_texture::load( const image& image, u32 x, u32 y, u8 level )
+void uncompressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 {
 	verify( image, x, y, level );
 	BindTexture( TEXTURE_2D, id );

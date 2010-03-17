@@ -40,7 +40,6 @@ enum
 	TEXTURE_MAG_FILTER			= 0x2800,
 	TEXTURE_MIN_FILTER			= 0x2801,
 
-	UNSIGNED_INT_8_8_8_8		= 0x8035,
 	ALPHA8						= 0x803C,
 	LUMINANCE8					= 0x8040,
 	LUMINANCE8_ALPHA8			= 0x8045,
@@ -66,6 +65,18 @@ enum
 	ALPHA16F					= 0x881C,
 	LUMINANCE16F				= 0x881E,
 	LUMINANCE_ALPHA16F			= 0x881F,
+
+	ARRAY_BUFFER				= 0x8892,
+	ELEMENT_ARRAY_BUFFER		= 0x8893,
+	READ_ONLY					= 0x88B8,
+	WRITE_ONLY					= 0x88B9,
+	READ_WRITE					= 0x88BA,
+	STREAM_DRAW					= 0x88E0,
+	STREAM_READ					= 0x88E1,
+	STATIC_DRAW					= 0x88E4,
+	STATIC_READ					= 0x88E5,
+	PIXEL_PACK_BUFFER			= 0x88EB,
+	PIXEL_UNPACK_BUFFER			= 0x88EC,
 
 	FRAGMENT_SHADER				= 0x8B30,
 	VERTEX_SHADER				= 0x8B31,
@@ -122,6 +133,13 @@ typedef void ( UniformMatrix2fv_t )( s32, s32, u8, const f32* );
 typedef void ( UniformMatrix3fv_t )( s32, s32, u8, const f32* );
 typedef void ( UniformMatrix4fv_t )( s32, s32, u8, const f32* );
 
+typedef void ( GenBuffers_t )( s32, u32* );
+typedef void ( DeleteBuffers_t )( s32, const u32* );
+typedef void ( BindBuffer_t )( u32, u32 );
+typedef void ( BufferData_t )( u32, up_t, const void*, u32 );
+typedef void* ( MapBuffer_t )( u32, u32 );
+typedef u8 ( UnmapBuffer_t )( u32 );
+
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
 extern Clear_t* Clear;
@@ -164,6 +182,13 @@ extern Uniform4iv_t* Uniform4iv;
 extern UniformMatrix2fv_t* UniformMatrix2fv;
 extern UniformMatrix3fv_t* UniformMatrix3fv;
 extern UniformMatrix4fv_t* UniformMatrix4fv;
+
+extern GenBuffers_t* GenBuffers;
+extern DeleteBuffers_t* DeleteBuffers;
+extern BindBuffer_t* BindBuffer;
+extern BufferData_t* BufferData;
+extern MapBuffer_t* MapBuffer;
+extern UnmapBuffer_t* UnmapBuffer;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 

@@ -30,8 +30,7 @@ class compressed_texture
 {
 public:
 	compressed_texture( const image_pyramid&, type, bool );
-
-	virtual void load( const image&, u32, u32, u8 );
+	virtual void write( const image&, u32, u32, u8 );
 
 private:
 	const u32 internal;
@@ -43,8 +42,7 @@ class uncompressed_texture
 {
 public:
 	uncompressed_texture( const image_pyramid&, type, bool );
-
-	virtual void load( const image&, u32, u32, u8 );
+	virtual void write( const image&, u32, u32, u8 );
 
 private:
 	const u32 external;

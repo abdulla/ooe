@@ -1,5 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/opengl_next/buffer.hpp"
 #include "foundation/opengl_next/context.hpp"
 #include "foundation/opengl_next/program.hpp"
 #include "foundation/opengl_next/shader.hpp"
@@ -22,6 +23,7 @@ public:
 	virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
 	virtual shader_type shader( const std::string&, shader::type ) const;
 	virtual program_type program( const shader_vector& ) const;
+	virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
 
 private:
 	const view_data& view;
@@ -77,6 +79,11 @@ shader_type driver::shader( const std::string& source, shader::type type ) const
 program_type driver::program( const shader_vector& vector ) const
 {
 	return new opengl::program( vector );
+}
+
+buffer_type driver::buffer( up_t size, buffer::type format, buffer::usage_type usage ) const
+{
+	return new opengl::buffer( size, format, usage );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

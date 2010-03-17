@@ -60,6 +60,13 @@ void load_symbols( void )
 	UniformMatrix3fv = find< UniformMatrix3fv_t >( "glUniformMatrix3fv" );
 	UniformMatrix4fv = find< UniformMatrix4fv_t >( "glUniformMatrix4fv" );
 
+	GenBuffers = find< GenBuffers_t >( "glGenBuffers" );
+	DeleteBuffers = find< DeleteBuffers_t >( "glDeleteBuffers" );
+	BindBuffer = find< BindBuffer_t >( "glBindBuffer" );
+	BufferData = find< BufferData_t >( "glBufferData" );
+	MapBuffer = find< MapBuffer_t >( "glMapBuffer" );
+	UnmapBuffer = find< UnmapBuffer_t >( "glUnmapBuffer" );
+
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
 
@@ -105,5 +112,12 @@ Uniform4iv_t* Uniform4iv;
 UniformMatrix2fv_t* UniformMatrix2fv;
 UniformMatrix3fv_t* UniformMatrix3fv;
 UniformMatrix4fv_t* UniformMatrix4fv;
+
+GenBuffers_t* GenBuffers;
+DeleteBuffers_t* DeleteBuffers;
+BindBuffer_t* BindBuffer;
+BufferData_t* BufferData;
+MapBuffer_t* MapBuffer;
+UnmapBuffer_t* UnmapBuffer;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

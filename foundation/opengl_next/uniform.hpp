@@ -29,7 +29,7 @@ public:
 	virtual void insert( const std::string&, const slang_mat4& );
 
 private:
-	u32 id;
+	const u32 id;
 	map_type map;
 };
 
