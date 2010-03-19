@@ -76,6 +76,8 @@ void load_symbols( void )
 	DeleteFramebuffers = find< DeleteFramebuffers_t >( "glDeleteFramebuffers" );
 	BindFramebuffer = find< BindFramebuffer_t >( "glBindFramebuffer" );
 	BlitFramebuffer = find< BlitFramebuffer_t >( "glBlitFramebuffer" );
+	FramebufferTexture2D = find< FramebufferTexture2D_t >( "glFramebufferTexture2D" );
+	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbuffer" );
 
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
@@ -139,5 +141,7 @@ GenFramebuffers_t* GenFramebuffers;
 DeleteFramebuffers_t* DeleteFramebuffers;
 BindFramebuffer_t* BindFramebuffer;
 BlitFramebuffer_t* BlitFramebuffer;
+FramebufferTexture2D_t* FramebufferTexture2D;
+FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

@@ -153,6 +153,8 @@ typedef void ( GenFramebuffers_t )( s32, u32* );
 typedef void ( DeleteFramebuffers_t )( s32, const u32* );
 typedef void ( BindFramebuffer_t )( u32, u32 );
 typedef void ( BlitFramebuffer_t )( s32, s32, s32, s32, s32, s32, s32, s32, u32, u32 );
+typedef void ( FramebufferTexture2D_t )( u32, u32, u32, u32, s32 );
+typedef void ( FramebufferRenderbuffer_t )( u32, u32, u32, u32 );
 
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
@@ -213,6 +215,8 @@ extern GenFramebuffers_t* GenFramebuffers;
 extern DeleteFramebuffers_t* DeleteFramebuffers;
 extern BindFramebuffer_t* BindFramebuffer;
 extern BlitFramebuffer_t* BlitFramebuffer;
+extern FramebufferTexture2D_t* FramebufferTexture2D;
+extern FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
