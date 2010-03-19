@@ -28,7 +28,8 @@ platform::context_type context_construct( const ooe::view_data& view )
 	{
 		NSOpenGLPFAColorSize,		24,
 		NSOpenGLPFAAlphaSize,		8,
-		NSOpenGLPFADepthSize,		32,
+		NSOpenGLPFADepthSize,		24,
+		NSOpenGLPFAStencilSize,		0,
 
 		NSOpenGLPFADoubleBuffer,	true,
 		NSOpenGLPFANoRecovery,		true,

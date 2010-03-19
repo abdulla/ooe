@@ -60,6 +60,7 @@ extern "C" void driver_choose( const ooe::view_data& view )
 		GLX_BLUE_SIZE,		8,
 		GLX_ALPHA_SIZE,		8,
 		GLX_DEPTH_SIZE,		24,
+		GLX_STENCIL_SIZE,	0,
 
 		GLX_DOUBLEBUFFER,	true,
 		0
