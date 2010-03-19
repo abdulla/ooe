@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_UNIFORM_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_UNIFORM_HPP
+#ifndef OOE_FOUNDATION_OPENGL_NEXT_CONSTANT_HPP
+#define OOE_FOUNDATION_OPENGL_NEXT_CONSTANT_HPP
 
 #include <map>
 
@@ -9,13 +9,13 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-class uniform
-	: public ooe::uniform
+class constant
+	: public ooe::constant
 {
 public:
 	typedef std::map< std::string, s32 > map_type;
 
-	uniform( u32 );
+	constant( u32 );
 	virtual void insert( const std::string&, f32 );
 	virtual void insert( const std::string&, const slang_vec2& );
 	virtual void insert( const std::string&, const slang_vec3& );
@@ -35,4 +35,4 @@ private:
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_UNIFORM_HPP
+#endif	// OOE_FOUNDATION_OPENGL_NEXT_CONSTANT_HPP

@@ -1,9 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/opengl_next/constant.hpp"
 #include "foundation/opengl_next/program.hpp"
 #include "foundation/opengl_next/shader.hpp"
 #include "foundation/opengl_next/symbol.hpp"
-#include "foundation/opengl_next/uniform.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -35,9 +35,9 @@ program::~program( void )
 	DeleteProgram( id );
 }
 
-uniform_type program::uniform( void ) const
+constant_type program::constant( void ) const
 {
-	return new opengl::uniform( id );
+	return new opengl::constant( id );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

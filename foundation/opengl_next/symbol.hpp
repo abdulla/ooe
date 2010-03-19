@@ -49,6 +49,8 @@ enum
 	BGR							= 0x80E0,
 	BGRA						= 0x80E1,
 
+	DEPTH_COMPONENT24			= 0x81A6,
+
 	TEXTURE_MAX_LEVEL			= 0x813D,
 
 	COMPRESSED_RGBA_S3TC_DXT1	= 0x83F1,
@@ -76,7 +78,6 @@ enum
 	STATIC_DRAW					= 0x88E4,
 	STATIC_READ					= 0x88E5,
 	PIXEL_PACK_BUFFER			= 0x88EB,
-	PIXEL_UNPACK_BUFFER			= 0x88EC,
 
 	FRAGMENT_SHADER				= 0x8B30,
 	VERTEX_SHADER				= 0x8B31,
@@ -85,8 +86,11 @@ enum
 	VALIDATE_STATUS				= 0x8B83,
 	INFO_LOG_LENGTH				= 0x8B84,
 
+	DEPTH_COMPONENT32F			= 0x8CAC,
+	COLOR_ATTACHMENT0			= 0x8CE0,
+	RENDERBUFFER				= 0x8D41,
+
 	DEPTH_BUFFER_BIT			= 0x00000100,
-	STENCIL_BUFFER_BIT			= 0x00000400,
 	COLOR_BUFFER_BIT			= 0x00004000
 };
 
@@ -140,6 +144,16 @@ typedef void ( BufferData_t )( u32, up_t, const void*, u32 );
 typedef void* ( MapBuffer_t )( u32, u32 );
 typedef u8 ( UnmapBuffer_t )( u32 );
 
+typedef void ( GenRenderbuffers_t )( s32, u32* );
+typedef void ( DeleteRenderbuffers_t )( s32, const u32* );
+typedef void ( BindRenderbuffer_t )( u32, u32 );
+typedef void ( RenderbufferStorage_t )( u32, u32, s32, s32 );
+
+typedef void ( GenFramebuffers_t )( s32, u32* );
+typedef void ( DeleteFramebuffers_t )( s32, const u32* );
+typedef void ( BindFramebuffer_t )( u32, u32 );
+typedef void ( BlitFramebuffer_t )( s32, s32, s32, s32, s32, s32, s32, s32, u32, u32 );
+
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
 extern Clear_t* Clear;
@@ -189,6 +203,16 @@ extern BindBuffer_t* BindBuffer;
 extern BufferData_t* BufferData;
 extern MapBuffer_t* MapBuffer;
 extern UnmapBuffer_t* UnmapBuffer;
+
+extern GenRenderbuffers_t* GenRenderbuffers;
+extern DeleteRenderbuffers_t* DeleteRenderbuffers;
+extern BindRenderbuffer_t* BindRenderbuffer;
+extern RenderbufferStorage_t* RenderbufferStorage;
+
+extern GenFramebuffers_t* GenFramebuffers;
+extern DeleteFramebuffers_t* DeleteFramebuffers;
+extern BindFramebuffer_t* BindFramebuffer;
+extern BlitFramebuffer_t* BlitFramebuffer;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 

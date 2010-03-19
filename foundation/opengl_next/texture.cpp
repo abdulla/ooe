@@ -18,13 +18,13 @@ compressed_tuple compressed_format( const image_pyramid& pyramid )
 	switch ( pyramid.format )
 	{
 	//--- dxt ------------------------------------------------------------------
-	case compressed_image::rgba_dxt1:
+	case image::rgba_dxt1:
 		return compressed_tuple( COMPRESSED_RGBA_S3TC_DXT1, size * 8 );
 
-	case compressed_image::rgba_dxt3:
+	case image::rgba_dxt3:
 		return compressed_tuple( COMPRESSED_RGBA_S3TC_DXT3, size * 16 );
 
-	case compressed_image::rgba_dxt5:
+	case image::rgba_dxt5:
 		return compressed_tuple( COMPRESSED_RGBA_S3TC_DXT5, size * 16 );
 
 	//--------------------------------------------------------------------------
@@ -39,58 +39,58 @@ uncompressed_tuple uncompressed_format( const image_pyramid& pyramid )
 {
 	switch ( pyramid.format )
 	{
-	case uncompressed_image::bgr_u8:
+	case image::bgr_u8:
 		return uncompressed_tuple( RGB8, BGR, UNSIGNED_BYTE );
 
-	case uncompressed_image::bgra_u8:
+	case image::bgra_u8:
 		return uncompressed_tuple( RGBA8, BGRA, UNSIGNED_BYTE );
 
 	//--- u8 -------------------------------------------------------------------
-	case uncompressed_image::rgb_u8:
+	case image::rgb_u8:
 		return uncompressed_tuple( RGB8, RGB, UNSIGNED_BYTE );
 
-	case uncompressed_image::rgba_u8:
+	case image::rgba_u8:
 		return uncompressed_tuple( RGBA8, RGBA, UNSIGNED_BYTE );
 
-	case uncompressed_image::a_u8:
+	case image::a_u8:
 		return uncompressed_tuple( ALPHA8, ALPHA, UNSIGNED_BYTE );
 
-	case uncompressed_image::y_u8:
+	case image::y_u8:
 		return uncompressed_tuple( LUMINANCE8, LUMINANCE, UNSIGNED_BYTE );
 
-	case uncompressed_image::ya_u8:
+	case image::ya_u8:
 		return uncompressed_tuple( LUMINANCE8_ALPHA8, LUMINANCE_ALPHA, UNSIGNED_BYTE );
 
 	//--- f16 ------------------------------------------------------------------
-	case uncompressed_image::rgb_f16:
+	case image::rgb_f16:
 		return uncompressed_tuple( RGB16F, RGB, HALF_FLOAT );
 
-	case uncompressed_image::rgba_f16:
+	case image::rgba_f16:
 		return uncompressed_tuple( RGBA16F, RGBA, HALF_FLOAT );
 
-	case uncompressed_image::a_f16:
+	case image::a_f16:
 		return uncompressed_tuple( ALPHA16F, ALPHA, HALF_FLOAT );
 
-	case uncompressed_image::y_f16:
+	case image::y_f16:
 		return uncompressed_tuple( LUMINANCE16F, LUMINANCE, HALF_FLOAT );
 
-	case uncompressed_image::ya_f16:
+	case image::ya_f16:
 		return uncompressed_tuple( LUMINANCE_ALPHA16F, LUMINANCE_ALPHA, HALF_FLOAT );
 
 	//--- f32 ------------------------------------------------------------------
-	case uncompressed_image::rgb_f32:
+	case image::rgb_f32:
 		return uncompressed_tuple( RGB32F, RGB, FLOAT );
 
-	case uncompressed_image::rgba_f32:
+	case image::rgba_f32:
 		return uncompressed_tuple( RGBA32F, RGBA, FLOAT );
 
-	case uncompressed_image::a_f32:
+	case image::a_f32:
 		return uncompressed_tuple( ALPHA32F, ALPHA, FLOAT );
 
-	case uncompressed_image::y_f32:
+	case image::y_f32:
 		return uncompressed_tuple( LUMINANCE32F, LUMINANCE, FLOAT );
 
-	case uncompressed_image::ya_f32:
+	case image::ya_f32:
 		return uncompressed_tuple( LUMINANCE_ALPHA16F, LUMINANCE_ALPHA, FLOAT );
 
 	//--------------------------------------------------------------------------
@@ -182,9 +182,12 @@ compressed_texture::
 	BindTexture( TEXTURE_2D, id );
 	set_filter( filter );
 
-	for ( u32 i = 0, end = vector.size(); i != end; ++i )
+	for ( u32 i = 0; i != levels; ++i )
 		CompressedTexImage2D
 			( TEXTURE_2D, i, internal, width >> i, height >> i, 0, size, vector[ i ] );
+
+	if ( !levels )
+		CompressedTexImage2D( TEXTURE_2D, 0, internal, width, height, 0, size, 0 );
 
 	set_levels( generate_mipmap, levels );
 }
@@ -210,9 +213,12 @@ uncompressed_texture::
 	BindTexture( TEXTURE_2D, id );
 	set_filter( filter );
 
-	for ( u32 i = 0, end = vector.size(); i != end; ++i )
+	for ( u32 i = 0; i != levels; ++i )
 		TexImage2D
 			( TEXTURE_2D, i, tuple._0, width >> i, height >> i, 0, external, type, vector[ i ] );
+
+	if ( !levels )
+		TexImage2D( TEXTURE_2D, 0, tuple._0, width, height, 0, external, type, 0 );
 
 	set_levels( generate_mipmap, levels );
 }

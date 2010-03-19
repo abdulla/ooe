@@ -18,11 +18,8 @@ u32 buffer_target( ooe::buffer::type format )
 	case ooe::buffer::index:
 		return opengl::ELEMENT_ARRAY_BUFFER;
 
-	case ooe::buffer::pixel_pack:
+	case ooe::buffer::pixel:
 		return opengl::PIXEL_PACK_BUFFER;
-
-	case ooe::buffer::pixel_unpack:
-		return opengl::PIXEL_UNPACK_BUFFER;
 
 	default:
 		throw error::runtime( "opengl::buffer: " ) << "Unknown buffer format: " << format;

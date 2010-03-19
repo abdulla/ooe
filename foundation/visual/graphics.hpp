@@ -23,6 +23,7 @@ public:
 	const image::type format;
 
 	image_pyramid( const image& );
+	image_pyramid( u32, u32, image::type );
 
 	void insert( const image& );
 	const vector_type& get( void ) const;
@@ -85,10 +86,10 @@ typedef slang_type< mat_tag, f32, 4 > slang_mat2;
 typedef slang_type< mat_tag, f32, 9 > slang_mat3;
 typedef slang_type< mat_tag, f32, 16 > slang_mat4;
 
-//--- uniform --------------------------------------------------------------------------------------
-struct uniform
+//--- constant -------------------------------------------------------------------------------------
+struct constant
 {
-	virtual ~uniform( void ) {}
+	virtual ~constant( void ) {}
 	virtual void insert( const std::string&, f32 ) = 0;
 	virtual void insert( const std::string&, const slang_vec2& ) = 0;
 	virtual void insert( const std::string&, const slang_vec3& ) = 0;
@@ -102,13 +103,13 @@ struct uniform
 	virtual void insert( const std::string&, const slang_mat4& ) = 0;
 };
 
-typedef shared_ptr< uniform > uniform_type;
+typedef shared_ptr< constant > constant_type;
 
 //--- program --------------------------------------------------------------------------------------
 struct program
 {
 	virtual ~program( void ) {}
-	virtual uniform_type uniform( void ) const = 0;
+	virtual constant_type constant( void ) const = 0;
 };
 
 typedef shared_ptr< program > program_type;
@@ -132,8 +133,7 @@ struct buffer
 	{
 		point,
 		index,
-		pixel_pack,
-		pixel_unpack
+		pixel
 	};
 
 	enum usage_type
@@ -157,39 +157,55 @@ struct buffer
 
 typedef shared_ptr< buffer > buffer_type;
 
-//--- frame ----------------------------------------------------------------------------------------
-class frame
-{
-public:
-	frame( void );
-
-protected:
-	opaque_ptr pointer;
-};
-
 //--- batch ----------------------------------------------------------------------------------------
 class batch
 {
 public:
 	void insert( const texture& );
-	void insert( const shader& );
 	void insert( const buffer& );
 
 protected:
 	typedef std::vector< texture > texture_vector;
-	typedef std::vector< shader > shader_vector;
 	typedef std::vector< buffer > buffer_vector;
 
 	texture_vector textures;
-	shader_vector shaders;
 	buffer_vector buffers;
+};
+
+//--- target ---------------------------------------------------------------------------------------
+struct target
+{
+	enum type
+	{
+		depth_u24 = image::compressed,
+		depth_f32
+	};
+
+	virtual ~target( void ) {}
+};
+
+typedef shared_ptr< target > target_type;
+
+//--- frame ----------------------------------------------------------------------------------------
+typedef shared_ptr< struct frame > frame_type;
+
+struct frame
+{
+	enum type
+	{
+		create,
+		system
+	};
+
+	virtual ~frame( void ) {}
+	virtual void draw( const frame_type& ) = 0;
+	virtual void draw( const batch& ) = 0;
 };
 
 //--- driver ---------------------------------------------------------------------------------------
 struct driver
 {
 	virtual ~driver( void ) {}
-	virtual void draw( frame&, const batch& ) = 0;
 	virtual void swap( void ) = 0;
 
 	virtual texture_type texture
@@ -198,6 +214,8 @@ struct driver
 	virtual program_type program( const shader_vector& ) const = 0;
 	virtual buffer_type buffer
 		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
+	virtual target_type target( u32, u32, u8 ) const = 0;
+	virtual frame_type frame( frame::type = frame::create ) const = 0;
 };
 
 typedef shared_ptr< driver > driver_type;

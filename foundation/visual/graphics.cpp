@@ -7,9 +7,13 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- image_pyramid --------------------------------------------------------------------------------
 image_pyramid::image_pyramid( const image& image )
-	: width( image.width ), height( image.height ), format( image.format ), vector()
+	: width( image.width ), height( image.height ), format( image.format ), vector( 1, image.ptr() )
 {
-	vector.push_back( image.ptr() );
+}
+
+image_pyramid::image_pyramid( u32 width_, u32 height_, image::type format_ )
+	: width( width_ ), height( height_ ), format( format_ ), vector()
+{
 }
 
 void image_pyramid::insert( const image& image )

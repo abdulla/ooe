@@ -67,6 +67,16 @@ void load_symbols( void )
 	MapBuffer = find< MapBuffer_t >( "glMapBuffer" );
 	UnmapBuffer = find< UnmapBuffer_t >( "glUnmapBuffer" );
 
+	GenRenderbuffers = find< GenRenderbuffers_t >( "glGenRenderbuffersEXT" );
+	DeleteRenderbuffers = find< DeleteRenderbuffers_t >( "glDeleteRenderbuffersEXT" );
+	BindRenderbuffer = find< BindRenderbuffer_t >( "glBindRenderbufferEXT" );
+	RenderbufferStorage = find< RenderbufferStorage_t >( "glRenderbufferStorageEXT" );
+
+	GenFramebuffers = find< GenFramebuffers_t >( "glGenFramebuffers" );
+	DeleteFramebuffers = find< DeleteFramebuffers_t >( "glDeleteFramebuffers" );
+	BindFramebuffer = find< BindFramebuffer_t >( "glBindFramebuffer" );
+	BlitFramebuffer = find< BlitFramebuffer_t >( "glBlitFramebuffer" );
+
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
 
@@ -119,5 +129,15 @@ BindBuffer_t* BindBuffer;
 BufferData_t* BufferData;
 MapBuffer_t* MapBuffer;
 UnmapBuffer_t* UnmapBuffer;
+
+GenRenderbuffers_t* GenRenderbuffers;
+DeleteRenderbuffers_t* DeleteRenderbuffers;
+BindRenderbuffer_t* BindRenderbuffer;
+RenderbufferStorage_t* RenderbufferStorage;
+
+GenFramebuffers_t* GenFramebuffers;
+DeleteFramebuffers_t* DeleteFramebuffers;
+BindFramebuffer_t* BindFramebuffer;
+BlitFramebuffer_t* BlitFramebuffer;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
