@@ -72,12 +72,12 @@ void load_symbols( void )
 	BindRenderbuffer = find< BindRenderbuffer_t >( "glBindRenderbufferEXT" );
 	RenderbufferStorage = find< RenderbufferStorage_t >( "glRenderbufferStorageEXT" );
 
-	GenFramebuffers = find< GenFramebuffers_t >( "glGenFramebuffers" );
-	DeleteFramebuffers = find< DeleteFramebuffers_t >( "glDeleteFramebuffers" );
-	BindFramebuffer = find< BindFramebuffer_t >( "glBindFramebuffer" );
-	BlitFramebuffer = find< BlitFramebuffer_t >( "glBlitFramebuffer" );
-	FramebufferTexture2D = find< FramebufferTexture2D_t >( "glFramebufferTexture2D" );
-	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbuffer" );
+	GenFramebuffers = find< GenFramebuffers_t >( "glGenFramebuffersEXT" );
+	DeleteFramebuffers = find< DeleteFramebuffers_t >( "glDeleteFramebuffersEXT" );
+	BindFramebuffer = find< BindFramebuffer_t >( "glBindFramebufferEXT" );
+	BlitFramebuffer = find< BlitFramebuffer_t >( "glBlitFramebufferEXT" );
+	FramebufferTexture2D = find< FramebufferTexture2D_t >( "glFramebufferTexture2DEXT" );
+	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbufferEXT" );
 
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
