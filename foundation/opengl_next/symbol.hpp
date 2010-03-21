@@ -86,6 +86,8 @@ enum
 	VALIDATE_STATUS				= 0x8B83,
 	INFO_LOG_LENGTH				= 0x8B84,
 
+	READ_FRAMEBUFFER			= 0x8CA8,
+	DRAW_FRAMEBUFFER			= 0x8CA9,
 	DEPTH_COMPONENT32F			= 0x8CAC,
 	COLOR_ATTACHMENT0			= 0x8CE0,
 	RENDERBUFFER				= 0x8D41,
@@ -98,6 +100,9 @@ enum
 typedef const c8* ( GetString_t )( u32 );
 typedef void ( Clear_t )( u32 );
 typedef void ( PixelStorei_t )( u32, s32 );
+
+typedef void ( DrawBuffers_t )( s32, const u32* );
+typedef void ( DrawElements_t )( u32, s32, u32, const void* );
 
 typedef void ( GenTextures_t )( s32, u32* );
 typedef void ( DeleteTextures_t )( s32, const u32* );
@@ -123,6 +128,8 @@ typedef void ( LinkProgram_t )( u32 );
 typedef void ( UseProgram_t )( u32 );
 typedef void ( GetProgramiv_t )( u32, u32, s32* );
 typedef void ( GetProgramInfoLog_t )( u32, s32, s32*, c8* );
+typedef s32 ( GetAttribLocation_t )( u32, const c8* );
+typedef s32 ( GetFragDataLocation_t )( u32, const c8* );
 
 typedef s32 ( GetUniformLocation_t )( u32, const c8* );
 typedef void ( Uniform1fv_t )( s32, s32, const f32* );
@@ -155,11 +162,15 @@ typedef void ( BindFramebuffer_t )( u32, u32 );
 typedef void ( BlitFramebuffer_t )( s32, s32, s32, s32, s32, s32, s32, s32, u32, u32 );
 typedef void ( FramebufferTexture2D_t )( u32, u32, u32, u32, s32 );
 typedef void ( FramebufferRenderbuffer_t )( u32, u32, u32, u32 );
+typedef u32 ( CheckFramebufferStatus_t )( u32 );
 
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
 extern Clear_t* Clear;
 extern PixelStorei_t* PixelStorei;
+
+extern DrawBuffers_t* DrawBuffers;
+extern DrawElements_t* DrawElements;
 
 extern GenTextures_t* GenTextures;
 extern DeleteTextures_t* DeleteTextures;
@@ -185,6 +196,8 @@ extern LinkProgram_t* LinkProgram;
 extern UseProgram_t* UseProgram;
 extern GetProgramiv_t* GetProgramiv;
 extern GetProgramInfoLog_t* GetProgramInfoLog;
+extern GetAttribLocation_t* GetAttribLocation;
+extern GetFragDataLocation_t* GetFragDataLocation;
 
 extern GetUniformLocation_t* GetUniformLocation;
 extern Uniform1fv_t* Uniform1fv;
@@ -217,6 +230,7 @@ extern BindFramebuffer_t* BindFramebuffer;
 extern BlitFramebuffer_t* BlitFramebuffer;
 extern FramebufferTexture2D_t* FramebufferTexture2D;
 extern FramebufferRenderbuffer_t* FramebufferRenderbuffer;
+extern CheckFramebufferStatus_t* CheckFramebufferStatus;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 

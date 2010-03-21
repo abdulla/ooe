@@ -25,7 +25,7 @@ public:
 	virtual program_type program( const shader_vector& ) const;
 	virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
 	virtual target_type target( u32, u32, u8 ) const;
-	virtual frame_type frame( frame::type ) const;
+	virtual frame_type frame( void ) const;
 
 private:
 	const view_data& view;
@@ -89,9 +89,9 @@ target_type driver::target( u32 width, u32 height, u8 format ) const
 	return new opengl::target( width, height, format );
 }
 
-frame_type driver::frame( frame::type format ) const
+frame_type driver::frame( void ) const
 {
-	return new opengl::frame( format );
+	return new opengl::frame();
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

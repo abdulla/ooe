@@ -157,21 +157,6 @@ struct buffer
 
 typedef shared_ptr< buffer > buffer_type;
 
-//--- batch ----------------------------------------------------------------------------------------
-class batch
-{
-public:
-	void insert( const texture& );
-	void insert( const buffer& );
-
-protected:
-	typedef std::vector< texture > texture_vector;
-	typedef std::vector< buffer > buffer_vector;
-
-	texture_vector textures;
-	buffer_vector buffers;
-};
-
 //--- target ---------------------------------------------------------------------------------------
 struct target
 {
@@ -191,21 +176,34 @@ typedef shared_ptr< struct frame > frame_type;
 
 struct frame
 {
-	enum type
+	enum attachment_type
 	{
-		create,
-		system
+		color	= 1 << 0,
+		depth	= 1 << 1
 	};
 
 	virtual ~frame( void ) {}
-	virtual void draw( const frame_type& ) = 0;
-	virtual void draw( const batch& ) = 0;
+	virtual void write( const frame_type&, u8 = color | depth ) = 0;
+	virtual void insert( const target_type&, attachment_type ) = 0;
+	virtual void insert( const texture_type&, attachment_type ) = 0;
 };
+
+//--- batch ----------------------------------------------------------------------------------------
+struct batch
+{
+	virtual ~batch( void ) {}
+	virtual void insert( const texture_type& ) = 0;
+	virtual void insert( const buffer_type& ) = 0;
+	virtual void insert( const frame_type& ) = 0;
+};
+
+typedef shared_ptr< batch > batch_type;
 
 //--- driver ---------------------------------------------------------------------------------------
 struct driver
 {
 	virtual ~driver( void ) {}
+//	virtual void draw( const batch_type& ) = 0;
 	virtual void swap( void ) = 0;
 
 	virtual texture_type texture
@@ -215,7 +213,8 @@ struct driver
 	virtual buffer_type buffer
 		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
 	virtual target_type target( u32, u32, u8 ) const = 0;
-	virtual frame_type frame( frame::type = frame::create ) const = 0;
+	virtual frame_type frame( void ) const = 0;
+//	virtual batch_type batch( void ) const = 0;
 };
 
 typedef shared_ptr< driver > driver_type;

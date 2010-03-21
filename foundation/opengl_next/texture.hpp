@@ -12,6 +12,8 @@ class texture
 {
 public:
 	const u32 id;
+	const u32 width;
+	const u32 height;
 
 	texture( const image_pyramid& );
 	virtual ~texture( void );
@@ -19,8 +21,6 @@ public:
 	void verify( const image&, u32, u32, u8 ) const;
 
 protected:
-	const u32 width;
-	const u32 height;
 	const image::type format;
 	const u32 levels;
 };

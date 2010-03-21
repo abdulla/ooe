@@ -56,8 +56,8 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- target ---------------------------------------------------------------------------------------
-target::target( u32 width, u32 height, u8 format )
-	: id()
+target::target( u32 width_, u32 height_, u8 format )
+	: id(), width( width_ ), height( height_ )
 {
 	GenRenderbuffers( 1, const_cast< u32* >( &id ) );
 

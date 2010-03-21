@@ -11,6 +11,8 @@ struct target
 	: public ooe::target
 {
 	const u32 id;
+	const u32 width;
+	const u32 height;
 
 	target( u32, u32, u8 );
 	virtual ~target( void );

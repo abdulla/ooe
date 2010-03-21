@@ -22,6 +22,9 @@ void load_symbols( void )
 	Clear = find< Clear_t >( "glClear" );
 	PixelStorei = find< PixelStorei_t >( "glPixelStorei" );
 
+	DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
+	DrawElements = find< DrawElements_t >( "glDrawElements" );
+
 	GenTextures = find< GenTextures_t >( "glGenTextures" );
 	DeleteTextures = find< DeleteTextures_t >( "glDeleteTextures" );
 	BindTexture = find< BindTexture_t >( "glBindTexture" );
@@ -46,6 +49,8 @@ void load_symbols( void )
 	UseProgram = find< UseProgram_t >( "glUseProgram" );
 	GetProgramiv = find< GetProgramiv_t >( "glGetProgramiv" );
 	GetProgramInfoLog = find< GetProgramInfoLog_t >( "glGetProgramInfoLog" );
+	GetAttribLocation = find< GetAttribLocation_t >( "glGetAttribLocation" );
+	GetFragDataLocation = find< GetFragDataLocation_t >( "glGetFragDataLocationEXT" );
 
 	GetUniformLocation = find< GetUniformLocation_t >( "glGetUniformLocation" );
 	Uniform1fv = find< Uniform1fv_t >( "glUniform1fv" );
@@ -78,6 +83,7 @@ void load_symbols( void )
 	BlitFramebuffer = find< BlitFramebuffer_t >( "glBlitFramebufferEXT" );
 	FramebufferTexture2D = find< FramebufferTexture2D_t >( "glFramebufferTexture2DEXT" );
 	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbufferEXT" );
+	CheckFramebufferStatus = find< CheckFramebufferStatus_t >( "glCheckFramebufferStatusEXT" );
 
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
@@ -86,6 +92,9 @@ void load_symbols( void )
 GetString_t* GetString;
 Clear_t* Clear;
 PixelStorei_t* PixelStorei;
+
+DrawBuffers_t* DrawBuffers;
+DrawElements_t* DrawElements;
 
 GenTextures_t* GenTextures;
 DeleteTextures_t* DeleteTextures;
@@ -111,6 +120,8 @@ LinkProgram_t* LinkProgram;
 UseProgram_t* UseProgram;
 GetProgramiv_t* GetProgramiv;
 GetProgramInfoLog_t* GetProgramInfoLog;
+GetAttribLocation_t* GetAttribLocation;
+GetFragDataLocation_t* GetFragDataLocation;
 
 GetUniformLocation_t* GetUniformLocation;
 Uniform1fv_t* Uniform1fv;
@@ -143,5 +154,6 @@ BindFramebuffer_t* BindFramebuffer;
 BlitFramebuffer_t* BlitFramebuffer;
 FramebufferTexture2D_t* FramebufferTexture2D;
 FramebufferRenderbuffer_t* FramebufferRenderbuffer;
+CheckFramebufferStatus_t* CheckFramebufferStatus;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
