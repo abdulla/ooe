@@ -193,8 +193,7 @@ struct batch
 {
 	virtual ~batch( void ) {}
 	virtual void insert( const texture_type& ) = 0;
-	virtual void insert( const buffer_type& ) = 0;
-	virtual void insert( const frame_type& ) = 0;
+	virtual void insert( /* locations, */ const buffer_type& ) = 0;
 };
 
 typedef shared_ptr< batch > batch_type;
@@ -203,7 +202,7 @@ typedef shared_ptr< batch > batch_type;
 struct driver
 {
 	virtual ~driver( void ) {}
-//	virtual void draw( const batch_type& ) = 0;
+//	virtual void draw( const frame_type&, const batch_type& ) = 0;
 	virtual void swap( void ) = 0;
 
 	virtual texture_type texture
