@@ -16,7 +16,7 @@ image_pyramid::image_pyramid( u32 width_, u32 height_, image::type format_ )
 {
 }
 
-void image_pyramid::insert( const image& image )
+void image_pyramid::push_back( const image& image )
 {
 	u32 level_width = width >> vector.size();
 	u32 level_height = height >> vector.size();

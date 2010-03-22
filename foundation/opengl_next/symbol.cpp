@@ -22,9 +22,6 @@ void load_symbols( void )
 	Clear = find< Clear_t >( "glClear" );
 	PixelStorei = find< PixelStorei_t >( "glPixelStorei" );
 
-	DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
-	DrawElements = find< DrawElements_t >( "glDrawElements" );
-
 	GenTextures = find< GenTextures_t >( "glGenTextures" );
 	DeleteTextures = find< DeleteTextures_t >( "glDeleteTextures" );
 	BindTexture = find< BindTexture_t >( "glBindTexture" );
@@ -49,21 +46,16 @@ void load_symbols( void )
 	UseProgram = find< UseProgram_t >( "glUseProgram" );
 	GetProgramiv = find< GetProgramiv_t >( "glGetProgramiv" );
 	GetProgramInfoLog = find< GetProgramInfoLog_t >( "glGetProgramInfoLog" );
-	GetAttribLocation = find< GetAttribLocation_t >( "glGetAttribLocation" );
-	GetFragDataLocation = find< GetFragDataLocation_t >( "glGetFragDataLocationEXT" );
 
 	GetUniformLocation = find< GetUniformLocation_t >( "glGetUniformLocation" );
-	Uniform1fv = find< Uniform1fv_t >( "glUniform1fv" );
-	Uniform2fv = find< Uniform2fv_t >( "glUniform2fv" );
-	Uniform3fv = find< Uniform3fv_t >( "glUniform3fv" );
-	Uniform4fv = find< Uniform4fv_t >( "glUniform4fv" );
-	Uniform1iv = find< Uniform1iv_t >( "glUniform1iv" );
-	Uniform2iv = find< Uniform2iv_t >( "glUniform2iv" );
-	Uniform3iv = find< Uniform3iv_t >( "glUniform3iv" );
-	Uniform4iv = find< Uniform4iv_t >( "glUniform4iv" );
-	UniformMatrix2fv = find< UniformMatrix2fv_t >( "glUniformMatrix2fv" );
+	Uniform1i = find< Uniform1i_t >( "glUniform1i" );
+	Uniform3i = find< Uniform3i_t >( "glUniform3i" );
+	Uniform1f = find< Uniform1f_t >( "glUniform1f" );
+	Uniform3f = find< Uniform3f_t >( "glUniform3f" );
 	UniformMatrix3fv = find< UniformMatrix3fv_t >( "glUniformMatrix3fv" );
 	UniformMatrix4fv = find< UniformMatrix4fv_t >( "glUniformMatrix4fv" );
+	GetAttribLocation = find< GetAttribLocation_t >( "glGetAttribLocation" );
+	GetFragDataLocation = find< GetFragDataLocation_t >( "glGetFragDataLocationEXT" );
 
 	GenBuffers = find< GenBuffers_t >( "glGenBuffers" );
 	DeleteBuffers = find< DeleteBuffers_t >( "glDeleteBuffers" );
@@ -85,6 +77,10 @@ void load_symbols( void )
 	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbufferEXT" );
 	CheckFramebufferStatus = find< CheckFramebufferStatus_t >( "glCheckFramebufferStatusEXT" );
 
+	VertexAttribPointer = find< VertexAttribPointer_t >( "glVertexAttribPointer" );
+	DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
+	DrawElements = find< DrawElements_t >( "glDrawElements" );
+
 	/*const c8* extensions = */GetString( EXTENSIONS );
 }
 
@@ -92,9 +88,6 @@ void load_symbols( void )
 GetString_t* GetString;
 Clear_t* Clear;
 PixelStorei_t* PixelStorei;
-
-DrawBuffers_t* DrawBuffers;
-DrawElements_t* DrawElements;
 
 GenTextures_t* GenTextures;
 DeleteTextures_t* DeleteTextures;
@@ -120,21 +113,16 @@ LinkProgram_t* LinkProgram;
 UseProgram_t* UseProgram;
 GetProgramiv_t* GetProgramiv;
 GetProgramInfoLog_t* GetProgramInfoLog;
-GetAttribLocation_t* GetAttribLocation;
-GetFragDataLocation_t* GetFragDataLocation;
 
 GetUniformLocation_t* GetUniformLocation;
-Uniform1fv_t* Uniform1fv;
-Uniform2fv_t* Uniform2fv;
-Uniform3fv_t* Uniform3fv;
-Uniform4fv_t* Uniform4fv;
-Uniform1iv_t* Uniform1iv;
-Uniform2iv_t* Uniform2iv;
-Uniform3iv_t* Uniform3iv;
-Uniform4iv_t* Uniform4iv;
-UniformMatrix2fv_t* UniformMatrix2fv;
+Uniform1i_t* Uniform1i;
+Uniform3i_t* Uniform3i;
+Uniform1f_t* Uniform1f;
+Uniform3f_t* Uniform3f;
 UniformMatrix3fv_t* UniformMatrix3fv;
 UniformMatrix4fv_t* UniformMatrix4fv;
+GetAttribLocation_t* GetAttribLocation;
+GetFragDataLocation_t* GetFragDataLocation;
 
 GenBuffers_t* GenBuffers;
 DeleteBuffers_t* DeleteBuffers;
@@ -155,5 +143,9 @@ BlitFramebuffer_t* BlitFramebuffer;
 FramebufferTexture2D_t* FramebufferTexture2D;
 FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 CheckFramebufferStatus_t* CheckFramebufferStatus;
+
+VertexAttribPointer_t* VertexAttribPointer;
+DrawBuffers_t* DrawBuffers;
+DrawElements_t* DrawElements;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

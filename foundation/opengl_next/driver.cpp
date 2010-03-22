@@ -18,13 +18,15 @@ class driver
 public:
 	driver( const ooe::view_data& );
 	virtual ~driver( void );
+
+	virtual void draw( const block_type&, const frame_type& );
 	virtual void swap( void );
 
 	virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
-	virtual shader_type shader( const std::string&, shader::type ) const;
-	virtual program_type program( const shader_vector& ) const;
 	virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
 	virtual target_type target( u32, u32, u8 ) const;
+	virtual shader_type shader( const std::string&, shader::type ) const;
+	virtual program_type program( const shader_vector& ) const;
 	virtual frame_type frame( void ) const;
 
 private:
@@ -54,6 +56,10 @@ driver::~driver( void )
 	context_destruct( view, context );
 }
 
+void driver::draw( const block_type&, const frame_type& )
+{
+}
+
 void driver::swap( void )
 {
 	context_swap( view, context );
@@ -69,16 +75,6 @@ texture_type driver::
 		return new uncompressed_texture( pyramid, filter, generate_mipmap );
 }
 
-shader_type driver::shader( const std::string& source, shader::type type ) const
-{
-	return new opengl::shader( source, type );
-}
-
-program_type driver::program( const shader_vector& vector ) const
-{
-	return new opengl::program( vector );
-}
-
 buffer_type driver::buffer( up_t size, buffer::type format, buffer::usage_type usage ) const
 {
 	return new opengl::buffer( size, format, usage );
@@ -89,9 +85,19 @@ target_type driver::target( u32 width, u32 height, u8 format ) const
 	return new opengl::target( width, height, format );
 }
 
+shader_type driver::shader( const std::string& source, shader::type type ) const
+{
+	return new opengl::shader( source, type );
+}
+
+program_type driver::program( const shader_vector& vector ) const
+{
+	return new opengl::program( vector );
+}
+
 frame_type driver::frame( void ) const
 {
-	return new opengl::frame();
+	return new opengl::frame;
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

@@ -1,6 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/opengl_next/constant.hpp"
+#include "foundation/opengl_next/block.hpp"
 #include "foundation/opengl_next/program.hpp"
 #include "foundation/opengl_next/shader.hpp"
 #include "foundation/opengl_next/symbol.hpp"
@@ -35,9 +35,9 @@ program::~program( void )
 	DeleteProgram( id );
 }
 
-constant_type program::constant( void ) const
+block_type program::block( void ) const
 {
-	return new opengl::constant( id );
+	return new opengl::block( id );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

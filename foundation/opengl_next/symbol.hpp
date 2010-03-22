@@ -101,9 +101,6 @@ typedef const c8* ( GetString_t )( u32 );
 typedef void ( Clear_t )( u32 );
 typedef void ( PixelStorei_t )( u32, s32 );
 
-typedef void ( DrawBuffers_t )( s32, const u32* );
-typedef void ( DrawElements_t )( u32, s32, u32, const void* );
-
 typedef void ( GenTextures_t )( s32, u32* );
 typedef void ( DeleteTextures_t )( s32, const u32* );
 typedef void ( BindTexture_t )( u32, u32 );
@@ -128,21 +125,16 @@ typedef void ( LinkProgram_t )( u32 );
 typedef void ( UseProgram_t )( u32 );
 typedef void ( GetProgramiv_t )( u32, u32, s32* );
 typedef void ( GetProgramInfoLog_t )( u32, s32, s32*, c8* );
-typedef s32 ( GetAttribLocation_t )( u32, const c8* );
-typedef s32 ( GetFragDataLocation_t )( u32, const c8* );
 
 typedef s32 ( GetUniformLocation_t )( u32, const c8* );
-typedef void ( Uniform1fv_t )( s32, s32, const f32* );
-typedef void ( Uniform2fv_t )( s32, s32, const f32* );
-typedef void ( Uniform3fv_t )( s32, s32, const f32* );
-typedef void ( Uniform4fv_t )( s32, s32, const f32* );
-typedef void ( Uniform1iv_t )( s32, s32, const s32* );
-typedef void ( Uniform2iv_t )( s32, s32, const s32* );
-typedef void ( Uniform3iv_t )( s32, s32, const s32* );
-typedef void ( Uniform4iv_t )( s32, s32, const s32* );
-typedef void ( UniformMatrix2fv_t )( s32, s32, u8, const f32* );
+typedef void ( Uniform1i_t )( s32, s32 );
+typedef void ( Uniform3i_t )( s32, s32, s32, s32 );
+typedef void ( Uniform1f_t )( s32, f32 );
+typedef void ( Uniform3f_t )( s32, f32, f32, f32 );
 typedef void ( UniformMatrix3fv_t )( s32, s32, u8, const f32* );
 typedef void ( UniformMatrix4fv_t )( s32, s32, u8, const f32* );
+typedef s32 ( GetAttribLocation_t )( u32, const c8* );
+typedef s32 ( GetFragDataLocation_t )( u32, const c8* );
 
 typedef void ( GenBuffers_t )( s32, u32* );
 typedef void ( DeleteBuffers_t )( s32, const u32* );
@@ -164,13 +156,14 @@ typedef void ( FramebufferTexture2D_t )( u32, u32, u32, u32, s32 );
 typedef void ( FramebufferRenderbuffer_t )( u32, u32, u32, u32 );
 typedef u32 ( CheckFramebufferStatus_t )( u32 );
 
+typedef void ( VertexAttribPointer_t )( u32, s32, u32, u8, s32, const void* );
+typedef void ( DrawBuffers_t )( s32, const u32* );
+typedef void ( DrawElements_t )( u32, s32, u32, const void* );
+
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
 extern Clear_t* Clear;
 extern PixelStorei_t* PixelStorei;
-
-extern DrawBuffers_t* DrawBuffers;
-extern DrawElements_t* DrawElements;
 
 extern GenTextures_t* GenTextures;
 extern DeleteTextures_t* DeleteTextures;
@@ -196,21 +189,16 @@ extern LinkProgram_t* LinkProgram;
 extern UseProgram_t* UseProgram;
 extern GetProgramiv_t* GetProgramiv;
 extern GetProgramInfoLog_t* GetProgramInfoLog;
-extern GetAttribLocation_t* GetAttribLocation;
-extern GetFragDataLocation_t* GetFragDataLocation;
 
 extern GetUniformLocation_t* GetUniformLocation;
-extern Uniform1fv_t* Uniform1fv;
-extern Uniform2fv_t* Uniform2fv;
-extern Uniform3fv_t* Uniform3fv;
-extern Uniform4fv_t* Uniform4fv;
-extern Uniform1iv_t* Uniform1iv;
-extern Uniform2iv_t* Uniform2iv;
-extern Uniform3iv_t* Uniform3iv;
-extern Uniform4iv_t* Uniform4iv;
-extern UniformMatrix2fv_t* UniformMatrix2fv;
+extern Uniform1i_t* Uniform1i;
+extern Uniform3i_t* Uniform3i;
+extern Uniform1f_t* Uniform1f;
+extern Uniform3f_t* Uniform3f;
 extern UniformMatrix3fv_t* UniformMatrix3fv;
 extern UniformMatrix4fv_t* UniformMatrix4fv;
+extern GetAttribLocation_t* GetAttribLocation;
+extern GetFragDataLocation_t* GetFragDataLocation;
 
 extern GenBuffers_t* GenBuffers;
 extern DeleteBuffers_t* DeleteBuffers;
@@ -231,6 +219,10 @@ extern BlitFramebuffer_t* BlitFramebuffer;
 extern FramebufferTexture2D_t* FramebufferTexture2D;
 extern FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 extern CheckFramebufferStatus_t* CheckFramebufferStatus;
+
+extern VertexAttribPointer_t* VertexAttribPointer;
+extern DrawBuffers_t* DrawBuffers;
+extern DrawElements_t* DrawElements;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
