@@ -13,6 +13,8 @@ void load_symbols( void );
 //--- constants ------------------------------------------------------------------------------------
 enum
 {
+	TRIANGLES					= 0x0004,
+
 	UNPACK_ALIGNMENT			= 0x0CF5,
 	PACK_ALIGNMENT				= 0x0D05,
 
@@ -56,6 +58,8 @@ enum
 	COMPRESSED_RGBA_S3TC_DXT1	= 0x83F1,
 	COMPRESSED_RGBA_S3TC_DXT3	= 0x83F2,
 	COMPRESSED_RGBA_S3TC_DXT5	= 0x83F3,
+
+	TEXTURE0					= 0x84C0,
 
 	RGBA32F						= 0x8814,
 	RGB32F						= 0x8815,
@@ -104,6 +108,7 @@ typedef void ( PixelStorei_t )( u32, s32 );
 typedef void ( GenTextures_t )( s32, u32* );
 typedef void ( DeleteTextures_t )( s32, const u32* );
 typedef void ( BindTexture_t )( u32, u32 );
+typedef void ( ActiveTexture_t )( u32 );
 typedef void ( TexImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
 typedef void ( TexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
 typedef void ( CompressedTexImage2D_t )( u32, s32, u32, s32, s32, s32, s32, const void* );
@@ -168,6 +173,7 @@ extern PixelStorei_t* PixelStorei;
 extern GenTextures_t* GenTextures;
 extern DeleteTextures_t* DeleteTextures;
 extern BindTexture_t* BindTexture;
+extern ActiveTexture_t* ActiveTexture;
 extern TexImage2D_t* TexImage2D;
 extern TexSubImage2D_t* TexSubImage2D;
 extern CompressedTexImage2D_t* CompressedTexImage2D;

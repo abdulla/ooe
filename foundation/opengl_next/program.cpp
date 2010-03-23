@@ -35,9 +35,9 @@ program::~program( void )
 	DeleteProgram( id );
 }
 
-block_type program::block( void ) const
+block_type program::block( const buffer_type& buffer ) const
 {
-	return new opengl::block( id );
+	return new opengl::block( id, buffer );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

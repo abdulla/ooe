@@ -25,6 +25,7 @@ void load_symbols( void )
 	GenTextures = find< GenTextures_t >( "glGenTextures" );
 	DeleteTextures = find< DeleteTextures_t >( "glDeleteTextures" );
 	BindTexture = find< BindTexture_t >( "glBindTexture" );
+	ActiveTexture = find< ActiveTexture_t >( "glActiveTexture" );
 	TexImage2D = find< TexImage2D_t >( "glTexImage2D" );
 	TexSubImage2D = find< TexSubImage2D_t >( "glTexSubImage2D" );
 	CompressedTexImage2D = find< CompressedTexImage2D_t >( "glCompressedTexImage2D" );
@@ -92,6 +93,7 @@ PixelStorei_t* PixelStorei;
 GenTextures_t* GenTextures;
 DeleteTextures_t* DeleteTextures;
 BindTexture_t* BindTexture;
+ActiveTexture_t* ActiveTexture;
 TexImage2D_t* TexImage2D;
 TexSubImage2D_t* TexSubImage2D;
 CompressedTexImage2D_t* CompressedTexImage2D;

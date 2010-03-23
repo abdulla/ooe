@@ -15,7 +15,7 @@ struct program
 	program( const shader_vector& );
 	virtual ~program( void );
 
-	virtual block_type block( void ) const;
+	virtual block_type block( const buffer_type& ) const;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

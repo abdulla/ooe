@@ -18,20 +18,17 @@ private:
 	const u32 target;
 };
 
-class buffer
+struct buffer
 	: public ooe::buffer
 {
-public:
 	const u32 id;
+	const u32 target;
+	const up_t size;
 
 	buffer( up_t, type, usage_type );
 	virtual ~buffer( void );
 
 	virtual map_type map( access_type ) const;
-
-private:
-	const u32 target;
-	const up_t size;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

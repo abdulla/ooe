@@ -3,6 +3,7 @@
 #include "foundation/executable/environment.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/io/memory.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
@@ -41,6 +42,12 @@ void process_events( event_queue& event_queue )
 	}
 }
 
+std::string source( const std::string root, const std::string name )
+{
+	memory memory( descriptor( root + "../resource/glsl/" + name ) );
+	return std::string( memory.as< c8 >(), memory.size() );
+}
+
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
@@ -49,12 +56,19 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	event_queue event_queue;
 	view view( event_queue, width, height, false );
-	driver_type driver = library.find< driver_type ( const view_data& ) >( "driver_open" )( view );
+	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
+
+	shader_type vertex = device->shader( source( root, "null.vs" ), shader::vertex );
+	shader_type fragment = device->shader( source( root, "null.fs" ), shader::fragment );
+	shader_vector vector;
+	vector.push_back( vertex );
+	vector.push_back( fragment );
+	program_type program = device->program( vector );
 
 	while ( !executable::has_signal() )
 	{
 		executable::yield();
-		driver->swap();
+		device->swap();
 
 		process_events( event_queue );
 	}

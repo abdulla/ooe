@@ -135,11 +135,11 @@ struct block
 	virtual void input( const std::string&, const mat3& ) = 0;
 	virtual void input( const std::string&, const mat4& ) = 0;
 
-	virtual void input( const std::string&, const buffer_type&, u8, u8 ) = 0;
 	virtual void input( const std::string&, const texture_type& ) = 0;
+	virtual void input( const std::string&, u8, const buffer_type& ) = 0;
 
-	virtual void output( const std::string&, const target_type&, attachment_type ) = 0;
-	virtual void output( const std::string&, const texture_type&, attachment_type ) = 0;
+	virtual void output( const std::string&, attachment_type, const texture_type& ) = 0;
+	virtual void output( const std::string&, attachment_type, const target_type& ) = 0;
 };
 
 typedef shared_ptr< block > block_type;
@@ -148,7 +148,7 @@ typedef shared_ptr< block > block_type;
 struct program
 {
 	virtual ~program( void ) {}
-	virtual block_type block( void ) const = 0;
+	virtual block_type block( const buffer_type& ) const = 0;
 };
 
 typedef shared_ptr< program > program_type;
@@ -161,10 +161,10 @@ struct frame
 
 typedef shared_ptr< frame > frame_type;
 
-//--- driver ---------------------------------------------------------------------------------------
-struct driver
+//--- device ---------------------------------------------------------------------------------------
+struct device
 {
-	virtual ~driver( void ) {}
+	virtual ~device( void ) {}
 	virtual void draw( const block_type&, const frame_type& ) = 0;
 	virtual void swap( void ) = 0;
 
@@ -178,7 +178,7 @@ struct driver
 	virtual frame_type frame( void ) const = 0;
 };
 
-typedef shared_ptr< driver > driver_type;
+typedef shared_ptr< device > device_type;
 
 OOE_NAMESPACE_END( ( ooe ) )
 
