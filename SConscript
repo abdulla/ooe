@@ -91,7 +91,7 @@ build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'python_host', 'component/python/host', 'executable python registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Executable( 'surrogate', 'component/registry/surrogate', 'executable registry' )
-build.Executable( 'ui', 'component/ui', 'executable io opengl_next visual' )
+build.Executable( 'ui', 'component/ui', 'executable io maths opengl_next visual' )
 
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,

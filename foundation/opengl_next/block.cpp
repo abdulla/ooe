@@ -11,7 +11,7 @@ typedef s32 ( function_type )( u32, const c8* );
 
 void insert( opengl::block::name_set& names, const std::string& name )
 {
-	if ( names.find( name ) == names.end() )
+	if ( names.find( name ) != names.end() )
 		throw error::runtime( "opengl::block: " ) << "Variable \"" << name << "\" already set";
 
 	names.insert( name );
@@ -28,11 +28,34 @@ s32 find( s32 id, opengl::block::name_set& names, const std::string& name, funct
 	return location;
 }
 
-s32 use( s32 id, opengl::block::name_set& names, const std::string& name )
+void uniform_1i( s32 location, const opengl::block::uniform_data data )
 {
-	s32 location = find( id, names, name, GetUniformLocation );
-	UseProgram( id );
-	return location;
+	Uniform1iv( location, 1, reinterpret_cast< const s32* >( data ) );
+}
+
+void uniform_3i( s32 location, const opengl::block::uniform_data data )
+{
+	Uniform3iv( location, 1, reinterpret_cast< const s32* >( data ) );
+}
+
+void uniform_1f( s32 location, const opengl::block::uniform_data data )
+{
+	Uniform1fv( location, 1, reinterpret_cast< const f32* >( data ) );
+}
+
+void uniform_3f( s32 location, const opengl::block::uniform_data data )
+{
+	Uniform3fv( location, 1, reinterpret_cast< const f32* >( data ) );
+}
+
+void uniform_3m( s32 location, const opengl::block::uniform_data data )
+{
+	UniformMatrix3fv( location, 1, false, reinterpret_cast< const f32* >( data ) );
+}
+
+void uniform_4m( s32 location, const opengl::block::uniform_data data )
+{
+	UniformMatrix4fv( location, 1, false, reinterpret_cast< const f32* >( data ) );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -41,8 +64,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- block ----------------------------------------------------------------------------------------
 block::block( u32 id_, const buffer_type& index_ )
-	: id( id_ ), index( index_ ), in_textures(), in_buffers(), out_textures(), out_targets(),
-	names()
+	: id( id_ ), index( index_ ), uniforms(), textures(), buffers(), names()
 {
 	if ( dynamic_cast< opengl::buffer& >( *index ).target != ELEMENT_ARRAY_BUFFER )
 		throw error::runtime( "opengl::block: " ) << "Index buffer expected";
@@ -54,57 +76,78 @@ block::~block( void )
 
 void block::input( const std::string& name, s32 x )
 {
-	Uniform1i( use( id, names, name ), x );
+	uniform_tuple tuple;
+	tuple._0 = find( id, names, name, GetUniformLocation );
+	tuple._2 = uniform_1i;
+	std::memcpy( tuple._1, &x, sizeof( x ) );
+
+	uniforms.push_back( tuple );
 }
 
 void block::input( const std::string& name, s32 x, s32 y, s32 z )
 {
-	Uniform3i( use( id, names, name ), x, y, z );
+	s32 array[] = { x, y, z };
+
+	uniform_tuple tuple;
+	tuple._0 = find( id, names, name, GetUniformLocation );
+	tuple._2 = uniform_3i;
+	std::memcpy( tuple._1, array, sizeof( array ) );
+
+	uniforms.push_back( tuple );
 }
 
 void block::input( const std::string& name, f32 x )
 {
-	Uniform1f( use( id, names, name ), x );
+	uniform_tuple tuple;
+	tuple._0 = find( id, names, name, GetUniformLocation );
+	tuple._2 = uniform_1f;
+	std::memcpy( tuple._1, &x, sizeof( x ) );
+
+	uniforms.push_back( tuple );
 }
 
 void block::input( const std::string& name, f32 x, f32 y, f32 z )
 {
-	Uniform3f( use( id, names, name ), x, y, z );
+	f32 array[] = { x, y, z };
+
+	uniform_tuple tuple;
+	tuple._0 = find( id, names, name, GetUniformLocation );
+	tuple._2 = uniform_3f;
+	std::memcpy( tuple._1, array, sizeof( array ) );
+
+	uniforms.push_back( tuple );
 }
 
 void block::input( const std::string& name, const mat3& m )
 {
-	UniformMatrix3fv( use( id, names, name ), 1, false, m[ 0 ] );
+	uniform_tuple tuple;
+	tuple._0 = find( id, names, name, GetUniformLocation );
+	tuple._2 = uniform_3m;
+	std::memcpy( tuple._1, &m, sizeof( m ) );
+
+	uniforms.push_back( tuple );
 }
 
 void block::input( const std::string& name, const mat4& m )
 {
-	UniformMatrix4fv( use( id, names, name ), 1, false, m[ 0 ] );
+	uniform_tuple tuple;
+	tuple._0 = find( id, names, name, GetUniformLocation );
+	tuple._2 = uniform_4m;
+	std::memcpy( tuple._1, &m, sizeof( m ) );
+
+	uniforms.push_back( tuple );
 }
 
 void block::input( const std::string& name, const texture_type& texture )
 {
 	s32 location = find( id, names, name, GetUniformLocation );
-	in_textures.push_back( in_texture_tuple( location, texture ) );
+	textures.push_back( texture_tuple( location, texture ) );
 }
 
 void block::input( const std::string& name, u8 size, const buffer_type& buffer )
 {
 	s32 location = find( id, names, name, GetAttribLocation );
-	in_buffers.insert( in_buffer_map::value_type( buffer, in_buffer_tuple( location, size ) ) );
-}
-
-void block::
-	output( const std::string& name, attachment_type attachment, const texture_type& texture )
-{
-	s32 location = find( id, names, name, GetFragDataLocation );
-	out_textures.push_back( out_texture_tuple( location, attachment, texture ) );
-}
-
-void block::output( const std::string& name, attachment_type attachment, const target_type& target )
-{
-	s32 location = find( id, names, name, GetFragDataLocation );
-	out_targets.push_back( out_target_tuple( location, attachment, target ) );
+	buffers.insert( buffer_map::value_type( buffer, buffer_tuple( location, size ) ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

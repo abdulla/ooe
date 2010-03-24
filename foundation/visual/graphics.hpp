@@ -121,12 +121,6 @@ typedef std::vector< shader_type > shader_vector;
 //--- block ----------------------------------------------------------------------------------------
 struct block
 {
-	enum attachment_type
-	{
-		colour,
-		depth
-	};
-
 	virtual ~block( void ) {}
 	virtual void input( const std::string&, s32 ) = 0;
 	virtual void input( const std::string&, s32, s32, s32 ) = 0;
@@ -137,29 +131,35 @@ struct block
 
 	virtual void input( const std::string&, const texture_type& ) = 0;
 	virtual void input( const std::string&, u8, const buffer_type& ) = 0;
+};
 
+typedef shared_ptr< block > block_type;
+
+//--- frame ----------------------------------------------------------------------------------------
+struct frame
+{
+	enum attachment_type
+	{
+		colour,
+		depth
+	};
+
+	virtual ~frame( void ) {}
 	virtual void output( const std::string&, attachment_type, const texture_type& ) = 0;
 	virtual void output( const std::string&, attachment_type, const target_type& ) = 0;
 };
 
-typedef shared_ptr< block > block_type;
+typedef shared_ptr< frame > frame_type;
 
 //--- program --------------------------------------------------------------------------------------
 struct program
 {
 	virtual ~program( void ) {}
 	virtual block_type block( const buffer_type& ) const = 0;
+	virtual frame_type frame( void ) const = 0;
 };
 
 typedef shared_ptr< program > program_type;
-
-//--- frame ----------------------------------------------------------------------------------------
-struct frame
-{
-	virtual ~frame( void ) {}
-};
-
-typedef shared_ptr< frame > frame_type;
 
 //--- device ---------------------------------------------------------------------------------------
 struct device
@@ -175,7 +175,6 @@ struct device
 	virtual target_type target( u32, u32, u8 ) const = 0;
 	virtual shader_type shader( const std::string&, shader::type ) const = 0;
 	virtual program_type program( const shader_vector& ) const = 0;
-	virtual frame_type frame( void ) const = 0;
 };
 
 typedef shared_ptr< device > device_type;

@@ -3,7 +3,6 @@
 #include "foundation/opengl_next/block.hpp"
 #include "foundation/opengl_next/buffer.hpp"
 #include "foundation/opengl_next/context.hpp"
-#include "foundation/opengl_next/frame.hpp"
 #include "foundation/opengl_next/program.hpp"
 #include "foundation/opengl_next/shader.hpp"
 #include "foundation/opengl_next/symbol.hpp"
@@ -13,22 +12,23 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-void set_attributes( opengl::block::in_buffer_map::const_iterator begin,
-	opengl::block::in_buffer_map::const_iterator end )
+void set_attributes( opengl::block::buffer_map::const_iterator begin,
+	opengl::block::buffer_map::const_iterator end )
 {
 	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *begin->first );
 	BindBuffer( buffer.target, buffer.id );
-	u8 size = 0;
+	s32 size = 0;
 
-	for ( opengl::block::in_buffer_map::const_iterator i = begin; i != end; ++i )
+	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
 		size += i->second._1;
 
-	u8 offset = 0;
+	up_t offset = 0;
 
-	for ( opengl::block::in_buffer_map::const_iterator i = begin; i != end; ++i )
+	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
 	{
 		offset += i->second._1;
-		VertexAttribPointer( i->second._0, i->second._1, FLOAT, false, size, ( void* )offset );
+		VertexAttribPointer
+			( i->second._0, i->second._1, FLOAT, false, size, reinterpret_cast< void* >( offset ) );
 	}
 }
 
@@ -52,7 +52,6 @@ public:
 	virtual target_type target( u32, u32, u8 ) const;
 	virtual shader_type shader( const std::string&, shader::type ) const;
 	virtual program_type program( const shader_vector& ) const;
-	virtual frame_type frame( void ) const;
 
 private:
 	const view_data& view;
@@ -85,28 +84,38 @@ void device::draw( const block_type& generic_block, const frame_type& )
 {
 	opengl::block& block = dynamic_cast< opengl::block& >( *generic_block );
 	UseProgram( block.id );
-	u8 j = 0;
 
-	for ( block::in_texture_vector::const_iterator i = block.in_textures.begin(),
-		end = block.in_textures.end(); i != end; ++i, ++j )
+	for ( block::uniform_vector::const_iterator i = block.uniforms.begin(),
+		end = block.uniforms.end(); i != end; ++i )
+		i->_2( i->_0, i->_1 );
+
+	s32 j = 0;
+
+	for ( block::texture_vector::const_iterator i = block.textures.begin(),
+		end = block.textures.end(); i != end; ++i, ++j )
 	{
-		Uniform1i( i->_0, j );
+		Uniform1iv( i->_0, 1, &j );
 		ActiveTexture( TEXTURE0 + j );
 		BindTexture( TEXTURE_2D, dynamic_cast< opengl::texture& >( *i->_1 ).id );
 	}
 
-	block::in_buffer_map& map = block.in_buffers;
+	block::buffer_map& map = block.buffers;
 
 	if ( map.empty() )
 		throw error::runtime( "opengl::device: " ) << "Block does not contain any buffers";
 
-	typedef block::in_buffer_map::const_iterator buffer_iterator;
+	typedef block::buffer_map::const_iterator buffer_iterator;
 	typedef std::pair< buffer_iterator, buffer_iterator > buffer_pair;
 	buffer_iterator end = map.end();
 
-	for ( buffer_pair pair = map.equal_range( map.begin()->first ); pair.first != end;
+	for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
 		pair = map.equal_range( pair.second->first ) )
+	{
 		set_attributes( pair.first, pair.second );
+
+		if ( pair.second == end )
+			break;
+	}
 
 	opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
 	BindBuffer( index.target, index.id );
@@ -146,11 +155,6 @@ shader_type device::shader( const std::string& source, shader::type type ) const
 program_type device::program( const shader_vector& vector ) const
 {
 	return new opengl::program( vector );
-}
-
-frame_type device::frame( void ) const
-{
-	return new opengl::frame;
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

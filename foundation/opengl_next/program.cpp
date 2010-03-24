@@ -1,10 +1,30 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/opengl_next/block.hpp"
+#include "foundation/opengl_next/frame.hpp"
 #include "foundation/opengl_next/program.hpp"
 #include "foundation/opengl_next/shader.hpp"
 #include "foundation/opengl_next/symbol.hpp"
 #include "foundation/utility/error.hpp"
+
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+
+void check_status( s32 id, s32 parameter, const c8* type )
+{
+	s32 status;
+	GetProgramiv( id, parameter, &status );
+
+	if ( status )
+		return;
+
+	s32 size;
+	GetProgramiv( id, INFO_LOG_LENGTH, &size );
+	scoped_array< c8 > array( new c8[ size ] );
+	GetProgramInfoLog( id, size, 0, array );
+	throw error::runtime( "opengl::program: " ) << type << " failed: " << array;
+}
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
@@ -16,18 +36,10 @@ program::program( const shader_vector& vector )
 		AttachShader( id, dynamic_cast< opengl::shader& >( **i ).id );
 
 	LinkProgram( id );
+	check_status( id, LINK_STATUS, "Link" );
 
-	s32 status;
-	GetProgramiv( id, LINK_STATUS, &status );
-
-	if ( status )
-		return;
-
-	s32 size;
-	GetProgramiv( id, INFO_LOG_LENGTH, &size );
-	scoped_array< c8 > array( new c8[ size ] );
-	GetProgramInfoLog( id, size, 0, array );
-	throw error::runtime( "opengl::program: " ) << "Unable to link: " << array;
+	ValidateProgram( id );
+	check_status( id, VALIDATE_STATUS, "Validate" );
 }
 
 program::~program( void )
@@ -38,6 +50,11 @@ program::~program( void )
 block_type program::block( const buffer_type& buffer ) const
 {
 	return new opengl::block( id, buffer );
+}
+
+frame_type program::frame( void ) const
+{
+	return new opengl::frame( id );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

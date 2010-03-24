@@ -65,9 +65,49 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	vector.push_back( fragment );
 	program_type program = device->program( vector );
 
+	buffer_type point = device->buffer( sizeof( f32 ) * 4 * 2, buffer::point );
+	{
+		map_type map = point->map( buffer::write );
+		f32* value = static_cast< f32* >( map->data );
+
+		// top left
+		value[ 0 ] = -1;
+		value[ 1 ] = 1;
+
+		// bottom left
+		value[ 2 ] = -1;
+		value[ 3 ] = -1;
+
+		// top right
+		value[ 4 ] = 1;
+		value[ 5 ] = 1;
+
+		// bottom right
+		value[ 6 ] = 1;
+		value[ 7 ] = -1;
+	}
+
+	buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
+	{
+		map_type map = index->map( buffer::write );
+		u16* value = static_cast< u16* >( map->data );
+
+		value[ 0 ] = 0;
+		value[ 1 ] = 1;
+		value[ 2 ] = 2;
+		value[ 3 ] = 2;
+		value[ 4 ] = 1;
+		value[ 5 ] = 3;
+	}
+
+	block_type block = program->block( index );
+	block->input( "projection", mat4::identity );
+	block->input( "vertex", 2, point );
+
 	while ( !executable::has_signal() )
 	{
 		executable::yield();
+		device->draw( block, frame_type( 0 ) );
 		device->swap();
 
 		process_events( event_queue );
