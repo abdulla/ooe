@@ -7,6 +7,7 @@
 
 #include "foundation/executable/library.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/utility/scoped.hpp"
 #include "foundation/visual/event_queue.hpp"
 
 #define OOE_X_HEADER_INCLUDED
@@ -18,10 +19,10 @@ namespace
 	using namespace ooe;
 	typedef void ( * choose_type )( const view_data& );
 
-	const u32 event_mask =
+	const sp_t event_mask =
 		KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask;
 
-	void grab( Display* display, u32 window )
+	void grab( Display* display, up_t window )
 	{
 		XGrabKeyboard( display, window, true, GrabModeAsync, GrabModeAsync, CurrentTime );
 		XGrabPointer( display, window, true, 0, GrabModeAsync, GrabModeAsync, 0, 0, CurrentTime );
@@ -69,8 +70,8 @@ namespace ooe
 	view_data::view_data( const event_queue& queue_, u16 width_, u16 height_, bool full )
 		: platform::view_data( queue_, width_, height_ )
 	{
-		u32 root = DefaultRootWindow( queue.display );
-		u32 mask = CWEventMask | CWColormap;
+		up_t root = DefaultRootWindow( queue.display );
+		sp_t mask = CWEventMask | CWColormap;
 		XSetWindowAttributes attributes;
 		std::memset( &attributes, 0, sizeof( attributes ) );
 
@@ -100,7 +101,7 @@ namespace ooe
 
 //--- platform::view -----------------------------------------------------------
 	platform::view::view( const event_queue& queue, bool full )
-		: config( 0 ), resize(), rotate()
+		: config( 0 ), resize(), rotate(), cursor()
 	{
 		if ( !full )
 			return;
@@ -123,11 +124,27 @@ namespace ooe
 	{
 		if ( !XMapRaised( queue.display, window ) )
 			throw error::runtime( "view: " ) << "Unable to map window";
-		else if ( !full )
+
+		c8 bitmap = 0;
+		up_t pixmap = XCreateBitmapFromData( queue.display, window, &bitmap, 1, 1 );
+
+		if ( !pixmap )
+			throw error::runtime( "view: " ) << "Unable to create bitmap";
+
+		scoped< s32 ( Display*, up_t ) > scoped( XFreePixmap, queue.display, pixmap );
+		XColor colour = { 0, 0, 0, 0, 0, 0 };
+		cursor = XCreatePixmapCursor( queue.display, pixmap, pixmap, &colour, &colour, 0, 0 );
+
+		if ( !cursor )
+			throw error::runtime( "view: " ) << "Unable to define cursor";
+
+		XDefineCursor( queue.display, window, cursor );
+
+		if ( !full )
 			return;
 
 		resize = XRRConfigCurrentConfiguration( config, &rotate );
-		u32 root = DefaultRootWindow( queue.display );
+		up_t root = DefaultRootWindow( queue.display );
 		s32 length;
 		XRRScreenSize* sizes = XRRConfigSizes( config, &length );
 
@@ -144,12 +161,13 @@ namespace ooe
 
 	view::~view( void )
 	{
+		XFreeCursor( queue.display, cursor );
 		::ungrab( queue.display );
 
 		if ( !config )
 			return;
 
-		u32 root = DefaultRootWindow( queue.display );
+		up_t root = DefaultRootWindow( queue.display );
 
 		if ( XRRSetScreenConfig( queue.display, config, root, resize, rotate, CurrentTime ) )
 			OOE_WARNING( "view", "Unable to set screen configuration" );

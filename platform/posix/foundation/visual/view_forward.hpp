@@ -29,7 +29,7 @@ namespace ooe
 		const event_queue& queue;
 		u16 width;
 		u16 height;
-		u32 window;
+		up_t window;
 		mutable XVisualInfo* visual_info;
 
 	protected:
@@ -47,6 +47,7 @@ namespace ooe
 		XRRScreenConfiguration* config;
 		u16 resize;
 		u16 rotate;
+		up_t cursor;
 
 		view( const event_queue&, bool );
 		~view( void );
