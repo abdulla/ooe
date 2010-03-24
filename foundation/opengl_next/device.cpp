@@ -27,6 +27,7 @@ void set_attributes( opengl::block::buffer_map::const_iterator begin,
 
 	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
 	{
+		EnableVertexAttribArray( i->second._0 );
 		VertexAttribPointer( i->second._0, i->second._1, FLOAT, false, size, offset );
 		offset += i->second._1;
 	}
@@ -120,6 +121,16 @@ void device::draw( const block_type& generic_block, const frame_type& )
 	opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
 	BindBuffer( index.target, index.id );
 	DrawElements( TRIANGLES, index.size / sizeof( u16 ), UNSIGNED_SHORT, 0 );
+
+	// TODO: cache currently enabled attributes in a set, used set operations to enable and disable
+	for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
+		pair = map.equal_range( pair.second->first ) )
+	{
+		DisableVertexAttribArray( pair.first->second._0 );
+
+		if ( pair.second == end )
+			break;
+	}
 }
 
 void device::swap( void )
