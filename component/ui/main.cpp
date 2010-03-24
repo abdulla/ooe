@@ -10,8 +10,8 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const u16 width = 1024;
-const u16 height = 640;
+const f32 width = 1024;
+const f32 height = 640;
 
 //--- process_events -------------------------------------------------------------------------------
 void process_events( event_queue& event_queue )
@@ -101,8 +101,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	}
 
 	block_type block = program->block( index );
-	block->input( "projection", mat4::identity );
 	block->input( "vertex", 2, point );
+	block->input( "projection", perspective( degree( 45 ), width / height, 1, 100 ) );
 
 	while ( !executable::has_signal() )
 	{

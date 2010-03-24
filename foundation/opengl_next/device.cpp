@@ -22,13 +22,13 @@ void set_attributes( opengl::block::buffer_map::const_iterator begin,
 	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
 		size += i->second._1;
 
-	up_t offset = 0;
+	size *= sizeof( f32 );
+	u8* offset = 0;
 
 	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
 	{
+		VertexAttribPointer( i->second._0, i->second._1, FLOAT, false, size, offset );
 		offset += i->second._1;
-		VertexAttribPointer
-			( i->second._0, i->second._1, FLOAT, false, size, reinterpret_cast< void* >( offset ) );
 	}
 }
 
