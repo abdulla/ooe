@@ -107,7 +107,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	while ( !executable::has_signal() )
 	{
 		executable::yield();
-		device->draw( block, frame_type( 0 ) );
+		device->draw( block );
 		device->swap();
 
 		process_events( event_queue );

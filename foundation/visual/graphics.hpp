@@ -150,6 +150,7 @@ struct frame
 };
 
 typedef shared_ptr< frame > frame_type;
+extern frame_type default_frame;
 
 //--- program --------------------------------------------------------------------------------------
 struct program
@@ -165,7 +166,7 @@ typedef shared_ptr< program > program_type;
 struct device
 {
 	virtual ~device( void ) {}
-	virtual void draw( const block_type&, const frame_type& ) = 0;
+	virtual void draw( const block_type&, const frame_type& = default_frame ) = 0;
 	virtual void swap( void ) = 0;
 
 	virtual texture_type texture

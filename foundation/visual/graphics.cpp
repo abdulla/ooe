@@ -5,6 +5,8 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+frame_type default_frame( 0 );
+
 //--- image_pyramid --------------------------------------------------------------------------------
 image_pyramid::image_pyramid( const image& image )
 	: width( image.width ), height( image.height ), format( image.format ), vector( 1, image.ptr() )
