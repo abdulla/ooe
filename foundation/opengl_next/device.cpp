@@ -1,5 +1,8 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <algorithm>
+#include <iterator>
+
 #include "foundation/opengl_next/block.hpp"
 #include "foundation/opengl_next/buffer.hpp"
 #include "foundation/opengl_next/context.hpp"
@@ -12,8 +15,10 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-void set_attributes( opengl::block::buffer_map::const_iterator begin,
-	opengl::block::buffer_map::const_iterator end )
+typedef std::set< s32 > attribute_set;
+
+void set_attributes( const opengl::block::buffer_map::const_iterator begin,
+	const opengl::block::buffer_map::const_iterator end )
 {
 	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *begin->first );
 	BindBuffer( buffer.target, buffer.id );
@@ -27,10 +32,28 @@ void set_attributes( opengl::block::buffer_map::const_iterator begin,
 
 	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
 	{
-		EnableVertexAttribArray( i->second._0 );
 		VertexAttribPointer( i->second._0, i->second._1, FLOAT, false, size, offset );
 		offset += i->second._1;
 	}
+}
+
+void enable_attributes( attribute_set& x, attribute_set& y )
+{
+	typedef std::vector< s32 > attribute_vector;
+	typedef std::insert_iterator< attribute_vector > inserter;
+	attribute_vector v;
+	std::set_difference( x.begin(), x.end(), y.begin(), y.end(), inserter( v, v.begin() ) );
+
+	for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+		DisableVertexAttribArray( *i );
+
+	v.clear();
+	std::set_difference( y.begin(), y.end(), x.begin(), x.end(), inserter( v, v.begin() ) );
+
+	for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+		EnableVertexAttribArray( *i );
+
+	x.swap( y );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -57,11 +80,12 @@ public:
 private:
 	const view_data& view;
 	platform::context_type context;
+	attribute_set attributes;
 };
 
 device::device( const ooe::view_data& view_ )
 try
-	: view( view_ ), context( context_construct( view ) )
+	: view( view_ ), context( context_construct( view ) ), attributes()
 {
 	context_current( view, context );
 	context_sync( view, context, true );
@@ -103,34 +127,27 @@ void device::draw( const block_type& generic_block, const frame_type& )
 	block::buffer_map& map = block.buffers;
 
 	if ( map.empty() )
-		throw error::runtime( "opengl::device: " ) << "Block does not contain any buffers";
+		throw error::runtime( "opengl::device: " ) << "Block does not contain any point buffers";
 
 	typedef block::buffer_map::const_iterator buffer_iterator;
 	typedef std::pair< buffer_iterator, buffer_iterator > buffer_pair;
 	buffer_iterator end = map.end();
+	attribute_set enable;
 
 	for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
 		pair = map.equal_range( pair.second->first ) )
 	{
 		set_attributes( pair.first, pair.second );
+		enable.insert( pair.first->second._0 );
 
 		if ( pair.second == end )
 			break;
 	}
 
+	enable_attributes( attributes, enable );
 	opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
 	BindBuffer( index.target, index.id );
 	DrawElements( TRIANGLES, index.size / sizeof( u16 ), UNSIGNED_SHORT, 0 );
-
-	// TODO: cache currently enabled attributes in a set, used set operations to enable and disable
-	for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
-		pair = map.equal_range( pair.second->first ) )
-	{
-		DisableVertexAttribArray( pair.first->second._0 );
-
-		if ( pair.second == end )
-			break;
-	}
 }
 
 void device::swap( void )

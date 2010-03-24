@@ -146,6 +146,9 @@ void block::input( const std::string& name, const texture_type& texture )
 
 void block::input( const std::string& name, u8 size, const buffer_type& buffer )
 {
+	if ( dynamic_cast< opengl::buffer& >( *buffer ).target != ARRAY_BUFFER )
+		throw error::runtime( "opengl::block: " ) << "Point buffer expected";
+
 	s32 location = find( id, names, name, GetAttribLocation );
 	buffers.insert( buffer_map::value_type( buffer, buffer_tuple( location, size ) ) );
 }
