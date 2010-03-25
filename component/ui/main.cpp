@@ -104,10 +104,16 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "vertex", 2, point );
 	block->input( "projection", perspective( degree( 45 ), width / height, 1, 100 ) );
 
+	frame_type default_frame = device->default_frame( width, height );
+	target_type target = device->target( width, height, image::rgba_u8 );
+	frame_type frame = program->frame( width, height );
+	frame->output( "gl_FragData[ 0 ]", frame::colour, target );
+
 	while ( !executable::has_signal() )
 	{
 		executable::yield();
-		device->draw( block );
+		device->draw( block, frame );
+		default_frame->write( frame );
 		device->swap();
 
 		process_events( event_queue );

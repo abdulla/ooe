@@ -6,16 +6,19 @@
 #include "foundation/opengl_next/block.hpp"
 #include "foundation/opengl_next/buffer.hpp"
 #include "foundation/opengl_next/context.hpp"
+#include "foundation/opengl_next/frame.hpp"
 #include "foundation/opengl_next/program.hpp"
 #include "foundation/opengl_next/shader.hpp"
 #include "foundation/opengl_next/symbol.hpp"
 #include "foundation/opengl_next/target.hpp"
 #include "foundation/opengl_next/texture.hpp"
+#include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-typedef std::set< s32 > attribute_set;
+typedef std::set< s32 > set_type;
+typedef std::vector< u32 > vector_type;
 
 void set_attributes( const opengl::block::buffer_map::const_iterator begin,
 	const opengl::block::buffer_map::const_iterator end )
@@ -37,23 +40,54 @@ void set_attributes( const opengl::block::buffer_map::const_iterator begin,
 	}
 }
 
-void enable_attributes( attribute_set& x, attribute_set& y )
+void enable_attributes( set_type& x, set_type& y )
 {
-	typedef std::vector< s32 > attribute_vector;
-	typedef std::insert_iterator< attribute_vector > inserter;
-	attribute_vector v;
+	typedef std::insert_iterator< vector_type > inserter;
+	vector_type v;
 	std::set_difference( x.begin(), x.end(), y.begin(), y.end(), inserter( v, v.begin() ) );
 
-	for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+	for ( vector_type::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
 		DisableVertexAttribArray( *i );
 
 	v.clear();
 	std::set_difference( y.begin(), y.end(), x.begin(), x.end(), inserter( v, v.begin() ) );
 
-	for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+	for ( vector_type::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
 		EnableVertexAttribArray( *i );
 
 	x.swap( y );
+}
+
+template< typename type >
+	void set_frame( const type& in, vector_type& out )
+{
+	for ( typename type::const_iterator i = in.begin(), end = in.end(); i != end; ++i )
+	{
+		if ( up_t( i->_0 ) >= out.size() )
+			throw error::runtime( "opengl::device: " ) << "Frame does not contain all attachments";
+
+		out[ i->_0 ] = i->_1;
+	}
+}
+
+void enable_frame( const frame_type& generic_frame )
+{
+	if ( dynamic_cast< opengl::default_frame* >( generic_frame.get() ) )
+	{
+		BindFramebuffer( DRAW_FRAMEBUFFER, 0 );
+		return;
+	}
+
+	opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
+	BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
+	vector_type vector( frame.textures.size() + frame.targets.size() );
+	set_frame( frame.textures, vector );
+	set_frame( frame.targets, vector );
+	DrawBuffers( vector.size(), &vector[ 0 ] );
+	s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
+
+	if ( status != FRAMEBUFFER_COMPLETE )
+		throw error::runtime( "opengl::device: " ) << "Frame is incomplete: " << hex( status );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -76,11 +110,12 @@ public:
 	virtual target_type target( u32, u32, u8 ) const;
 	virtual shader_type shader( const std::string&, shader::type ) const;
 	virtual program_type program( const shader_vector& ) const;
+	virtual frame_type default_frame( u32, u32 ) const;
 
 private:
 	const view_data& view;
 	platform::context_type context;
-	attribute_set attributes;
+	set_type attributes;
 };
 
 device::device( const ooe::view_data& view_ )
@@ -105,7 +140,7 @@ device::~device( void )
 	context_destruct( view, context );
 }
 
-void device::draw( const block_type& generic_block, const frame_type& )
+void device::draw( const block_type& generic_block, const frame_type& frame )
 {
 	opengl::block& block = dynamic_cast< opengl::block& >( *generic_block );
 	UseProgram( block.id );
@@ -132,7 +167,7 @@ void device::draw( const block_type& generic_block, const frame_type& )
 	typedef block::buffer_map::const_iterator buffer_iterator;
 	typedef std::pair< buffer_iterator, buffer_iterator > buffer_pair;
 	buffer_iterator end = map.end();
-	attribute_set enable;
+	set_type enable;
 
 	for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
 		pair = map.equal_range( pair.second->first ) )
@@ -145,6 +180,8 @@ void device::draw( const block_type& generic_block, const frame_type& )
 	}
 
 	enable_attributes( attributes, enable );
+	enable_frame( frame );
+
 	opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
 	BindBuffer( index.target, index.id );
 	DrawElements( TRIANGLES, index.size / sizeof( u16 ), UNSIGNED_SHORT, 0 );
@@ -183,6 +220,11 @@ shader_type device::shader( const std::string& source, shader::type type ) const
 program_type device::program( const shader_vector& vector ) const
 {
 	return new opengl::program( vector );
+}
+
+frame_type device::default_frame( u32 width, u32 height ) const
+{
+	return new opengl::default_frame( width, height );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

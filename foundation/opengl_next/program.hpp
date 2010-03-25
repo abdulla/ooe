@@ -16,7 +16,7 @@ struct program
 	virtual ~program( void );
 
 	virtual block_type block( const buffer_type& ) const;
-	virtual frame_type frame( void ) const;
+	virtual frame_type frame( u32, u32 ) const;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

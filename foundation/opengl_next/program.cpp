@@ -52,9 +52,9 @@ block_type program::block( const buffer_type& buffer ) const
 	return new opengl::block( id, buffer );
 }
 
-frame_type program::frame( void ) const
+frame_type program::frame( u32 width, u32 height ) const
 {
-	return new opengl::frame( id );
+	return new opengl::frame( id, width, height );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

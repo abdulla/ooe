@@ -1,4 +1,4 @@
 void main( void )
 {
-	gl_FragColor = vec4( 1, 1, 1, 1 );
+	gl_FragData[ 0 ] = vec4( 1, 1, 1, 1 );
 }

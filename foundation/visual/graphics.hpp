@@ -136,6 +136,8 @@ struct block
 typedef shared_ptr< block > block_type;
 
 //--- frame ----------------------------------------------------------------------------------------
+typedef shared_ptr< struct frame > frame_type;
+
 struct frame
 {
 	enum attachment_type
@@ -145,19 +147,17 @@ struct frame
 	};
 
 	virtual ~frame( void ) {}
+	virtual void write( const frame_type& ) = 0;
 	virtual void output( const std::string&, attachment_type, const texture_type& ) = 0;
 	virtual void output( const std::string&, attachment_type, const target_type& ) = 0;
 };
-
-typedef shared_ptr< frame > frame_type;
-extern frame_type default_frame;
 
 //--- program --------------------------------------------------------------------------------------
 struct program
 {
 	virtual ~program( void ) {}
 	virtual block_type block( const buffer_type& ) const = 0;
-	virtual frame_type frame( void ) const = 0;
+	virtual frame_type frame( u32, u32 ) const = 0;
 };
 
 typedef shared_ptr< program > program_type;
@@ -166,7 +166,7 @@ typedef shared_ptr< program > program_type;
 struct device
 {
 	virtual ~device( void ) {}
-	virtual void draw( const block_type&, const frame_type& = default_frame ) = 0;
+	virtual void draw( const block_type&, const frame_type& ) = 0;
 	virtual void swap( void ) = 0;
 
 	virtual texture_type texture
@@ -176,6 +176,7 @@ struct device
 	virtual target_type target( u32, u32, u8 ) const = 0;
 	virtual shader_type shader( const std::string&, shader::type ) const = 0;
 	virtual program_type program( const shader_vector& ) const = 0;
+	virtual frame_type default_frame( u32, u32 ) const = 0;
 };
 
 typedef shared_ptr< device > device_type;
