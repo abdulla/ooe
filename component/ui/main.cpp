@@ -4,18 +4,21 @@
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/io/memory.hpp"
+#include "foundation/maths/camera.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
+typedef tuple< vec3 /* rotate */, vec3 /* translate */ > camera_tuple;
 const f32 width = 1024;
 const f32 height = 640;
 
 //--- process_events -------------------------------------------------------------------------------
-void process_events( event_queue& event_queue )
+camera_tuple process_events( event_queue& event_queue )
 {
+	camera_tuple tuple( vec3::zero, vec3::zero );
 	event event;
 
 	for ( event::type type; ( type = event_queue.next_event( event, false ) ); )
@@ -23,12 +26,50 @@ void process_events( event_queue& event_queue )
 		switch ( type )
 		{
 		case event::motion_flag:
+			tuple._0.y += event.motion.x;
+			tuple._0.z += event.motion.y;
+			break;
+
 		case event::button_flag:
 			break;
 
 		case event::key_flag:
-			if ( event.key.value == 'q' )
+			if ( !event.key.press )
+				break;
+
+			switch ( event.key.value )
+			{
+			case 's':
+				tuple._1.x -= 1;
+				break;
+
+			case 'w':
+				tuple._1.x += 1;
+				break;
+
+			case ' ':
+				tuple._1.y -= 1;
+				break;
+
+			case 'c':
+				tuple._1.y += 1;
+				break;
+
+			case 'a':
+				tuple._1.z += 1;
+				break;
+
+			case 'd':
+				tuple._1.z -= 1;
+				break;
+
+			case 'q':
 				executable::quit();
+				break;
+
+			default:
+				break;
+			}
 
 			break;
 
@@ -40,6 +81,8 @@ void process_events( event_queue& event_queue )
 			break;
 		}
 	}
+
+	return tuple;
 }
 
 std::string source( const std::string root, const std::string name )
@@ -100,14 +143,15 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		value[ 5 ] = 3;
 	}
 
+	camera camera( degree( 45 ), width / height, 1, 100 );
 	block_type block = program->block( index );
 	block->input( "vertex", 2, point );
-	block->input( "projection", perspective( degree( 45 ), width / height, 1, 100 ) );
+	block->input( "projection", camera.matrix() );
 
 	frame_type default_frame = device->default_frame( width, height );
 	target_type target = device->target( width, height, image::rgba_u8 );
 	frame_type frame = program->frame( width, height );
-	frame->output( "gl_FragData[ 0 ]", frame::colour, target );
+	frame->output( frame::colour, target );
 
 	while ( !executable::has_signal() )
 	{
@@ -116,7 +160,10 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		default_frame->write( frame );
 		device->swap();
 
-		process_events( event_queue );
+		camera_tuple tuple = process_events( event_queue );
+		camera.rotate( tuple._0 * radian( degree( .05 ) ) );
+		camera.translate( tuple._1 );
+		block->input( "projection", camera.matrix() );
 	}
 
 	return true;

@@ -8,32 +8,23 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-void insert( opengl::frame::name_set& names, const std::string& name )
+// use with EXT_gpu_shader4 or GL_ARB_explicit_attrib_location
+s32 find( s32 id, const std::string& name )
 {
-	if ( names.find( name ) != names.end() )
-		throw error::runtime( "opengl::frame: " ) << "Variable \"" << name << "\" already set";
+	s32 location = GetFragDataLocation( id, name.c_str() );
 
-	names.insert( name );
-}
+	if ( location == -1 )
+		throw error::runtime( "opengl::frame: " ) << "Variable \"" << name << "\" does not exist";
 
-// commented-out code is for use with EXT_gpu_shader4 or GL_ARB_explicit_attrib_location
-s32 find( s32 /*id*/, opengl::frame::name_set& names, const std::string& name )
-{
-	s32 location = /*GetFragDataLocation( id, name.c_str() )*/ names.size();
-
-	/*if ( location == -1 )
-		throw error::runtime( "opengl::frame: " ) << "Variable \"" << name << "\" does not exist";*/
-
-	insert( names, name );
 	return location;
 }
 
-s32 frame_attachment( ooe::frame::attachment_type attachment, s32 offset )
+s32 frame_attachment( ooe::frame::attachment_type attachment, u32& colour_index )
 {
 	switch ( attachment )
 	{
 	case ooe::frame::colour:
-		return COLOR_ATTACHMENT0 + offset;
+		return COLOR_ATTACHMENT0 + colour_index++;
 
 	case ooe::frame::depth:
 		return DEPTH_ATTACHMENT;
@@ -78,19 +69,20 @@ void default_frame::write( const frame_type& generic_frame )
 		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
 }
 
-void default_frame::output( const std::string&, attachment_type, const texture_type& )
+void default_frame::output( attachment_type, const texture_type& )
 {
 	throw error::runtime( "opengl::default_frame: " ) << "Can not attach to default frame";
 }
 
-void default_frame::output( const std::string&, attachment_type, const target_type& )
+void default_frame::output( attachment_type, const target_type& )
 {
 	throw error::runtime( "opengl::default_frame: " ) << "Can not attach to default frame";
 }
 
 //--- frame ----------------------------------------------------------------------------------------
 frame::frame( u32 program_, u32 width_, u32 height_ )
-	: id(), width( width_ ), height( height_ ), textures(), targets(), program( program_ ), names()
+	: id(), width( width_ ), height( height_ ), textures(), targets(), program( program_ ),
+	colour_index( 0 )
 {
 	GenFramebuffers( 1, const_cast< u32* >( &id ) );
 }
@@ -109,25 +101,21 @@ void frame::write( const frame_type& generic_frame )
 		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
 }
 
-void frame::
-	output( const std::string& name, attachment_type type, const texture_type& generic_texture )
+void frame::output( attachment_type type, const texture_type& generic_texture )
 {
 	const opengl::texture& texture = verify< opengl::texture >( *generic_texture, width, height );
-	s32 location = find( id, names, name );
-	s32 attachment = frame_attachment( type, textures.size() );
-	textures.push_back( texture_tuple( location, attachment, generic_texture ) );
+	s32 attachment = frame_attachment( type, colour_index );
+	textures[ attachment ] = generic_texture;
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
 	FramebufferTexture2D( DRAW_FRAMEBUFFER, attachment, TEXTURE_2D, texture.id, 0 );
 }
 
-void frame::
-	output( const std::string& name, attachment_type type, const target_type& generic_target )
+void frame::output( attachment_type type, const target_type& generic_target )
 {
 	const opengl::target& target = verify< opengl::target >( *generic_target, width, height );
-	s32 location = find( id, names, name );
-	s32 attachment = frame_attachment( type, targets.size() );
-	targets.push_back( target_tuple( location, attachment, generic_target ) );
+	s32 attachment = frame_attachment( type, colour_index );
+	targets[ attachment ] = generic_target;
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
 	FramebufferRenderbuffer( DRAW_FRAMEBUFFER, attachment, RENDERBUFFER, target.id );

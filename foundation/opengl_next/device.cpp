@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <set>
 
 #include "foundation/opengl_next/block.hpp"
 #include "foundation/opengl_next/buffer.hpp"
@@ -18,7 +19,6 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 typedef std::set< s32 > set_type;
-typedef std::vector< u32 > vector_type;
 
 void set_attributes( const opengl::block::buffer_map::const_iterator begin,
 	const opengl::block::buffer_map::const_iterator end )
@@ -42,6 +42,7 @@ void set_attributes( const opengl::block::buffer_map::const_iterator begin,
 
 void enable_attributes( set_type& x, set_type& y )
 {
+	typedef std::vector< s32 > vector_type;
 	typedef std::insert_iterator< vector_type > inserter;
 	vector_type v;
 	std::set_difference( x.begin(), x.end(), y.begin(), y.end(), inserter( v, v.begin() ) );
@@ -59,15 +60,10 @@ void enable_attributes( set_type& x, set_type& y )
 }
 
 template< typename type >
-	void set_frame( const type& in, vector_type& out )
+	void set_frame( const type& in, set_type& out )
 {
 	for ( typename type::const_iterator i = in.begin(), end = in.end(); i != end; ++i )
-	{
-		if ( up_t( i->_0 ) >= out.size() )
-			throw error::runtime( "opengl::device: " ) << "Frame does not contain all attachments";
-
-		out[ i->_0 ] = i->_1;
-	}
+		out.insert( i->first );
 }
 
 void enable_frame( const frame_type& generic_frame )
@@ -79,15 +75,19 @@ void enable_frame( const frame_type& generic_frame )
 	}
 
 	opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
+	set_type set;
+	set_frame( frame.textures, set );
+	set_frame( frame.targets, set );
+	std::vector< u32 > vector( set.begin(), set.end() );
+
 	BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
-	vector_type vector( frame.textures.size() + frame.targets.size() );
-	set_frame( frame.textures, vector );
-	set_frame( frame.targets, vector );
 	DrawBuffers( vector.size(), &vector[ 0 ] );
 	s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
 
 	if ( status != FRAMEBUFFER_COMPLETE )
 		throw error::runtime( "opengl::device: " ) << "Frame is incomplete: " << hex( status );
+
+	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -145,18 +145,18 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
 	opengl::block& block = dynamic_cast< opengl::block& >( *generic_block );
 	UseProgram( block.id );
 
-	for ( block::uniform_vector::const_iterator i = block.uniforms.begin(),
+	for ( block::uniform_map::const_iterator i = block.uniforms.begin(),
 		end = block.uniforms.end(); i != end; ++i )
-		i->_2( i->_0, i->_1 );
+		i->second._1( i->first, i->second._0 );
 
 	s32 j = 0;
 
-	for ( block::texture_vector::const_iterator i = block.textures.begin(),
+	for ( block::texture_map::const_iterator i = block.textures.begin(),
 		end = block.textures.end(); i != end; ++i, ++j )
 	{
-		Uniform1iv( i->_0, 1, &j );
+		Uniform1iv( i->first, 1, &j );
 		ActiveTexture( TEXTURE0 + j );
-		BindTexture( TEXTURE_2D, dynamic_cast< opengl::texture& >( *i->_1 ).id );
+		BindTexture( TEXTURE_2D, dynamic_cast< opengl::texture& >( *i->second ).id );
 	}
 
 	block::buffer_map& map = block.buffers;
@@ -190,7 +190,7 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
 void device::swap( void )
 {
 	context_swap( view, context );
-	Clear( DEPTH_BUFFER_BIT | COLOR_BUFFER_BIT );
+	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }
 
 texture_type device::
