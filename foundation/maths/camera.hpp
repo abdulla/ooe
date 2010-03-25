@@ -13,8 +13,8 @@ namespace ooe
 	public:
 		camera( radian, f32, f32 = 100, f32 = 1000000 );
 
-		void translate( const vec3& );
 		void rotate( const vec3& );
+		void translate( const vec3& );
 
 		vec3 position( void ) const;
 		mat4 matrix( void ) const;

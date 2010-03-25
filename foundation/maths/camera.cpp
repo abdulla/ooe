@@ -34,13 +34,6 @@ namespace ooe
 	{
 	}
 
-	void camera::translate( const vec3& change )
-	{
-		eye += axis.x * change.x;
-		eye += axis.y * change.y;
-		eye += axis.z * change.z;
-	}
-
 	void camera::rotate( const vec3& change )
 	{
 		const mat3 rotate_y( axis_angle< mat3 >( axis.y, change.y ) );
@@ -55,6 +48,13 @@ namespace ooe
 		look.x = dot( rotate_z, look.x );
 		look.y = dot( rotate_z, look.y );
 		look.z = dot( rotate_z, look.z );
+	}
+
+	void camera::translate( const vec3& change )
+	{
+		eye += axis.x * change.x;
+		eye += axis.y * change.y;
+		eye += axis.z * change.z;
 	}
 
 	vec3 camera::position( void ) const
