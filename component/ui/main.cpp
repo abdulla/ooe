@@ -20,7 +20,7 @@ camera_tuple process_events( event_queue& event_queue )
 {
 	camera_tuple tuple( vec3::zero, vec3::zero );
 	event event;
-	epoch_t timeout( 3600, 0 );
+	epoch_t timeout( 0, 0 );
 
 	for ( event::type type; ( type = event_queue.next_event( event, timeout ) ); )
 	{
