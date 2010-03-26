@@ -25,7 +25,6 @@ namespace ooe
 		mutable up_t wm_delete;
 		mutable s32 x;
 		mutable s32 y;
-		mutable function< void ( void ) > grab;
 		mutable function< void ( void ) > warp;
 
 		event_queue( void );

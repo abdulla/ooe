@@ -19,9 +19,6 @@ namespace
 	using namespace ooe;
 	typedef void ( * choose_type )( const view_data& );
 
-	const sp_t event_mask =
-		KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask;
-
 	void grab( Display* display, up_t window )
 	{
 		XGrabKeyboard( display, window, true, GrabModeAsync, GrabModeAsync, CurrentTime );
@@ -41,7 +38,9 @@ namespace ooe
 	platform::view_data::view_data( const event_queue& queue_, u16 width_, u16 height_ )
 		: queue( queue_ ), width( width_ ), height( height_ ), window( 0 ), visual_info( 0 )
 	{
-		queue.grab = make_function( *this, &view_data::grab );
+		warp();
+		queue.x = width / 2;
+		queue.y = height / 2;
 		queue.warp = make_function( *this, &view_data::warp );
 		library::find< choose_type >( "driver_choose", library::next )( *this );
 	}
@@ -51,14 +50,6 @@ namespace ooe
 		// XFree can not be called with null (see man page)
 		if ( visual_info )
 			XFree( visual_info );
-	}
-
-	void platform::view_data::grab( void )
-	{
-		::grab( queue.display, window );
-		warp();
-		queue.x = width / 2;
-		queue.y = height / 2;
 	}
 
 	void platform::view_data::warp( void )
@@ -81,7 +72,8 @@ namespace ooe
 			attributes.override_redirect = 1;
 		}
 
-		attributes.event_mask = event_mask | StructureNotifyMask | ExposureMask;
+		attributes.event_mask =
+			KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask;
 		attributes.colormap = XCreateColormap( queue.display, root, visual_info->visual, 0 );
 		window = XCreateWindow( queue.display, root, 0, 0, width, height, 0, visual_info->depth,
 			InputOutput, visual_info->visual, mask, &attributes );

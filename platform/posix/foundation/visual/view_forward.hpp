@@ -37,7 +37,6 @@ namespace ooe
 		~view_data( void );
 
 	private:
-		void grab( void );
 		void warp( void );
 	};
 
