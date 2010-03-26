@@ -18,9 +18,10 @@ namespace ooe
 	}
 
 //--- event_queue --------------------------------------------------------------
-	event::type event_queue::next_event( event& event, bool wait ) const
+	event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	{
-		NSDate* date = wait ? [ NSDate distantFuture ] : 0;
+		f64 interval = timeout._0 + timeout._1 * 1e-9;
+		NSDate* date = [ NSDate dateWithTimeIntervalSinceNow: interval ];
 		NSEvent* nsevent;
 
 		while ( ( nsevent = [ NSApp nextEventMatchingMask: NSAnyEventMask untilDate: date

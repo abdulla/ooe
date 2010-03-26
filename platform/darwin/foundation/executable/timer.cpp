@@ -30,7 +30,7 @@ namespace ooe
 		return epoch_t( time / 1000000000, time % 1000000000 );
 	}
 
-	epoch_t timer::sleep( const epoch_t& value )
+	epoch_t timer::sleep( epoch_t value )
 	{
 		initialise_timebase();
 		u64 absolute = mach_absolute_time() +

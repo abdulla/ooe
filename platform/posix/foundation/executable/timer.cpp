@@ -19,7 +19,7 @@ namespace ooe
 		return epoch_t( value.tv_sec, value.tv_nsec );
 	}
 
-	epoch_t timer::sleep( const epoch_t& value )
+	epoch_t timer::sleep( epoch_t value )
 	{
 		timespec request = { value._0, value._1 };
 

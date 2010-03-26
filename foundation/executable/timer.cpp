@@ -6,7 +6,7 @@ namespace
 {
 	using namespace ooe;
 
-	f32 difference( const epoch_t& begin, const epoch_t& end )
+	f32 difference( epoch_t begin, epoch_t end )
 	{
 		return static_cast< f32 >( end._0 - begin._0 ) +
 			static_cast< f32 >( end._1 - begin._1 ) * 1e-9f;

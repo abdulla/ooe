@@ -3,8 +3,7 @@
 #ifndef OOE_FOUNDATION_VISUAL_EVENT_QUEUE_HPP
 #define OOE_FOUNDATION_VISUAL_EVENT_QUEUE_HPP
 
-#include "foundation/utility/fundamental.hpp"
-#include "foundation/utility/noncopyable.hpp"
+#include "foundation/executable/timer.hpp"
 #include "foundation/visual/event_queue_forward.hpp"
 
 namespace ooe
@@ -42,7 +41,7 @@ namespace ooe
 	struct OOE_VISIBLE event_queue
 		: private noncopyable, public platform::event_queue
 	{
-		event::type next_event( event&, bool = true ) const;
+		event::type next_event( event&, epoch_t = epoch_t( 0, 0 ) ) const;
 	};
 }
 

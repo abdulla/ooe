@@ -112,7 +112,7 @@ namespace
 	{
 		event event;
 
-		for ( event::type type; ( type = event_queue.next_event( event, false ) ); )
+		for ( event::type type; ( type = event_queue.next_event( event ) ); )
 		{
 			switch ( type )
 			{
