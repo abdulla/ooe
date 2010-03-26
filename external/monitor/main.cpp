@@ -118,13 +118,14 @@ namespace
 
 		detect detect( directory, percent, width, height );
 		sight sight( make_function( detect, &detect::process ), width, height );
+		epoch_t timeout( 1000000000, 0 );
 
 #ifdef __APPLE__
 		event_queue queue;
 		event event;
-		while ( queue.next_event( event ) ) {}
+		while ( queue.next_event( event, timeout ) ) {}
 #else
-		while ( true ) timer::sleep( epoch_t( 1000000000, 0 ) );
+		while ( true ) timer::sleep( timeout );
 #endif
 
 		return true;
