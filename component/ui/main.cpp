@@ -20,8 +20,9 @@ camera_tuple process_events( event_queue& event_queue )
 {
 	camera_tuple tuple( vec3::zero, vec3::zero );
 	event event;
+	epoch_t timeout( 3600, 0 );
 
-	for ( event::type type; ( type = event_queue.next_event( event ) ); )
+	for ( event::type type; ( type = event_queue.next_event( event, timeout ) ); )
 	{
 		switch ( type )
 		{
@@ -160,7 +161,6 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		camera.translate( tuple._1 );
 		block->input( "projection", camera.matrix() );
 
-		executable::yield();
 		device->draw( block, frame );
 		default_frame->write( frame );
 		device->swap();
