@@ -40,19 +40,19 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	pollfd array = { ConnectionNumber( display ), POLLIN, 0 };
 	timespec interval = { timeout._0, timeout._1 };
 
-	if ( !XPending( display ) )
+	while ( true )
 	{
-		s32 status = ppoll( &array, 1, &interval, 0 );
+		if ( !XPending( display ) )
+		{
+			s32 status = ppoll( &array, 1, &interval, 0 );
 
-		if ( !status )
-			return event::none;
-		else if ( status == -1 )
-			throw error::runtime( "event_queue: " ) <<
-				"Unable to poll display connection: " << error::number( errno );
-	}
+			if ( !status )
+				return event::none;
+			else if ( status == -1 )
+				throw error::runtime( "event_queue: " ) <<
+					"Unable to poll display connection: " << error::number( errno );
+		}
 
-	do
-	{
 		XEvent xevent;
 		XNextEvent( display, &xevent );
 
@@ -98,9 +98,6 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 			break;
 		}
 	}
-	while ( XPending( display ) );
-
-	return event::none;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

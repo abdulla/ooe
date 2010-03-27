@@ -11,46 +11,42 @@ typedef struct XVisualInfo XVisualInfo;
 
 typedef struct _XRRScreenConfiguration XRRScreenConfiguration;
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+struct event_queue;
+
+OOE_NAMESPACE_END( ( ooe ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+class view_data
 {
-	struct event_queue;
+public:
+	const event_queue& queue;
+	u16 width;
+	u16 height;
+	up_t window;
+	mutable XVisualInfo* visual_info;
 
-	namespace platform
-	{
-		class view_data;
-		class view;
+protected:
+	view_data( const event_queue&, u16, u16 );
+	~view_data( void );
 
-		typedef void ( choose_type )( view_data& );
-	}
+	void warp( void );
+};
 
-	class platform::view_data
-	{
-	public:
-		const event_queue& queue;
-		u16 width;
-		u16 height;
-		up_t window;
-		mutable XVisualInfo* visual_info;
+class view
+{
+protected:
+	XRRScreenConfiguration* config;
+	u16 resize;
+	u16 rotate;
+	up_t cursor;
 
-	protected:
-		view_data( const event_queue&, u16, u16 );
-		~view_data( void );
+	view( const event_queue&, bool );
+	~view( void );
+};
 
-	private:
-		void warp( void );
-	};
-
-	class platform::view
-	{
-	protected:
-		XRRScreenConfiguration* config;
-		u16 resize;
-		u16 rotate;
-		up_t cursor;
-
-		view( const event_queue&, bool );
-		~view( void );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform ) )
 
 #endif	// OOE_PLATFORM_POSIX_FOUNDATION_VISUAL_VIEW_FORWARD_HPP
