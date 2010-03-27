@@ -82,10 +82,16 @@ void enable_frame( const frame_type& generic_frame )
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
 	DrawBuffers( vector.size(), &vector[ 0 ] );
-	s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
 
-	if ( status != FRAMEBUFFER_COMPLETE )
-		throw error::runtime( "opengl::device: " ) << "Frame is incomplete: " << hex( status );
+	if ( frame.check )
+	{
+		s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
+
+		if ( status != FRAMEBUFFER_COMPLETE )
+			throw error::runtime( "opengl::device: " ) << "Frame is incomplete: " << hex( status );
+
+		frame.check = false;
+	}
 
 	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }

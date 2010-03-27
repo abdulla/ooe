@@ -35,6 +35,7 @@ public:
 	const u32 id;
 	const u32 width;
 	const u32 height;
+	bool check;
 	texture_map textures;
 	target_map targets;
 

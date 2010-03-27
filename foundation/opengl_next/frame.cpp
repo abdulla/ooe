@@ -87,8 +87,8 @@ void default_frame::output( attachment_type, const target_type& )
 
 //--- frame ----------------------------------------------------------------------------------------
 frame::frame( u32 program_, u32 width_, u32 height_ )
-	: id(), width( width_ ), height( height_ ), textures(), targets(), program( program_ ),
-	colour_index( 0 )
+	: id(), width( width_ ), height( height_ ), check( true ), textures(), targets(),
+	program( program_ ), colour_index( 0 )
 {
 	GenFramebuffers( 1, const_cast< u32* >( &id ) );
 }
@@ -112,6 +112,7 @@ void frame::output( attachment_type type, const texture_type& generic_texture )
 	const opengl::texture& texture = verify< opengl::texture >( *generic_texture, width, height );
 	s32 attachment = frame_attachment( type, colour_index );
 	textures[ attachment ] = generic_texture;
+	check = true;
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
 	FramebufferTexture2D( DRAW_FRAMEBUFFER, attachment, TEXTURE_2D, texture.id, 0 );
@@ -122,6 +123,7 @@ void frame::output( attachment_type type, const target_type& generic_target )
 	const opengl::target& target = verify< opengl::target >( *generic_target, width, height );
 	s32 attachment = frame_attachment( type, colour_index );
 	targets[ attachment ] = generic_target;
+	check = true;
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
 	FramebufferRenderbuffer( DRAW_FRAMEBUFFER, attachment, RENDERBUFFER, target.id );
