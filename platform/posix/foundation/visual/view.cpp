@@ -16,8 +16,6 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-typedef void ( * choose_type )( const view_data& );
-
 void grab( Display* display, up_t window )
 {
 	XGrabKeyboard( display, window, true, GrabModeAsync, GrabModeAsync, CurrentTime );
@@ -41,7 +39,7 @@ view_data::view_data( const event_queue& queue_, u16 width_, u16 height_ )
 	queue.x = width / 2;
 	queue.y = height / 2;
 	queue.warp = make_function( *this, &view_data::warp );
-	library::find< choose_type >( "driver_choose", library::next )( *this );
+	library::find< void ( const view_data& ) >( "driver_choose", library::next )( *this );
 }
 
 view_data::~view_data( void )
