@@ -9,15 +9,21 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 // use with EXT_gpu_shader4 or GL_ARB_explicit_attrib_location
-s32 find( s32 id, const std::string& name )
+/*s32 find( s32 id, opengl::frame::location_map& locations, const std::string& name )
 {
+	opengl::frame::location_map::const_iterator i = locations.find( name );
+
+	if ( i != locations.end() )
+		return i->second;
+
 	s32 location = GetFragDataLocation( id, name.c_str() );
 
 	if ( location == -1 )
 		throw error::runtime( "opengl::frame: " ) << "Variable \"" << name << "\" does not exist";
 
+	locations.insert( opengl::frame::location_map::value_type( name, location ) );
 	return location;
-}
+}*/
 
 s32 frame_attachment( ooe::frame::attachment_type attachment, u32& colour_index )
 {
