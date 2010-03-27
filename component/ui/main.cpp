@@ -20,9 +20,10 @@ camera_tuple process_events( event_queue& event_queue )
 {
 	camera_tuple tuple( vec3::zero, vec3::zero );
 	event event;
-	epoch_t timeout( 0, 0 );
+	epoch_t timeout( 3600, 0 );
 
-	for ( event::type type; ( type = event_queue.next_event( event, timeout ) ); )
+	for ( event::type type; ( type = event_queue.next_event( event, timeout ) );
+		timeout = epoch_t( 0, 0 ) )
 	{
 		switch ( type )
 		{
@@ -146,6 +147,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	camera camera( degree( 45 ), width / height, 1, 100 );
 	camera.rotate( vec3( 0, maths::pi_half, 0 ) );
+	radian sensitivity( degree( .05 ) );
 	block_type block = program->block( index );
 	block->input( "vertex", 2, point );
 
@@ -156,14 +158,14 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	while ( !executable::has_signal() )
 	{
-		camera_tuple tuple = process_events( event_queue );
-		camera.rotate( tuple._0 * radian( degree( .05 ) ) );
-		camera.translate( tuple._1 );
 		block->input( "projection", camera.matrix() );
-
 		device->draw( block, frame );
 		default_frame->write( frame );
 		device->swap();
+
+		camera_tuple tuple = process_events( event_queue );
+		camera.rotate( tuple._0 * sensitivity );
+		camera.translate( tuple._1 );
 	}
 
 	return true;
