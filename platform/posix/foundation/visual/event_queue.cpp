@@ -20,7 +20,7 @@ event_queue::event_queue( void )
 	: display( XOpenDisplay( 0 ) ), wm_delete(), x(), y(), warp()
 {
 	if ( !display )
-		throw error::runtime( "view: " ) << "Display not opened";
+		throw error::runtime( "view: " ) << "Unable to open display connection";
 
 	wm_delete = XInternAtom( display, "WM_DELETE_WINDOW", false );
 }
