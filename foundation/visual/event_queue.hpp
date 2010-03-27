@@ -14,11 +14,12 @@ namespace ooe
 		enum type
 		{
 			none,
+			exit,
+			ignore,
 
 			motion_flag,
 			button_flag,
-			key_flag,
-			exit_flag
+			key_flag
 		};
 
 		union

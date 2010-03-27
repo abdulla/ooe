@@ -40,63 +40,60 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	pollfd array = { ConnectionNumber( display ), POLLIN, 0 };
 	timespec interval = { timeout._0, timeout._1 };
 
-	while ( true )
+	if ( !XPending( display ) )
 	{
-		if ( !XPending( display ) )
-		{
-			s32 status = ppoll( &array, 1, &interval, 0 );
+		s32 status = ppoll( &array, 1, &interval, 0 );
 
-			if ( !status )
-				return event::none;
-			else if ( status == -1 )
-				throw error::runtime( "event_queue: " ) <<
-					"Unable to poll display connection: " << error::number( errno );
-		}
+		if ( !status )
+			return event::none;
+		else if ( status == -1 )
+			throw error::runtime( "event_queue: " ) <<
+				"Unable to poll display connection: " << error::number( errno );
+	}
 
-		XEvent xevent;
-		XNextEvent( display, &xevent );
+	XEvent xevent;
+	XNextEvent( display, &xevent );
 
-		switch ( xevent.type )
-		{
-		case MotionNotify:
-			event.motion.x = xevent.xmotion.x - x;
-			event.motion.y = xevent.xmotion.y - y;
+	switch ( xevent.type )
+	{
+	case MotionNotify:
+		event.motion.x = xevent.xmotion.x - x;
+		event.motion.y = xevent.xmotion.y - y;
 
-			if ( !event.motion.x && !event.motion.y )
-				continue;
+		if ( !event.motion.x && !event.motion.y )
+			return event::ignore;
 
-			warp();
-			return event::motion_flag;
+		warp();
+		return event::motion_flag;
 
-		case KeyRelease:
-			event.key.value = XLookupKeysym( &xevent.xkey, 0 );
-			event.key.press = false;
-			return event::key_flag;
+	case KeyRelease:
+		event.key.value = XLookupKeysym( &xevent.xkey, 0 );
+		event.key.press = false;
+		return event::key_flag;
 
-		case KeyPress:
-			event.key.value = XLookupKeysym( &xevent.xkey, 0 );
-			event.key.press = true;
-			return event::key_flag;
+	case KeyPress:
+		event.key.value = XLookupKeysym( &xevent.xkey, 0 );
+		event.key.press = true;
+		return event::key_flag;
 
-		case ButtonRelease:
-			event.button.value = xevent.xbutton.button;
-			event.button.press = false;
-			return event::button_flag;
+	case ButtonRelease:
+		event.button.value = xevent.xbutton.button;
+		event.button.press = false;
+		return event::button_flag;
 
-		case ButtonPress:
-			event.button.value = xevent.xbutton.button;
-			event.button.press = true;
-			return event::button_flag;
+	case ButtonPress:
+		event.button.value = xevent.xbutton.button;
+		event.button.press = true;
+		return event::button_flag;
 
-		case ClientMessage:
-			if ( xevent.xclient.data.l[ 0 ] == static_cast< sp_t >( wm_delete ) )
-				return event::exit_flag;
-			else
-				break;
+	case ClientMessage:
+		if ( xevent.xclient.data.l[ 0 ] == static_cast< sp_t >( wm_delete ) )
+			return event::exit;
+		else
+			return event::ignore;
 
-		default:
-			break;
-		}
+	default:
+		return event::ignore;
 	}
 }
 

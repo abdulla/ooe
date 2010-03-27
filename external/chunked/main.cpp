@@ -128,7 +128,7 @@ namespace
 				setup_key( event.key.value, event.key.press, translate, speed );
 				break;
 
-			case event::exit_flag:
+			case event::exit:
 				executable::quit();
 				break;
 

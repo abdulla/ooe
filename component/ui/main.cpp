@@ -75,7 +75,7 @@ camera_tuple process_events( event_queue& event_queue )
 
 			break;
 
-		case event::exit_flag:
+		case event::exit:
 			executable::quit();
 			break;
 

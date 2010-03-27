@@ -25,75 +25,72 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 event::type event_queue::next_event( event& event, epoch_t timeout ) const
 {
 	NSDate* date = [ NSDate dateWithTimeIntervalSinceNow: timeout._0 + timeout._1 * 1e-9 ];
-	NSEvent* nsevent;
+	NSEvent* nsevent = [ NSApp nextEventMatchingMask: NSAnyEventMask untilDate: date
+		inMode: NSDefaultRunLoopMode dequeue: true ];
 
-	while ( ( nsevent = [ NSApp nextEventMatchingMask: NSAnyEventMask untilDate: date
-		inMode: NSDefaultRunLoopMode dequeue: true ] ) )
+	if ( !nsevent )
+		return event::none;
+
+	switch ( nsevent.type )
 	{
-		switch ( nsevent.type )
+	case NSMouseMoved:
+	case NSLeftMouseDragged:
+	case NSRightMouseDragged:
+	case NSOtherMouseDragged:
+		CGGetLastMouseDelta( &event.motion.x, &event.motion.y );
+
+		if ( !delta )
 		{
-		case NSMouseMoved:
-		case NSLeftMouseDragged:
-		case NSRightMouseDragged:
-		case NSOtherMouseDragged:
-			CGGetLastMouseDelta( &event.motion.x, &event.motion.y );
-
-			if ( !delta )
-			{
-				delta = true;
-				continue;
-			}
-
-			return event::motion_flag;
-
-		case NSKeyDown:
-			event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
-			event.key.press = true;
-			return event::key_flag;
-
-		case NSKeyUp:
-			event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
-			event.key.press = false;
-			return event::key_flag;
-
-		case NSLeftMouseDown:
-			event.button.value = 0;
-			event.button.press = true;
-			return event::button_flag;
-
-		case NSRightMouseDown:
-			event.button.value = 1;
-			event.button.press = true;
-			return event::button_flag;
-
-		case NSOtherMouseDown:
-			event.button.value = 2;
-			event.button.press = true;
-			return event::button_flag;
-
-		case NSLeftMouseUp:
-			event.button.value = 0;
-			event.button.press = false;
-			return event::button_flag;
-
-		case NSRightMouseUp:
-			event.button.value = 1;
-			event.button.press = false;
-			return event::button_flag;
-
-		case NSOtherMouseUp:
-			event.button.value = 2;
-			event.button.press = false;
-			return event::button_flag;
-
-		default:
-			[ NSApp sendEvent: nsevent ];
-			break;
+			delta = true;
+			return event::ignore;
 		}
-	}
 
-	[ NSApp updateWindows ];
-	return event::none;
+		return event::motion_flag;
+
+	case NSKeyDown:
+		event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
+		event.key.press = true;
+		return event::key_flag;
+
+	case NSKeyUp:
+		event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
+		event.key.press = false;
+		return event::key_flag;
+
+	case NSLeftMouseDown:
+		event.button.value = 0;
+		event.button.press = true;
+		return event::button_flag;
+
+	case NSRightMouseDown:
+		event.button.value = 1;
+		event.button.press = true;
+		return event::button_flag;
+
+	case NSOtherMouseDown:
+		event.button.value = 2;
+		event.button.press = true;
+		return event::button_flag;
+
+	case NSLeftMouseUp:
+		event.button.value = 0;
+		event.button.press = false;
+		return event::button_flag;
+
+	case NSRightMouseUp:
+		event.button.value = 1;
+		event.button.press = false;
+		return event::button_flag;
+
+	case NSOtherMouseUp:
+		event.button.value = 2;
+		event.button.press = false;
+		return event::button_flag;
+
+	default:
+		[ NSApp sendEvent: nsevent ];
+		return event::ignore;
+	}
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
