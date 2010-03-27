@@ -3,7 +3,7 @@
 #ifndef OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_EVENT_QUEUE_FORWARD_HPP
 #define OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_EVENT_QUEUE_FORWARD_HPP
 
-#include "foundation/utility/macro.hpp"
+#include "foundation/utility/namespace.hpp"
 
 #ifdef __OBJC__
 	@class NSAutoreleasePool;
@@ -11,20 +11,16 @@
 	struct NSAutoreleasePool;
 #endif
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+class event_queue
 {
-	namespace platform
-	{
-		class event_queue;
-	}
+protected:
+	mutable bool delta;
 
-	class OOE_VISIBLE platform::event_queue
-	{
-	protected:
-		mutable bool delta;
+	event_queue( void );
+};
 
-		event_queue( void );
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform ) )
 
 #endif	// OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_EVENT_QUEUE_FORWARD_HPP

@@ -11,26 +11,22 @@
 	struct NSWindow;
 #endif
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+class view_data
 {
-	namespace platform
-	{
-		class view_data;
-		struct view;
-	}
+public:
+	NSWindow* window;
 
-	class platform::view_data
-	{
-	public:
-		NSWindow* window;
+protected:
+	view_data( void );
+};
 
-	protected:
-		view_data( void );
-	};
+struct view
+{
+};
 
-	struct platform::view
-	{
-	};
-}
+OOE_NAMESPACE_END( ( ooe )( platform ) )
+
 
 #endif	// OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_VIEW_FORWARD_HPP

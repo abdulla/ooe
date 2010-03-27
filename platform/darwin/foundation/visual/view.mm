@@ -6,96 +6,103 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/view.hpp"
 
-namespace ooe
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+
+void warp( NSWindow* window )
 {
-//--- platform::view_data ------------------------------------------------------
-	platform::view_data::view_data( void )
-		: window( 0 )
-	{
-	}
+	NSRect rect = window.frame;
+	rect.origin.y = CGDisplayPixelsHigh( kCGDirectMainDisplay ) - rect.origin.y - rect.size.height;
+	CGPoint point = { rect.origin.x + rect.size.width / 2, rect.origin.y + rect.size.height / 2 };
+	CGWarpMouseCursorPosition( point );
+}
 
-//--- view_data ----------------------------------------------------------------
-	view_data::view_data( const event_queue&, u16 width, u16 height, bool full )
-		: platform::view_data()
-	{
-		if ( full )
-			return;
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
-		ProcessSerialNumber serial = { 0, kCurrentProcess };
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
-		if ( TransformProcessType( &serial, kProcessTransformToForegroundApplication ) ||
-			SetFrontProcess( &serial ) )
-			throw error::runtime( "view: " ) << "Unable to set process to foreground";
+//--- view_data ------------------------------------------------------------------------------------
+view_data::view_data( void )
+	: window( 0 )
+{
+}
 
-		NSRect rect = { { 0, 0 }, { width, height } };
-		window = [ [ NSWindow alloc ] initWithContentRect: rect styleMask: NSTitledWindowMask
-			backing: NSBackingStoreBuffered defer: false ];
+OOE_NAMESPACE_END( ( ooe )( platform ) )
 
-		if ( !window )
-			throw error::runtime( "view: " ) << "Unable to initialise window";
+OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-		[ window orderFront: 0 ];
-		window.title = @"OOE";
-		window.acceptsMouseMovedEvents = true;
-	}
+//--- view_data ------------------------------------------------------------------------------------
+view_data::view_data( const event_queue&, u16 width, u16 height, bool full )
+	: platform::view_data()
+{
+	if ( full )
+		return;
 
-	view_data::~view_data( void )
-	{
-		[ window release ];
-	}
+	ProcessSerialNumber serial = { 0, kCurrentProcess };
+
+	if ( TransformProcessType( &serial, kProcessTransformToForegroundApplication ) ||
+		SetFrontProcess( &serial ) )
+		throw error::runtime( "view: " ) << "Unable to set process to foreground";
+
+	NSRect rect = { { 0, 0 }, { width, height } };
+	window = [ [ NSWindow alloc ] initWithContentRect: rect styleMask: NSTitledWindowMask
+		backing: NSBackingStoreBuffered defer: false ];
+
+	if ( !window )
+		throw error::runtime( "view: " ) << "Unable to initialise window";
+
+	[ window orderFront: 0 ];
+	window.title = @"OOE";
+	window.acceptsMouseMovedEvents = true;
+}
+
+view_data::~view_data( void )
+{
+	[ window release ];
+}
 
 //--- view ---------------------------------------------------------------------
-	view::view( const event_queue& queue, u16 width, u16 height, bool full )
-		: view_data( queue, width, height, full ), platform::view()
+view::view( const event_queue& queue, u16 width, u16 height, bool full )
+	: view_data( queue, width, height, full ), platform::view()
+{
+	warp( window );
+	CGAssociateMouseAndMouseCursorPosition( false );
+	CGDisplayHideCursor( kCGDirectMainDisplay );
+
+	if ( !full )
+		return;
+
+	CFArrayRef modes = CGDisplayCopyAllDisplayModes( kCGDirectMainDisplay, 0 );
+	CGDisplayMode* mode = 0;
+
+	for ( sp_t i = 0; i != CFArrayGetCount( modes ); ++i )
 	{
-		CGPoint point = { width / 2, height / 2 };
+		CGDisplayMode* current = ( CGDisplayMode* )CFArrayGetValueAtIndex( modes, i );
 
-		if ( !full )
+		if ( CGDisplayModeGetWidth( current ) != width &&
+			CGDisplayModeGetHeight( current ) != height )
+			continue;
+
+		CFStringRef encoding = CGDisplayModeCopyPixelEncoding( current );
+
+		if ( !CFStringCompare( encoding, CFSTR( IO32BitDirectPixels ), 0 ) )
 		{
-			NSRect rect = window.frame;
-			point.x += rect.origin.x;
-			point.y += rect.origin.y;
+			mode = current;
+			break;
 		}
-
-		CGDirectDisplayID display = CGMainDisplayID();
-		CGDisplayMoveCursorToPoint( display, point );
-		CGDisplayHideCursor( display );
-		CGAssociateMouseAndMouseCursorPosition( false );
-
-		if ( !full )
-			return;
-
-		CFArrayRef modes = CGDisplayCopyAllDisplayModes( display, 0 );
-		CGDisplayMode* mode = 0;
-
-		for ( sp_t i = 0; i != CFArrayGetCount( modes ); ++i )
-		{
-			CGDisplayMode* current = ( CGDisplayMode* )CFArrayGetValueAtIndex( modes, i );
-
-			if ( CGDisplayModeGetWidth( current ) != width &&
-				CGDisplayModeGetHeight( current ) != height )
-				continue;
-
-			CFStringRef encoding = CGDisplayModeCopyPixelEncoding( current );
-
-			if ( !CFStringCompare( encoding, CFSTR( IO32BitDirectPixels ), 0 ) )
-			{
-				mode = current;
-				break;
-			}
-		}
-
-		CGDisplayCapture( display );
-
-		if ( !mode )
-			throw error::runtime( "view: " ) << "Unable to find display mode";
-		else if ( CGDisplaySetDisplayMode( display, mode, 0 ) )
-			throw error::runtime( "view: " ) << "Unable to set display mode";
 	}
 
-	view::~view( void )
-	{
-		if ( !window )
-			CGReleaseAllDisplays();
-	}
+	CGDisplayCapture( kCGDirectMainDisplay );
+
+	if ( !mode )
+		throw error::runtime( "view: " ) << "Unable to find display mode";
+	else if ( CGDisplaySetDisplayMode( kCGDirectMainDisplay, mode, 0 ) )
+		throw error::runtime( "view: " ) << "Unable to set display mode";
 }
+
+view::~view( void )
+{
+	if ( !window )
+		CGReleaseAllDisplays();
+}
+
+OOE_NAMESPACE_END( ( ooe ) )
