@@ -3,6 +3,7 @@
 #ifndef OOE_FOUNDATION_VISUAL_FONT_HPP
 #define OOE_FOUNDATION_VISUAL_FONT_HPP
 
+#include "foundation/image/image.hpp"
 #include "foundation/io/memory.hpp"
 
 struct FT_FaceRec_;
@@ -10,73 +11,65 @@ typedef FT_FaceRec_* FT_Face;
 struct FT_LibraryRec_;
 typedef FT_LibraryRec_* FT_Library;
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( font ) )
+
+//--- library --------------------------------------------------------------------------------------
+struct OOE_VISIBLE library
+	: private noncopyable
 {
-	namespace font
+public:
+	library( void );
+	~library( void );
+
+private:
+	FT_Library freetype;
+
+	friend class face;
+};
+
+//--- bitmap ---------------------------------------------------------------------------------------
+struct OOE_VISIBLE bitmap
+{
+	const s32 left;
+	const s32 top;
+	const u32 x;
+	const u32 y;
+	const ooe::uncompressed_image image;
+
+	bitmap( s32, s32, u32, u32, const uncompressed_image& );
+};
+
+//--- face -----------------------------------------------------------------------------------------
+class OOE_VISIBLE face
+	: private noncopyable
+{
+public:
+	enum string_type
 	{
-		class library;
-		class face;
-		struct metric;
-		struct bitmap;
-	}
-
-	struct OOE_VISIBLE font::library
-		: private noncopyable
-	{
-	public:
-		library( void );
-		~library( void );
-
-	private:
-		FT_Library freetype;
-
-		friend class face;
+		family,
+		style
 	};
 
-	class OOE_VISIBLE font::face
-		: private noncopyable
+	enum number_type
 	{
-	public:
-		enum
-		{
-			family,
-			style
-		};
-
-		enum
-		{
-			glyphs,
-			strikes
-		};
-
-		face( const library&, const descriptor& );
-		~face( void );
-
-		bool character( bitmap&, u32 );
-		bool size( u32 );
-		std::string name( u8 );
-		u32 number( u8 );
-
-	private:
-		ooe::memory memory;
-		FT_Face face_;
+		glyphs,
+		strikes
 	};
 
-	struct font::metric
-	{
-		u32 width;
-		u32 height;
-		s32 left;
-		s32 top;
-		u32 x;
-		u32 y;
-	};
+	face( const library&, const descriptor&, u32 );
+	~face( void );
 
-	struct font::bitmap
-		: public metric
-	{
-		u8* pointer;
-	};
-}
+	bitmap character( up_t );
+	void size( u32 );
+
+	std::string string( string_type );
+	u32 number( number_type );
+
+private:
+	ooe::memory memory;
+	FT_Face face_;
+};
+
+OOE_NAMESPACE_END( ( ooe )( font ) )
 
 #endif	// OOE_FOUNDATION_VISUAL_FONT_HPP

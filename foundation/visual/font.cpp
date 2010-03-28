@@ -1,67 +1,98 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <iostream>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/font.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( font ) )
+
+//--- library --------------------------------------------------------------------------------------
+library::library( void )
+	: freetype()
 {
-//--- font::library ------------------------------------------------------------
-	font::library::library( void )
-		: freetype()
-	{
-		if ( FT_Init_FreeType( &freetype ) )
-			throw error::runtime( "font::library: " ) << "Library not initialised";
-	}
+	if ( FT_Init_FreeType( &freetype ) )
+		throw error::runtime( "font::library: " ) << "Unable to initialise library";
+}
 
-	font::library::~library( void )
-	{
-		FT_Done_FreeType( freetype );
-	}
+library::~library( void )
+{
+	if ( FT_Done_FreeType( freetype ) )
+		OOE_WARNING( "font::library", "Unable to destroy library" );
+}
 
-//--- font::face ---------------------------------------------------------------
-	font::face::face( const library& library, const descriptor& desc )
-		: memory( desc ), face_( 0 )
-	{
-		if ( FT_New_Memory_Face( library.freetype, memory.as< u8 >(), memory.size(), 0, &face_ ) )
-			throw error::runtime( "font: " ) << "Unable to open font face";
-	}
+//--- bitmap ---------------------------------------------------------------------------------------
+bitmap::bitmap( s32 left_, s32 top_, u32 x_, u32 y_, const uncompressed_image& image_ )
+	: left( left_ ), top( top_ ), x( x_ ), y( y_ ), image( image_ )
+{
+}
 
-	font::face::~face( void )
-	{
-		FT_Done_Face( face_ );
-	}
+//--- face -----------------------------------------------------------------------------------------
+face::face( const library& library, const descriptor& desc, u32 size_ )
+	: memory( desc ), face_()
+{
+	if ( FT_New_Memory_Face( library.freetype, memory.as< u8 >(), memory.size(), 0, &face_ ) )
+		throw error::runtime( "font::face: " ) << "Unable to open font face";
 
-	bool font::face::character( bitmap& requested, u32 index )
-	{
-		if ( FT_Load_Char( face_, index, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
-			return false;
+	size( size_ );
+}
 
-		FT_GlyphSlot glyph = face_->glyph;
-		requested.width = glyph->bitmap.width;
-		requested.height = glyph->bitmap.rows;
-		requested.left = glyph->bitmap_left;
-		requested.top = glyph->bitmap_top;
-		requested.x = glyph->advance.x >> 6;
-		requested.y = glyph->advance.y >> 6;
-		requested.pointer = glyph->bitmap.buffer;
-		return true;
-	}
+face::~face( void )
+{
+	if ( FT_Done_Face( face_ ) )
+		OOE_WARNING( "font::face", "Unable to close font face" );
+}
 
-	bool font::face::size( u32 size_ )
-	{
-		return !FT_Set_Pixel_Sizes( face_, size_ - 1, 0 );
-	}
+bitmap face::character( up_t char_code )
+{
+	if ( FT_Load_Char( face_, char_code, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
+		throw error::runtime( "font::face: " ) << "Unable to load character " << hex( char_code );
 
-	std::string font::face::name( u8 type )
-	{
-		return type == family ? face_->family_name : face_->style_name;
-	}
+	FT_GlyphSlot glyph = face_->glyph;
+	uncompressed_image image( glyph->bitmap.width, glyph->bitmap.rows, image::a_u8 );
+	std::memcpy( image.get(), glyph->bitmap.buffer, image.byte_size() );
 
-	u32 font::face::number( u8 type )
+	return bitmap( glyph->bitmap_left, glyph->bitmap_top,
+		glyph->advance.x >> 6, glyph->advance.y >> 6, image );
+}
+
+void face::size( u32 size_ )
+{
+	if ( FT_Set_Pixel_Sizes( face_, size_ - 1, 0 ) )
+		throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size_;
+}
+
+std::string face::string( string_type type )
+{
+	switch ( type )
 	{
-		return type == glyphs ? face_->num_glyphs : face_->num_fixed_sizes;
+	case family:
+		return face_->family_name;
+
+	case style:
+		return face_->style_name;
+
+	default:
+		throw error::runtime( "font::face: " ) << "Unknown string type: " << type;
 	}
 }
+
+u32 face::number( number_type type )
+{
+	switch ( type )
+	{
+	case glyphs:
+		return face_->num_glyphs;
+
+	case strikes:
+		return face_->num_fixed_sizes;
+
+	default:
+		throw error::runtime( "font::face: " ) << "Unknown number type: " << type;
+	}
+}
+
+OOE_NAMESPACE_END( ( ooe )( font ) )
