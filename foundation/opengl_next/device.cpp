@@ -20,10 +20,11 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 typedef std::set< s32 > set_type;
 
-void set_attributes( const set_type& input, set_type& output,
-	const opengl::block::buffer_map::const_iterator begin,
+void set_attributes( set_type& set, const opengl::block::buffer_map::const_iterator begin,
 	const opengl::block::buffer_map::const_iterator end )
 {
+	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *begin->first );
+	BindBuffer( buffer.target, buffer.id );
 	s32 size = 0;
 
 	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
@@ -31,20 +32,12 @@ void set_attributes( const set_type& input, set_type& output,
 
 	size *= sizeof( f32 );
 	u8* offset = 0;
-	set_type::const_iterator input_end = input.end();
 
-	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *begin->first );
-	BindBuffer( buffer.target, buffer.id );
-
-	for ( opengl::block::buffer_map::const_iterator i = begin; i != end;
-		offset += i->second._1 * sizeof( f32 ), ++i )
+	for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
 	{
-		output.insert( i->second._0 );
-
-		if ( input.find( i->second._0 ) != input_end )
-			continue;
-
+		set.insert( i->second._0 );
 		VertexAttribPointer( i->second._0, i->second._1, FLOAT, false, size, offset );
+		offset += i->second._1 * sizeof( f32 );
 	}
 }
 
@@ -186,7 +179,7 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
 	for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
 		pair = map.equal_range( pair.second->first ) )
 	{
-		set_attributes( attributes, set, pair.first, pair.second );
+		set_attributes( set, pair.first, pair.second );
 
 		if ( pair.second == end )
 			break;
