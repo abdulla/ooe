@@ -53,18 +53,18 @@ namespace
 		u32 reserved_2[ 3 ];
 	};
 
-	compressed_image::type dds_compressed_image_type( u32 fourcc )
+	image::type dds_compressed_image_type( u32 fourcc )
 	{
 		switch ( fourcc )
 		{
 		case OOE_FOURCC( 'D', 'X', 'T', '1' ):
-			return compressed_image::rgba_dxt1;
+			return image::rgba_dxt1;
 
 		case OOE_FOURCC( 'D', 'X', 'T', '3' ):
-			return compressed_image::rgba_dxt3;
+			return image::rgba_dxt3;
 
 		case OOE_FOURCC( 'D', 'X', 'T', '5' ):
-			return compressed_image::rgba_dxt5;
+			return image::rgba_dxt5;
 
 		default:
 			throw error::runtime( "dds: " ) << "Unsupported dxt version";
@@ -75,13 +75,13 @@ namespace
 	{
 		switch ( type )
 		{
-		case compressed_image::rgba_dxt1:
+		case image::rgba_dxt1:
 			return OOE_FOURCC( 'D', 'X', 'T', '1' );
 
-		case compressed_image::rgba_dxt3:
+		case image::rgba_dxt3:
 			return OOE_FOURCC( 'D', 'X', 'T', '3' );
 
-		case compressed_image::rgba_dxt5:
+		case image::rgba_dxt5:
 			return OOE_FOURCC( 'D', 'X', 'T', '5' );
 
 		default:
@@ -93,13 +93,13 @@ namespace
 	{
 		switch ( type )
 		{
-		case compressed_image::rgba_dxt1:
+		case image::rgba_dxt1:
 			return squish::kDxt1;
 
-		case compressed_image::rgba_dxt3:
+		case image::rgba_dxt3:
 			return squish::kDxt3;
 
-		case compressed_image::rgba_dxt5:
+		case image::rgba_dxt5:
 			return squish::kDxt5;
 
 		default:
@@ -134,7 +134,7 @@ namespace ooe
 		else if ( ~header.pixel_format.flags & dds_pixel_format::use_fourcc )
 			throw error::runtime( "dds: " ) << "Unsupported pixel format";
 
-		compressed_image::type type = dds_compressed_image_type( header.pixel_format.fourcc );
+		image::type type = dds_compressed_image_type( header.pixel_format.fourcc );
 		compressed_image image( header.width, header.height, type );
 		up_t byte_size = image.byte_size();
 
@@ -178,13 +178,13 @@ namespace ooe
 	{
 		using namespace squish;
 
-		uncompressed_image out( in.width, in.height, uncompressed_image::rgba_u8 );
+		uncompressed_image out( in.width, in.height, image::rgba_u8 );
 		u32 flags = dxt_version( in.format );
 		DecompressImage( out.as< u8 >(), in.width, in.height, in.as< u8 >(), flags );
 		return out;
 	}
 
-	compressed_image dxt::encode( const uncompressed_image& in, compressed_image::type type )
+	compressed_image dxt::encode( const uncompressed_image& in, image::type type )
 	{
 		using namespace squish;
 

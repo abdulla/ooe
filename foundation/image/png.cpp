@@ -50,21 +50,21 @@ namespace
 		static_cast< ooe::file* >( png_get_io_ptr( write_struct ) )->sync();
 	}
 
-	uncompressed_image::type png_image_type( u8 type )
+	image::type png_image_type( u8 type )
 	{
 		switch ( type )
 		{
 		case PNG_COLOR_TYPE_GRAY:
-			return uncompressed_image::y_u8;
+			return image::y_u8;
 
 		case PNG_COLOR_TYPE_GRAY_ALPHA:
-			return uncompressed_image::ya_u8;
+			return image::ya_u8;
 
 		case PNG_COLOR_TYPE_RGB:
-			return uncompressed_image::rgb_u8;
+			return image::rgb_u8;
 
 		case PNG_COLOR_TYPE_RGB_ALPHA:
-			return uncompressed_image::rgba_u8;
+			return image::rgba_u8;
 
 		default:
 			throw error::runtime( "png: " ) << "Unsupported colour type";
@@ -75,20 +75,20 @@ namespace
 	{
 		switch ( type )
 		{
-		case uncompressed_image::y_u8:
+		case image::y_u8:
 			return PNG_COLOR_TYPE_GRAY;
 
-		case uncompressed_image::ya_u8:
+		case image::ya_u8:
 			return PNG_COLOR_TYPE_GRAY_ALPHA;
 
-		case uncompressed_image::bgr_u8:
+		case image::bgr_u8:
 			png_set_bgr( write_struct );
-		case uncompressed_image::rgb_u8:
+		case image::rgb_u8:
 			return PNG_COLOR_TYPE_RGB;
 
-		case uncompressed_image::bgra_u8:
+		case image::bgra_u8:
 			png_set_bgr( write_struct );
-		case uncompressed_image::rgba_u8:
+		case image::rgba_u8:
 			return PNG_COLOR_TYPE_RGB_ALPHA;
 
 		default:

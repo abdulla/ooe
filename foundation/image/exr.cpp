@@ -81,7 +81,7 @@ namespace
 	}
 
 //--- format -------------------------------------------------------------------
-	uncompressed_image::type exr_image_type( const ChannelList& channels, PixelType type )
+	image::type exr_image_type( const ChannelList& channels, PixelType type )
 	{
 		std::string format;
 		format.reserve( 4 );
@@ -98,15 +98,15 @@ namespace
 		}
 
 		if ( format == "BGR" )
-			return type == HALF ? uncompressed_image::rgb_f16 : uncompressed_image::rgb_f32;
+			return type == HALF ? image::rgb_f16 : image::rgb_f32;
 		else if ( format == "ABGR" )
-			return type == HALF ? uncompressed_image::rgba_f16 : uncompressed_image::rgba_f32;
+			return type == HALF ? image::rgba_f16 : image::rgba_f32;
 		else if ( format == "A" )
-			return type == HALF ? uncompressed_image::a_f16 : uncompressed_image::a_f32;
+			return type == HALF ? image::a_f16 : image::a_f32;
 		else if ( format == "Y" )
-			return type == HALF ? uncompressed_image::y_f16 : uncompressed_image::y_f32;
+			return type == HALF ? image::y_f16 : image::y_f32;
 		else if ( format == "AY" )
-			return type == HALF ? uncompressed_image::ya_f16 : uncompressed_image::ya_f32;
+			return type == HALF ? image::ya_f16 : image::ya_f32;
 		else
 			throw error::runtime( "exr: " ) << "Unknown format: " << format;
 	}

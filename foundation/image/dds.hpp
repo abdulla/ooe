@@ -19,7 +19,7 @@ namespace ooe
 	namespace dxt
 	{
 		uncompressed_image decode( const compressed_image& ) OOE_VISIBLE;
-		compressed_image encode( const uncompressed_image&, compressed_image::type ) OOE_VISIBLE;
+		compressed_image encode( const uncompressed_image&, image::type ) OOE_VISIBLE;
 	}
 }
 

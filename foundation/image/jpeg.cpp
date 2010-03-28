@@ -99,15 +99,15 @@ namespace
 	}
 
 	//--- image format functions -----------------------------------------------
-	uncompressed_image::type jpeg_image_type( J_COLOR_SPACE colour_space )
+	image::type jpeg_image_type( J_COLOR_SPACE colour_space )
 	{
 		switch ( colour_space )
 		{
 		case JCS_GRAYSCALE:
-			return uncompressed_image::y_u8;
+			return image::y_u8;
 
 		case JCS_RGB:
-			return uncompressed_image::rgb_u8;
+			return image::rgb_u8;
 
 		default:
 			throw error::runtime( "jpeg: " ) << "Unsupported colour type";
@@ -118,10 +118,10 @@ namespace
 	{
 		switch ( type )
 		{
-		case uncompressed_image::y_u8:
+		case image::y_u8:
 			return JCS_GRAYSCALE;
 
-		case uncompressed_image::rgb_u8:
+		case image::rgb_u8:
 			return JCS_RGB;
 
 		default:
@@ -131,10 +131,10 @@ namespace
 
 	uncompressed_image jpeg_swap_br( const uncompressed_image& in )
 	{
-		if ( in.format != uncompressed_image::bgr_u8 )
+		if ( in.format != image::bgr_u8 )
 			return in;
 
-		uncompressed_image out( in.width, in.height, uncompressed_image::rgb_u8 );
+		uncompressed_image out( in.width, in.height, image::rgb_u8 );
 		u8* begin_i = in.as< u8 >();
 		u8* begin_o = out.as< u8 >();
 
@@ -194,7 +194,7 @@ namespace ooe
 		jpeg_read_header( &read_struct, true );
 		jpeg_start_decompress( &read_struct );
 
-		uncompressed_image::type type = jpeg_image_type( read_struct.out_color_space );
+		image::type type = jpeg_image_type( read_struct.out_color_space );
 		uncompressed_image image( read_struct.output_width, read_struct.output_height, type );
 		scoped_image.assign( destruct< uncompressed_image >, &image );
 

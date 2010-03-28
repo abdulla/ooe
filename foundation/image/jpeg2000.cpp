@@ -19,23 +19,23 @@ namespace
 		OOE_WARNING( "jpeg2000", "Warning: " << message );
 	}
 
-	uncompressed_image::type jpeg2000_image_type( OPJ_COLOR_SPACE colour_space, u8 channels )
+	image::type jpeg2000_image_type( OPJ_COLOR_SPACE colour_space, u8 channels )
 	{
 		switch ( colour_space )
 		{
 		case CLRSPC_GRAY:
 			if ( channels == 1 )
-				return uncompressed_image::y_u8;
+				return image::y_u8;
 			else if ( channels == 2 )
-				return uncompressed_image::ya_u8;
+				return image::ya_u8;
 			else
 				break;
 
 		case CLRSPC_SRGB:
 			if ( channels == 3 )
-				return uncompressed_image::rgb_u8;
+				return image::rgb_u8;
 			else if ( channels == 4 )
-				return uncompressed_image::rgba_u8;
+				return image::rgba_u8;
 			else
 		default:
 				break;
@@ -48,12 +48,12 @@ namespace
 	{
 		switch ( type )
 		{
-		case uncompressed_image::y_u8:
-		case uncompressed_image::ya_u8:
+		case image::y_u8:
+		case image::ya_u8:
 			return CLRSPC_GRAY;
 
-		case uncompressed_image::rgb_u8:
-		case uncompressed_image::rgba_u8:
+		case image::rgb_u8:
+		case image::rgba_u8:
 			return CLRSPC_SRGB;
 
 		default:
@@ -101,7 +101,7 @@ namespace ooe
 		u32 width = image->x1 - image->x0;
 		u32 height = image->y1 - image->y0;
 		u32 length = width * height;
-		uncompressed_image::type type = jpeg2000_image_type( image->color_space, image->numcomps );
+		image::type type = jpeg2000_image_type( image->color_space, image->numcomps );
 		uncompressed_image out( width, height, type );
 
 		for ( s32 i = 0; i != image->numcomps; ++i )
