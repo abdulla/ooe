@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <cstring>
+
 #include "foundation/executable/environment.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
@@ -115,10 +117,12 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
+	uncompressed_image image( 256, 256, image::y_u8 );
+	std::memset( image.get(), 0, image.byte_size() );
 	font::library font_library;
-	font::face face( font_library, descriptor( root + "../resource/font/vera.ttf" ), 64 );
-	font::bitmap bitmap = face.character( 'a' );
-	texture_type texture = device->texture( image_pyramid( 64, 64, image::a_u8 ) );
+	font::face face( font_library, descriptor( root + "../resource/font/vera.ttf" ), image.width );
+	font::bitmap bitmap = face.character( '@' );
+	texture_type texture = device->texture( image_pyramid( image ) );
 	texture->write( bitmap.image, 0, 0 );
 
 	shader_type vertex = device->shader( source( root, "null.vs" ), shader::vertex );
@@ -137,25 +141,25 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		value[ 0 ] = -1;
 		value[ 1 ] = 1;
 		value[ 2 ] = 0;
-		value[ 3 ] = 1;
+		value[ 3 ] = 0;
 
 		// bottom left
 		value[ 4 ] = -1;
 		value[ 5 ] = -1;
 		value[ 6 ] = 0;
-		value[ 7 ] = 0;
+		value[ 7 ] = 1;
 
 		// top right
 		value[ 8 ] = 1;
 		value[ 9 ] = 1;
 		value[ 10 ] = 1;
-		value[ 11 ] = 1;
+		value[ 11 ] = 0;
 
 		// bottom right
 		value[ 12 ] = 1;
 		value[ 13 ] = -1;
 		value[ 14 ] = 1;
-		value[ 15 ] = 0;
+		value[ 15 ] = 1;
 	}
 
 	buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
