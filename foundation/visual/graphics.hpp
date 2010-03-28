@@ -165,7 +165,14 @@ typedef shared_ptr< program > program_type;
 //--- device ---------------------------------------------------------------------------------------
 struct device
 {
+	enum set_type
+	{
+		alpha_test,
+		depth_test
+	};
+
 	virtual ~device( void ) {}
+	virtual void set( set_type, bool ) = 0;
 	virtual void draw( const block_type&, const frame_type& ) = 0;
 	virtual void swap( void ) = 0;
 

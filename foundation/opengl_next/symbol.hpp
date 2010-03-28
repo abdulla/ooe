@@ -15,6 +15,9 @@ enum
 {
 	TRIANGLES					= 0x0004,
 
+	ALPHA_TEST					= 0x0BC0,
+	DEPTH_TEST					= 0x0B71,
+
 	UNPACK_ALIGNMENT			= 0x0CF5,
 	PACK_ALIGNMENT				= 0x0D05,
 
@@ -104,6 +107,8 @@ enum
 
 //--- typedefs -------------------------------------------------------------------------------------
 typedef const c8* ( GetString_t )( u32 );
+typedef void ( Enable_t )( u32 );
+typedef void ( Disable_t )( u32 );
 typedef void ( Clear_t )( u32 );
 typedef void ( PixelStorei_t )( u32, s32 );
 
@@ -172,6 +177,8 @@ typedef void ( DrawElements_t )( u32, s32, u32, const void* );
 
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
+extern Enable_t* Enable;
+extern Disable_t* Disable;
 extern Clear_t* Clear;
 extern PixelStorei_t* PixelStorei;
 

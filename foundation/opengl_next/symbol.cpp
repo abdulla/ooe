@@ -19,6 +19,8 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 void load_symbols( void )
 {
 	GetString = find< GetString_t >( "glGetString" );
+	Enable = find< Enable_t >( "glEnable" );
+	Disable = find< Disable_t >( "glDisable" );
 	Clear = find< Clear_t >( "glClear" );
 	PixelStorei = find< PixelStorei_t >( "glPixelStorei" );
 
@@ -90,6 +92,8 @@ void load_symbols( void )
 
 //--- functions ------------------------------------------------------------------------------------
 GetString_t* GetString;
+Enable_t* Enable;
+Disable_t* Disable;
 Clear_t* Clear;
 PixelStorei_t* PixelStorei;
 

@@ -18,9 +18,9 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-typedef std::set< s32 > set_type;
+typedef std::set< s32 > attribute_set;
 
-void set_attributes( set_type& set, const opengl::block::buffer_map::const_iterator begin,
+void set_attributes( attribute_set& set, const opengl::block::buffer_map::const_iterator begin,
 	const opengl::block::buffer_map::const_iterator end )
 {
 	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *begin->first );
@@ -41,27 +41,27 @@ void set_attributes( set_type& set, const opengl::block::buffer_map::const_itera
 	}
 }
 
-void enable_attributes( set_type& x, set_type& y )
+void enable_attributes( attribute_set& x, attribute_set& y )
 {
-	typedef std::vector< s32 > vector_type;
-	typedef std::insert_iterator< vector_type > inserter;
-	vector_type v;
+	typedef std::vector< s32 > attributes_vector;
+	typedef std::insert_iterator< attributes_vector > inserter;
+	attributes_vector v;
 	std::set_difference( x.begin(), x.end(), y.begin(), y.end(), inserter( v, v.begin() ) );
 
-	for ( vector_type::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+	for ( attributes_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
 		DisableVertexAttribArray( *i );
 
 	v.clear();
 	std::set_difference( y.begin(), y.end(), x.begin(), x.end(), inserter( v, v.begin() ) );
 
-	for ( vector_type::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+	for ( attributes_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
 		EnableVertexAttribArray( *i );
 
 	x.swap( y );
 }
 
 template< typename type >
-	void set_frame( const type& in, set_type& out )
+	void set_frame( const type& in, attribute_set& out )
 {
 	for ( typename type::const_iterator i = in.begin(), end = in.end(); i != end; ++i )
 		out.insert( i->first );
@@ -76,7 +76,7 @@ void enable_frame( const frame_type& generic_frame )
 	}
 
 	opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
-	set_type set;
+	attribute_set set;
 	set_frame( frame.textures, set );
 	set_frame( frame.targets, set );
 	std::vector< u32 > vector( set.begin(), set.end() );
@@ -109,6 +109,7 @@ public:
 	device( const ooe::view_data& );
 	virtual ~device( void );
 
+	virtual void set( set_type, bool );
 	virtual void draw( const block_type&, const frame_type& );
 	virtual void swap( void );
 
@@ -122,7 +123,7 @@ public:
 private:
 	const view_data& view;
 	platform::context_type context;
-	set_type attributes;
+	attribute_set attributes;
 };
 
 device::device( const ooe::view_data& view_ )
@@ -145,6 +146,30 @@ device::~device( void )
 {
 	context_current( view, 0 );
 	context_destruct( view, context );
+}
+
+void device::set( set_type type, bool enable )
+{
+	u32 value;
+
+	switch ( type )
+	{
+	case alpha_test:
+		value = ALPHA_TEST;
+		break;
+
+	case depth_test:
+		value = DEPTH_TEST;
+		break;
+
+	default:
+		throw error::runtime( "opengl::device: " ) << "Unknown set type: " << type;
+	}
+
+	if ( enable )
+		Enable( value );
+	else
+		Disable( value );
 }
 
 void device::draw( const block_type& generic_block, const frame_type& frame )
@@ -174,18 +199,18 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
 	typedef block::buffer_map::const_iterator buffer_iterator;
 	typedef std::pair< buffer_iterator, buffer_iterator > buffer_pair;
 	buffer_iterator end = map.end();
-	set_type set;
+	attribute_set enable_set;
 
 	for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
 		pair = map.equal_range( pair.second->first ) )
 	{
-		set_attributes( set, pair.first, pair.second );
+		set_attributes( enable_set, pair.first, pair.second );
 
 		if ( pair.second == end )
 			break;
 	}
 
-	enable_attributes( attributes, set );
+	enable_attributes( attributes, enable_set );
 	enable_frame( frame );
 
 	opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
