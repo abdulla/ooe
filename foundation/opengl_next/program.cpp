@@ -30,6 +30,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- program --------------------------------------------------------------------------------------
 program::program( const shader_vector& vector )
+try
 	: id ( CreateProgram() )
 {
 	for ( shader_vector::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
@@ -40,6 +41,10 @@ program::program( const shader_vector& vector )
 
 	ValidateProgram( id );
 	check_status( id, VALIDATE_STATUS, "Validate" );
+}
+catch ( ... )
+{
+	this->~program();
 }
 
 program::~program( void )

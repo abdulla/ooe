@@ -15,14 +15,15 @@ public:
 	const u32 width;
 	const u32 height;
 
-	texture( const image_pyramid& );
+	texture( const image_pyramid&, bool );
 	virtual ~texture( void );
-
-	void verify( const image&, u32, u32, u8 ) const;
 
 protected:
 	const image::type format;
 	const u32 levels;
+	const bool generate_mipmap;
+
+	void verify( const image&, u32, u32, u8 ) const;
 };
 
 class compressed_texture
