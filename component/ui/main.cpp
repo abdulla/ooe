@@ -117,13 +117,14 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
-	uncompressed_image image( 256, 256, image::y_u8 );
+	uncompressed_image image( 256, 256, image::a_u8 );
 	std::memset( image.get(), 0, image.byte_size() );
 	font::library font_library;
 	font::face face( font_library, descriptor( root + "../resource/font/vera.ttf" ), image.width );
 	font::bitmap bitmap = face.character( '@' );
 	texture_type texture = device->texture( image_pyramid( image ) );
 	texture->write( bitmap.image, 0, 0 );
+	device->set( device::blend, true );
 
 	shader_type vertex = device->shader( source( root, "null.vs" ), shader::vertex );
 	shader_type fragment = device->shader( source( root, "null.fs" ), shader::fragment );
