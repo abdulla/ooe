@@ -15,8 +15,11 @@ enum
 {
 	TRIANGLES					= 0x0004,
 
-	ALPHA_TEST					= 0x0BC0,
+	SRC_ALPHA					= 0x0302,
+	ONE_MINUS_SRC_ALPHA			= 0x0303,
+
 	DEPTH_TEST					= 0x0B71,
+	BLEND						= 0x0BE2,
 
 	UNPACK_ALIGNMENT			= 0x0CF5,
 	PACK_ALIGNMENT				= 0x0D05,
@@ -44,6 +47,8 @@ enum
 
 	TEXTURE_MAG_FILTER			= 0x2800,
 	TEXTURE_MIN_FILTER			= 0x2801,
+	TEXTURE_WRAP_S				= 0x2802,
+	TEXTURE_WRAP_T				= 0x2803,
 
 	ALPHA8						= 0x803C,
 	LUMINANCE8					= 0x8040,
@@ -56,6 +61,7 @@ enum
 
 	DEPTH_COMPONENT24			= 0x81A6,
 
+	CLAMP_TO_EDGE				= 0x812F,
 	TEXTURE_MAX_LEVEL			= 0x813D,
 
 	COMPRESSED_RGBA_S3TC_DXT1	= 0x83F1,
@@ -109,8 +115,9 @@ enum
 typedef const c8* ( GetString_t )( u32 );
 typedef void ( Enable_t )( u32 );
 typedef void ( Disable_t )( u32 );
-typedef void ( Clear_t )( u32 );
+typedef void ( BlendFunc_t )( u32, u32 );
 typedef void ( PixelStorei_t )( u32, s32 );
+typedef void ( Clear_t )( u32 );
 
 typedef void ( GenTextures_t )( s32, u32* );
 typedef void ( DeleteTextures_t )( s32, const u32* );
@@ -179,8 +186,9 @@ typedef void ( DrawElements_t )( u32, s32, u32, const void* );
 extern GetString_t* GetString;
 extern Enable_t* Enable;
 extern Disable_t* Disable;
-extern Clear_t* Clear;
+extern BlendFunc_t* BlendFunc;
 extern PixelStorei_t* PixelStorei;
+extern Clear_t* Clear;
 
 extern GenTextures_t* GenTextures;
 extern DeleteTextures_t* DeleteTextures;

@@ -21,8 +21,9 @@ void load_symbols( void )
 	GetString = find< GetString_t >( "glGetString" );
 	Enable = find< Enable_t >( "glEnable" );
 	Disable = find< Disable_t >( "glDisable" );
-	Clear = find< Clear_t >( "glClear" );
+	BlendFunc = find< BlendFunc_t >( "glBlendFunc" );
 	PixelStorei = find< PixelStorei_t >( "glPixelStorei" );
+	Clear = find< Clear_t >( "glClear" );
 
 	GenTextures = find< GenTextures_t >( "glGenTextures" );
 	DeleteTextures = find< DeleteTextures_t >( "glDeleteTextures" );
@@ -94,8 +95,9 @@ void load_symbols( void )
 GetString_t* GetString;
 Enable_t* Enable;
 Disable_t* Disable;
-Clear_t* Clear;
+BlendFunc_t* BlendFunc;
 PixelStorei_t* PixelStorei;
+Clear_t* Clear;
 
 GenTextures_t* GenTextures;
 DeleteTextures_t* DeleteTextures;
