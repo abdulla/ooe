@@ -7,19 +7,6 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/view.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
-
-void context_multithread( platform::context_type nsgl, bool enable )
-{
-	CGLError ( * cgl_set )( CGLContextObj, CGLContextEnable ) = enable ? CGLEnable : CGLDisable;
-	CGLContextObj cgl = static_cast< CGLContextObj >( nsgl.CGLContextObj );
-
-	if ( cgl_set( cgl, kCGLCEMPEngine ) )
-		throw error::runtime( "opengl: " ) << "Unable to set multi-threaded execution";
-}
-
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
-
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 platform::context_type context_construct( const ooe::view_data& view )
@@ -48,6 +35,8 @@ platform::context_type context_construct( const ooe::view_data& view )
 
 	if ( !nsgl )
 		throw error::runtime( "opengl: " ) << "Unable to create context";
+	else if ( CGLEnable( static_cast< CGLContextObj >( nsgl.CGLContextObj ), kCGLCEMPEngine ) )
+		throw error::runtime( "opengl: " ) << "Unable to enable multi-threaded execution";
 
 	if ( view.window )
 		[ nsgl setView: view.window.contentView ];
@@ -69,7 +58,6 @@ void context_current( const ooe::view_data&, platform::context_type nsgl )
 
 void context_sync( const ooe::view_data&, platform::context_type nsgl, bool vsync )
 {
-	context_multithread( nsgl, !vsync );
 	const s32 value = vsync;
 	[ nsgl setValues: &value forParameter: NSOpenGLCPSwapInterval ];
 }
