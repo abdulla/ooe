@@ -7,12 +7,23 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+//--- physical_source ------------------------------------------------------------------------------
+struct physical_source
+{
+	typedef tuple< u32, u32 > size_tuple;
+
+	virtual size_tuple size( void ) const = 0;
+	virtual image read( u32, u32, u8 ) = 0;
+};
+
+//--- virtual_texture ------------------------------------------------------------------------------
 class virtual_texture
 {
 public:
-	virtual_texture( void );
+	virtual_texture( physical_source& );
 
 private:
+	physical_source& source;
 	texture_type page_table;
 	texture_type page_cache;
 };
