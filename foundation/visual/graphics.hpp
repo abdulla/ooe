@@ -167,6 +167,7 @@ struct device
 {
 	enum set_type
 	{
+		blend,
 		alpha_test,
 		depth_test
 	};

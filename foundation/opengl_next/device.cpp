@@ -134,6 +134,7 @@ try
 	context_sync( view, context, true );
 	load_symbols();
 
+	BlendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
 	PixelStorei( PACK_ALIGNMENT, 1 );
 	PixelStorei( UNPACK_ALIGNMENT, 1 );
 }
@@ -154,12 +155,12 @@ void device::set( set_type type, bool enable )
 
 	switch ( type )
 	{
-	case alpha_test:
-		value = ALPHA_TEST;
-		break;
-
 	case depth_test:
 		value = DEPTH_TEST;
+		break;
+
+	case blend:
+		value = BLEND;
 		break;
 
 	default:
