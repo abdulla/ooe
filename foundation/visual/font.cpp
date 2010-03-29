@@ -52,7 +52,7 @@ bitmap face::character( up_t char_code )
 		throw error::runtime( "font::face: " ) << "Unable to load character " << hex( char_code );
 
 	FT_GlyphSlot glyph = face_->glyph;
-	uncompressed_image image( glyph->bitmap.width, glyph->bitmap.rows, image::y_u8 );
+	uncompressed_image image( glyph->bitmap.width, glyph->bitmap.rows, image::a_u8 );
 	std::memcpy( image.get(), glyph->bitmap.buffer, image.byte_size() );
 
 	return bitmap( glyph->bitmap_left, glyph->bitmap_top,
