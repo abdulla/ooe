@@ -124,6 +124,8 @@ void set_filter( ooe::texture::type filter )
 
 	TexParameteri( TEXTURE_2D, TEXTURE_MIN_FILTER, min_filter );
 	TexParameteri( TEXTURE_2D, TEXTURE_MAG_FILTER, mag_filter );
+	TexParameteri( TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE );
+	TexParameteri( TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE );
 }
 
 //--- set_levels -----------------------------------------------------------------------------------
