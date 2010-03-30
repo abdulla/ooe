@@ -93,6 +93,31 @@ template< typename target, typename source >
 	return out;
 }
 
+void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height )
+{
+	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
+	BindFramebuffer( READ_FRAMEBUFFER, input.id );
+	BindFramebuffer( DRAW_FRAMEBUFFER, id );
+	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
+		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
+}
+
+void frame_read
+	( buffer_type& generic_buffer, image::type format, s32 id, u32 target, u32 width, u32 height )
+{
+	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
+
+	if ( buffer.target != PIXEL_PACK_BUFFER )
+		throw error::runtime( "opengl::frame: " ) << "Pixel buffer expected";
+
+	BindFramebuffer( READ_FRAMEBUFFER, id );
+	ReadBuffer( target );
+
+	format_tuple tuple = frame_format( format );
+	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
+	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
+}
+
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -109,26 +134,12 @@ default_frame::~default_frame( void )
 
 void default_frame::write( const frame_type& generic_frame )
 {
-	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
-	BindFramebuffer( READ_FRAMEBUFFER, input.id );
-	BindFramebuffer( DRAW_FRAMEBUFFER, 0 );
-	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
-		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
+	frame_write( generic_frame, 0, width, height );
 }
 
 void default_frame::read( buffer_type& generic_buffer, image::type format )
 {
-	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
-
-	if ( buffer.target != PIXEL_PACK_BUFFER )
-		throw error::runtime( "opengl::frame: " ) << "Pixel buffer expected";
-
-	BindFramebuffer( READ_FRAMEBUFFER, 0 );
-	ReadBuffer( FRONT );
-
-	format_tuple tuple = frame_format( format );
-	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
-	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
+	frame_read( generic_buffer, format, 0, FRONT, width, height );
 }
 
 void default_frame::output( attachment_type, const texture_type& )
@@ -155,26 +166,12 @@ frame::~frame( void )
 
 void frame::write( const frame_type& generic_frame )
 {
-	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
-	BindFramebuffer( READ_FRAMEBUFFER, input.id );
-	BindFramebuffer( DRAW_FRAMEBUFFER, id );
-	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
-		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
+	frame_write( generic_frame, id, width, height );
 }
 
 void frame::read( buffer_type& generic_buffer, image::type format )
 {
-	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
-
-	if ( buffer.target != PIXEL_PACK_BUFFER )
-		throw error::runtime( "opengl::frame: " ) << "Pixel buffer expected";
-
-	BindFramebuffer( READ_FRAMEBUFFER, id );
-	ReadBuffer( COLOR_ATTACHMENT0 );
-
-	format_tuple tuple = frame_format( format );
-	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
-	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
+	frame_read( generic_buffer, format, id, COLOR_ATTACHMENT0, width, height );
 }
 
 void frame::output( attachment_type type, const texture_type& generic_texture )
