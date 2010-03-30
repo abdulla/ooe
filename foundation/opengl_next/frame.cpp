@@ -106,11 +106,11 @@ void frame_check( bool& check )
 	check = false;
 }
 
-void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height, bool& check )
+void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height )
 {
 	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
 	BindFramebuffer( READ_FRAMEBUFFER, input.id );
-	frame_check( check );
+	frame_check( input.check );
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
 
 	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
@@ -156,8 +156,7 @@ default_frame::~default_frame( void )
 
 void default_frame::write( const frame_type& generic_frame )
 {
-	bool check = false;
-	frame_write( generic_frame, 0, width, height, check );
+	frame_write( generic_frame, 0, width, height );
 }
 
 void default_frame::read( buffer_type& generic_buffer, image::type format )
@@ -190,7 +189,7 @@ frame::~frame( void )
 
 void frame::write( const frame_type& generic_frame )
 {
-	frame_write( generic_frame, id, width, height, check );
+	frame_write( generic_frame, id, width, height );
 }
 
 void frame::read( buffer_type& generic_buffer, image::type format )
