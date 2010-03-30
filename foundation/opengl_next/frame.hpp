@@ -3,8 +3,6 @@
 #ifndef OOE_FOUNDATION_OPENGL_NEXT_FRAME_HPP
 #define OOE_FOUNDATION_OPENGL_NEXT_FRAME_HPP
 
-#include <map>
-
 #include "foundation/visual/graphics.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -29,15 +27,13 @@ struct frame
 	: public ooe::frame
 {
 public:
-	typedef std::map< s32, texture_type > texture_map;
-	typedef std::map< s32, target_type > target_map;
+	typedef std::vector< u32 > colour_vector;
 
 	const u32 id;
 	const u32 width;
 	const u32 height;
 	bool check;
-	texture_map textures;
-	target_map targets;
+	colour_vector colours;
 
 	frame( u32, u32, u32 );
 	virtual ~frame( void );
@@ -48,7 +44,6 @@ public:
 
 private:
 	const u32 program;
-	u32 colour_index;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

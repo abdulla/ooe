@@ -25,12 +25,14 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 	return location;
 }*/
 
-s32 frame_attachment( ooe::frame::attachment_type attachment, u32& colour_index )
+u32 frame_attachment
+	( ooe::frame::attachment_type attachment, opengl::frame::colour_vector& colours )
 {
 	switch ( attachment )
 	{
 	case ooe::frame::colour:
-		return COLOR_ATTACHMENT0 + colour_index++;
+		colours.push_back( COLOR_ATTACHMENT0 + colours.size() );
+		return colours.back();
 
 	case ooe::frame::depth:
 		return DEPTH_ATTACHMENT;
@@ -87,8 +89,7 @@ void default_frame::output( attachment_type, const target_type& )
 
 //--- frame ----------------------------------------------------------------------------------------
 frame::frame( u32 program_, u32 width_, u32 height_ )
-	: id(), width( width_ ), height( height_ ), check( true ), textures(), targets(),
-	program( program_ ), colour_index( 0 )
+	: id(), width( width_ ), height( height_ ), check( true ), colours(), program( program_ )
 {
 	GenFramebuffers( 1, const_cast< u32* >( &id ) );
 }
@@ -110,8 +111,7 @@ void frame::write( const frame_type& generic_frame )
 void frame::output( attachment_type type, const texture_type& generic_texture )
 {
 	const opengl::texture& texture = verify< opengl::texture >( *generic_texture, width, height );
-	s32 attachment = frame_attachment( type, colour_index );
-	textures[ attachment ] = generic_texture;
+	u32 attachment = frame_attachment( type, colours );
 	check = true;
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
@@ -121,8 +121,7 @@ void frame::output( attachment_type type, const texture_type& generic_texture )
 void frame::output( attachment_type type, const target_type& generic_target )
 {
 	const opengl::target& target = verify< opengl::target >( *generic_target, width, height );
-	s32 attachment = frame_attachment( type, colour_index );
-	targets[ attachment ] = generic_target;
+	u32 attachment = frame_attachment( type, colours );
 	check = true;
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );

@@ -60,13 +60,6 @@ void enable_attributes( attribute_set& x, attribute_set& y )
 	x.swap( y );
 }
 
-template< typename type >
-	void set_frame( const type& in, attribute_set& out )
-{
-	for ( typename type::const_iterator i = in.begin(), end = in.end(); i != end; ++i )
-		out.insert( i->first );
-}
-
 void enable_frame( const frame_type& generic_frame )
 {
 	if ( dynamic_cast< opengl::default_frame* >( generic_frame.get() ) )
@@ -76,13 +69,8 @@ void enable_frame( const frame_type& generic_frame )
 	}
 
 	opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
-	attribute_set set;
-	set_frame( frame.textures, set );
-	set_frame( frame.targets, set );
-	std::vector< u32 > vector( set.begin(), set.end() );
-
 	BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
-	DrawBuffers( vector.size(), &vector[ 0 ] );
+	DrawBuffers( frame.colours.size(), &frame.colours[ 0 ] );
 
 	if ( frame.check )
 	{

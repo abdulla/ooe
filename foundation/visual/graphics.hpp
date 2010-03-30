@@ -167,9 +167,8 @@ struct device
 {
 	enum set_type
 	{
-		blend,
-		alpha_test,
-		depth_test
+		depth_test,
+		blend
 	};
 
 	virtual ~device( void ) {}
