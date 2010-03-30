@@ -9,7 +9,7 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-typedef tuple< u32, u32 > format_tuple;
+typedef tuple< u32, u32, u8 > format_tuple;
 
 // use with EXT_gpu_shader4 or GL_ARB_explicit_attrib_location
 /*s32 find( s32 id, opengl::frame::location_map& locations, const std::string& name )
@@ -50,31 +50,31 @@ format_tuple frame_format( image::type format )
 	switch ( format )
 	{
 	case image::bgr_u8:
-		return format_tuple( BGR, UNSIGNED_BYTE );
+		return format_tuple( BGR, UNSIGNED_BYTE, 3 );
 
 	case image::bgra_u8:
-		return format_tuple( BGRA, UNSIGNED_BYTE );
+		return format_tuple( BGRA, UNSIGNED_BYTE, 4 );
 
 	//--- u8 -------------------------------------------------------------------
 	case image::rgb_u8:
-		return format_tuple( RGB, UNSIGNED_BYTE );
+		return format_tuple( RGB, UNSIGNED_BYTE, 3 );
 
 	case image::rgba_u8:
-		return format_tuple( RGBA, UNSIGNED_BYTE );
+		return format_tuple( RGBA, UNSIGNED_BYTE, 4 );
 
 	//--- f16 ------------------------------------------------------------------
 	case image::rgb_f16:
-		return format_tuple( RGB, HALF_FLOAT );
+		return format_tuple( RGB, HALF_FLOAT, 6 );
 
 	case image::rgba_f16:
-		return format_tuple( RGBA, HALF_FLOAT );
+		return format_tuple( RGBA, HALF_FLOAT, 8 );
 
 	//--- f32 ------------------------------------------------------------------
 	case image::rgb_f32:
-		return format_tuple( RGB, FLOAT );
+		return format_tuple( RGB, FLOAT, 12 );
 
 	case image::rgba_f32:
-		return format_tuple( RGBA, FLOAT );
+		return format_tuple( RGBA, FLOAT, 16 );
 
 	default:
 		throw error::runtime( "opengl::frame: " ) << "Unknown frame format: " << format;
@@ -110,10 +110,16 @@ void frame_read
 	if ( buffer.target != PIXEL_PACK_BUFFER )
 		throw error::runtime( "opengl::frame: " ) << "Pixel buffer expected";
 
+	format_tuple tuple = frame_format( format );
+	up_t size = tuple._2 * width * height;
+
+	if ( size > buffer.size )
+		throw error::runtime( "opengl::frame: " ) <<
+			"Pixel buffer size " << buffer.size << " < " << size;
+
 	BindFramebuffer( READ_FRAMEBUFFER, id );
 	ReadBuffer( target );
 
-	format_tuple tuple = frame_format( format );
 	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
 	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
