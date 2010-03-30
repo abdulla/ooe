@@ -1,5 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include "foundation/opengl_next/buffer.hpp"
 #include "foundation/opengl_next/frame.hpp"
 #include "foundation/opengl_next/symbol.hpp"
 #include "foundation/opengl_next/target.hpp"
@@ -7,6 +8,8 @@
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+
+typedef tuple< u32, u32 > format_tuple;
 
 // use with EXT_gpu_shader4 or GL_ARB_explicit_attrib_location
 /*s32 find( s32 id, opengl::frame::location_map& locations, const std::string& name )
@@ -39,6 +42,42 @@ u32 frame_attachment
 
 	default:
 		throw error::runtime( "opengl::frame: " ) << "Unknown attachment type: " << attachment;
+	}
+}
+
+format_tuple frame_format( image::type format )
+{
+	switch ( format )
+	{
+	case image::bgr_u8:
+		return format_tuple( BGR, UNSIGNED_BYTE );
+
+	case image::bgra_u8:
+		return format_tuple( BGRA, UNSIGNED_BYTE );
+
+	//--- u8 -------------------------------------------------------------------
+	case image::rgb_u8:
+		return format_tuple( RGB, UNSIGNED_BYTE );
+
+	case image::rgba_u8:
+		return format_tuple( RGBA, UNSIGNED_BYTE );
+
+	//--- f16 ------------------------------------------------------------------
+	case image::rgb_f16:
+		return format_tuple( RGB, HALF_FLOAT );
+
+	case image::rgba_f16:
+		return format_tuple( RGBA, HALF_FLOAT );
+
+	//--- f32 ------------------------------------------------------------------
+	case image::rgb_f32:
+		return format_tuple( RGB, FLOAT );
+
+	case image::rgba_f32:
+		return format_tuple( RGBA, FLOAT );
+
+	default:
+		throw error::runtime( "opengl::frame: " ) << "Unknown frame format: " << format;
 	}
 }
 
@@ -77,6 +116,21 @@ void default_frame::write( const frame_type& generic_frame )
 		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
 }
 
+void default_frame::read( buffer_type& generic_buffer, image::type format )
+{
+	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
+
+	if ( buffer.target != PIXEL_PACK_BUFFER )
+		throw error::runtime( "opengl::frame: " ) << "Pixel buffer expected";
+
+	BindFramebuffer( READ_FRAMEBUFFER, 0 );
+	ReadBuffer( FRONT );
+
+	format_tuple tuple = frame_format( format );
+	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
+	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
+}
+
 void default_frame::output( attachment_type, const texture_type& )
 {
 	throw error::runtime( "opengl::default_frame: " ) << "Can not attach to default frame";
@@ -106,6 +160,21 @@ void frame::write( const frame_type& generic_frame )
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
 	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
 		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
+}
+
+void frame::read( buffer_type& generic_buffer, image::type format )
+{
+	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
+
+	if ( buffer.target != PIXEL_PACK_BUFFER )
+		throw error::runtime( "opengl::frame: " ) << "Pixel buffer expected";
+
+	BindFramebuffer( READ_FRAMEBUFFER, id );
+	ReadBuffer( COLOR_ATTACHMENT0 );
+
+	format_tuple tuple = frame_format( format );
+	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
+	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
 
 void frame::output( attachment_type type, const texture_type& generic_texture )
