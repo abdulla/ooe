@@ -46,8 +46,7 @@ u32 target_format( u8 format )
 
 	//--------------------------------------------------------------------------
 	default:
-		throw error::runtime( "opengl::texture: " ) <<
-			"Unknown uncompressed image format: " << format;
+		throw error::runtime( "opengl::texture: " ) << "Unknown image format: " << format;
 	}
 }
 
