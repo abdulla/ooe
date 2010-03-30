@@ -18,6 +18,8 @@ enum
 	SRC_ALPHA					= 0x0302,
 	ONE_MINUS_SRC_ALPHA			= 0x0303,
 
+	FRONT						= 0x0404,
+
 	DEPTH_TEST					= 0x0B71,
 	BLEND						= 0x0BE2,
 
@@ -175,6 +177,8 @@ typedef void ( BlitFramebuffer_t )( s32, s32, s32, s32, s32, s32, s32, s32, u32,
 typedef void ( FramebufferTexture2D_t )( u32, u32, u32, u32, s32 );
 typedef void ( FramebufferRenderbuffer_t )( u32, u32, u32, u32 );
 typedef u32 ( CheckFramebufferStatus_t )( u32 );
+typedef void ( ReadBuffer_t )( u32 );
+typedef void ( ReadPixels_t )( s32, s32, s32, s32, u32, u32, const void* );
 
 typedef void ( EnableVertexAttribArray_t )( u32 );
 typedef void ( DisableVertexAttribArray_t )( u32 );
@@ -246,6 +250,8 @@ extern BlitFramebuffer_t* BlitFramebuffer;
 extern FramebufferTexture2D_t* FramebufferTexture2D;
 extern FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 extern CheckFramebufferStatus_t* CheckFramebufferStatus;
+extern ReadBuffer_t* ReadBuffer;
+extern ReadPixels_t* ReadPixels;
 
 extern EnableVertexAttribArray_t* EnableVertexAttribArray;
 extern DisableVertexAttribArray_t* DisableVertexAttribArray;

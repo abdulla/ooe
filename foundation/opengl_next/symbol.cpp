@@ -81,6 +81,8 @@ void load_symbols( void )
 	FramebufferTexture2D = find< FramebufferTexture2D_t >( "glFramebufferTexture2DEXT" );
 	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbufferEXT" );
 	CheckFramebufferStatus = find< CheckFramebufferStatus_t >( "glCheckFramebufferStatusEXT" );
+	ReadBuffer = find< ReadBuffer_t >( "glReadBuffer" );
+	ReadPixels = find< ReadPixels_t >( "glReadPixels" );
 
 	EnableVertexAttribArray = find< EnableVertexAttribArray_t >( "glEnableVertexAttribArray" );
 	DisableVertexAttribArray = find< DisableVertexAttribArray_t >( "glDisableVertexAttribArray" );
@@ -155,6 +157,8 @@ BlitFramebuffer_t* BlitFramebuffer;
 FramebufferTexture2D_t* FramebufferTexture2D;
 FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 CheckFramebufferStatus_t* CheckFramebufferStatus;
+ReadBuffer_t* ReadBuffer;
+ReadPixels_t* ReadPixels;
 
 EnableVertexAttribArray_t* EnableVertexAttribArray;
 DisableVertexAttribArray_t* DisableVertexAttribArray;
