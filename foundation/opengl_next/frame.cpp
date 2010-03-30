@@ -93,17 +93,32 @@ template< typename target, typename source >
 	return out;
 }
 
-void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height )
+void frame_check( bool& check )
+{
+	if ( !check )
+		return;
+
+	s32 status = CheckFramebufferStatus( READ_FRAMEBUFFER );
+
+	if ( status != FRAMEBUFFER_COMPLETE )
+		throw error::runtime( "opengl::frame: " ) << "Frame is incomplete: " << hex( status );
+
+	check = false;
+}
+
+void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height, bool& check )
 {
 	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
 	BindFramebuffer( READ_FRAMEBUFFER, input.id );
+	frame_check( check );
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
+
 	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
 		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
 }
 
-void frame_read
-	( buffer_type& generic_buffer, image::type format, s32 id, u32 target, u32 width, u32 height )
+void frame_read( buffer_type& generic_buffer, image::type format, s32 id, u32 width, u32 height,
+	u32 target, bool& check )
 {
 	opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
 
@@ -118,6 +133,7 @@ void frame_read
 			"Pixel buffer size " << buffer.size << " < " << size;
 
 	BindFramebuffer( READ_FRAMEBUFFER, id );
+	frame_check( check );
 	ReadBuffer( target );
 
 	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
@@ -140,12 +156,14 @@ default_frame::~default_frame( void )
 
 void default_frame::write( const frame_type& generic_frame )
 {
-	frame_write( generic_frame, 0, width, height );
+	bool check = false;
+	frame_write( generic_frame, 0, width, height, check );
 }
 
 void default_frame::read( buffer_type& generic_buffer, image::type format )
 {
-	frame_read( generic_buffer, format, 0, FRONT, width, height );
+	bool check = false;
+	frame_read( generic_buffer, format, 0, width, height, FRONT, check );
 }
 
 void default_frame::output( attachment_type, const texture_type& )
@@ -172,12 +190,15 @@ frame::~frame( void )
 
 void frame::write( const frame_type& generic_frame )
 {
-	frame_write( generic_frame, id, width, height );
+	frame_write( generic_frame, id, width, height, check );
 }
 
 void frame::read( buffer_type& generic_buffer, image::type format )
 {
-	frame_read( generic_buffer, format, id, COLOR_ATTACHMENT0, width, height );
+	if ( !colours.size() )
+		throw error::runtime( "opengl::frame: " ) << "Frame has no colour attachment";
+
+	frame_read( generic_buffer, format, id, width, height, COLOR_ATTACHMENT0, check );
 }
 
 void frame::output( attachment_type type, const texture_type& generic_texture )
