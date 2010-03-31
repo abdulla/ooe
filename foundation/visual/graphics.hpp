@@ -172,10 +172,19 @@ struct device
 		blend
 	};
 
+	enum limit_type
+	{
+		draw_buffers,
+		texture_size,
+		texture_units
+	};
+
 	virtual ~device( void ) {}
-	virtual void set( set_type, bool ) = 0;
 	virtual void draw( const block_type&, const frame_type& ) = 0;
 	virtual void swap( void ) = 0;
+
+	virtual void set( set_type, bool ) = 0;
+	virtual u32 limit( limit_type ) = 0;
 
 	virtual texture_type texture
 		( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;

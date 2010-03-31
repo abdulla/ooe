@@ -60,7 +60,7 @@ void enable_attributes( attribute_set& x, attribute_set& y )
 	x.swap( y );
 }
 
-void enable_frame( const frame_type& generic_frame )
+void enable_frame( const frame_type& generic_frame, s32 draw_buffers_limit )
 {
 	if ( dynamic_cast< opengl::default_frame* >( generic_frame.get() ) )
 	{
@@ -69,8 +69,14 @@ void enable_frame( const frame_type& generic_frame )
 	}
 
 	opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
+	s32 size = frame.colours.size();
+
+	if ( size > draw_buffers_limit )
+		throw error::runtime( "opengl::device: " ) <<
+			"Frame has " << size << " colour attachments, device supports " << draw_buffers_limit;
+
 	BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
-	DrawBuffers( frame.colours.size(), &frame.colours[ 0 ] );
+	DrawBuffers( size, &frame.colours[ 0 ] );
 
 	if ( frame.check )
 	{
@@ -97,9 +103,11 @@ public:
 	device( const ooe::view_data& );
 	virtual ~device( void );
 
-	virtual void set( set_type, bool );
 	virtual void draw( const block_type&, const frame_type& );
 	virtual void swap( void );
+
+	virtual void set( set_type, bool );
+	virtual u32 limit( limit_type );
 
 	virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
 	virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
@@ -112,15 +120,24 @@ private:
 	const view_data& view;
 	platform::context_type context;
 	attribute_set attributes;
+
+	s32 draw_buffers_limit;
+	s32 texture_size_limit;
+	s32 texture_units_limit;
 };
 
 device::device( const ooe::view_data& view_ )
 try
-	: view( view_ ), context( context_construct( view ) ), attributes()
+	: view( view_ ), context( context_construct( view ) ), attributes(), draw_buffers_limit(),
+	texture_size_limit(), texture_units_limit()
 {
 	context_current( view, context );
 	context_sync( view, context, true );
 	load_symbols();
+
+	GetIntegerv( MAX_DRAW_BUFFERS, &draw_buffers_limit );
+	GetIntegerv( MAX_TEXTURE_SIZE, &texture_size_limit );
+	GetIntegerv( MAX_TEXTURE_IMAGE_UNITS, &texture_units_limit );
 
 	BlendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
 	PixelStorei( PACK_ALIGNMENT, 1 );
@@ -137,30 +154,6 @@ device::~device( void )
 	context_destruct( view, context );
 }
 
-void device::set( set_type type, bool enable )
-{
-	u32 value;
-
-	switch ( type )
-	{
-	case depth_test:
-		value = DEPTH_TEST;
-		break;
-
-	case blend:
-		value = BLEND;
-		break;
-
-	default:
-		throw error::runtime( "opengl::device: " ) << "Unknown set type: " << type;
-	}
-
-	if ( enable )
-		Enable( value );
-	else
-		Disable( value );
-}
-
 void device::draw( const block_type& generic_block, const frame_type& frame )
 {
 	opengl::block& block = dynamic_cast< opengl::block& >( *generic_block );
@@ -171,6 +164,11 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
 		i->second._1( i->first, i->second._0 );
 
 	s32 j = 0;
+	s32 size = block.textures.size();
+
+	if ( size > texture_units_limit )
+		throw error::runtime( "opengl::device: " ) <<
+			"Block has " << size << " textures, device supports " << texture_units_limit;
 
 	for ( block::texture_map::const_iterator i = block.textures.begin(),
 		end = block.textures.end(); i != end; ++i, ++j )
@@ -200,7 +198,7 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
 	}
 
 	enable_attributes( attributes, enable_set );
-	enable_frame( frame );
+	enable_frame( frame, draw_buffers_limit );
 
 	opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
 	BindBuffer( index.target, index.id );
@@ -213,9 +211,55 @@ void device::swap( void )
 	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }
 
+void device::set( set_type type, bool enable )
+{
+	u32 value;
+
+	switch ( type )
+	{
+	case depth_test:
+		value = DEPTH_TEST;
+		break;
+
+	case blend:
+		value = BLEND;
+		break;
+
+	default:
+		throw error::runtime( "opengl::device: " ) << "Unknown set type: " << type;
+	}
+
+	if ( enable )
+		Enable( value );
+	else
+		Disable( value );
+}
+
+u32 device::limit( limit_type type )
+{
+	switch ( type )
+	{
+	case draw_buffers:
+		return draw_buffers_limit;
+
+	case texture_size:
+		return texture_size_limit;
+
+	case texture_units:
+		return texture_units_limit;
+
+	default:
+		throw error::runtime( "opengl::device: " ) << "Unknown limit type: " << type;
+	}
+}
+
 texture_type device::
 	texture( const image_pyramid& pyramid, texture::type filter, bool generate_mipmap ) const
 {
+	if ( pyramid.width > u32( texture_size_limit ) || pyramid.height > u32( texture_size_limit ) )
+		throw error::runtime( "opengl::device: " ) << "Pyramid size " << pyramid.width << 'x' <<
+			pyramid.height << " > device texture size " << texture_size_limit;
+
 	if ( is_compressed( pyramid.format ) )
 		return new compressed_texture( pyramid, filter, generate_mipmap );
 	else
