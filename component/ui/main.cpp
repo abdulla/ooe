@@ -189,6 +189,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	frame_type frame = program->frame( width, height );
 	frame->output( frame::colour, target );
 
+	buffer_type pixel = device->buffer( 4 * width * height, buffer::pixel );
+	bool read_back = true;
+
 	while ( !executable::has_signal() )
 	{
 		block->input( "projection", camera.matrix() );
@@ -196,9 +199,21 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		default_frame->write( frame );
 		device->swap();
 
+		if ( read_back )
+		{
+			frame->read( pixel, image::rgba_u8 );
+			read_back = false;
+		}
+
 		camera_tuple tuple = process_events( event_queue );
 		camera.rotate( tuple._0 * sensitivity );
 		camera.translate( tuple._1 );
+	}
+
+	{
+		uncompressed_image frame_image( width, height, image::rgba_u8 );
+		map_type map = pixel->map( buffer::read );
+		std::memcpy( frame_image.get(), map->data, frame_image.byte_size() );
 	}
 
 	return true;
