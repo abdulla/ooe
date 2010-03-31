@@ -12,6 +12,7 @@ struct physical_source
 {
 	typedef tuple< u32, u32 > size_tuple;
 
+	virtual ~physical_source( void ) {}
 	virtual size_tuple size( void ) const = 0;
 	virtual image read( u32, u32, u8 ) = 0;
 };
@@ -20,7 +21,7 @@ struct physical_source
 class virtual_texture
 {
 public:
-	virtual_texture( physical_source& );
+	virtual_texture( const device_type&, physical_source& );
 
 private:
 	physical_source& source;
