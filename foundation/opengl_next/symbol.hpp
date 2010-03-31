@@ -26,6 +26,7 @@ enum
 	UNPACK_ALIGNMENT			= 0x0CF5,
 	PACK_ALIGNMENT				= 0x0D05,
 
+	MAX_TEXTURE_SIZE			= 0x0D33,
 	TEXTURE_2D					= 0x0DE1,
 
 	UNSIGNED_BYTE				= 0x1401,
@@ -83,6 +84,9 @@ enum
 	LUMINANCE16F				= 0x881E,
 	LUMINANCE_ALPHA16F			= 0x881F,
 
+	MAX_DRAW_BUFFERS			= 0x8824,
+	MAX_TEXTURE_IMAGE_UNITS		= 0x8872,
+
 	ARRAY_BUFFER				= 0x8892,
 	ELEMENT_ARRAY_BUFFER		= 0x8893,
 	READ_ONLY					= 0x88B8,
@@ -115,6 +119,7 @@ enum
 
 //--- typedefs -------------------------------------------------------------------------------------
 typedef const c8* ( GetString_t )( u32 );
+typedef void ( GetIntegerv_t )( u32, s32* );
 typedef void ( Enable_t )( u32 );
 typedef void ( Disable_t )( u32 );
 typedef void ( BlendFunc_t )( u32, u32 );
@@ -188,6 +193,7 @@ typedef void ( DrawElements_t )( u32, s32, u32, const void* );
 
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
+extern GetIntegerv_t* GetIntegerv;
 extern Enable_t* Enable;
 extern Disable_t* Disable;
 extern BlendFunc_t* BlendFunc;

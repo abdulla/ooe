@@ -19,6 +19,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 void load_symbols( void )
 {
 	GetString = find< GetString_t >( "glGetString" );
+	GetIntegerv = find< GetIntegerv_t >( "glGetIntegerv" );
 	Enable = find< Enable_t >( "glEnable" );
 	Disable = find< Disable_t >( "glDisable" );
 	BlendFunc = find< BlendFunc_t >( "glBlendFunc" );
@@ -95,6 +96,7 @@ void load_symbols( void )
 
 //--- functions ------------------------------------------------------------------------------------
 GetString_t* GetString;
+GetIntegerv_t* GetIntegerv;
 Enable_t* Enable;
 Disable_t* Disable;
 BlendFunc_t* BlendFunc;
