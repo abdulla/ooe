@@ -198,6 +198,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		device->draw( block, frame );
 		default_frame->write( frame );
 		device->swap();
+		frame->clear();
 
 		if ( read_back )
 		{

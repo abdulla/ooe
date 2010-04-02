@@ -16,7 +16,7 @@ public:
 	font_source( const font::face&, u32 );
 
 	virtual size_tuple size( void ) const;
-	virtual image read( u32, u32, u8 );
+	virtual image read( u32, u32, u16 );
 
 private:
 	font::face face;
