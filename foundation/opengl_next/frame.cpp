@@ -140,6 +140,12 @@ void frame_read( buffer_type& generic_buffer, image::type format, s32 id, u32 wi
 	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
 
+void frame_clear( s32 id )
+{
+	BindFramebuffer( DRAW_FRAMEBUFFER, id );
+	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
+}
+
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -163,6 +169,11 @@ void default_frame::read( buffer_type& generic_buffer, image::type format )
 {
 	bool check = false;
 	frame_read( generic_buffer, format, 0, width, height, FRONT, check );
+}
+
+void default_frame::clear( void )
+{
+	frame_clear( 0 );
 }
 
 void default_frame::output( attachment_type, const texture_type& )
@@ -198,6 +209,11 @@ void frame::read( buffer_type& generic_buffer, image::type format )
 		throw error::runtime( "opengl::frame: " ) << "Frame has no colour attachment";
 
 	frame_read( generic_buffer, format, id, width, height, COLOR_ATTACHMENT0, check );
+}
+
+void frame::clear( void )
+{
+	frame_clear( id );
 }
 
 void frame::output( attachment_type type, const texture_type& generic_texture )

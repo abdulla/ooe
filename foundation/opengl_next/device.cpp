@@ -78,17 +78,15 @@ void enable_frame( const frame_type& generic_frame, s32 draw_buffers_limit )
 	BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
 	DrawBuffers( size, &frame.colours[ 0 ] );
 
-	if ( frame.check )
-	{
-		s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
+	if ( !frame.check )
+		return;
 
-		if ( status != FRAMEBUFFER_COMPLETE )
-			throw error::runtime( "opengl::device: " ) << "Frame is incomplete: " << hex( status );
+	s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
 
-		frame.check = false;
-	}
+	if ( status != FRAMEBUFFER_COMPLETE )
+		throw error::runtime( "opengl::device: " ) << "Frame is incomplete: " << hex( status );
 
-	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
+	frame.check = false;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -208,7 +206,6 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
 void device::swap( void )
 {
 	context_swap( view, context );
-	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }
 
 void device::set( set_type type, bool enable )

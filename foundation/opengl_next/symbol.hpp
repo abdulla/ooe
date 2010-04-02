@@ -124,7 +124,6 @@ typedef void ( Enable_t )( u32 );
 typedef void ( Disable_t )( u32 );
 typedef void ( BlendFunc_t )( u32, u32 );
 typedef void ( PixelStorei_t )( u32, s32 );
-typedef void ( Clear_t )( u32 );
 
 typedef void ( GenTextures_t )( s32, u32* );
 typedef void ( DeleteTextures_t )( s32, const u32* );
@@ -184,6 +183,7 @@ typedef void ( FramebufferRenderbuffer_t )( u32, u32, u32, u32 );
 typedef u32 ( CheckFramebufferStatus_t )( u32 );
 typedef void ( ReadBuffer_t )( u32 );
 typedef void ( ReadPixels_t )( s32, s32, s32, s32, u32, u32, const void* );
+typedef void ( Clear_t )( u32 );
 
 typedef void ( EnableVertexAttribArray_t )( u32 );
 typedef void ( DisableVertexAttribArray_t )( u32 );
@@ -198,7 +198,6 @@ extern Enable_t* Enable;
 extern Disable_t* Disable;
 extern BlendFunc_t* BlendFunc;
 extern PixelStorei_t* PixelStorei;
-extern Clear_t* Clear;
 
 extern GenTextures_t* GenTextures;
 extern DeleteTextures_t* DeleteTextures;
@@ -258,6 +257,7 @@ extern FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 extern CheckFramebufferStatus_t* CheckFramebufferStatus;
 extern ReadBuffer_t* ReadBuffer;
 extern ReadPixels_t* ReadPixels;
+extern Clear_t* Clear;
 
 extern EnableVertexAttribArray_t* EnableVertexAttribArray;
 extern DisableVertexAttribArray_t* DisableVertexAttribArray;

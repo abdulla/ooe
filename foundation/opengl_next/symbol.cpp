@@ -24,7 +24,6 @@ void load_symbols( void )
 	Disable = find< Disable_t >( "glDisable" );
 	BlendFunc = find< BlendFunc_t >( "glBlendFunc" );
 	PixelStorei = find< PixelStorei_t >( "glPixelStorei" );
-	Clear = find< Clear_t >( "glClear" );
 
 	GenTextures = find< GenTextures_t >( "glGenTextures" );
 	DeleteTextures = find< DeleteTextures_t >( "glDeleteTextures" );
@@ -84,6 +83,7 @@ void load_symbols( void )
 	CheckFramebufferStatus = find< CheckFramebufferStatus_t >( "glCheckFramebufferStatusEXT" );
 	ReadBuffer = find< ReadBuffer_t >( "glReadBuffer" );
 	ReadPixels = find< ReadPixels_t >( "glReadPixels" );
+	Clear = find< Clear_t >( "glClear" );
 
 	EnableVertexAttribArray = find< EnableVertexAttribArray_t >( "glEnableVertexAttribArray" );
 	DisableVertexAttribArray = find< DisableVertexAttribArray_t >( "glDisableVertexAttribArray" );
@@ -101,7 +101,6 @@ Enable_t* Enable;
 Disable_t* Disable;
 BlendFunc_t* BlendFunc;
 PixelStorei_t* PixelStorei;
-Clear_t* Clear;
 
 GenTextures_t* GenTextures;
 DeleteTextures_t* DeleteTextures;
@@ -161,6 +160,7 @@ FramebufferRenderbuffer_t* FramebufferRenderbuffer;
 CheckFramebufferStatus_t* CheckFramebufferStatus;
 ReadBuffer_t* ReadBuffer;
 ReadPixels_t* ReadPixels;
+Clear_t* Clear;
 
 EnableVertexAttribArray_t* EnableVertexAttribArray;
 DisableVertexAttribArray_t* DisableVertexAttribArray;

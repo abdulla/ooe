@@ -149,6 +149,8 @@ struct frame
 	virtual ~frame( void ) {}
 	virtual void write( const frame_type& ) = 0;
 	virtual void read( buffer_type&, image::type ) = 0;
+	virtual void clear( void ) = 0;
+
 	virtual void output( attachment_type, const texture_type& ) = 0;
 	virtual void output( attachment_type, const target_type& ) = 0;
 };

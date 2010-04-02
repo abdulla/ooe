@@ -16,6 +16,8 @@ public:
 
 	virtual void write( const frame_type& );
 	virtual void read( buffer_type&, image::type );
+	virtual void clear( void );
+
 	virtual void output( attachment_type, const texture_type& );
 	virtual void output( attachment_type, const target_type& );
 
@@ -41,6 +43,8 @@ public:
 
 	virtual void write( const frame_type& );
 	virtual void read( buffer_type&, image::type );
+	virtual void clear( void );
+
 	virtual void output( attachment_type, const texture_type& );
 	virtual void output( attachment_type, const target_type& );
 
