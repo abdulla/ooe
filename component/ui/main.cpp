@@ -194,11 +194,11 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	while ( !executable::has_signal() )
 	{
+		frame->clear();
 		block->input( "projection", camera.matrix() );
 		device->draw( block, frame );
 		default_frame->write( frame );
 		device->swap();
-		frame->clear();
 
 		if ( read_back )
 		{
