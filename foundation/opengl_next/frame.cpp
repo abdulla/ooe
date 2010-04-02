@@ -93,12 +93,12 @@ template< typename target, typename source >
 	return out;
 }
 
-void frame_check( bool& check )
+void frame_check( bool& check, u32 target )
 {
 	if ( !check )
 		return;
 
-	s32 status = CheckFramebufferStatus( READ_FRAMEBUFFER );
+	s32 status = CheckFramebufferStatus( target );
 
 	if ( status != FRAMEBUFFER_COMPLETE )
 		throw error::runtime( "opengl::frame: " ) << "Frame is incomplete: " << hex( status );
@@ -110,7 +110,7 @@ void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height
 {
 	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
 	BindFramebuffer( READ_FRAMEBUFFER, input.id );
-	frame_check( input.check );
+	frame_check( input.check, READ_FRAMEBUFFER );
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
 
 	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
@@ -133,16 +133,17 @@ void frame_read( buffer_type& generic_buffer, image::type format, s32 id, u32 wi
 			"Pixel buffer size " << buffer.size << " < " << size;
 
 	BindFramebuffer( READ_FRAMEBUFFER, id );
-	frame_check( check );
+	frame_check( check, READ_FRAMEBUFFER );
 	ReadBuffer( target );
 
 	BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
 	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
 
-void frame_clear( s32 id )
+void frame_clear( s32 id, bool& check )
 {
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
+	frame_check( check, DRAW_FRAMEBUFFER );
 	Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }
 
@@ -173,7 +174,8 @@ void default_frame::read( buffer_type& generic_buffer, image::type format )
 
 void default_frame::clear( void )
 {
-	frame_clear( 0 );
+	bool check = false;
+	frame_clear( 0, check );
 }
 
 void default_frame::output( attachment_type, const texture_type& )
@@ -213,7 +215,7 @@ void frame::read( buffer_type& generic_buffer, image::type format )
 
 void frame::clear( void )
 {
-	frame_clear( id );
+	frame_clear( id, check );
 }
 
 void frame::output( attachment_type type, const texture_type& generic_texture )
