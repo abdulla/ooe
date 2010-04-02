@@ -1,7 +1,3 @@
-write new generalised main loop
-	- focus on sleeping and coalescing wake ups
-	- make subsystems independent - rendering doesn't rely on main loop, but wakes on animate
-
 make all constructors explicit
 	- something that should have been done a long time ago, but wasn't, due to laziness
 
@@ -10,16 +6,6 @@ use openctm for models
 
 add translate/localisation functions
 	- use gettext or similar
-
-more use of exceptions
-	- wherever return values can be unchecked, ie boolean returns
-
-two-pass rendering
-	- z-buffer only, then pixels?
-	- sort only by shader/texture (early z-pass)?
-
-move to xcb for x11
-	- use xcb instead of libx11
 
 extend setup_path
 	- use GetModuleFileName() under windows

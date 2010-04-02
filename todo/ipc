@@ -3,5 +3,5 @@ asynchronous rpc wrapper
 	- have an async_client, wraps a client with background thread
 	- have result template that can block on result of async rpc call
 
-have way of replaying responses
+add a way to replay responses
 	- this could be used for unit testing
