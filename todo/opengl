@@ -4,3 +4,6 @@ ARB_framebuffer_object
 EXT_gpu_shader4
 	- has texture2DGrad() in GLSL
 	- has GetFragDataLocation() in API
+
+EXT_texture_array
+	- no need for special texture sampling, an array element can be a page
