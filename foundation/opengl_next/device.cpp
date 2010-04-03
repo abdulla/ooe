@@ -290,7 +290,7 @@ frame_type device::default_frame( u32 width, u32 height ) const
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-extern "C" device_type device_open( const view_data& view )
+extern "C" device_type OOE_VISIBLE device_open( const view_data& view )
 {
 	return new opengl::device( view );
 }

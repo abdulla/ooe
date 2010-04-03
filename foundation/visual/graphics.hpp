@@ -12,7 +12,7 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- image_pyramid --------------------------------------------------------------------------------
-class image_pyramid
+class OOE_VISIBLE image_pyramid
 {
 public:
 	typedef std::vector< shared_free< void > > vector_type;
@@ -52,7 +52,7 @@ struct map
 	void* const data;
 	const up_t size;
 
-	map( void*, up_t );
+	map( void*, up_t ) OOE_VISIBLE;
 	virtual ~map( void ) {}
 };
 

@@ -636,6 +636,7 @@ namespace
 	}
 }
 
+extern "C" video_type* video_open( const view_data& ) OOE_VISIBLE;
 extern "C" video_type* video_open( const view_data& view )
 {
 	return new video_type( view, context_f( view ) );

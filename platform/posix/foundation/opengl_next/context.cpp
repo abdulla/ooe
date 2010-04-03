@@ -50,7 +50,7 @@ void context_swap( const ooe::view_data& view, platform::context_type )
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-extern "C" void driver_choose( const ooe::view_data& view )
+extern "C" void OOE_VISIBLE context_open( const ooe::view_data& view )
 {
 	ooe::s32 attributes[] =
 	{

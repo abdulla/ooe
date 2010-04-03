@@ -12,7 +12,7 @@ typedef struct _XDisplay Display;
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
-struct event_queue
+struct OOE_VISIBLE event_queue
 {
 	Display* display;
 	mutable up_t wm_delete;

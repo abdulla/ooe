@@ -56,7 +56,7 @@ def UtilityConfigure( platform, setup ):
 	if not setup.CheckCXXHeader( 'boost/mpl/vector.hpp' ): Exit( 1 )
 	if not setup.CheckCXXHeader( 'boost/utility/enable_if.hpp' ): Exit( 1 )
 
-def VideoConfigure( platform, setup ):
+def VisualConfigure( platform, setup ):
 	if not setup.CheckLibWithHeader( 'freetype', 'ft2build.h', 'c' ): Exit( 1 )
 
 	if platform == 'posix':
@@ -82,7 +82,7 @@ build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'opengl_next', 'foundation/opengl_next', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
 build.Linkable( 'visual', 'foundation/visual', 'image parallel', ooe.qtkit.framework,
-	ooe.freetype.include_path, ooe.freetype.library_path, VideoConfigure )
+	ooe.freetype.include_path, ooe.freetype.library_path, VisualConfigure )
 
 #--- component -------------------------------------------------------------------------------------
 build.Executable( 'doc', 'component/registry/doc', 'executable registry' )

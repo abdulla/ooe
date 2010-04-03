@@ -3,6 +3,7 @@
 #ifndef OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_EVENT_QUEUE_FORWARD_HPP
 #define OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_EVENT_QUEUE_FORWARD_HPP
 
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/namespace.hpp"
 
 #ifdef __OBJC__
@@ -13,7 +14,7 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
-class event_queue
+class OOE_VISIBLE event_queue
 {
 protected:
 	mutable bool delta;
