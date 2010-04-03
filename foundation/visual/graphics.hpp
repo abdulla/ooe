@@ -5,9 +5,9 @@
 
 #include <vector>
 
+#include "foundation/io/descriptor.hpp"
 #include "foundation/image/image.hpp"
 #include "foundation/maths/maths.hpp"
-#include "foundation/utility/string.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -186,14 +186,14 @@ struct device
 	virtual void swap( void ) = 0;
 
 	virtual void set( set_type, bool ) = 0;
-	virtual u32 limit( limit_type ) = 0;
+	virtual u32 limit( limit_type ) const = 0;
 
 	virtual texture_type texture
 		( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
 	virtual buffer_type buffer
 		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
 	virtual target_type target( u32, u32, u8 ) const = 0;
-	virtual shader_type shader( const std::string&, shader::type ) const = 0;
+	virtual shader_type shader( const std::string&, const descriptor&, shader::type ) const = 0;
 	virtual program_type program( const shader_vector& ) const = 0;
 	virtual frame_type default_frame( u32, u32 ) const = 0;
 };

@@ -105,12 +105,12 @@ public:
 	virtual void swap( void );
 
 	virtual void set( set_type, bool );
-	virtual u32 limit( limit_type );
+	virtual u32 limit( limit_type ) const;
 
 	virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
 	virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
 	virtual target_type target( u32, u32, u8 ) const;
-	virtual shader_type shader( const std::string&, shader::type ) const;
+	virtual shader_type shader( const std::string&, const descriptor&, shader::type ) const;
 	virtual program_type program( const shader_vector& ) const;
 	virtual frame_type default_frame( u32, u32 ) const;
 
@@ -232,7 +232,7 @@ void device::set( set_type type, bool enable )
 		Disable( value );
 }
 
-u32 device::limit( limit_type type )
+u32 device::limit( limit_type type ) const
 {
 	switch ( type )
 	{
@@ -273,9 +273,10 @@ target_type device::target( u32 width, u32 height, u8 format ) const
 	return new opengl::target( width, height, format );
 }
 
-shader_type device::shader( const std::string& source, shader::type type ) const
+shader_type device::
+	shader( const std::string& source, const descriptor& desc, shader::type type ) const
 {
-	return new opengl::shader( source, type );
+	return new opengl::shader( source, desc, type );
 }
 
 program_type device::program( const shader_vector& vector ) const
