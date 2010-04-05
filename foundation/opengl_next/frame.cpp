@@ -101,7 +101,7 @@ void frame_check( bool& check, u32 target )
 	s32 status = CheckFramebufferStatus( target );
 
 	if ( status != FRAMEBUFFER_COMPLETE )
-		throw error::runtime( "opengl::frame: " ) << "Frame is incomplete: " << hex( status );
+		throw error::runtime( "opengl::frame: " ) << "Frame is incomplete: 0x" << hex( status );
 
 	check = false;
 }

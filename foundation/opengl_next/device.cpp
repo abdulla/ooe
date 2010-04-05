@@ -84,7 +84,7 @@ void enable_frame( const frame_type& generic_frame, s32 draw_buffers_limit )
 	s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
 
 	if ( status != FRAMEBUFFER_COMPLETE )
-		throw error::runtime( "opengl::device: " ) << "Frame is incomplete: " << hex( status );
+		throw error::runtime( "opengl::device: " ) << "Frame is incomplete: 0x" << hex( status );
 
 	frame.check = false;
 }
