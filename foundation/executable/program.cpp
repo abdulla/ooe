@@ -85,7 +85,7 @@ s32 launch( launch_type launch, s32 argc, c8** argv )
 
 	try
 	{
-		path_tuple path = executable::path();
+		path_type path = executable::path();
 		std::string log = path._0 + path._1 + ".log";
 
 		if ( close( STDERR_FILENO ) == -1 )
@@ -134,7 +134,7 @@ void null_fd( s32 fd )
 			"Unable to duplicate fd: " << error::number( errno );
 }
 
-path_tuple path( void )
+path_type path( void )
 {
 	c8 path[ PATH_MAX ];
 
@@ -146,7 +146,7 @@ path_tuple path( void )
 	if ( !point++ )
 		throw error::runtime( "executable::path: " ) << "Unable to find executable path\n";
 
-	return path_tuple( std::string( path, point ), point );
+	return path_type( std::string( path, point ), point );
 }
 
 OOE_NAMESPACE_END( ( ooe )( executable ) )
