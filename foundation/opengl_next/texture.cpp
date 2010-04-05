@@ -134,7 +134,7 @@ void set_levels( bool generate_mipmap, u32 levels )
 	if ( generate_mipmap )
 		GenerateMipmap( TEXTURE_2D );
 	else
-		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, levels ? levels - 1 : 0 );
+		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, levels );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
