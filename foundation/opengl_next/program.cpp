@@ -21,7 +21,7 @@ void check_status( s32 id, s32 parameter, const c8* type )
 	GetProgramiv( id, INFO_LOG_LENGTH, &size );
 	scoped_array< c8 > array( new c8[ size ] );
 	GetProgramInfoLog( id, size, 0, array );
-	throw error::runtime( "opengl::program: " ) << type << " failed: " << array;
+	throw error::runtime( "opengl::program: " ) << type << " failed:\n" << array;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )

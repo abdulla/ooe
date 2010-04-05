@@ -46,7 +46,8 @@ shader::shader( const std::string& name, const descriptor& desc, type stage )
 	GetShaderiv( id, INFO_LOG_LENGTH, &size );
 	scoped_array< c8 > array( new c8[ size ] );
 	GetShaderInfoLog( id, size, 0, array );
-	throw error::runtime( "opengl::shader: " ) << "Unable to compile \"" << name << "\": " << array;
+	throw error::runtime( "opengl::shader: " ) <<
+		"Unable to compile \"" << name << "\":\n" << array;
 }
 
 shader::~shader( void )
