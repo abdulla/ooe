@@ -2,14 +2,11 @@
 
 #include <cstring>
 
-#include "foundation/executable/environment.hpp"
+#include "component/ui/font_source.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/io/descriptor.hpp"
 #include "foundation/maths/camera.hpp"
 #include "foundation/visual/event_queue.hpp"
-#include "foundation/visual/font.hpp"
-#include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
@@ -101,6 +98,12 @@ camera_tuple process_events( event_queue& event_queue )
 	return tuple;
 }
 
+shader_type make_shader( const device_type& device, const std::string& root, shader::type type,
+	const std::string& name )
+{
+	return device->shader( name, root + "../resource/glsl/" + name, type );
+}
+
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
@@ -111,23 +114,16 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
-	uncompressed_image image( 256, 256, image::a_u8 );
-	std::memset( image.get(), 0, image.byte_size() );
 	font::library font_library;
-	font::face face( font_library, descriptor( root + "../resource/font/vera.ttf" ), image.width );
-	font::bitmap bitmap = face.character( '@' );
-	texture_type texture = device->texture( image_pyramid( image ) );
-	texture->write( bitmap.image, 0, 0 );
+	font::face face( font_library, descriptor( root + "../resource/font/vera.ttf" ) );
+	font_source source( face, 1024 );
+	virtual_texture virtual_texture( device, source, width, height );
 	device->set( device::blend, true );
 
-	shader_type vertex =
-		device->shader( "null.vs", root + "../resource/glsl/null.vs", shader::vertex );
-	shader_type fragment =
-		device->shader( "null.fs", root + "../resource/glsl/null.fs", shader::fragment );
 	shader_vector vector;
-	vector.push_back( vertex );
-	vector.push_back( fragment );
-	program_type program = device->program( vector );
+	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
+	vector.push_back( make_shader( device, root, shader::fragment, "null.fs" ) );
+	program_type program = virtual_texture.program( device, vector );
 
 	buffer_type point = device->buffer( sizeof( f32 ) * 4 * 4, buffer::point );
 	{
@@ -172,21 +168,16 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		value[ 5 ] = 3;
 	}
 
+	block_type block = virtual_texture.block( program, index );
+	block->input( "vertex", 2, point );
+	block->input( "coords", 2, point );
+
+	frame_type default_frame = device->default_frame( width, height );
+	frame_type frame = virtual_texture.frame( program );
+
 	camera camera( degree( 45 ), width / height, 1, 100 );
 	camera.rotate( vec3( 0, maths::pi_half, 0 ) );
 	radian sensitivity( degree( .05 ) );
-	block_type block = program->block( index );
-	block->input( "vertex", 2, point );
-	block->input( "coords", 2, point );
-	block->input( "texture", texture );
-
-	frame_type default_frame = device->default_frame( width, height );
-	target_type target = device->target( width, height, image::rgba_u8 );
-	frame_type frame = program->frame( width, height );
-	frame->output( frame::colour, target );
-
-	buffer_type pixel = device->buffer( 4 * width * height, buffer::pixel );
-	bool read_back = true;
 
 	while ( !executable::has_signal() )
 	{
@@ -196,21 +187,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		default_frame->write( frame );
 		device->swap();
 
-		if ( read_back )
-		{
-			frame->read( pixel, image::rgba_u8 );
-			read_back = false;
-		}
-
 		camera_tuple tuple = process_events( event_queue );
 		camera.rotate( tuple._0 * sensitivity );
 		camera.translate( tuple._1 );
-	}
-
-	{
-		uncompressed_image frame_image( width, height, image::rgba_u8 );
-		map_type map = pixel->map( buffer::read );
-		std::memcpy( frame_image.get(), map->data, frame_image.byte_size() );
 	}
 
 	return true;

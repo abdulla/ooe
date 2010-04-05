@@ -3,7 +3,7 @@
 #ifndef OOE_COMPONENT_UI_FONT_SOURCE_HPP
 #define OOE_COMPONENT_UI_FONT_SOURCE_HPP
 
-#include "foundation/ui/virtual_texture.hpp"
+#include "component/ui/virtual_texture.hpp"
 #include "foundation/visual/font.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -13,13 +13,19 @@ class font_source
 	: public physical_source
 {
 public:
-	font_source( const font::face&, u32 );
+	font_source( font::face&, u32 ) OOE_VISIBLE;
+	virtual ~font_source( void );
 
-	virtual size_tuple size( void ) const;
-	virtual image read( u32, u32, u16 );
+	virtual dimension_type dimension( void ) const;
+	virtual image::type format( void ) const;
+	virtual u16 page_size( void ) const;
+
+	virtual image read( u32, u32, u8 );
 
 private:
-	font::face face;
+	font::face& face;
+	const u32 width;
+	const u32 height;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
