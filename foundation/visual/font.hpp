@@ -56,7 +56,7 @@ public:
 		strikes
 	};
 
-	face( const library&, const descriptor&, u32 = 32 );
+	face( const library&, const descriptor& );
 	~face( void );
 
 	bitmap character( up_t );

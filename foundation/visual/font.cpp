@@ -31,13 +31,11 @@ bitmap::bitmap( s32 left_, s32 top_, u32 x_, u32 y_, const uncompressed_image& i
 }
 
 //--- face -----------------------------------------------------------------------------------------
-face::face( const library& library, const descriptor& desc, u32 size_ )
+face::face( const library& library, const descriptor& desc )
 	: memory( desc ), face_()
 {
 	if ( FT_New_Memory_Face( library.freetype, memory.as< u8 >(), memory.size(), 0, &face_ ) )
 		throw error::runtime( "font::face: " ) << "Unable to open font face";
-
-	size( size_ );
 }
 
 face::~face( void )
