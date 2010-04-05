@@ -16,36 +16,32 @@ template< typename type >
 	return std::max( min, std::min( value, max ) );
 }
 
-//--- divide ---------------------------------------------------------------------------------------
-inline f32 divide( u32 x, u32 y )
+//--- ceiling --------------------------------------------------------------------------------------
+template< typename type >
+	type ceiling( type dividend, type divisor )
 {
-	return static_cast< f32 >( x ) / static_cast< f32 >( y );
+	return dividend / divisor + ( dividend % divisor ? 1 : 0 );
+}
+
+//--- floor ----------------------------------------------------------------------------------------
+template< typename type >
+	type floor( type dividend, type divisor )
+{
+	return dividend / divisor;
 }
 
 //--- round_up -------------------------------------------------------------------------------------
-inline up_t round_up( up_t dividend, up_t divisor )
+template< typename type >
+	type round_up( type dividend, type divisor )
 {
-	up_t quotient = dividend / divisor + ( dividend % divisor ? 1 : 0 );
-	return quotient * divisor;
-}
-
-template< up_t divisor >
-	up_t round_up( up_t dividend )
-{
-	return round_up( dividend, divisor );
+	return ceiling( dividend, divisor ) * divisor;
 }
 
 //--- round_down -----------------------------------------------------------------------------------
-inline up_t round_down( up_t dividend, up_t divisor )
+template< typename type >
+	type round_down( type dividend, type divisor )
 {
-	up_t quotient = dividend / divisor;
-	return quotient * divisor;
-}
-
-template< up_t divisor >
-	up_t round_down( up_t dividend )
-{
-	return round_down( dividend, divisor );
+	return floor( dividend, divisor ) * divisor;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

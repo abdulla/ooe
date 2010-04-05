@@ -70,7 +70,7 @@ public:
 
 	virtual void allocate( up_t size )
 	{
-		size = round_up< executable::static_page_size >( size + executable::static_page_size );
+		size = round_up( size + executable::static_page_size, executable::static_page_size );
 		scoped_ptr< shared_memory >
 			( new shared_memory( unique_name(), shared_memory::create, size ) ).swap( memory );
 

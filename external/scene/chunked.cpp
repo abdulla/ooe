@@ -441,7 +441,7 @@ namespace ooe
 			if ( !( lod & 0xff00 ) )
 				lod = static_cast< u16 >( clamp( this_lod, lod & 0xff00, lod | 0xff ) );
 
-			morph = 1.f - divide( lod & 255, 255 );
+			morph = 1.f - ( lod & 255 ) / 255.f;
 			split = false;
 			return;
 		}
