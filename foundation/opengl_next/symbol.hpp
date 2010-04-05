@@ -18,7 +18,7 @@ enum
 	SRC_ALPHA					= 0x0302,
 	ONE_MINUS_SRC_ALPHA			= 0x0303,
 
-	FRONT						= 0x0404,
+	BACK_LEFT					= 0x0402,
 
 	DEPTH_TEST					= 0x0B71,
 	BLEND						= 0x0BE2,

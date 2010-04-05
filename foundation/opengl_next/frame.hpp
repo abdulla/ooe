@@ -14,8 +14,8 @@ public:
 	default_frame( u32, u32 );
 	virtual ~default_frame( void );
 
-	virtual void write( const frame_type& );
-	virtual void read( buffer_type&, image::type );
+	virtual void read( buffer_type&, image::type, u8 ) const;
+	virtual void write( const frame_type&, u8 );
 	virtual void clear( void );
 
 	virtual void output( attachment_type, const texture_type& );
@@ -29,27 +29,23 @@ private:
 struct frame
 	: public ooe::frame
 {
-public:
 	typedef std::vector< u32 > colour_vector;
 
 	const u32 id;
 	const u32 width;
 	const u32 height;
-	bool check;
+	mutable bool check;
 	colour_vector colours;
 
 	frame( u32, u32, u32 );
 	virtual ~frame( void );
 
-	virtual void write( const frame_type& );
-	virtual void read( buffer_type&, image::type );
+	virtual void read( buffer_type&, image::type, u8 ) const;
+	virtual void write( const frame_type&, u8 );
 	virtual void clear( void );
 
 	virtual void output( attachment_type, const texture_type& );
 	virtual void output( attachment_type, const target_type& );
-
-private:
-	const u32 program;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

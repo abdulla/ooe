@@ -106,17 +106,6 @@ void frame_check( bool& check, u32 target )
 	check = false;
 }
 
-void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height )
-{
-	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
-	BindFramebuffer( READ_FRAMEBUFFER, input.id );
-	frame_check( input.check, READ_FRAMEBUFFER );
-	BindFramebuffer( DRAW_FRAMEBUFFER, id );
-
-	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
-		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
-}
-
 void frame_read( buffer_type& generic_buffer, image::type format, s32 id, u32 width, u32 height,
 	u32 target, bool& check )
 {
@@ -140,6 +129,22 @@ void frame_read( buffer_type& generic_buffer, image::type format, s32 id, u32 wi
 	ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
 
+void frame_write( const frame_type& generic_frame, s32 id, u32 width, u32 height, u32 read_target,
+	u32 draw_target )
+{
+	opengl::frame& input = dynamic_cast< opengl::frame& >( *generic_frame );
+
+	BindFramebuffer( READ_FRAMEBUFFER, input.id );
+	frame_check( input.check, READ_FRAMEBUFFER );
+	ReadBuffer( read_target );
+
+	BindFramebuffer( DRAW_FRAMEBUFFER, id );
+	DrawBuffers( 1, &draw_target );
+
+	BlitFramebuffer( 0, 0, input.width, input.height, 0, 0, width, height,
+		COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
+}
+
 void frame_clear( s32 id, bool& check )
 {
 	BindFramebuffer( DRAW_FRAMEBUFFER, id );
@@ -161,15 +166,15 @@ default_frame::~default_frame( void )
 {
 }
 
-void default_frame::write( const frame_type& generic_frame )
-{
-	frame_write( generic_frame, 0, width, height );
-}
-
-void default_frame::read( buffer_type& generic_buffer, image::type format )
+void default_frame::read( buffer_type& generic_buffer, image::type format, u8 index ) const
 {
 	bool check = false;
-	frame_read( generic_buffer, format, 0, width, height, FRONT, check );
+	frame_read( generic_buffer, format, 0, width, height, BACK_LEFT + index, check );
+}
+
+void default_frame::write( const frame_type& generic_frame, u8 index )
+{
+	frame_write( generic_frame, 0, width, height, COLOR_ATTACHMENT0 + index, BACK_LEFT );
 }
 
 void default_frame::clear( void )
@@ -189,8 +194,8 @@ void default_frame::output( attachment_type, const target_type& )
 }
 
 //--- frame ----------------------------------------------------------------------------------------
-frame::frame( u32 program_, u32 width_, u32 height_ )
-	: id(), width( width_ ), height( height_ ), check( true ), colours(), program( program_ )
+frame::frame( u32 /* program */, u32 width_, u32 height_ )
+	: id(), width( width_ ), height( height_ ), check( true ), colours()
 {
 	GenFramebuffers( 1, const_cast< u32* >( &id ) );
 }
@@ -200,17 +205,17 @@ frame::~frame( void )
 	DeleteFramebuffers( 1, &id );
 }
 
-void frame::write( const frame_type& generic_frame )
-{
-	frame_write( generic_frame, id, width, height );
-}
-
-void frame::read( buffer_type& generic_buffer, image::type format )
+void frame::read( buffer_type& generic_buffer, image::type format, u8 index ) const
 {
 	if ( !colours.size() )
 		throw error::runtime( "opengl::frame: " ) << "Frame has no colour attachment";
 
-	frame_read( generic_buffer, format, id, width, height, COLOR_ATTACHMENT0, check );
+	frame_read( generic_buffer, format, id, width, height, COLOR_ATTACHMENT0 + index, check );
+}
+
+void frame::write( const frame_type& generic_frame, u8 index )
+{
+	frame_write( generic_frame, id, width, height, COLOR_ATTACHMENT0 + index, COLOR_ATTACHMENT0 );
 }
 
 void frame::clear( void )
