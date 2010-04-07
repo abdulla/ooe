@@ -82,7 +82,7 @@ build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'opengl_next', 'foundation/opengl_next', 'io', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
 build.Linkable( 'visual', 'foundation/visual', 'image parallel', ooe.qtkit.framework,
-	ooe.freetype.include_path, ooe.freetype.library_path, VisualConfigure )
+	ooe.freetype.include_path, configure = VisualConfigure )
 
 #--- component -------------------------------------------------------------------------------------
 build.Executable( 'doc', 'component/registry/doc', 'executable registry' )

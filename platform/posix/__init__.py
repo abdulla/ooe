@@ -16,7 +16,6 @@ class ooe:
 
 	class freetype:
 		include_path = '/usr/include/freetype2'
-		library_path = ''
 
 	class lua:
 		include_path = '/usr/include/lua5.1'

@@ -15,8 +15,7 @@ class ooe:
 		include_path = '/sw/include/OpenEXR'
 
 	class freetype:
-		include_path = '/sw/lib/freetype219/include /sw/lib/freetype219/include/freetype2'
-		library_path = '/sw/lib/freetype219/lib'
+		include_path = '/sw/include/freetype2'
 
 	class lua:
 		include_path = ''
