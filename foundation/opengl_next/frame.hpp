@@ -3,6 +3,8 @@
 #ifndef OOE_FOUNDATION_OPENGL_NEXT_FRAME_HPP
 #define OOE_FOUNDATION_OPENGL_NEXT_FRAME_HPP
 
+#include <map>
+
 #include "foundation/visual/graphics.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -14,12 +16,12 @@ public:
 	default_frame( u32, u32 );
 	virtual ~default_frame( void );
 
-	virtual void read( buffer_type&, image::type, u8 ) const;
-	virtual void write( const frame_type&, u8 );
+	virtual void read( const std::string&, image::type, buffer_type& ) const;
+	virtual void write( const std::string&, const std::string&, const frame_type& );
 	virtual void clear( void );
 
-	virtual void output( attachment_type, const texture_type& );
-	virtual void output( attachment_type, const target_type& );
+	virtual void output( const std::string&, const texture_type& );
+	virtual void output( const std::string&, const target_type& );
 
 private:
 	const u32 width;
@@ -30,22 +32,25 @@ struct frame
 	: public ooe::frame
 {
 	typedef std::vector< u32 > colour_vector;
+	typedef std::map< std::string, s32 > location_map;
 
 	const u32 id;
+	const u32 program;
 	const u32 width;
 	const u32 height;
 	mutable bool check;
 	colour_vector colours;
+	mutable location_map locations;
 
 	frame( u32, u32, u32 );
 	virtual ~frame( void );
 
-	virtual void read( buffer_type&, image::type, u8 ) const;
-	virtual void write( const frame_type&, u8 );
+	virtual void read( const std::string&, image::type, buffer_type& ) const;
+	virtual void write( const std::string&, const std::string&, const frame_type& );
 	virtual void clear( void );
 
-	virtual void output( attachment_type, const texture_type& );
-	virtual void output( attachment_type, const target_type& );
+	virtual void output( const std::string&, const texture_type& );
+	virtual void output( const std::string&, const target_type& );
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

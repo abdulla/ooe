@@ -43,18 +43,18 @@ void set_attributes( attribute_set& set, const opengl::block::buffer_map::const_
 
 void enable_attributes( attribute_set& x, attribute_set& y )
 {
-	typedef std::vector< s32 > attributes_vector;
-	typedef std::insert_iterator< attributes_vector > inserter;
-	attributes_vector v;
+	typedef std::vector< s32 > attribute_vector;
+	typedef std::insert_iterator< attribute_vector > inserter;
+	attribute_vector v;
 	std::set_difference( x.begin(), x.end(), y.begin(), y.end(), inserter( v, v.begin() ) );
 
-	for ( attributes_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+	for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
 		DisableVertexAttribArray( *i );
 
 	v.clear();
 	std::set_difference( y.begin(), y.end(), x.begin(), x.end(), inserter( v, v.begin() ) );
 
-	for ( attributes_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
+	for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
 		EnableVertexAttribArray( *i );
 
 	x.swap( y );
@@ -76,17 +76,19 @@ void enable_frame( const frame_type& generic_frame, s32 draw_buffers_limit )
 			"Frame has " << size << " colour attachments, device supports " << draw_buffers_limit;
 
 	BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
+
+	if ( frame.check )
+	{
+		s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
+
+		if ( status != FRAMEBUFFER_COMPLETE )
+			throw error::runtime( "opengl::device: " ) <<
+				"Frame is incomplete: 0x" << hex( status );
+
+		frame.check = false;
+	}
+
 	DrawBuffers( size, &frame.colours[ 0 ] );
-
-	if ( !frame.check )
-		return;
-
-	s32 status = CheckFramebufferStatus( DRAW_FRAMEBUFFER );
-
-	if ( status != FRAMEBUFFER_COMPLETE )
-		throw error::runtime( "opengl::device: " ) << "Frame is incomplete: 0x" << hex( status );
-
-	frame.check = false;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )

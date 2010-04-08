@@ -34,7 +34,7 @@ void load_symbols( void )
 	CompressedTexImage2D = find< CompressedTexImage2D_t >( "glCompressedTexImage2D" );
 	CompressedTexSubImage2D = find< CompressedTexSubImage2D_t >( "glCompressedTexSubImage2D" );
 	TexParameteri = find< TexParameteri_t >( "glTexParameteri" );
-	GenerateMipmap = find< GenerateMipmap_t >( "glGenerateMipmapEXT" );
+	GenerateMipmap = find< GenerateMipmap_t >( "glGenerateMipmap" );
 
 	CreateShader = find< CreateShader_t >( "glCreateShader" );
 	DeleteShader = find< DeleteShader_t >( "glDeleteShader" );
@@ -71,18 +71,18 @@ void load_symbols( void )
 	MapBuffer = find< MapBuffer_t >( "glMapBuffer" );
 	UnmapBuffer = find< UnmapBuffer_t >( "glUnmapBuffer" );
 
-	GenRenderbuffers = find< GenRenderbuffers_t >( "glGenRenderbuffersEXT" );
-	DeleteRenderbuffers = find< DeleteRenderbuffers_t >( "glDeleteRenderbuffersEXT" );
-	BindRenderbuffer = find< BindRenderbuffer_t >( "glBindRenderbufferEXT" );
-	RenderbufferStorage = find< RenderbufferStorage_t >( "glRenderbufferStorageEXT" );
+	GenRenderbuffers = find< GenRenderbuffers_t >( "glGenRenderbuffers" );
+	DeleteRenderbuffers = find< DeleteRenderbuffers_t >( "glDeleteRenderbuffers" );
+	BindRenderbuffer = find< BindRenderbuffer_t >( "glBindRenderbuffer" );
+	RenderbufferStorage = find< RenderbufferStorage_t >( "glRenderbufferStorage" );
 
-	GenFramebuffers = find< GenFramebuffers_t >( "glGenFramebuffersEXT" );
-	DeleteFramebuffers = find< DeleteFramebuffers_t >( "glDeleteFramebuffersEXT" );
-	BindFramebuffer = find< BindFramebuffer_t >( "glBindFramebufferEXT" );
-	BlitFramebuffer = find< BlitFramebuffer_t >( "glBlitFramebufferEXT" );
-	FramebufferTexture2D = find< FramebufferTexture2D_t >( "glFramebufferTexture2DEXT" );
-	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbufferEXT" );
-	CheckFramebufferStatus = find< CheckFramebufferStatus_t >( "glCheckFramebufferStatusEXT" );
+	GenFramebuffers = find< GenFramebuffers_t >( "glGenFramebuffers" );
+	DeleteFramebuffers = find< DeleteFramebuffers_t >( "glDeleteFramebuffers" );
+	BindFramebuffer = find< BindFramebuffer_t >( "glBindFramebuffer" );
+	BlitFramebuffer = find< BlitFramebuffer_t >( "glBlitFramebuffer" );
+	FramebufferTexture2D = find< FramebufferTexture2D_t >( "glFramebufferTexture2D" );
+	FramebufferRenderbuffer = find< FramebufferRenderbuffer_t >( "glFramebufferRenderbuffer" );
+	CheckFramebufferStatus = find< CheckFramebufferStatus_t >( "glCheckFramebufferStatus" );
 	ReadBuffer = find< ReadBuffer_t >( "glReadBuffer" );
 	ReadPixels = find< ReadPixels_t >( "glReadPixels" );
 	Clear = find< Clear_t >( "glClear" );

@@ -136,19 +136,13 @@ typedef shared_ptr< struct frame > frame_type;
 
 struct frame
 {
-	enum attachment_type
-	{
-		colour,
-		depth
-	};
-
 	virtual ~frame( void ) {}
-	virtual void read( buffer_type&, image::type, u8 = 0 /* change to std::string */ ) const = 0;
-	virtual void write( const frame_type&, u8 = 0 /* change to std::string */ ) = 0;
+	virtual void read( const std::string&, image::type, buffer_type& ) const = 0;
+	virtual void write( const std::string&, const std::string&, const frame_type& ) = 0;
 	virtual void clear( void ) = 0;
 
-	virtual void output( attachment_type, const texture_type& ) = 0;
-	virtual void output( attachment_type, const target_type& ) = 0;
+	virtual void output( const std::string&, const texture_type& ) = 0;
+	virtual void output( const std::string&, const target_type& ) = 0;
 };
 
 //--- program --------------------------------------------------------------------------------------
