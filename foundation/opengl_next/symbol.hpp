@@ -150,8 +150,10 @@ typedef void ( GetProgramInfoLog_t )( u32, s32, s32*, c8* );
 
 typedef s32 ( GetUniformLocation_t )( u32, const c8* );
 typedef void ( Uniform1iv_t )( s32, s32, const s32* );
+typedef void ( Uniform2iv_t )( s32, s32, const s32* );
 typedef void ( Uniform3iv_t )( s32, s32, const s32* );
 typedef void ( Uniform1fv_t )( s32, s32, const f32* );
+typedef void ( Uniform2fv_t )( s32, s32, const f32* );
 typedef void ( Uniform3fv_t )( s32, s32, const f32* );
 typedef void ( UniformMatrix3fv_t )( s32, s32, u8, const f32* );
 typedef void ( UniformMatrix4fv_t )( s32, s32, u8, const f32* );
@@ -224,8 +226,10 @@ extern GetProgramInfoLog_t* GetProgramInfoLog;
 
 extern GetUniformLocation_t* GetUniformLocation;
 extern Uniform1iv_t* Uniform1iv;
+extern Uniform2iv_t* Uniform2iv;
 extern Uniform3iv_t* Uniform3iv;
 extern Uniform1fv_t* Uniform1fv;
+extern Uniform2fv_t* Uniform2fv;
 extern Uniform3fv_t* Uniform3fv;
 extern UniformMatrix3fv_t* UniformMatrix3fv;
 extern UniformMatrix4fv_t* UniformMatrix4fv;

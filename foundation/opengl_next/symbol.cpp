@@ -54,8 +54,10 @@ void load_symbols( void )
 
 	GetUniformLocation = find< GetUniformLocation_t >( "glGetUniformLocation" );
 	Uniform1iv = find< Uniform1iv_t >( "glUniform1iv" );
+	Uniform2iv = find< Uniform2iv_t >( "glUniform2iv" );
 	Uniform3iv = find< Uniform3iv_t >( "glUniform3iv" );
 	Uniform1fv = find< Uniform1fv_t >( "glUniform1fv" );
+	Uniform2fv = find< Uniform2fv_t >( "glUniform2fv" );
 	Uniform3fv = find< Uniform3fv_t >( "glUniform3fv" );
 	UniformMatrix3fv = find< UniformMatrix3fv_t >( "glUniformMatrix3fv" );
 	UniformMatrix4fv = find< UniformMatrix4fv_t >( "glUniformMatrix4fv" );
@@ -131,8 +133,10 @@ GetProgramInfoLog_t* GetProgramInfoLog;
 
 GetUniformLocation_t* GetUniformLocation;
 Uniform1iv_t* Uniform1iv;
+Uniform2iv_t* Uniform2iv;
 Uniform3iv_t* Uniform3iv;
 Uniform1fv_t* Uniform1fv;
+Uniform2fv_t* Uniform2fv;
 Uniform3fv_t* Uniform3fv;
 UniformMatrix3fv_t* UniformMatrix3fv;
 UniformMatrix4fv_t* UniformMatrix4fv;
