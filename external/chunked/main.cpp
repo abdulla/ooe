@@ -41,9 +41,9 @@ namespace
 	{
 		vec3 center = aabb_center( box );
 		vec3 viewer = vec3( -center.x, -center.y - aabb_extent( box ).y - 10, -center.z );
-		camera.rotate( vec3( 0, maths::pi_half, 0 ) );
+		camera.rotate( vec3( 0, pi_half, 0 ) );
 		camera.translate( viewer );
-		camera.rotate( vec3( 0, maths::pi_half, 0 ) );
+		camera.rotate( vec3( 0, pi_half, 0 ) );
 	}
 
 	void setup_frame( video& video, chunked& chunked, render_queue& render_queue,
