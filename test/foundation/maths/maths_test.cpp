@@ -33,8 +33,8 @@ namespace ooe
 		{
 			std::cerr << "radian\n";
 
-			OOE_CHECK( "1 rad == pi", is_equal( radian( maths::pi ), maths::pi ) );
-			OOE_CHECK( "180 deg == pi", is_equal( radian( degree( 180 ) ), maths::pi ) );
+			OOE_CHECK( "1 rad == pi", is_equal( radian( pi ), pi ) );
+			OOE_CHECK( "180 deg == pi", is_equal( radian( degree( 180 ) ), pi ) );
 		}
 
 		template<>
@@ -44,7 +44,7 @@ namespace ooe
 			std::cerr << "degree\n";
 
 			OOE_CHECK( "180 deg == 180", is_equal( degree( 180 ), 180 ) );
-			OOE_CHECK( "180 deg == pi", is_equal( degree( radian( maths::pi ) ), 180 ) );
+			OOE_CHECK( "180 deg == pi", is_equal( degree( radian( pi ) ), 180 ) );
 		}
 
 		template<>
