@@ -109,7 +109,7 @@ public:
 
 	virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
 	virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
-	virtual target_type target( u32, u32, u8 ) const;
+	virtual target_type target( u32, u32, image::type ) const;
 	virtual shader_type shader( const std::string&, const descriptor&, shader::type ) const;
 	virtual program_type program( const shader_vector& ) const;
 	virtual frame_type default_frame( u32, u32 ) const;
@@ -268,7 +268,7 @@ buffer_type device::buffer( up_t size, buffer::type format, buffer::usage_type u
 	return new opengl::buffer( size, format, usage );
 }
 
-target_type device::target( u32 width, u32 height, u8 format ) const
+target_type device::target( u32 width, u32 height, image::type format ) const
 {
 	return new opengl::target( width, height, format );
 }

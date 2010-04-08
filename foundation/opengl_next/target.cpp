@@ -6,7 +6,7 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-u32 target_format( u8 format )
+u32 target_format( image::type format )
 {
 	switch ( format )
 	{
@@ -37,13 +37,6 @@ u32 target_format( u8 format )
 	case image::rgba_f32:
 		return RGBA32F;
 
-	//--- depth ----------------------------------------------------------------
-	case ooe::target::depth_u24:
-		return DEPTH_COMPONENT24;
-
-	case ooe::target::depth_f32:
-		return DEPTH_COMPONENT32F;
-
 	//--------------------------------------------------------------------------
 	default:
 		throw error::runtime( "opengl::texture: " ) << "Unknown image format: " << format;
@@ -55,7 +48,7 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- target ---------------------------------------------------------------------------------------
-target::target( u32 width_, u32 height_, u8 format )
+target::target( u32 width_, u32 height_, image::type format )
 	: id(), width( width_ ), height( height_ )
 {
 	GenRenderbuffers( 1, const_cast< u32* >( &id ) );

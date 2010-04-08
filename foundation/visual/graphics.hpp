@@ -92,12 +92,6 @@ typedef shared_ptr< buffer > buffer_type;
 //--- target ---------------------------------------------------------------------------------------
 struct target
 {
-	enum type
-	{
-		depth_u24 = image::compressed,
-		depth_f32
-	};
-
 	virtual ~target( void ) {}
 };
 
@@ -194,7 +188,7 @@ struct device
 		( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
 	virtual buffer_type buffer
 		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
-	virtual target_type target( u32, u32, u8 ) const = 0;
+	virtual target_type target( u32, u32, image::type ) const = 0;
 	virtual shader_type shader( const std::string&, const descriptor&, shader::type ) const = 0;
 	virtual program_type program( const shader_vector& ) const = 0;
 	virtual frame_type default_frame( u32, u32 ) const = 0;
