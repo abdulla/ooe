@@ -33,8 +33,10 @@ public:
 	virtual ~block( void );
 
 	virtual void input( const std::string&, s32 );
+	virtual void input( const std::string&, s32, s32 );
 	virtual void input( const std::string&, s32, s32, s32 );
 	virtual void input( const std::string&, f32 );
+	virtual void input( const std::string&, f32, f32 );
 	virtual void input( const std::string&, f32, f32, f32 );
 	virtual void input( const std::string&, const mat3& );
 	virtual void input( const std::string&, const mat4& );

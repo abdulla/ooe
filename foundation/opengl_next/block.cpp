@@ -31,6 +31,11 @@ void uniform_1i( s32 location, const opengl::block::uniform_data data )
 	Uniform1iv( location, 1, reinterpret_cast< const s32* >( data ) );
 }
 
+void uniform_2i( s32 location, const opengl::block::uniform_data data )
+{
+	Uniform2iv( location, 1, reinterpret_cast< const s32* >( data ) );
+}
+
 void uniform_3i( s32 location, const opengl::block::uniform_data data )
 {
 	Uniform3iv( location, 1, reinterpret_cast< const s32* >( data ) );
@@ -39,6 +44,11 @@ void uniform_3i( s32 location, const opengl::block::uniform_data data )
 void uniform_1f( s32 location, const opengl::block::uniform_data data )
 {
 	Uniform1fv( location, 1, reinterpret_cast< const f32* >( data ) );
+}
+
+void uniform_2f( s32 location, const opengl::block::uniform_data data )
+{
+	Uniform2fv( location, 1, reinterpret_cast< const f32* >( data ) );
 }
 
 void uniform_3f( s32 location, const opengl::block::uniform_data data )
@@ -81,6 +91,16 @@ void block::input( const std::string& name, s32 x )
 	tuple._1 = uniform_1i;
 }
 
+void block::input( const std::string& name, s32 x, s32 y )
+{
+	s32 location = find( id, locations, name, GetUniformLocation );
+	s32 array[] = { x, y };
+
+	uniform_tuple& tuple = uniforms[ location ];
+	std::memcpy( tuple._0, array, sizeof( array ) );
+	tuple._1 = uniform_2i;
+}
+
 void block::input( const std::string& name, s32 x, s32 y, s32 z )
 {
 	s32 location = find( id, locations, name, GetUniformLocation );
@@ -98,6 +118,16 @@ void block::input( const std::string& name, f32 x )
 	uniform_tuple& tuple = uniforms[ location ];
 	std::memcpy( tuple._0, &x, sizeof( x ) );
 	tuple._1 = uniform_1f;
+}
+
+void block::input( const std::string& name, f32 x, f32 y )
+{
+	s32 location = find( id, locations, name, GetUniformLocation );
+	f32 array[] = { x, y };
+
+	uniform_tuple& tuple = uniforms[ location ];
+	std::memcpy( tuple._0, array, sizeof( array ) );
+	tuple._1 = uniform_2f;
 }
 
 void block::input( const std::string& name, f32 x, f32 y, f32 z )
