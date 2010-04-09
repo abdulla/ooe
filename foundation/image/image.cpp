@@ -44,17 +44,23 @@ namespace ooe
 	{
 		switch ( format )
 		{
-		case a_u8:
-		case a_f16:
-		case a_f32:
 		case y_u8:
 		case y_f16:
 		case y_f32:
+		case a_u8:
+		case a_f16:
+		case a_f32:
+		case r_u8:
+		case r_f16:
+		case r_f32:
 			return 1;
 
 		case ya_u8:
 		case ya_f16:
 		case ya_f32:
+		case rg_u8:
+		case rg_f16:
+		case rg_f32:
 			return 2;
 
 		case bgr_u8:
@@ -82,23 +88,29 @@ namespace ooe
 		case bgra_u8:
 		case rgb_u8:
 		case rgba_u8:
-		case a_u8:
 		case y_u8:
 		case ya_u8:
+		case a_u8:
+		case r_u8:
+		case rg_u8:
 			return 1;
 
 		case rgb_f16:
 		case rgba_f16:
-		case a_f16:
 		case y_f16:
 		case ya_f16:
+		case a_f16:
+		case r_f16:
+		case rg_f16:
 			return 2;
 
 		case rgb_f32:
 		case rgba_f32:
-		case a_f32:
 		case y_f32:
 		case ya_f32:
+		case a_f32:
+		case r_f32:
+		case rg_f32:
 			return 4;
 
 		default:

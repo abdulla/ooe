@@ -52,14 +52,20 @@ uncompressed_tuple uncompressed_format( const image_pyramid& pyramid )
 	case image::rgba_u8:
 		return uncompressed_tuple( RGBA8, RGBA, UNSIGNED_BYTE );
 
-	case image::a_u8:
-		return uncompressed_tuple( ALPHA8, ALPHA, UNSIGNED_BYTE );
-
 	case image::y_u8:
 		return uncompressed_tuple( LUMINANCE8, LUMINANCE, UNSIGNED_BYTE );
 
 	case image::ya_u8:
 		return uncompressed_tuple( LUMINANCE8_ALPHA8, LUMINANCE_ALPHA, UNSIGNED_BYTE );
+
+	case image::a_u8:
+		return uncompressed_tuple( ALPHA8, ALPHA, UNSIGNED_BYTE );
+
+	case image::r_u8:
+		return uncompressed_tuple( R8, RED, UNSIGNED_BYTE );
+
+	case image::rg_u8:
+		return uncompressed_tuple( RG8, RG, UNSIGNED_BYTE );
 
 	//--- f16 ------------------------------------------------------------------
 	case image::rgb_f16:
@@ -68,14 +74,20 @@ uncompressed_tuple uncompressed_format( const image_pyramid& pyramid )
 	case image::rgba_f16:
 		return uncompressed_tuple( RGBA16F, RGBA, HALF_FLOAT );
 
-	case image::a_f16:
-		return uncompressed_tuple( ALPHA16F, ALPHA, HALF_FLOAT );
-
 	case image::y_f16:
 		return uncompressed_tuple( LUMINANCE16F, LUMINANCE, HALF_FLOAT );
 
 	case image::ya_f16:
 		return uncompressed_tuple( LUMINANCE_ALPHA16F, LUMINANCE_ALPHA, HALF_FLOAT );
+
+	case image::a_f16:
+		return uncompressed_tuple( ALPHA16F, ALPHA, HALF_FLOAT );
+
+	case image::r_f16:
+		return uncompressed_tuple( R16F, RED, HALF_FLOAT );
+
+	case image::rg_f16:
+		return uncompressed_tuple( RG16F, RG, HALF_FLOAT );
 
 	//--- f32 ------------------------------------------------------------------
 	case image::rgb_f32:
@@ -84,14 +96,20 @@ uncompressed_tuple uncompressed_format( const image_pyramid& pyramid )
 	case image::rgba_f32:
 		return uncompressed_tuple( RGBA32F, RGBA, FLOAT );
 
-	case image::a_f32:
-		return uncompressed_tuple( ALPHA32F, ALPHA, FLOAT );
-
 	case image::y_f32:
 		return uncompressed_tuple( LUMINANCE32F, LUMINANCE, FLOAT );
 
 	case image::ya_f32:
 		return uncompressed_tuple( LUMINANCE_ALPHA16F, LUMINANCE_ALPHA, FLOAT );
+
+	case image::a_f32:
+		return uncompressed_tuple( ALPHA32F, ALPHA, FLOAT );
+
+	case image::r_f32:
+		return uncompressed_tuple( R32F, RED, FLOAT );
+
+	case image::rg_f32:
+		return uncompressed_tuple( RG32F, RG, FLOAT );
 
 	//--------------------------------------------------------------------------
 	default:
@@ -164,7 +182,7 @@ void texture::verify( const image& image, u32 x, u32 y, u8 level ) const
 			"Mipmap level " << level << " should be 0, if generate mipmap is set";
 	else if ( levels && level >= levels )
 		throw error::runtime( "opengl::texture: " ) <<
-			"Mipmap level " << level << " is greater than maximum level " << levels - 1;
+			"Mipmap level " << level << " > maximum level " << levels - 1;
 	else if ( image.width + x > w || image.height + y > h )
 		throw error::runtime( "opengl::texture: " ) <<
 			"Image size " << image.width << 'x' << image.height << " and offset " << x << ", " <<

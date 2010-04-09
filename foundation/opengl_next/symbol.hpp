@@ -35,6 +35,7 @@ enum
 	FLOAT						= 0x1406,
 	HALF_FLOAT					= 0x140B,
 
+	RED							= 0x1903,
 	ALPHA						= 0x1906,
 	RGB							= 0x1907,
 	RGBA						= 0x1908,
@@ -64,6 +65,14 @@ enum
 
 	CLAMP_TO_EDGE				= 0x812F,
 	TEXTURE_MAX_LEVEL			= 0x813D,
+
+	RG							= 0x8227,
+	R8							= 0x8229,
+	RG8							= 0x822B,
+	R16F						= 0x822D,
+	R32F						= 0x822E,
+	RG16F						= 0x822F,
+	RG32F						= 0x8230,
 
 	COMPRESSED_RGBA_S3TC_DXT1	= 0x83F1,
 	COMPRESSED_RGBA_S3TC_DXT3	= 0x83F2,
