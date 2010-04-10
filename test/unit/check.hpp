@@ -8,7 +8,7 @@ do\
 {\
 	ooe::unit::fail();\
 	std::cerr <<\
-		reason "\n"\
+		reason << "\n"\
 		"\tFile \"" __FILE__ "\", Line " << __LINE__ << ":\n"\
 		"\t" detail "\n";\
 }\
