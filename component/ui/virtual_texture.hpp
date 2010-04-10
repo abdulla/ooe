@@ -12,27 +12,26 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 //--- physical_source ------------------------------------------------------------------------------
 struct physical_source
 {
-	typedef tuple< u32, u32 > dimension_type;
-
 	virtual ~physical_source( void ) {}
 
-	virtual dimension_type dimension( void ) const = 0;
 	virtual image::type format( void ) const = 0;
+	virtual u32 size( void ) const = 0;
 	virtual u16 page_size( void ) const = 0;
 
 	virtual image read( u32, u32, u8 ) = 0;
 };
 
+//--- physical_cache -------------------------------------------------------------------------------
+
 //--- virtual_texture ------------------------------------------------------------------------------
 class virtual_texture
 {
 public:
-	virtual_texture( const device_type&, physical_source&, u32, u32 );
+	virtual_texture( const device_type&, physical_source& );
 
 	program_type program( const device_type&, shader_vector& ) const;
 	block_type block( const program_type&, const buffer_type& ) const;
-	frame_type frame( const program_type& ) const;
-	void write( const frame_type&, frame_type& );
+	void load( u32, u32, u32, u32, u8 );
 
 private:
 	typedef std::list< buffer_type > readback_type;
@@ -40,17 +39,14 @@ private:
 	typedef std::list< cache_tuple > cache_type;
 
 	physical_source& source;
-	u32 frame_width;
-	u32 frame_height;
-	u32 cache_dimension;
+	u8 table_levels;
+	u32 table_size;
+	u32 cache_size;
 
 	shader_type shader;
 	texture_type page_table;
 	texture_type page_cache;
 
-	target_type fragment_target;
-	target_type writeback_target;
-	readback_type readback_list;
 	// cache_type free_list;
 	// cache_type used_list;	// lru-sorted
 };

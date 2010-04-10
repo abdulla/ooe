@@ -5,8 +5,9 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
-font_source::font_source( font::face& face_, u32 size )
-	: face( face_ ), width( face.number( font::face::glyphs ) * size ), height( size )
+font_source::font_source( font::face& face_, u32 font_size )
+	// incorrect, but temporary, size calculation
+	: face( face_ ), size_( face.number( font::face::glyphs ) * font_size )
 {
 }
 
@@ -14,14 +15,14 @@ font_source::~font_source( void )
 {
 }
 
-font_source::dimension_type font_source::dimension( void ) const
-{
-	return dimension_type( width, height );
-}
-
 image::type font_source::format( void ) const
 {
 	return image::a_u8;
+}
+
+u32 font_source::size( void ) const
+{
+	return size_;
 }
 
 u16 font_source::page_size( void ) const

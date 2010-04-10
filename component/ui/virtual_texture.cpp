@@ -1,39 +1,27 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
+#include <cmath>
 #include <cstring>
 
 #include "component/ui/virtual_texture.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/utility/arithmetic.hpp"
+#include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const up_t readback_limit = 3;
-const image::type table_format = image::rgba_f32;
-const image::type readback_format = image::rgba_u8;
+const image::type table_format = image::rgb_f32;
 const c8 shader_name[] = "virtual_texture.fs";
 
-uncompressed_image blank_image( u32 width, u32 height, image::type format )
+uncompressed_image table_image( u32 size )
 {
-	uncompressed_image image( width, height, format );
-	std::memset( image.get(), 0, image.byte_size() );
+	uncompressed_image image( size, size, table_format );
+
+	for ( f32* i = image.as< f32 >(), * end = i + size * size * image.channels(); i != end; ++i )
+		*i = -1;
+
 	return image;
-}
-
-// from "Advanced Virtual Texture Topics" by Mittring
-u16 f16( f32 value )
-{
-	u32 int_float;
-	std::memcpy( &int_float, &value, sizeof( int_float ) );
-
-	u32 mantissa = int_float & 0x7fffff;
-	s32 exponent = ( s32 )( ( int_float >> 23 ) & 0xff ) - ( s32 )0x7f;
-	u32 sign = int_float >> 31;
-
-	return ( u16 )( sign << 15 ) | ( u32 )( ( exponent + 0xf ) << 10 ) | ( mantissa >> 13 );
 }
 
 shader_type make_shader( const device_type& device, const std::string& name )
@@ -47,48 +35,37 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- virtual_texture ------------------------------------------------------------------------------
-virtual_texture::virtual_texture( const device_type& device, physical_source& source_,
-	u32 frame_width_, u32 frame_height_ )
-	: source( source_ ), frame_width( frame_width_ ), frame_height( frame_height_ ),
-	cache_dimension(), shader( make_shader( device, shader_name ) ), page_table(), page_cache(),
-	fragment_target( device->target( frame_width, frame_height, readback_format ) ),
-	writeback_target( device->target( frame_width, frame_height, readback_format ) ),
-	readback_list()
+virtual_texture::virtual_texture( const device_type& device, physical_source& source_ )
+	: source( source_ ), table_levels(), table_size(), cache_size(),
+	shader( make_shader( device, shader_name ) ), page_table(), page_cache()
 {
 	//--- page table -----------------------------------------------------------
-	physical_source::dimension_type dimension = source.dimension();
 	u32 page_size = source.page_size();
-	u32 width = ceiling( dimension._0, page_size );
-	u32 height = ceiling( dimension._1, page_size );
+
+	if ( !is_bit_round( page_size ) )
+		throw error::runtime( "virtual_texture: " ) <<
+			"Page size " << page_size << " is not a power of 2";
+
+	table_size = ceiling( source.size(), page_size );
 	u32 size_limit = device->limit( device::texture_size );
 
-	if ( width > size_limit || height > size_limit )
-		throw error::runtime( "virtual_texture: " ) << "Page table size " << width << 'x' <<
-			height << " > device texture size " << size_limit;
+	if ( table_size > size_limit )
+		throw error::runtime( "virtual_texture: " ) <<
+			"Page table size " << table_size << " > device texture size " << size_limit;
 
-	image_pyramid table_pyramid( blank_image( width, height, table_format ) );
+	image_pyramid table_pyramid( table_image( table_size ) );
+	u32 i = 1;
 
-	for ( u32 x = width >> 1, y = height >> 1; x && y; x >>= 1, y >>= 1 )
-		table_pyramid.push_back( blank_image( x, y, table_format ) );
+	for ( u32 x = table_size >> 1; x; x >>= 1, ++i )
+		table_pyramid.push_back( table_image( x ) );
 
+	table_levels = i + 1;
 	page_table = device->texture( table_pyramid, texture::nearest, false );
 
 	//--- page cache -----------------------------------------------------------
-	cache_dimension = round_down( size_limit, page_size );
-	image_pyramid cache_pyramid( blank_image( cache_dimension, cache_dimension, source.format() ) );
+	cache_size = round_down( size_limit, page_size );
+	image_pyramid cache_pyramid( cache_size, cache_size, source.format() );
 	page_cache = device->texture( cache_pyramid, texture::nearest, false );
-
-	//--- read-back ------------------------------------------------------------
-	u32 readback_size = frame_width * frame_height * 4;
-
-	for ( up_t i = 0; i != readback_limit; ++i )
-	{
-		readback_list.push_back( device->buffer( readback_size, buffer::pixel ) );
-		{
-			map_type map = readback_list.back()->map( buffer::write );
-			std::memset( map->data, 0, map->size );
-		}
-	}
 }
 
 program_type virtual_texture::program( const device_type& device, shader_vector& vector ) const
@@ -105,30 +82,42 @@ block_type virtual_texture::block( const program_type& program_, const buffer_ty
 	return block_;
 }
 
-frame_type virtual_texture::frame( const program_type& program_ ) const
+void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level )
 {
-	frame_type frame_ = program_->frame( frame_width, frame_height );
-	frame_->output( frame::colour, fragment_target );
-	frame_->output( frame::colour, writeback_target );
-	return frame_;
-}
+	u32 size = source.size();
 
-void virtual_texture::write( const frame_type& input, frame_type& output )
-{
-	input->read( readback_list.back(), readback_format, 1 );
-	readback_list.splice( readback_list.end(), readback_list, readback_list.begin() );
+	if ( level >= table_levels )
+		throw error::runtime( "virtual_texture: " ) <<
+			"Mipmap level " << level << " > maximum level " << table_levels - 1;
+	else if ( x + width > size || y + height > size )
+		throw error::runtime( "virtual_texture: " ) <<
+			"Load of (" << x << ", " << y << ", " << width << ", " << height <<
+			") is outside of source size " << size << " at level " << level;
+
+	u32 page_size = source.page_size();
+	u32 page_x1 = floor( x >> level, page_size );
+	u32 page_y1 = floor( y >> level, page_size );
+	u32 page_x2 = ceiling( ( x + width ) >> level, page_size );
+	u32 page_y2 = ceiling( ( y + height ) >> level, page_size );
+
+	uncompressed_image table_image( page_x2 - page_x1, page_y2 - page_y1, table_format );
+	f32* update = table_image.as< f32 >();
+
+	// TODO: limit the load by some number of texels
+	for ( u32 j = page_y1; j != page_y2; ++j )
 	{
-		map_type map = readback_list.back()->map( buffer::read );
-
-		for ( u8* i = static_cast< u8* >( map->data ), * end = i + map->size; i != end; i += 4 )
+		for ( u32 i = page_x1; i != page_x2; ++i, update += table_image.channels() )
 		{
-			if ( i[ 0 ] || i[ 1 ] )
-				std::cout << "rgba: " <<
-					i[ 0 ] << ' ' << i[ 1 ] << ' ' << i[ 2 ] << ' ' << i[ 3 ] << '\n';
+			image cache_image = source.read( i, j, level );
+			page_cache->write( cache_image, 0, 0, 0 );
+
+			update[ 0 ] = 0;	// should be multiplied by 1 / cache_size
+			update[ 1 ] = 0;	// ditto
+			update[ 2 ] = std::pow( 2, level ) / table_size;	// should be 2^(mipmap level)
 		}
 	}
 
-	output->write( input );
+	page_table->write( table_image, page_x1, page_y1, level );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
