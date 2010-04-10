@@ -8,57 +8,32 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- is_bit_round ---------------------------------------------------------------------------------
-template< typename type >
-	bool is_bit_round( type value )
+template< typename t >
+	bool is_bit_round( t value )
 {
 	return value > 0 && !( value & ( value - 1 ) );
 }
 
-//--- bit_round ------------------------------------------------------------------------------------
-inline u8 bit_round( u8 value_ )
+//--- bit_round_up ---------------------------------------------------------------------------------
+template< typename t >
+	t bit_round_up( t value )
 {
-	u32 value = value_;
+	if ( !value )
+		return 1;
 
 	--value;
-	value |= value >> 1;
-	value |= value >> 2;
-	value |= value >> 4;
-	return static_cast< u8 >( ++value );
-}
 
-inline u16 bit_round( u16 value_ )
-{
-	u32 value = value_;
+	for ( up_t i = 1; i != sizeof( t ) * 8; i <<= 1 )
+		value |= value >> i;
 
-	--value;
-	value |= value >> 1;
-	value |= value >> 2;
-	value |= value >> 4;
-	value |= value >> 8;
-	return static_cast< u16 >( ++value );
-}
-
-inline u32 bit_round( u32 value )
-{
-	--value;
-	value |= value >> 1;
-	value |= value >> 2;
-	value |= value >> 4;
-	value |= value >> 8;
-	value |= value >> 16;
 	return ++value;
 }
 
-inline u64 bit_round( u64 value )
+//--- bit_round_down -------------------------------------------------------------------------------
+template< typename t >
+	t bit_round_down( t value )
 {
-	--value;
-	value |= value >> 1;
-	value |= value >> 2;
-	value |= value >> 4;
-	value |= value >> 8;
-	value |= value >> 16;
-	value |= value >> 32;
-	return ++value;
+	return bit_round_up( value ) >> 1;
 }
 
 //--- bit_count ------------------------------------------------------------------------------------
