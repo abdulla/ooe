@@ -10,7 +10,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 const f32 width = 1024;
 const f32 height = 640;
-const f32 acceleration = 4;
+u32 acceleration = 4;
 
 //--- process_key ----------------------------------------------------------------------------------
 void process_key( u32 value, bool press, vec3& translate, vec3& scale )
@@ -42,6 +42,14 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale )
 
 	case ' ':
 		scale.x = scale.y += acceleration;
+		break;
+
+	case '.':
+		acceleration = acceleration ? acceleration << 1 : 1;
+		break;
+
+	case ',':
+		acceleration = acceleration ? acceleration >> 1 : 1;
 		break;
 
 	case 'q':
@@ -150,20 +158,25 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
 	null_source source( 1 * 1024 );
-	virtual_texture virtual_texture( device, source );
+	physical_cache cache( device, source.format(), source.page_size() );
+	virtual_texture virtual_texture( device, cache, source );
 
 	shader_vector vector;
 	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
 	vector.push_back( make_shader( device, root, shader::fragment, "null.fs" ) );
-	program_type program = virtual_texture.program( device, vector );
+	vector.push_back( virtual_texture.shader() );
+	program_type program = device->program( vector );
 
 	buffer_type point = point_buffer( device );
-	block_type block = virtual_texture.block( program, index_buffer( device ) );
+	block_type block = program->block( index_buffer( device ) );
+	block->input( "page_cache", cache.texture() );
+	block->input( "page_table", virtual_texture.texture() );
 	block->input( "vertex", 2, point );
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
 	virtual_texture.load( 0, 0, 256, 256, 0 );
+	virtual_texture.load( 256, 0, 256, 256, 0 );
 
 	frame_type frame = device->default_frame( width, height );
 	vec3 translate( width / 2, height / 2, 0 );

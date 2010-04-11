@@ -1,7 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include <cmath>
-#include <cstring>
 
 #include "component/ui/virtual_texture.hpp"
 #include "foundation/executable/program.hpp"
@@ -14,14 +13,41 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 const image::type table_format = image::rgb_f32;
 const c8 shader_name[] = "virtual_texture.fs";
 
-uncompressed_image table_image( u32 size )
+u32 cache_width( const device_type& device, u32 page_size )
 {
-	uncompressed_image image( size, size, table_format );
+	if ( !is_bit_round( page_size ) )
+		throw error::runtime( "physical_cache: " ) <<
+			"Page size " << page_size << " is not a power of 2";
 
-	for ( f32* i = image.as< f32 >(), * end = i + size * size * image.channels(); i != end; ++i )
-		*i = -1;
+	return round_down( device->limit( device::texture_size ), page_size );
+}
 
-	return image;
+u32 table_width( const device_type& device, const physical_source& source )
+{
+	u32 table_size = ceiling< u32 >( source.size(), source.page_size() );
+	u32 size_limit = device->limit( device::texture_size );
+
+	if ( table_size > size_limit )
+		throw error::runtime( "virtual_texture: " ) <<
+			"Page table size " << table_size << " > device texture size " << size_limit;
+
+	return table_size;
+}
+
+texture_type make_cache( const device_type& device, image::type format, u32 cache_size )
+{
+	image_pyramid pyramid( cache_size, cache_size, format );
+	return device->texture( pyramid, texture::nearest, false );
+}
+
+texture_type make_table( const device_type& device, u32 table_size )
+{
+	image_pyramid pyramid( uncompressed_image( table_size, table_size, table_format ) );
+
+	for ( u32 x = table_size >> 1; x; x >>= 1 )
+		pyramid.push_back( uncompressed_image( x, x, table_format ) );
+
+	return device->texture( pyramid, texture::nearest, false );
 }
 
 shader_type make_shader( const device_type& device, const std::string& name )
@@ -34,61 +60,81 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+//--- physical_cache -------------------------------------------------------------------------------
+physical_cache::
+	physical_cache( const device_type& device, image::type physical_format, u16 physical_page_size )
+	: format_( physical_format ), page_size_( physical_page_size ),
+	cache_size( cache_width( device, page_size_ ) ),
+	cache( make_cache( device, format_, cache_size ) ), free_list(), used_list()
+{
+	for ( u32 y = 0; y != cache_size; y += page_size_ )
+	{
+		for ( u32 x = 0; x != cache_size; x += page_size_ )
+			free_list.push_back( cache_tuple( x, y, false ) );
+	}
+}
+
+image::type physical_cache::format( void ) const
+{
+	return format_;
+}
+
+u16 physical_cache::page_size( void ) const
+{
+	return page_size_;
+}
+
+texture_type physical_cache::texture( void ) const
+{
+	return cache;
+}
+
+physical_cache::write_tuple physical_cache::write( const image& image, bool locked )
+{
+	used_list.splice( used_list.end(), free_list, free_list.begin() );
+	cache_tuple& tuple = used_list.back();
+	tuple._2 = locked;
+
+	cache->write( image, tuple._0, tuple._1, 0 );
+	return write_tuple( divide( tuple._0, cache_size ), divide( tuple._1, cache_size ) );
+}
+
 //--- virtual_texture ------------------------------------------------------------------------------
-virtual_texture::virtual_texture( const device_type& device, physical_source& source_ )
-	: source( source_ ), table_levels(), table_size(), cache_size(),
-	shader( make_shader( device, shader_name ) ), page_table(), page_cache()
+virtual_texture::
+	virtual_texture( const device_type& device, physical_cache& cache_, physical_source& source_ )
+	: cache( cache_ ), source( source_ ), table_size( table_width( device, source ) ),
+	level_limit( log2( table_size ) ), shader_( make_shader( device, shader_name ) ),
+	table( make_table( device, table_size ) )
 {
-	//--- page table -----------------------------------------------------------
-	u32 page_size = source.page_size();
+	// load base texture and lock
+	image cache_image = source.read( 0, 0, level_limit );
+	physical_cache::write_tuple tuple = cache.write( cache_image, true );
 
-	if ( !is_bit_round( page_size ) )
-		throw error::runtime( "virtual_texture: " ) <<
-			"Page size " << page_size << " is not a power of 2";
-
-	table_size = ceiling( source.size(), page_size );
-	u32 size_limit = device->limit( device::texture_size );
-
-	if ( table_size > size_limit )
-		throw error::runtime( "virtual_texture: " ) <<
-			"Page table size " << table_size << " > device texture size " << size_limit;
-
-	image_pyramid table_pyramid( table_image( table_size ) );
-	u32 i = 1;
-
-	for ( u32 x = table_size >> 1; x; x >>= 1, ++i )
-		table_pyramid.push_back( table_image( x ) );
-
-	table_levels = i + 1;
-	page_table = device->texture( table_pyramid, texture::nearest, false );
-
-	//--- page cache -----------------------------------------------------------
-	cache_size = round_down( size_limit, page_size );
-	image_pyramid cache_pyramid( cache_size, cache_size, source.format() );
-	page_cache = device->texture( cache_pyramid, texture::nearest, false );
+	uncompressed_image table_image( 1, 1, table_format );
+	f32* rgb = table_image.as< f32 >();
+	rgb[ 0 ] = tuple._0;
+	rgb[ 1 ] = tuple._1;
+	rgb[ 2 ] = divide( std::pow( 2, level_limit ), table_size );
+	table->write( table_image, 0, 0, level_limit );
 }
 
-program_type virtual_texture::program( const device_type& device, shader_vector& vector ) const
+shader_type virtual_texture::shader( void ) const
 {
-	vector.push_back( shader );
-	return device->program( vector );
+	return shader_;
 }
 
-block_type virtual_texture::block( const program_type& program_, const buffer_type& buffer ) const
+texture_type virtual_texture::texture( void ) const
 {
-	block_type block_ = program_->block( buffer );
-	block_->input( "page_table", page_table );
-	block_->input( "page_cache", page_cache );
-	return block_;
+	return table;
 }
 
 void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level )
 {
 	u32 size = source.size();
 
-	if ( level >= table_levels )
+	if ( level > level_limit )
 		throw error::runtime( "virtual_texture: " ) <<
-			"Mipmap level " << level << " > maximum level " << table_levels - 1;
+			"Mipmap level " << level << " > maximum level " << level_limit;
 	else if ( x + width > size || y + height > size )
 		throw error::runtime( "virtual_texture: " ) <<
 			"Load of (" << x << ", " << y << ", " << width << ", " << height <<
@@ -101,23 +147,24 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level )
 	u32 page_y2 = ceiling( ( y + height ) >> level, page_size );
 
 	uncompressed_image table_image( page_x2 - page_x1, page_y2 - page_y1, table_format );
-	f32* update = table_image.as< f32 >();
+	f32* rgb = table_image.as< f32 >();
+	u8 channels = table_image.channels();
 
 	// TODO: limit the load by some number of texels
 	for ( u32 j = page_y1; j != page_y2; ++j )
 	{
-		for ( u32 i = page_x1; i != page_x2; ++i, update += table_image.channels() )
+		for ( u32 i = page_x1; i != page_x2; ++i, rgb += channels )
 		{
 			image cache_image = source.read( i, j, level );
-			page_cache->write( cache_image, 0, 0, 0 );
+			physical_cache::write_tuple tuple = cache.write( cache_image, false );
 
-			update[ 0 ] = 0;	// should be multiplied by 1 / cache_size
-			update[ 1 ] = 0;	// ditto
-			update[ 2 ] = std::pow( 2, level ) / table_size;	// should be 2^(mipmap level)
+			rgb[ 0 ] = tuple._0;
+			rgb[ 1 ] = tuple._1;
+			rgb[ 2 ] = divide( std::pow( 2, level ), table_size );
 		}
 	}
 
-	page_table->write( table_image, page_x1, page_y1, level );
+	table->write( table_image, page_x1, page_y1, level );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
