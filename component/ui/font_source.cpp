@@ -15,14 +15,14 @@ font_source::~font_source( void )
 {
 }
 
-image::type font_source::format( void ) const
-{
-	return image::a_u8;
-}
-
 u32 font_source::size( void ) const
 {
 	return size_;
+}
+
+image::type font_source::format( void ) const
+{
+	return image::a_u8;
 }
 
 u16 font_source::page_size( void ) const

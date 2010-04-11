@@ -16,14 +16,14 @@ null_source::~null_source( void )
 {
 }
 
-image::type null_source::format( void ) const
-{
-	return image::rgba_u8;
-}
-
 u32 null_source::size( void ) const
 {
 	return size_;
+}
+
+image::type null_source::format( void ) const
+{
+	return image::rgba_u8;
 }
 
 u16 null_source::page_size( void ) const
