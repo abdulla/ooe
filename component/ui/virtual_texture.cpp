@@ -106,6 +106,13 @@ virtual_texture::
 	level_limit( log2( table_size ) ), shader_( make_shader( device, shader_name ) ),
 	table( make_table( device, table_size ) )
 {
+	if ( cache.format() != source.format() )
+		throw error::runtime( "virtual_texture: " ) << "Cache image format " << cache.format() <<
+			" != source image format " << source.format();
+	else if ( cache.page_size() != source.page_size() )
+		throw error::runtime( "virtual_texture: " ) << "Cache page size " << cache.page_size() <<
+			" != source page size " << source.page_size()
+
 	// load base texture and lock
 	image cache_image = source.read( 0, 0, level_limit );
 	physical_cache::write_tuple tuple = cache.write( cache_image, true );
