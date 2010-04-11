@@ -9,6 +9,12 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+//--- divide ---------------------------------------------------------------------------------------
+inline f32 divide( f32 dividend, f32 divisor )
+{
+	return dividend / divisor;
+}
+
 //--- clamp ----------------------------------------------------------------------------------------
 template< typename type >
 	type clamp( type value, type min, type max )
