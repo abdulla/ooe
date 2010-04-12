@@ -152,7 +152,7 @@ void set_levels( bool generate_mipmap, u32 levels )
 	if ( generate_mipmap )
 		GenerateMipmap( TEXTURE_2D );
 	else
-		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, levels );
+		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, levels ? levels - 1 : 0 );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -180,7 +180,7 @@ void texture::verify( const image& image, u32 x, u32 y, u8 level ) const
 	if ( level && generate_mipmap )
 		throw error::runtime( "opengl::texture: " ) <<
 			"Mipmap level " << level << " should be 0, if generate mipmap is set";
-	else if ( levels && level >= levels )
+	else if ( level && level >= levels )
 		throw error::runtime( "opengl::texture: " ) <<
 			"Mipmap level " << level << " > maximum level " << levels - 1;
 	else if ( image.width + x > w || image.height + y > h )
@@ -204,6 +204,7 @@ compressed_texture::compressed_texture
 
 	BindTexture( TEXTURE_2D, id );
 	set_filter( filter );
+	set_levels( generate_mipmap, levels );
 
 	for ( u32 i = 0; i != levels; ++i )
 		CompressedTexImage2D
@@ -211,8 +212,6 @@ compressed_texture::compressed_texture
 
 	if ( !levels )
 		CompressedTexImage2D( TEXTURE_2D, 0, internal, width, height, 0, size, 0 );
-
-	set_levels( generate_mipmap, levels );
 }
 
 void compressed_texture::write( const image& image, u32 x, u32 y, u8 level )
@@ -238,6 +237,7 @@ uncompressed_texture::uncompressed_texture
 
 	BindTexture( TEXTURE_2D, id );
 	set_filter( filter );
+	set_levels( generate_mipmap, levels );
 
 	for ( u32 i = 0; i != levels; ++i )
 		TexImage2D
@@ -245,8 +245,6 @@ uncompressed_texture::uncompressed_texture
 
 	if ( !levels )
 		TexImage2D( TEXTURE_2D, 0, tuple._0, width, height, 0, external, type, 0 );
-
-	set_levels( generate_mipmap, levels );
 }
 
 void uncompressed_texture::write( const image& image, u32 x, u32 y, u8 level )
