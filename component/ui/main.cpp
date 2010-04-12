@@ -159,24 +159,31 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	null_source source( 1 * 1024 );
 	physical_cache cache( device, source.format(), source.page_size() );
-	virtual_texture virtual_texture( device, cache, source );
+	virtual_texture vt( device, cache, source );
 
 	shader_vector vector;
 	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
 	vector.push_back( make_shader( device, root, shader::fragment, "null.fs" ) );
-	vector.push_back( virtual_texture.shader() );
+	vector.push_back( make_shader( device, root, shader::fragment, "virtual_texture.fs" ) );
 	program_type program = device->program( vector );
 
 	buffer_type point = point_buffer( device );
 	block_type block = program->block( index_buffer( device ) );
-	block->input( "page_cache", cache.texture() );
-	block->input( "page_table", virtual_texture.texture() );
+	block->input( "cache.page_ratio", cache.page_ratio() );
+	block->input( "cache.page_log2", cache.page_log2() );
+	block->input( "cache.page_cache", cache.page_cache() );
+	block->input( "vt.page_table", vt.page_table() );
 	block->input( "vertex", 2, point );
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
-	virtual_texture.load( 0, 0, 256, 256, 0 );
-	virtual_texture.load( 256, 0, 256, 256, 0 );
+	for ( u32 y = 0; y != 512; y += 256 )
+	{
+		for ( u32 x = 0; x != 512; x += 256 )
+			vt.load( x, y, 256, 256, 0 );
+	}
+
+	vt.load( 0, 0, 256, 256, 1 );
 
 	frame_type frame = device->default_frame( width, height );
 	vec3 translate( width / 2, height / 2, 0 );

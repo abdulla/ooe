@@ -31,7 +31,10 @@ public:
 
 	image::type format( void ) const;
 	u16 page_size( void ) const;
-	texture_type texture( void ) const;
+
+	f32 page_ratio( void ) const;
+	f32 page_log2( void ) const;
+	texture_type page_cache( void ) const;
 
 	write_tuple write( const image&, bool );
 
@@ -54,8 +57,7 @@ class virtual_texture
 public:
 	virtual_texture( const device_type&, physical_cache&, physical_source& );
 
-	shader_type shader( void ) const;
-	texture_type texture( void ) const;
+	texture_type page_table( void ) const;
 
 	void load( u32, u32, u32, u32, u8 );
 
@@ -65,7 +67,6 @@ private:
 	const u32 table_size;
 	const u8 level_limit;
 
-	shader_type shader_;
 	texture_type table;
 };
 

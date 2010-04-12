@@ -1,10 +1,20 @@
-uniform sampler2D page_table;
-uniform sampler2D page_cache;
 varying vec2 texcoord;
 
-vec4 virtual_texture( sampler2D, sampler2D, vec2 );
+uniform struct virtual_texture
+{
+	sampler2D page_table;
+} vt;
+
+uniform struct physical_cache
+{
+	float page_ratio;
+	float page_log2;
+	sampler2D page_cache;
+} cache;
+
+vec4 vtexture2D( virtual_texture, physical_cache, vec2 );
 
 void main( void )
 {
-	gl_FragColor = virtual_texture( page_table, page_cache, texcoord );
+	gl_FragColor = vtexture2D( vt, cache, texcoord );
 }

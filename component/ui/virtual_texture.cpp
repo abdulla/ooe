@@ -3,7 +3,6 @@
 #include <cmath>
 
 #include "component/ui/virtual_texture.hpp"
-#include "foundation/executable/program.hpp"
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
@@ -11,7 +10,6 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 const image::type table_format = image::rgb_f32;
-const c8 shader_name[] = "virtual_texture.fs";
 
 u32 cache_width( const device_type& device, u32 page_size )
 {
@@ -50,12 +48,6 @@ texture_type make_table( const device_type& device, u32 table_size )
 	return device->texture( pyramid, texture::nearest, false );
 }
 
-shader_type make_shader( const device_type& device, const std::string& name )
-{
-	std::string path = executable::path()._0 + "../resource/glsl/" + name;
-	return device->shader( name, path, shader::fragment );
-}
-
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -84,7 +76,17 @@ u16 physical_cache::page_size( void ) const
 	return page_size_;
 }
 
-texture_type physical_cache::texture( void ) const
+f32 physical_cache::page_ratio( void ) const
+{
+	return divide( page_size_, cache_size );
+}
+
+f32 physical_cache::page_log2( void ) const
+{
+	return log2( page_size_ );
+}
+
+texture_type physical_cache::page_cache( void ) const
 {
 	return cache;
 }
@@ -103,15 +105,14 @@ physical_cache::write_tuple physical_cache::write( const image& image, bool lock
 virtual_texture::
 	virtual_texture( const device_type& device, physical_cache& cache_, physical_source& source_ )
 	: cache( cache_ ), source( source_ ), table_size( table_width( device, source ) ),
-	level_limit( log2( table_size ) ), shader_( make_shader( device, shader_name ) ),
-	table( make_table( device, table_size ) )
+	level_limit( log2( table_size ) ), table( make_table( device, table_size ) )
 {
 	if ( cache.format() != source.format() )
 		throw error::runtime( "virtual_texture: " ) << "Cache image format " << cache.format() <<
 			" != source image format " << source.format();
 	else if ( cache.page_size() != source.page_size() )
 		throw error::runtime( "virtual_texture: " ) << "Cache page size " << cache.page_size() <<
-			" != source page size " << source.page_size()
+			" != source page size " << source.page_size();
 
 	// load base texture and lock
 	image cache_image = source.read( 0, 0, level_limit );
@@ -121,16 +122,11 @@ virtual_texture::
 	f32* rgb = table_image.as< f32 >();
 	rgb[ 0 ] = tuple._0;
 	rgb[ 1 ] = tuple._1;
-	rgb[ 2 ] = divide( std::pow( 2, level_limit ), table_size );
+	rgb[ 2 ] = 1;
 	table->write( table_image, 0, 0, level_limit );
 }
 
-shader_type virtual_texture::shader( void ) const
-{
-	return shader_;
-}
-
-texture_type virtual_texture::texture( void ) const
+texture_type virtual_texture::page_table( void ) const
 {
 	return table;
 }
@@ -167,7 +163,7 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level )
 
 			rgb[ 0 ] = tuple._0;
 			rgb[ 1 ] = tuple._1;
-			rgb[ 2 ] = divide( std::pow( 2, level ), table_size );
+			rgb[ 2 ] = std::pow( 2, level_limit - level );
 		}
 	}
 
