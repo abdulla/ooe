@@ -5,6 +5,7 @@
 
 #include <map>
 
+#include "foundation/utility/tuple.hpp"
 #include "foundation/visual/graphics.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )

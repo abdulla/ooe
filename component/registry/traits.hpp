@@ -4,6 +4,7 @@
 #define OOE_COMPONENT_REGISTRY_TRAITS_HPP
 
 #include "foundation/utility/hint.hpp"
+#include "foundation/utility/tuple.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( component ) )
 

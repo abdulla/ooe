@@ -4,6 +4,7 @@
 #include "foundation/opengl_next/texture.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
+#include "foundation/utility/tuple.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

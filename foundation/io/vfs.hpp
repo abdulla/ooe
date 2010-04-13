@@ -6,6 +6,7 @@
 #include <list>
 
 #include "foundation/io/descriptor.hpp"
+#include "foundation/utility/tuple.hpp"
 
 namespace ooe
 {

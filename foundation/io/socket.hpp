@@ -6,6 +6,7 @@
 #include <boost/iterator/iterator_facade.hpp>
 
 #include "foundation/io/socket_forward.hpp"
+#include "foundation/utility/tuple.hpp"
 
 struct sockaddr;
 struct addrinfo;

@@ -4,6 +4,7 @@
 #define OOE_FOUNDATION_IO_FILE_HPP
 
 #include "foundation/io/descriptor.hpp"
+#include "foundation/utility/tuple.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

@@ -9,6 +9,7 @@
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/traits.hpp"
+#include "foundation/utility/tuple.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
