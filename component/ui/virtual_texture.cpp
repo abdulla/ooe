@@ -57,12 +57,12 @@ physical_cache::
 	physical_cache( const device_type& device, image::type physical_format, u16 physical_page_size )
 	: format_( physical_format ), page_size_( physical_page_size ),
 	cache_size( cache_width( device, page_size_ ) ),
-	cache( make_cache( device, format_, cache_size ) ), free_list(), used_list()
+	cache( make_cache( device, format_, cache_size ) ), list(), map()
 {
 	for ( u32 y = 0; y != cache_size; y += page_size_ )
 	{
 		for ( u32 x = 0; x != cache_size; x += page_size_ )
-			free_list.push_back( cache_tuple( x, y, false ) );
+			list.push_back( list_tuple( x, y, false, key_tuple() ) );
 	}
 }
 
@@ -91,14 +91,38 @@ texture_type physical_cache::page_cache( void ) const
 	return cache;
 }
 
-physical_cache::write_tuple physical_cache::write( const image& image, bool locked )
+physical_cache::write_tuple physical_cache::
+	write( const image& image, const virtual_texture& vt, u32 x, u32 y, u8 level, bool locked )
 {
-	used_list.splice( used_list.end(), free_list, free_list.begin() );
-	cache_tuple& tuple = used_list.back();
-	tuple._2 = locked;
+	key_tuple key( &vt, x, y, level );
+	cache_map::const_iterator i = map.find( key );
 
-	cache->write( image, tuple._0, tuple._1, 0 );
-	return write_tuple( divide( tuple._0, cache_size ), divide( tuple._1, cache_size ) );
+	if ( i != map.end() )
+	{
+		list.splice( list.end(), list, i->second );
+		return write_tuple
+			( divide( i->second->_0, cache_size ), divide( i->second->_1, cache_size ), false );
+	}
+
+	cache_list::iterator j = list.begin();
+	cache_list::iterator end = list.end();
+	for ( ; j != end && j->_2; ++j ) {}
+
+	if ( j == end )
+		throw error::runtime( "physical_cache: " ) << "All pages are locked";
+	else if ( j->_3._0 )
+	{
+		// remove key j->_3 from map
+		// add j->_3 to evicted
+	}
+
+	cache->write( image, j->_0, j->_1, 0 );
+	j->_2 = locked;
+	j->_3 = key;
+
+	map.insert( cache_map::value_type( key, j ) );
+	list.splice( list.end(), list, j );
+	return write_tuple( divide( j->_0, cache_size ), divide( j->_1, cache_size ), true );
 }
 
 //--- virtual_texture ------------------------------------------------------------------------------
@@ -116,7 +140,7 @@ virtual_texture::
 
 	// load base texture and lock
 	image cache_image = source.read( 0, 0, level_limit );
-	physical_cache::write_tuple tuple = cache.write( cache_image, true );
+	physical_cache::write_tuple tuple = cache.write( cache_image, *this, 0, 0, level_limit, true );
 
 	uncompressed_image table_image( 1, 1, table_format );
 	f32* rgb = table_image.as< f32 >();
@@ -152,6 +176,7 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level )
 	uncompressed_image table_image( page_x2 - page_x1, page_y2 - page_y1, table_format );
 	f32* rgb = table_image.as< f32 >();
 	u8 channels = table_image.channels();
+	bool write = false;
 
 	// TODO: limit the load by some number of texels
 	for ( u32 j = page_y1; j != page_y2; ++j )
@@ -159,15 +184,18 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level )
 		for ( u32 i = page_x1; i != page_x2; ++i, rgb += channels )
 		{
 			image cache_image = source.read( i, j, level );
-			physical_cache::write_tuple tuple = cache.write( cache_image, false );
+			physical_cache::write_tuple tuple =
+				cache.write( cache_image, *this, i, j, level, false );
 
 			rgb[ 0 ] = tuple._0;
 			rgb[ 1 ] = tuple._1;
 			rgb[ 2 ] = std::pow( 2, level_limit - level );
+			write = write || tuple._2;
 		}
 	}
 
-	table->write( table_image, page_x1, page_y1, level );
+	if ( write )
+		table->write( table_image, page_x1, page_y1, level );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

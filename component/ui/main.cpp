@@ -177,13 +177,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
-	for ( u32 y = 0; y != 512; y += 256 )
-	{
-		for ( u32 x = 0; x != 512; x += 256 )
-			vt.load( x, y, 256, 256, 0 );
-	}
-
-	vt.load( 0, 0, 256, 256, 1 );
+	vt.load( 0, 0, 512, 512, 0 );
+	vt.load( 0, 0, 512, 512, 1 );
 
 	frame_type frame = device->default_frame( width, height );
 	vec3 translate( width / 2, height / 2, 0 );

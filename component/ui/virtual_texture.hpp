@@ -4,10 +4,14 @@
 #define OOE_COMPONENT_UI_VIRTUAL_TEXTURE_HPP
 
 #include <list>
+#include <map>
 
+#include "foundation/utility/tuple.hpp"
 #include "foundation/visual/graphics.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+class virtual_texture;
 
 //--- physical_source ------------------------------------------------------------------------------
 struct physical_source
@@ -25,7 +29,7 @@ struct physical_source
 class physical_cache
 {
 public:
-	typedef tuple< f32, f32 > write_tuple;
+	typedef tuple< f32, f32, bool > write_tuple;
 
 	physical_cache( const device_type&, image::type, u16 );
 
@@ -36,19 +40,24 @@ public:
 	f32 page_log2( void ) const;
 	texture_type page_cache( void ) const;
 
-	write_tuple write( const image&, bool );
+	write_tuple write( const image&, const virtual_texture&, u32, u32, u8, bool );
 
 private:
-	typedef tuple< u32 /* x */, u32 /* y */, bool /* locked */ > cache_tuple;
-	typedef std::list< cache_tuple > cache_type;
+	typedef tuple< const virtual_texture*, u32, u32, u8 > key_tuple;
+	typedef tuple< u32, u32, bool, key_tuple > list_tuple;
+	typedef std::list< list_tuple > cache_list;
+	typedef std::map< key_tuple, cache_list::iterator > cache_map;
+
+	typedef tuple< u32, u32, u8 > value_tuple;
+	typedef std::map< const virtual_texture*, std::vector< value_tuple > > evict_map;
 
 	const image::type format_;
 	const u16 page_size_;
 	const u32 cache_size;
 
 	texture_type cache;
-	cache_type free_list;
-	cache_type used_list;
+	cache_list list;
+	cache_map map;
 };
 
 //--- virtual_texture ------------------------------------------------------------------------------
