@@ -15,7 +15,8 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 class OOE_VISIBLE image_pyramid
 {
 public:
-	typedef std::vector< shared_free< void > > vector_type;
+	typedef shared_free< void > array_type;
+	typedef std::vector< array_type > vector_type;
 
 	const u32 width;
 	const u32 height;
@@ -25,7 +26,8 @@ public:
 	image_pyramid( u32, u32, image::type );
 
 	void push_back( const image& );
-	const vector_type& get( void ) const;
+	u8 size( void ) const;
+	array_type operator []( u8 ) const;
 
 private:
 	vector_type vector;

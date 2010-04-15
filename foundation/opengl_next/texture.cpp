@@ -163,7 +163,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 //--- texture --------------------------------------------------------------------------------------
 texture::texture( const image_pyramid& pyramid, bool generate_mipmap_ )
 	: id(), width( pyramid.width ), height( pyramid.height ), format( pyramid.format ),
-	levels( pyramid.get().size() ), generate_mipmap( generate_mipmap_ )
+	levels( pyramid.size() ), generate_mipmap( generate_mipmap_ )
 {
 	GenTextures( 1, const_cast< u32* >( &id ) );
 }
@@ -201,7 +201,6 @@ compressed_texture::compressed_texture
 	compressed_tuple tuple = compressed_format( pyramid );
 	const_cast< u32& >( internal ) = tuple._0;
 	const_cast< u32& >( size ) = tuple._1;
-	const image_pyramid::vector_type& vector = pyramid.get();
 
 	BindTexture( TEXTURE_2D, id );
 	set_filter( filter );
@@ -209,7 +208,7 @@ compressed_texture::compressed_texture
 
 	for ( u32 i = 0; i != levels; ++i )
 		CompressedTexImage2D
-			( TEXTURE_2D, i, internal, width >> i, height >> i, 0, size, vector[ i ] );
+			( TEXTURE_2D, i, internal, width >> i, height >> i, 0, size, pyramid[ i ] );
 
 	if ( !levels )
 		CompressedTexImage2D( TEXTURE_2D, 0, internal, width, height, 0, size, 0 );
@@ -234,7 +233,6 @@ uncompressed_texture::uncompressed_texture
 	uncompressed_tuple tuple = uncompressed_format( pyramid );
 	const_cast< u32& >( external ) = tuple._1;
 	const_cast< u32& >( type ) = tuple._2;
-	const image_pyramid::vector_type& vector = pyramid.get();
 
 	BindTexture( TEXTURE_2D, id );
 	set_filter( filter );
@@ -242,7 +240,7 @@ uncompressed_texture::uncompressed_texture
 
 	for ( u32 i = 0; i != levels; ++i )
 		TexImage2D
-			( TEXTURE_2D, i, tuple._0, width >> i, height >> i, 0, external, type, vector[ i ] );
+			( TEXTURE_2D, i, tuple._0, width >> i, height >> i, 0, external, type, pyramid[ i ] );
 
 	if ( !levels )
 		TexImage2D( TEXTURE_2D, 0, tuple._0, width, height, 0, external, type, 0 );

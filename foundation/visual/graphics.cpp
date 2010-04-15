@@ -32,9 +32,14 @@ void image_pyramid::push_back( const image& image )
 	vector.push_back( image.ptr() );
 }
 
-const image_pyramid::vector_type& image_pyramid::get( void ) const
+u8 image_pyramid::size( void ) const
 {
-	return vector;
+	return vector.size();
+}
+
+image_pyramid::array_type image_pyramid::operator []( u8 level ) const
+{
+	return vector[ level ];
 }
 
 //--- map ------------------------------------------------------------------------------------------
