@@ -8,11 +8,12 @@ uniform struct vsampler2D
 
 vec4 vtexture2D( vsampler2D sampler, vec2 virtual_address )
 {
-	// entry = { x: physical-x, y: physical-y, z: 2^{ max-level - mipmap-level } }
 	vec4 entry;
 
+	// handle page fault by ascending mipmap levels to find valid data
+	// NOTE: bias must be an integer, otherwise gpu will loop infinitely
 	do
-		entry = texture2D( sampler.page_table, virtual_address, sampler.page_log2++ - .5 );
+		entry = texture2D( sampler.page_table, virtual_address, sampler.page_log2++ );
 	while ( entry.z < 0. );
 
 	vec2 physical_address = entry.xy + fract( virtual_address * entry.z ) * sampler.page_ratio;
