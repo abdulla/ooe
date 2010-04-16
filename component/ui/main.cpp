@@ -158,8 +158,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
 	null_source source( 1 * 1024 );
-	physical_cache cache( device, source.format(), source.page_size() );
-	virtual_texture vt( device, cache, source );
+	virtual_texture vt( device, source );
 
 	shader_vector vector;
 	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
@@ -169,16 +168,15 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	buffer_type point = point_buffer( device );
 	block_type block = program->block( index_buffer( device ) );
-	block->input( "cache.page_ratio", cache.page_ratio() );
-	block->input( "cache.page_log2", cache.page_log2() );
-	block->input( "cache.page_cache", cache.page_cache() );
-	block->input( "vt.page_table", vt.page_table() );
+	vt.input( "vt", block );
 	block->input( "vertex", 2, point );
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
 	vt.load( 0, 0, 512, 512, 0 );
 	vt.load( 0, 0, 512, 512, 1 );
+	vt.load( 0, 0, 1024, 1024, 2 );
+	vt.write();
 
 	frame_type frame = device->default_frame( width, height );
 	vec3 translate( width / 2, height / 2, 0 );

@@ -3,6 +3,7 @@
 #ifndef OOE_COMPONENT_UI_VIRTUAL_TEXTURE_HPP
 #define OOE_COMPONENT_UI_VIRTUAL_TEXTURE_HPP
 
+#include <bitset>
 #include <list>
 #include <map>
 
@@ -25,58 +26,35 @@ struct physical_source
 	virtual image read( u32, u32, u8 ) = 0;
 };
 
-//--- physical_cache -------------------------------------------------------------------------------
-class physical_cache
-{
-public:
-	typedef tuple< f32, f32, bool > write_tuple;
-
-	physical_cache( const device_type&, image::type, u16 );
-
-	image::type format( void ) const;
-	u16 page_size( void ) const;
-
-	f32 page_ratio( void ) const;
-	f32 page_log2( void ) const;
-	texture_type page_cache( void ) const;
-
-	write_tuple write( const image&, const virtual_texture&, u32, u32, u8, bool );
-
-private:
-	typedef tuple< const virtual_texture*, u32, u32, u8 > key_tuple;
-	typedef tuple< u32, u32, bool, key_tuple > list_tuple;
-	typedef std::list< list_tuple > cache_list;
-	typedef std::map< key_tuple, cache_list::iterator > cache_map;
-
-	typedef tuple< u32, u32, u8 > value_tuple;
-	typedef std::map< const virtual_texture*, std::vector< value_tuple > > evict_map;
-
-	const image::type format_;
-	const u16 page_size_;
-	const u32 cache_size;
-
-	texture_type cache;
-	cache_list list;
-	cache_map map;
-};
-
 //--- virtual_texture ------------------------------------------------------------------------------
 class virtual_texture
 {
 public:
-	virtual_texture( const device_type&, physical_cache&, physical_source& );
+	typedef tuple< u32, u32, u8 > key_type;
 
-	texture_type page_table( void ) const;
+	virtual_texture( const device_type&, physical_source& );
 
+	void input( const std::string&, block_type& ) const;
 	void load( u32, u32, u32, u32, u8 );
+	void write( void );
 
 private:
-	physical_cache& cache;
+	typedef tuple< u32, u32, key_type > value_type;
+	typedef std::list< value_type > cache_list;
+	typedef std::map< key_type, cache_list::iterator > cache_map;
+	typedef std::bitset< sizeof( up_t ) > cache_bitset;
+
 	physical_source& source;
 	const u32 table_size;
-	const u8 level_limit;
+	const u32 cache_size;
 
+	image_pyramid pyramid;
 	texture_type table;
+	texture_type cache;
+
+	cache_list list;
+	cache_map map;
+	cache_bitset bitset;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
