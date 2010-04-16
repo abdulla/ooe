@@ -15,22 +15,20 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 class OOE_VISIBLE image_pyramid
 {
 public:
-	typedef shared_free< void > array_type;
-	typedef std::vector< array_type > vector_type;
-
 	const u32 width;
 	const u32 height;
-	const image::type format;
+	const ooe::image::type format;
 
-	image_pyramid( const image& );
-	image_pyramid( u32, u32, image::type );
+	image_pyramid( const ooe::image& );
+	image_pyramid( u32, u32, ooe::image::type );
 
-	void push_back( const image& );
+	void push_back( const ooe::image& );
+	ooe::image image( u8 ) const;
 	u8 size( void ) const;
-	array_type operator []( u8 ) const;
+	shared_free< void > operator []( u8 ) const;
 
 private:
-	vector_type vector;
+	std::vector< shared_free< void > > vector;
 };
 
 //--- texture --------------------------------------------------------------------------------------

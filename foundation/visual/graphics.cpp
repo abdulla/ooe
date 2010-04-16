@@ -6,30 +6,35 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- image_pyramid --------------------------------------------------------------------------------
-image_pyramid::image_pyramid( const image& image )
-	: width( image.width ), height( image.height ), format( image.format ), vector( 1, image.ptr() )
+image_pyramid::image_pyramid( const ooe::image& i )
+	: width( i.width ), height( i.height ), format( i.format ), vector( 1, i.ptr() )
 {
 }
 
-image_pyramid::image_pyramid( u32 width_, u32 height_, image::type format_ )
+image_pyramid::image_pyramid( u32 width_, u32 height_, ooe::image::type format_ )
 	: width( width_ ), height( height_ ), format( format_ ), vector()
 {
 }
 
-void image_pyramid::push_back( const image& image )
+void image_pyramid::push_back( const ooe::image& i )
 {
 	u32 level_width = width >> vector.size();
 	u32 level_height = height >> vector.size();
 
-	if ( image.width != level_width || image.height != level_height )
+	if ( i.width != level_width || i.height != level_height )
 		throw error::runtime( "image_pyramid: " ) <<
-			"Image size " << image.width << 'x' << image.height << " != " <<
+			"Image size " << i.width << 'x' << i.height << " != " <<
 			level_width << 'x' << level_height << " required for level " << vector.size();
-	else if ( image.format != format )
+	else if ( i.format != format )
 		throw error::runtime( "image_pyramid: " ) <<
-			"Image format " << image.format << " != " << format;
+			"Image format " << i.format << " != " << format;
 
-	vector.push_back( image.ptr() );
+	vector.push_back( i.ptr() );
+}
+
+ooe::image image_pyramid::image( u8 level ) const
+{
+	return ooe::image( width >> level, height >> level, format, vector[ level ] );
 }
 
 u8 image_pyramid::size( void ) const
@@ -37,7 +42,7 @@ u8 image_pyramid::size( void ) const
 	return vector.size();
 }
 
-image_pyramid::array_type image_pyramid::operator []( u8 level ) const
+shared_free< void > image_pyramid::operator []( u8 level ) const
 {
 	return vector[ level ];
 }
