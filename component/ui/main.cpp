@@ -157,7 +157,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
-	null_source source( 1 * 1024 );
+	null_source source( 4 * 1024 );
 	virtual_texture vt( device, source );
 
 	shader_vector vector;
@@ -173,9 +173,10 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
-	vt.load( 0, 0, 512, 512, 0 );
-	vt.load( 0, 0, 512, 512, 1 );
-	vt.load( 0, 0, 1024, 1024, 2 );
+	vt.load( 1024, 1024, 1024, 1024, 0 );
+	vt.load( 1024, 1024, 1024, 1024, 1 );
+	vt.load( 1024, 1024, 1024, 1024, 2 );
+	vt.load( 1024, 1024, 1024, 1024, 3 );
 	vt.write();
 
 	frame_type frame = device->default_frame( width, height );
