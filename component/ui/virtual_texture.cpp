@@ -55,11 +55,6 @@ image_pyramid make_pyramid( u32 table_size )
 	return pyramid;
 }
 
-texture_type make_table( const device_type& device, const image_pyramid& pyramid )
-{
-	return device->texture( pyramid, texture::nearest, false );
-}
-
 texture_type make_cache( const device_type& device, const physical_source& source, u32 cache_size )
 {
 	image_pyramid pyramid( cache_size, cache_size, source.format() );
@@ -105,8 +100,8 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 virtual_texture::virtual_texture( const device_type& device, physical_source& source_ )
 	: source( source_ ), table_size( table_width( device, source ) ),
 	cache_size( cache_width( device, source ) ), pyramid( make_pyramid( table_size ) ),
-	table( make_table( device, pyramid ) ), cache( make_cache( device, source, cache_size ) ),
-	list(), map(), bitset()
+	table( device->texture( pyramid, texture::nearest, false ) ),
+	cache( make_cache( device, source, cache_size ) ), list(), map(), bitset()
 {
 	u16 page_size = source.page_size();
 
