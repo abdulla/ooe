@@ -43,7 +43,7 @@ private:
 	typedef tuple< u32, u32, key_type, bool > value_type;
 	typedef std::list< value_type > cache_list;
 	typedef std::map< key_type, cache_list::iterator > cache_map;
-	typedef std::bitset< sizeof( up_t ) > cache_bitset;
+	typedef std::bitset< sizeof( up_t ) * 8 > cache_bitset;
 
 	physical_source& source;
 	const u32 table_size;
