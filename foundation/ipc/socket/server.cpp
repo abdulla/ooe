@@ -108,8 +108,8 @@ void server::accept( void )
 	ooe::socket socket = listen.accept();
 
 	lock lock( mutex );
-	list.push_back( servlet_list::value_type() );
-	list.back() = new servlet( --list.end(), socket, switchboard, *this );
+	list.push_front( servlet_list::value_type() );
+	list.front() = new servlet( list.begin(), socket, switchboard, *this );
 }
 
 void server::erase( servlet_iterator iterator )
@@ -123,8 +123,8 @@ void server::relink( ooe::socket& incoming )
 	ooe::socket socket = incoming.receive();
 
 	lock lock( mutex );
-	list.push_back( servlet_list::value_type() );
-	list.back() = new servlet( --list.end(), socket, switchboard, *this );
+	list.push_front( servlet_list::value_type() );
+	list.front() = new servlet( list.begin(), socket, switchboard, *this );
 }
 
 void server::migrate( ooe::socket& outgoing )
