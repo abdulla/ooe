@@ -235,15 +235,11 @@ template< typename t, typename v >
 	}
 };
 
-OOE_NAMESPACE_END( ( ooe ) )
-
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/utility/traits.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
-
-OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- is_stdcontainer ------------------------------------------------------------------------------
 template< typename t >
@@ -302,8 +298,6 @@ OOE_NAMESPACE_END( ( ooe ) )
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-OOE_NAMESPACE_BEGIN( ( ooe ) )
-
 //--- remove_member --------------------------------------------------------------------------------
 template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 	struct remove_member< r ( t::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) const >
@@ -347,8 +341,6 @@ template< typename a, template< BOOST_PP_ENUM_PARAMS( LIMIT, typename s ) > clas
 	static const bool value = apply< typename no_ref< a >::type >::value;
 };
 #endif
-
-OOE_NAMESPACE_END( ( ooe ) )
 
 	#undef LIMIT
 
