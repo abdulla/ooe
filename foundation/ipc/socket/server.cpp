@@ -33,7 +33,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 servlet::servlet( servlet_iterator iterator_, ooe::socket& socket_,
 	const ipc::switchboard& switchboard_, server& server )
 	: iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ), state( true ),
-	thread( make_function( *this, &servlet::call ), &server )
+	thread( make_function( *this, &servlet::main ), &server )
 {
 }
 
@@ -49,7 +49,7 @@ void servlet::migrate( ooe::socket& outgoing )
 	state = false;
 }
 
-void* servlet::call( void* pointer )
+void* servlet::main( void* pointer )
 {
 	u8 data[ executable::static_page_size ];
 	heap_allocator allocator;

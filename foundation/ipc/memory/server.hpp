@@ -33,7 +33,7 @@ private:
 	atom< bool > state;
 	ooe::thread thread;
 
-	void* call( void* );
+	void* main( void* );
 };
 
 //--- server ---------------------------------------------------------------------------------------

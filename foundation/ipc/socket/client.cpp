@@ -36,7 +36,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 //--- client ---------------------------------------------------------------------------------------
 client::client( const address& address )
 	: connect( address ), map(), in( 0 ), out( 0 ), notify( 0 ), mutex(), condition(),
-	thread( make_function( *this, &client::call ), 0 ),
+	thread( make_function( *this, &client::main ), 0 ),
 	scratch( new u8[ executable::static_page_size ] )
 {
 }
@@ -112,7 +112,7 @@ void client::write( const u8* data, up_t size_ )
 		throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
 }
 
-void* client::call( void* )
+void* client::main( void* )
 {
 	scoped< void ( u64&, ooe::mutex&, ooe::condition& ) >
 		scoped( error_set, notify, mutex, condition );

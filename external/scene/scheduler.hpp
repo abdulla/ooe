@@ -93,7 +93,7 @@ namespace ooe
 
 		void push_back( task_type );
 		task_type pop_front( void ) OOE_HIDDEN;
-		void* call( void* ) OOE_HIDDEN;
+		void* main( void* ) OOE_HIDDEN;
 	};
 }
 

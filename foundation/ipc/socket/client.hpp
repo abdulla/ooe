@@ -49,7 +49,7 @@ private:
 
 	scoped_array< u8 > scratch;
 
-	void* call( void* ) OOE_HIDDEN;
+	void* main( void* ) OOE_HIDDEN;
 };
 
 //--- result_base ----------------------------------------------------------------------------------

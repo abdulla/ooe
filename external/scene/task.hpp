@@ -66,7 +66,7 @@ namespace ooe
 		unique_task( const function_type& function
 			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, t, a ) )
 			: partial( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ), value(),
-			thread( make_function( *this, &unique_task::call ), 0 )
+			thread( make_function( *this, &unique_task::main ), 0 )
 		{
 		}
 
@@ -86,7 +86,7 @@ namespace ooe
 		r value;
 		ooe::thread thread;
 
-		void* call( void* )
+		void* main( void* )
 		{
 			value = partial();
 			return 0;
@@ -103,7 +103,7 @@ namespace ooe
 		unique_task( const function_type& function
 			BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, t, a ) )
 			: partial( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ),
-			thread( make_function( *this, &unique_task::call ), 0 )
+			thread( make_function( *this, &unique_task::main ), 0 )
 		{
 		}
 
@@ -116,7 +116,7 @@ namespace ooe
 		partial_type partial;
 		ooe::thread thread;
 
-		void* call( void* )
+		void* main( void* )
 		{
 			partial();
 			return 0;

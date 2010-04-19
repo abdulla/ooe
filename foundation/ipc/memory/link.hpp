@@ -51,7 +51,7 @@ private:
 	atom< type > state;
 	ooe::thread thread;
 
-	void* call( void* );
+	void* main( void* );
 };
 
 //--- link_client ----------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ private:
 	atom< bool > state;
 	ooe::thread thread;
 
-	void* call( void* );
+	void* main( void* );
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

@@ -14,7 +14,7 @@ class thread_unit
 {
 public:
 	thread_unit( void )
-		: state( true ), thread( thread::function_type( *this, &thread_unit::call ), 0 )
+		: state( true ), thread( thread::function_type( *this, &thread_unit::main ), 0 )
 	{
 	}
 
@@ -54,7 +54,7 @@ private:
 		return task;
 	}
 
-	void* call( void* )
+	void* main( void* )
 	{
 		while ( state )
 		{

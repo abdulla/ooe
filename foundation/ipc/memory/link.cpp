@@ -31,7 +31,7 @@ socket link_listen::accept( void ) const
 //--- link_server ----------------------------------------------------------------------------------
 link_server::link_server( const ooe::socket& socket_, link_t link_, server& server )
 	: socket( socket_ ), pair( make_pair() ), link( link_ ), state( work ),
-	thread( make_function( *this, &link_server::call ), &server )
+	thread( make_function( *this, &link_server::main ), &server )
 {
 }
 
@@ -55,7 +55,7 @@ void link_server::migrate( ooe::socket& migrate_socket )
 	pair._1.shutdown( socket::write );
 }
 
-void* link_server::call( void* pointer )
+void* link_server::main( void* pointer )
 {
 	memory::server& server = *static_cast< memory::server* >( pointer );
 
@@ -75,7 +75,7 @@ void* link_server::call( void* pointer )
 //--- link_client ----------------------------------------------------------------------------------
 link_client::link_client( const std::string& name, transport& transport )
 	: connect( local_address( local_name( name ) ) ), state( true ),
-	thread( make_function( *this, &link_client::call ), &transport )
+	thread( make_function( *this, &link_client::main ), &transport )
 {
 }
 
@@ -94,7 +94,7 @@ link_client::operator bool( void ) const
 	return state;
 }
 
-void* link_client::call( void* pointer )
+void* link_client::main( void* pointer )
 {
 	memory::transport& transport = *static_cast< memory::transport* >( pointer );
 

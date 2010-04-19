@@ -73,7 +73,7 @@ namespace ooe
 		{
 			for ( ; j != workers; ++j )
 			{
-				worker_list.push_back( new worker( make_function( *this, &scheduler::call ) ) );
+				worker_list.push_back( new worker( make_function( *this, &scheduler::main ) ) );
 				worker_list.back()->iterator = --worker_list.end();
 			}
 		}
@@ -98,7 +98,7 @@ namespace ooe
 		return task;
 	}
 
-	void* scheduler::call( void* pointer )
+	void* scheduler::main( void* pointer )
 	{
 		ooe::worker& worker = *static_cast< ooe::worker* >( pointer );
 
