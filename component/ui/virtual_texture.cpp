@@ -162,6 +162,7 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool 
 			{
 				map.erase( page->_2 );
 				write_pyramid( pyramid, page->_2, -1, -1, -1 );
+				bitset.set( page->_2._2 );
 			}
 
 			do_write = true;
