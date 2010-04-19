@@ -63,7 +63,7 @@ template<>
 	for ( s32 i = 0; i != 10000; ++i )
 	{
 		s32 value;
-		OOE_CHECK( "queue.dequeue( value )", queue.dequeue( value ) );
+		while ( !queue.dequeue( value ) ) {}
 		OOE_CHECK( value << " < 10000", value < 10000 );
 	}
 }
