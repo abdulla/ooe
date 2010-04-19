@@ -85,12 +85,16 @@ namespace
 			else if ( status == fork_io::waiting )
 			{
 				if ( i->_3.elapsed() < time_out )
+				{
+					vector[ i->_0 ]._1 += read( i->_2 );
 					continue;
-				else
-					i->_1.signal( SIGKILL );
+				}
+
+				i->_1.signal( SIGKILL );
 			}
 
-			vector[ i->_0 ] = vector_tuple( passed, read( i->_2 ) );
+			vector[ i->_0 ]._0 = passed;
+			vector[ i->_0 ]._1 += read( i->_2 );
 			i = --list.erase( i );
 		}
 	}
