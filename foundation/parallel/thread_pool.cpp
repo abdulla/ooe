@@ -4,8 +4,8 @@
 #include <list>
 
 #include "foundation/executable/environment.hpp"
+#include "foundation/parallel/thread.hpp"
 #include "foundation/parallel/thread_pool.hpp"
-#include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -21,7 +21,7 @@ public:
 	~thread_unit( void )
 	{
 		state = false;
-		// push_back empty task
+		push_back( new task< void ( void ) >( function< void ( void ) >() ) );
 		thread.join();
 	}
 
@@ -59,7 +59,11 @@ private:
 		while ( state )
 		{
 			task_type task = pop_front();
-			OOE_PRINT( "thread_pool", ( *task )() );
+			{
+				lock lock( task->mutex );
+				task->state = task_base::error;
+				OOE_PRINT( "thread_pool", ( *task )(); task->state = task_base::done );
+			}
 			task->condition.notify_all();
 		}
 
@@ -69,10 +73,16 @@ private:
 
 //--- thread_pool ----------------------------------------------------------------------------------
 thread_pool::thread_pool( void )
-	: vector()
+	: index( 0 ), vector()
 {
 	for ( up_t i = 0, end = executable::cpu_cores(); i != end; ++i )
 		vector.push_back( opaque_ptr( new thread_unit, destroy< thread_unit > ) );
+}
+
+void thread_pool::insert( const task_type& task )
+{
+	vector[ index ].as< thread_unit >()->push_back( task );
+	++index %= vector.size();
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

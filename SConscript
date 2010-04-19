@@ -107,6 +107,7 @@ build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
 build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
+build.Executable( 'parallel_test', 'test/foundation/parallel', 'parallel unit' )
 build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 
 build.Linkable( 'unit', 'test/unit', 'io executable' )

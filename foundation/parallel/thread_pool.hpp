@@ -7,89 +7,88 @@
 
 #include <vector>
 
-#include "foundation/parallel/lock.hpp"
-#include "foundation/parallel/thread.hpp"
+#include "foundation/parallel/thread_pool_forward.hpp"
 #include "foundation/utility/atom.hpp"
-#include "foundation/utility/partial.hpp"
+#include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-template< typename >
-	class task;
-
-template< typename >
-	class future;
-
-//--- result ---------------------------------------------------------------------------------------
-template< typename t >
-	class result
-{
-protected:
-	t value;
-
-	friend class future< t >;
-};
-
-//--- task_base ------------------------------------------------------------------------------------
-class task_base
-{
-public:
-	virtual ~task_base( void ) {}
-
-protected:
-	ooe::mutex mutex;
-	ooe::condition condition;
-
-	task_base( void );
-	virtual void operator ()( void ) = 0;
-
-	friend class thread_unit;
-};
-
 typedef atom_ptr< task_base > task_type;
 
-	#define TASK
-	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
-	#define BOOST_PP_FILENAME_1 "foundation/parallel/thread_pool.hpp"
-	#include BOOST_PP_ITERATE()
-	#undef BOOST_PP_FILENAME_1
-	#undef BOOST_PP_ITERATION_LIMITS
-	#undef TASK
-
-//--- future ---------------------------------------------------------------------------------------
-template< typename t >
-	class future
+//--- result_base ----------------------------------------------------------------------------------
+class result_base
 {
-public:
-	future( const task_type& task_ )
+protected:
+	task_type task;
+
+	result_base( const task_type& task_ )
 		: task( task_ )
 	{
 	}
 
-private:
-	task_type task;
+	void wait( void )
+	{
+		lock lock( task->mutex );
+
+		while ( task->state == task_base::wait )
+			task->condition.wait( lock );
+
+		if ( task->state == task_base::error )
+			throw error::runtime( "result: " ) << "An error occured processing the result";
+	}
+};
+
+//--- result ---------------------------------------------------------------------------------------
+template< typename t >
+	struct result
+	: private result_base
+{
+	result( const task_type& task_ )
+		: result_base( task_ )
+	{
+	}
+
+	t& operator ()( void )
+	{
+		wait();
+		return dynamic_cast< task_value< t >& >( *task ).value;
+	}
+};
+
+template<>
+	struct result< void >
+	: private result_base
+{
+	result( const task_type& task_ )
+		: result_base( task_ )
+	{
+	}
+
+	void operator ()( void )
+	{
+		wait();
+	}
 };
 
 //--- thread_pool ----------------------------------------------------------------------------------
 class thread_pool
 {
 public:
+	thread_pool( void ) OOE_VISIBLE;
+	void insert( const task_type& ) OOE_VISIBLE;
+
+private:
 	typedef std::vector< opaque_ptr > vector_type;
 
-	thread_pool( void );
-	~thread_pool( void );
+	up_t index;
+	vector_type vector;
+};
 
-	#define INSERT
 	#define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
 	#define BOOST_PP_FILENAME_1 "foundation/parallel/thread_pool.hpp"
 	#include BOOST_PP_ITERATE()
 	#undef BOOST_PP_FILENAME_1
 	#undef BOOST_PP_ITERATION_LIMITS
-	#undef INSERT
-
-private:
-	vector_type vector;
-};
 
 OOE_NAMESPACE_END( ( ooe ) )
 
@@ -99,58 +98,17 @@ OOE_NAMESPACE_END( ( ooe ) )
 
 	#define LIMIT BOOST_PP_ITERATION()
 
-	#ifdef TASK
-//--- task -----------------------------------------------------------------------------------------
 template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-	class task< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-	: public task_base, public result< r >
+	result< r > async( thread_pool& pool,
+	const function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >& function
+	BOOST_PP_ENUM_TRAILING_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) )
 {
-public:
-	typedef ooe::partial< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > partial_type;
-
-	task( const partial_type& partial_ )
-		: task_base(), result< r >(), partial( partial_ )
-	{
-	}
-
-private:
-	partial_type partial;
-
-	virtual void operator ()( void )
-	{
-		this->value = partial();
-	}
-};
-
-template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
-	class task< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
-	: public task_base
-{
-public:
-	typedef ooe::partial< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > partial_type;
-
-	task( const partial_type& partial_ )
-		: task_base(), partial( partial_ )
-	{
-	}
-
-private:
-	partial_type partial;
-
-	virtual void operator ()( void )
-	{
-		partial();
-	}
-};
-	#endif
-
-	#ifdef INSERT
-	template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
-		future< r >
-		insert( BOOST_PP_ENUM_BINARY_PARAMS( LIMIT, typename call_traits< t, >::param_type a ) )
-	{
-	}
-	#endif
+	typedef task< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > t;
+	typedef typename t::partial_type p;
+	task_type task = new t( p( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ) );
+	pool.insert( task );
+	return task;
+}
 
 	#undef LIMIT
 
