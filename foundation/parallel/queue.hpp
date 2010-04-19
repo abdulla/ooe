@@ -35,6 +35,8 @@ template< typename t >
 class queue_base
 {
 protected:
+	typedef queue_node_base base_type;
+
 	atom< base_type* > head;
 	atom< base_type* > tail;
 
@@ -54,7 +56,6 @@ template< typename t >
 	struct queue
 	: private queue_base
 {
-	typedef queue_node_base base_type;
 	typedef queue_node< t > node_type;
 
 	queue( void )
