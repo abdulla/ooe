@@ -14,12 +14,12 @@ inline void memory_barrier( void )
 }
 #endif
 
-//--- atom -----------------------------------------------------------------------------------------
+//--- atom_base ------------------------------------------------------------------------------------
 template< typename type >
-	class atom
+	class atom_base
 {
 public:
-	atom( type value = 0 )
+	atom_base( type value = 0 )
 		: atomic( value )
 	{
 	}
@@ -69,9 +69,10 @@ public:
 		return compare_exchange( compare, value );
 	}
 
-private:
+protected:
 	volatile type atomic;
 
+private:
 #if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
 	type exchange_add( type value )
 	{
@@ -88,6 +89,37 @@ private:
 		return __sync_bool_compare_and_swap( &atomic, compare, value );
 	}
 #endif
+};
+
+//--- atom -----------------------------------------------------------------------------------------
+template< typename type >
+	struct atom
+	: public atom_base< type >
+{
+	atom( type value_ = 0 )
+		: atom_base< type >( value_ )
+	{
+	}
+};
+
+template< typename type >
+	struct atom< type* >
+	: public atom_base< type* >
+{
+	atom( type* value_ = 0 )
+		: atom_base< type* >( value_ )
+	{
+	}
+
+	type* operator ->( void ) const
+	{
+		return this->atomic;
+	}
+
+	type& operator *( void ) const
+	{
+		return *this->atomic;
+	}
 };
 
 //--- atom_ptr -------------------------------------------------------------------------------------
