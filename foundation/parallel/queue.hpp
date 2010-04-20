@@ -40,17 +40,18 @@ protected:
 	atom< base_type* > head;
 	atom< base_type* > tail;
 
-	queue_base( void )
-		: head( new base_type( 0 ) ), tail( head )
+	queue_base( base_type* node )
+		: head( node ), tail( node )
 	{
 	}
 
 	~queue_base( void )
 	{
-		delete head;
 	}
 };
 
+// implements Michael and Scott's algorithm from:
+// http://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
 //--- queue ----------------------------------------------------------------------------------------
 template< typename t >
 	struct queue
@@ -59,13 +60,13 @@ template< typename t >
 	typedef queue_node< t > node_type;
 
 	queue( void )
-		: queue_base()
+		: queue_base( new node_type( t() ) )
 	{
 	}
 
 	~queue( void )
 	{
-		for ( base_type* i = head->next; i; )
+		for ( base_type* i = head; i; )
 		{
 			base_type* next = i->next;
 			delete static_cast< node_type* >( i );
