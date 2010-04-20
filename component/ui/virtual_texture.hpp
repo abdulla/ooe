@@ -7,6 +7,8 @@
 #include <list>
 #include <map>
 
+#include "foundation/parallel/queue.hpp"
+#include "foundation/parallel/thread_pool.hpp"
 #include "foundation/utility/tuple.hpp"
 #include "foundation/visual/graphics.hpp"
 
@@ -31,13 +33,15 @@ class virtual_texture
 {
 public:
 	typedef tuple< u32, u32, u8 > key_type;
+	typedef tuple< key_type, bool, atom_ptr< image > > pending_type;
+	typedef ooe::queue< pending_type > pending_queue;
 
-	virtual_texture( const device_type&, physical_source& );
+	virtual_texture( const device_type&, physical_source&, thread_pool& );
 
 	void input( const std::string&, block_type& ) const;
 	void load( u32, u32, u32, u32, u8, bool = false );
 	void unlock( u32, u32, u32, u32, u8 );
-	void write( void );
+	up_t write( void );
 
 private:
 	typedef tuple< u32, u32, key_type, bool > value_type;
@@ -46,6 +50,7 @@ private:
 	typedef std::bitset< sizeof( up_t ) * 8 > cache_bitset;
 
 	physical_source& source;
+	thread_pool& pool;
 	const u32 table_size;
 	const u32 cache_size;
 
@@ -56,6 +61,9 @@ private:
 	cache_list list;
 	cache_map map;
 	cache_bitset bitset;
+
+	up_t pending;
+	pending_queue queue;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
