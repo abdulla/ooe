@@ -109,8 +109,7 @@ virtual_texture::
 	: source( source_ ), pool( pool_ ), table_size( table_width( device, source ) ),
 	cache_size( cache_width( device, source ) ), pyramid( make_pyramid( table_size ) ),
 	table( device->texture( pyramid, texture::nearest, false ) ),
-	cache( make_cache( device, source, cache_size ) ), list(), map(), bitset(), pending( 0 ),
-	queue()
+	cache( make_cache( device, source, cache_size ) ), list(), map(), bitset(), loads( 0 ), queue()
 {
 	u16 page_size = source.page_size();
 
@@ -136,6 +135,11 @@ void virtual_texture::input( const std::string& name, block_type& block ) const
 	block->input( name + ".page_table", table );
 }
 
+up_t virtual_texture::pending( void ) const
+{
+	return loads;
+}
+
 void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool locked )
 {
 	u8 level_limit = pyramid.size() - 1;
@@ -158,7 +162,7 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool 
 				continue;
 			}
 
-			++pending;
+			++loads;
 			async( pool, make_function( read_source ), source, queue, key, locked );
 		}
 	}
@@ -181,12 +185,12 @@ void virtual_texture::unlock( u32 x, u32 y, u32 width, u32 height, u8 level )
 	}
 }
 
-up_t virtual_texture::write( void )
+void virtual_texture::write( void )
 {
 	u8 level_limit = pyramid.size() - 1;
 	pending_type value;
 
-	for ( ; queue.dequeue( value ); --pending )
+	for ( ; queue.dequeue( value ); --loads )
 	{
 		// find least-recently-used unlocked page
 		cache_list::iterator page = list.begin();
@@ -219,7 +223,7 @@ up_t virtual_texture::write( void )
 	}
 
 	if ( bitset.none() )
-		return pending;
+		return;
 
 	for ( u8 i = 0, end = pyramid.size(); i != end; ++i )
 	{
@@ -228,7 +232,6 @@ up_t virtual_texture::write( void )
 	}
 
 	bitset.reset();
-	return pending;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

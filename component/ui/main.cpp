@@ -178,7 +178,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	vt.load( 1024, 1024, 1024, 1024, 1 );
 	vt.load( 1024, 1024, 1024, 1024, 2 );
 	vt.load( 1024, 1024, 1024, 1024, 3 );
-	up_t pending = vt.write();
+	vt.write();
 
 	frame_type frame = device->default_frame( width, height );
 	vec3 translate( width / 2, height / 2, 0 );
@@ -195,8 +195,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 		process_events( event_queue, translate, scale );
 
-		if ( pending )
-			pending = vt.write();
+		if ( vt.pending() )
+			vt.write();
 	}
 
 	return true;

@@ -39,9 +39,11 @@ public:
 	virtual_texture( const device_type&, physical_source&, thread_pool& );
 
 	void input( const std::string&, block_type& ) const;
+	up_t pending( void ) const;
+
 	void load( u32, u32, u32, u32, u8, bool = false );
 	void unlock( u32, u32, u32, u32, u8 );
-	up_t write( void );
+	void write( void );
 
 private:
 	typedef tuple< u32, u32, key_type, bool > value_type;
@@ -62,7 +64,7 @@ private:
 	cache_map map;
 	cache_bitset bitset;
 
-	up_t pending;
+	up_t loads;
 	pending_queue queue;
 };
 
