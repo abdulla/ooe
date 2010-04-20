@@ -95,7 +95,7 @@ region_type get_region( const physical_source& source, u8 level_limit,
 void read_source( physical_source& source, virtual_texture::pending_queue& queue,
 	virtual_texture::key_type key, bool locked )
 {
-	atom_ptr< ooe::image > image( new ooe::image( source.read( key._0, key._1, key._2 ) ) );
+	shared_ptr< ooe::image > image( new ooe::image( source.read( key._0, key._1, key._2 ) ) );
 	queue.enqueue( make_tuple( key, locked, image ) );
 }
 

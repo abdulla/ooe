@@ -33,7 +33,7 @@ class virtual_texture
 {
 public:
 	typedef tuple< u32, u32, u8 > key_type;
-	typedef tuple< key_type, bool, atom_ptr< image > > pending_type;
+	typedef tuple< key_type, bool, shared_ptr< image > > pending_type;
 	typedef ooe::queue< pending_type > pending_queue;
 
 	virtual_texture( const device_type&, physical_source&, thread_pool& );

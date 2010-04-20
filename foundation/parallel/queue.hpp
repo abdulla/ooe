@@ -50,8 +50,6 @@ protected:
 	}
 };
 
-// implements Michael and Scott's algorithm from:
-// http://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
 //--- queue ----------------------------------------------------------------------------------------
 template< typename t >
 	struct queue
@@ -74,6 +72,8 @@ template< typename t >
 		}
 	}
 
+	// implements Michael and Scott's algorithm from:
+	// http://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
 	void enqueue( const t& value )
 	{
 		base_type* node = new node_type( value );
