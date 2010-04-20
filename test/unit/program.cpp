@@ -15,7 +15,7 @@ namespace
 	bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** argv )
 	{
 		::signal( SIGCHLD, SIG_DFL );
-		time_t time_out = 60;
+		time_t timeout = 60;
 		bool no_stdout = true;
 
 		for ( s32 option; ( option = getopt( argc, argv, "lst:" ) ) != -1; )
@@ -36,18 +36,18 @@ namespace
 				break;
 
 			case 't':
-				time_out = std::strtoul( optarg, 0, 10 );
+				timeout = std::strtoul( optarg, 0, 10 );
 				break;
 
 			default:
 				std::cout <<
 					"Usage:\n"
-					"    " << name << " [-t time_out] [test_group]...\n"
+					"    " << name << " [-t timeout] [test_group]...\n"
 					"    " << name << " -l\n"
 					"\n"
 					"Options:\n"
 					"    -s             Enable stdout in tests\n"
-					"    -t <time_out>  Time out for each test\n"
+					"    -t <timeout>  Time out for each test\n"
 					"    -l             List all groups of tests\n";
 
 				return false;
@@ -55,13 +55,13 @@ namespace
 		}
 
 		if ( optind == argc )
-			return unit::global_runner.run( time_out, no_stdout );
+			return unit::global_runner.run( timeout, no_stdout );
 
 		bool success = true;
 
 		for ( s32 i = optind; i != argc; ++i )
 		{
-			if ( !unit::global_runner.run( argv[ i ], time_out, no_stdout ) )
+			if ( !unit::global_runner.run( argv[ i ], timeout, no_stdout ) )
 				success = false;
 		}
 
