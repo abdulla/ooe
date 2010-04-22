@@ -6,10 +6,8 @@
 #include "foundation/image/image.hpp"
 #include "foundation/io/memory.hpp"
 
-struct FT_FaceRec_;
-typedef FT_FaceRec_* FT_Face;
-struct FT_LibraryRec_;
-typedef FT_LibraryRec_* FT_Library;
+typedef struct FT_FaceRec_* FT_Face;
+typedef struct FT_LibraryRec_* FT_Library;
 
 OOE_NAMESPACE_BEGIN( ( ooe )( font ) )
 
@@ -27,16 +25,26 @@ private:
 	friend class face;
 };
 
-//--- bitmap ---------------------------------------------------------------------------------------
-struct OOE_VISIBLE bitmap
+//--- metric ---------------------------------------------------------------------------------------
+struct metric
 {
 	const s32 left;
 	const s32 top;
 	const u32 x;
 	const u32 y;
-	const ooe::uncompressed_image image;
+	const u32 width;
+	const u32 height;
 
-	bitmap( s32, s32, u32, u32, const uncompressed_image& );
+	metric( s32, s32, u32, u32, u32, u32 );
+};
+
+//--- bitmap ---------------------------------------------------------------------------------------
+struct bitmap
+{
+	font::metric metric;
+	const u8* data;
+
+	bitmap( const font::metric&, const u8* );
 };
 
 //--- face -----------------------------------------------------------------------------------------
@@ -59,11 +67,9 @@ public:
 	face( const library&, const descriptor& );
 	~face( void );
 
-	bitmap character( up_t );
-	void size( u32 );
-
-	std::string string( string_type );
-	u32 number( number_type );
+	std::string string( string_type ) const;
+	u32 number( number_type ) const;
+	bitmap character( up_t, u32 );
 
 private:
 	ooe::memory memory;

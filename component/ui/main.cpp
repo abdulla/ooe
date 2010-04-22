@@ -1,5 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include "component/ui/font_source.hpp"
 #include "component/ui/null_source.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
@@ -62,10 +63,9 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale )
 }
 
 //--- process_events -------------------------------------------------------------------------------
-void process_events( event_queue& event_queue, vec3& translate, vec3& scale )
+void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epoch_t timeout )
 {
 	event event;
-	epoch_t timeout( 3600, 0 );
 
 	for ( event::type type; ( type = event_queue.next_event( event, timeout ) );
 		timeout = epoch_t( 0, 0 ) )
@@ -157,7 +157,10 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
-	null_source source( 4 * 1024 );
+	font::library font_library;
+	font::face font_face( font_library, root + "../resource/font/vera.ttf" );
+	font_source source( font_face, 256 );
+//	null_source source( 4 * 1024 );
 	thread_pool pool;
 	virtual_texture vt( device, source, pool );
 
@@ -193,9 +196,10 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		device->draw( block, frame );
 		device->swap();
 
-		process_events( event_queue, translate, scale );
+		up_t pending = vt.pending();
+		process_events( event_queue, translate, scale, epoch_t( pending ? 0 : 3600, 0 ) );
 
-		if ( vt.pending() )
+		if ( pending )
 			vt.write();
 	}
 

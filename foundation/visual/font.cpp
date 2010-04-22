@@ -24,9 +24,15 @@ library::~library( void )
 		OOE_WARNING( "font::library", "Unable to destroy library" );
 }
 
+//--- metric ---------------------------------------------------------------------------------------
+metric::metric( s32 left_, s32 top_, u32 x_, u32 y_, u32 width_, u32 height_ )
+	: left( left_ ), top( top_ ), x( x_ ), y( y_ ), width( width_ ), height( height_ )
+{
+}
+
 //--- bitmap ---------------------------------------------------------------------------------------
-bitmap::bitmap( s32 left_, s32 top_, u32 x_, u32 y_, const uncompressed_image& image_ )
-	: left( left_ ), top( top_ ), x( x_ ), y( y_ ), image( image_ )
+bitmap::bitmap( const font::metric& metric_, const u8* data_ )
+	: metric( metric_ ), data( data_ )
 {
 }
 
@@ -44,26 +50,7 @@ face::~face( void )
 		OOE_WARNING( "font::face", "Unable to close font face" );
 }
 
-bitmap face::character( up_t char_code )
-{
-	if ( FT_Load_Char( face_, char_code, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
-		throw error::runtime( "font::face: " ) << "Unable to load character " << hex( char_code );
-
-	FT_GlyphSlot glyph = face_->glyph;
-	uncompressed_image image( glyph->bitmap.width, glyph->bitmap.rows, image::a_u8 );
-	std::memcpy( image.get(), glyph->bitmap.buffer, image.byte_size() );
-
-	return bitmap( glyph->bitmap_left, glyph->bitmap_top,
-		glyph->advance.x >> 6, glyph->advance.y >> 6, image );
-}
-
-void face::size( u32 size_ )
-{
-	if ( FT_Set_Pixel_Sizes( face_, size_, 0 ) )
-		throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size_;
-}
-
-std::string face::string( string_type type )
+std::string face::string( string_type type ) const
 {
 	switch ( type )
 	{
@@ -78,7 +65,7 @@ std::string face::string( string_type type )
 	}
 }
 
-u32 face::number( number_type type )
+u32 face::number( number_type type ) const
 {
 	switch ( type )
 	{
@@ -91,6 +78,19 @@ u32 face::number( number_type type )
 	default:
 		throw error::runtime( "font::face: " ) << "Unknown number type: " << type;
 	}
+}
+
+bitmap face::character( up_t char_code, u32 size )
+{
+	if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
+		throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
+	else if ( FT_Load_Char( face_, char_code, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
+		throw error::runtime( "font::face: " ) << "Unable to load character " << hex( char_code );
+
+	FT_GlyphSlot glyph = face_->glyph;
+	font::metric metric( glyph->bitmap_left, glyph->bitmap_top, glyph->advance.x >> 6,
+		glyph->advance.y >> 6, glyph->bitmap.width, glyph->bitmap.rows );
+	return bitmap( metric, glyph->bitmap.buffer );
 }
 
 OOE_NAMESPACE_END( ( ooe )( font ) )

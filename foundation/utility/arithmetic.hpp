@@ -50,6 +50,28 @@ template< typename type >
 	return floor( dividend, divisor ) * divisor;
 }
 
+//--- isqrt ----------------------------------------------------------------------------------------
+template< typename type >
+	typename enable_if< is_unsigned< type > >::type isqrt( type value )
+{
+	type remainder = 0;
+	type root = 0;
+
+	for ( u8 i = 0, end = sizeof( type ) * 4; i != end; ++i )
+	{
+		root <<= 1;
+		remainder = ( remainder << 2 ) + ( value >> 30 );
+		value <<= 2;
+
+		if ( ++root > remainder )
+			--root;
+		else
+			remainder -= root++;
+	}
+
+	return root >> 1;
+}
+
 OOE_NAMESPACE_END( ( ooe ) )
 
 #endif	// OOE_FOUNDATION_UTILITY_ARITHMETIC_HPP

@@ -13,18 +13,23 @@ class font_source
 	: public physical_source
 {
 public:
+	typedef tuple< u32, u32 > glyph_type;
+
 	font_source( font::face&, u32 ) OOE_VISIBLE;
 	virtual ~font_source( void );
 
 	virtual u32 size( void ) const;
 	virtual image::type format( void ) const;
 	virtual u16 page_size( void ) const;
+	glyph_type glyph( up_t ) const;
 
 	virtual image read( u32, u32, u8 );
 
 private:
+	ooe::mutex mutex;
 	font::face& face;
-	const u32 size_;
+	const u32 font_size;
+	const u32 width;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
