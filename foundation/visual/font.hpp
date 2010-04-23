@@ -61,7 +61,8 @@ public:
 	enum number_type
 	{
 		glyphs,
-		strikes
+		strikes,
+		first
 	};
 
 	face( const library&, const descriptor& );

@@ -75,6 +75,9 @@ u32 face::number( number_type type ) const
 	case strikes:
 		return face_->num_fixed_sizes;
 
+	case first:
+		return FT_Get_First_Char( face_, 0 );
+
 	default:
 		throw error::runtime( "font::face: " ) << "Unknown number type: " << type;
 	}
