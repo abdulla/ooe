@@ -65,7 +65,7 @@ void write_pyramid( image_pyramid& pyramid, const virtual_texture::key_type& key
 	f32 x, f32 y, f32 pow_level )
 {
 	u32 width = pyramid.width >> key._2;
-	f32* rgb = pyramid[ key._2 ].as< f32 >() + ( key._0 * width + key._1 ) * 3;
+	f32* rgb = pyramid[ key._2 ].as< f32 >() + ( key._0 + key._1 * width ) * 3;
 	rgb[ 0 ] = x;
 	rgb[ 1 ] = y;
 	rgb[ 2 ] = pow_level;
