@@ -30,6 +30,8 @@ private:
 	font::face& face;
 	const u32 font_size;
 	const u32 width;
+	const u32 first;
+	const u32 glyphs;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
