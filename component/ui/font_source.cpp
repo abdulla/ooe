@@ -19,26 +19,32 @@ u32 get_width( const font::face& face, u32 font_size )
 	return bit_round_up( root ) * font_size;
 }
 
-void write_glyphs( uncompressed_image& image, const font::bitmap& bitmap, u32 i, u32 j, u32 size )
+void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
 {
-	u8* image_end = image.as< u8 >() + image.byte_size();
-	const u8* bitmap_end = bitmap.data + bitmap.metric.width * bitmap.metric.height;
+	u8* target_end = image.as< u8 >() + image.byte_size();
+	const u8* source_end = bitmap.data + bitmap.metric.width * bitmap.metric.height;
 
-	u8* image_ptr = image.as< u8 >() + i * size + j * page_width;
-	const u8* bitmap_ptr = bitmap.data;
+	u8* target = image.as< u8 >() + x + y * image.width;
+	const u8* source = bitmap.data;
 
-	for ( u32 y = 0; y != bitmap.metric.height; ++y,
-		image_ptr += page_width, bitmap_ptr += bitmap.metric.width )
+	for ( u32 i = 0; i != bitmap.metric.height;
+		++i, target += image.width, source += bitmap.metric.width )
 	{
-		if ( image_ptr > image_end )
-			std::cout << "image_ptr out of bounds (" << size << "): " << y << " : " <<
-				up_t( image_ptr - image_end ) << '\n';
+		if ( target + bitmap.metric.width > target_end )
+		{
+			std::cout << "target > target_end: " << i << " - " << x << ", " << y << " - " <<
+				bitmap.metric.height << '\n';
+			break;
+		}
 
-		if ( bitmap_ptr > bitmap_end )
-			std::cout << "bitmap_ptr out of bounds (" << size << "): " << y << " : " <<
-				up_t( bitmap_ptr - bitmap_end ) << '\n';
+		if ( source + bitmap.metric.width > source_end )
+		{
+			std::cout << "source > source_end: " << i << " - " << x << ", " << y << " - " <<
+				bitmap.metric.height << '\n';
+			break;
+		}
 
-		std::memcpy( image_ptr, bitmap_ptr, bitmap.metric.width );
+		std::memcpy( target, source, bitmap.metric.width );
 	}
 }
 
@@ -76,33 +82,43 @@ font_source::glyph_type font_source::glyph( up_t char_code ) const
 	return glyph_type( ( char_code / width ) * font_size, ( char_code % width ) * font_size );
 }
 
-image font_source::read( u32 /*x*/, u32 /*y*/, u8 /*level*/ )
+image font_source::read( u32 x, u32 y, u8 level )
 {
 	uncompressed_image image( page_width, page_width, image_type );
-/*	u32 resize = font_size >> level;
+	std::memset( image.get(), 0, image.byte_size() );
+
+	u32 resize = font_size >> level;
 	u32 glyphs_per_row = width / font_size;
-	up_t char_code = x * round_down< u32 >( page_width, font_size ) + y * glyphs_per_row;
+	u32 glyphs_per_page = page_width / resize;
+	up_t char_code = x * glyphs_per_page + y * glyphs_per_row;
+
+	if ( char_code > face.number( font::face::glyphs ) )
+	{
+		std::cout << "glyph " << char_code << " out of range " << face.number( font::face::glyphs )
+			<< '\n';
+		return image;
+	}
 
 	if ( resize >= page_width )
 	{
 		lock lock( mutex );
-		std::cout << "too large, ignorning\n";
-//		write_glyph( image, face.character( char_code, resize ), i, j );
+		std::cout << "ignoring larger glyph (" << resize << ", " << page_width << ")\n";
 		return image;
 	}
 
-	u32 end = round_up< u32 >( page_width, font_size );
-
-	for ( u32 j = 0; j != end; ++j )
+	for ( u32 j = 0; j < resize; ++j )
 	{
-		for ( u32 i = 0; i != end; ++i )
+		for ( u32 i = 0; i < resize; ++i )
 		{
 			lock lock( mutex );
 			u32 code = char_code + i + j * glyphs_per_row;
-			write_glyphs( image, face.character( code, resize ), i, j, resize );
+			std::cout << "attempting to render character code (level " << u32( level ) << "): " <<
+				code << " of " << face.number( font::face::glyphs ) << '\n';
+			font::bitmap bitmap = face.character( code, resize );
+			copy_square( image, bitmap, i * glyphs_per_page, j * glyphs_per_page );
 		}
 	}
-*/
+
 	return image;
 }
 
