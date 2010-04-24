@@ -88,7 +88,7 @@ bitmap face::character( up_t char_code, u32 size )
 	if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
 		throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
 	else if ( FT_Load_Char( face_, char_code, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
-		throw error::runtime( "font::face: " ) << "Unable to load character " << hex( char_code );
+		throw error::runtime( "font::face: " ) << "Unable to load character " << char_code;
 
 	FT_GlyphSlot glyph = face_->glyph;
 	font::metric metric( glyph->bitmap_left, glyph->bitmap_top, glyph->advance.x >> 6,
