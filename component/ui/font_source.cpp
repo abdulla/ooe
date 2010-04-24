@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include <cmath>
 
 #include "component/ui/font_source.hpp"
@@ -17,6 +15,21 @@ u32 get_width( const font::face& face, u32 font_size )
 {
 	u32 root = std::sqrt( face.number( font::face::glyphs ) );
 	return bit_round_up( root ) * font_size;
+}
+
+void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
+{
+	if ( x >= bitmap.metric.width || y >= bitmap.metric.height )
+		return;
+
+	u8* target = image.as< u8 >();
+	const u8* source = bitmap.data + x + y * bitmap.metric.width;
+
+	u32 width = bitmap.metric.width - x;
+	u32 height = bitmap.metric.height - y;
+
+	for ( u32 i = 0; i != height; ++i, target += image.width, source += bitmap.metric.width )
+		std::memcpy( target, source, width );
 }
 
 void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
@@ -73,15 +86,20 @@ image font_source::read( u32 x, u32 y, u8 level )
 	u32 resize = font_size >> level;
 	u32 glyphs_per_row = width / font_size;
 	u32 glyphs_per_page = page_width / resize;
-	up_t char_code = ( x + y * glyphs_per_row ) * glyphs_per_page + first;
+	up_t char_code = ( x + y * glyphs_per_row / resize ) * page_width / resize + first;
 
 	if ( char_code >= glyphs + first )
 		return image;
 
-	if ( resize > page_width )
+	if ( resize >= page_width )
 	{
+		u32 pages_per_glyph = resize / page_width;
+		u32 x_offset = ( x % pages_per_glyph ) * page_width;
+		u32 y_offset = ( y % pages_per_glyph ) * page_width;
+
 		lock lock( mutex );
-		std::cout << "ignoring larger glyph (" << resize << ", " << page_width << ")\n";
+		font::bitmap bitmap = face.character( char_code, resize );
+		copy_partial( image, bitmap, x_offset, y_offset );
 		return image;
 	}
 
@@ -89,12 +107,12 @@ image font_source::read( u32 x, u32 y, u8 level )
 	{
 		for ( u32 i = 0; i != glyphs_per_page; ++i )
 		{
-			lock lock( mutex );
 			u32 code = char_code + i + j * glyphs_per_row;
 
 			if ( code >= glyphs + first )
 				return image;
 
+			lock lock( mutex );
 			font::bitmap bitmap = face.character( code, resize );
 			copy_square( image, bitmap, i * resize, j * resize );
 		}

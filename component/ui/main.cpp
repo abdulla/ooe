@@ -159,7 +159,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	font::library font_library;
 	font::face font_face( font_library, root + "../resource/font/vera.ttf" );
-	font_source source( font_face, 256 );
+	font_source source( font_face, 512 );
 //	null_source source( 4 * 1024 );
 	thread_pool pool;
 	virtual_texture vt( device, source, pool );
@@ -177,10 +177,11 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
-	vt.load( 1024, 1024, 1024, 1024, 0 );
-	vt.load( 1024, 1024, 1024, 1024, 1 );
-	vt.load( 1024, 1024, 1024, 1024, 2 );
-	vt.load( 1024, 1024, 1024, 1024, 3 );
+	vt.load( 0, 0, 4096, 512, 0 );
+	vt.load( 0, 0, 4096, 512, 1 );
+	vt.load( 0, 0, 4096, 512, 2 );
+	vt.load( 0, 0, 4096, 512, 3 );
+	vt.load( 0, 0, 4096, 512, 4 );
 	vt.write();
 
 	frame_type frame = device->default_frame( width, height );
