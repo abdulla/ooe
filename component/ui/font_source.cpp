@@ -25,8 +25,8 @@ void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x,
 	u8* target = image.as< u8 >();
 	const u8* source = bitmap.data + x + y * bitmap.metric.width;
 
-	u32 width = bitmap.metric.width - x;
-	u32 height = bitmap.metric.height - y;
+	u32 width = std::min< u32 >( page_width, bitmap.metric.width - x );
+	u32 height = std::min< u32 >( page_width, bitmap.metric.height - y );
 
 	for ( u32 i = 0; i != height; ++i, target += image.width, source += bitmap.metric.width )
 		std::memcpy( target, source, width );
