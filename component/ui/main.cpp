@@ -1,7 +1,8 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <cmath>
+
 #include "component/ui/font_source.hpp"
-#include "component/ui/null_source.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/visual/event_queue.hpp"
@@ -158,9 +159,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
 	font::library font_library;
-	font::face font_face( font_library, root + "../resource/font/vera.ttf" );
+	font::face font_face( font_library, root + "../resource/font/vera-sans.ttf" );
 	font_source source( font_face, 512 );
-//	null_source source( 4 * 1024 );
 	thread_pool pool;
 	virtual_texture vt( device, source, pool );
 
@@ -172,21 +172,21 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	buffer_type point = point_buffer( device );
 	block_type block = program->block( index_buffer( device ) );
-	vt.input( "vt", block );
 	block->input( "vertex", 2, point );
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
-	vt.load( 0, 0, 4096, 512, 0 );
-	vt.load( 0, 0, 4096, 512, 1 );
-	vt.load( 0, 0, 4096, 512, 2 );
-	vt.load( 0, 0, 4096, 512, 3 );
-	vt.load( 0, 0, 4096, 512, 4 );
+	u16 page_size = source.page_size();
+	vt.input( "vt", block );
+
+	for ( u32 size = source.size(), i = size / page_size; i; i >>= 1 )
+		vt.load( 0, 0, size, source.font_size() * 2, log2( i ) );
+
 	vt.write();
 
 	frame_type frame = device->default_frame( width, height );
 	vec3 translate( width / 2, height / 2, 0 );
-	vec3 scale( 100, 100, 1 );
+	vec3 scale( page_size, page_size, 1 );
 
 	while ( !executable::has_signal() )
 	{
