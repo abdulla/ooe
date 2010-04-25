@@ -9,6 +9,12 @@
 
 #include "foundation/io/descriptor.hpp"
 
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+DIR* directory_open( const ooe::descriptor& );
+
+OOE_NAMESPACE_END( ( ooe )( platform ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- directory_iterator ---------------------------------------------------------------------------
@@ -47,12 +53,10 @@ private:
 	DIR* dir;
 };
 
+//--------------------------------------------------------------------------------------------------
+void make_directory( const std::string& ) OOE_VISIBLE;
+bool exists( const std::string& ) OOE_VISIBLE;
+
 OOE_NAMESPACE_END( ( ooe ) )
-
-OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
-
-DIR* directory_open( const ooe::descriptor& );
-
-OOE_NAMESPACE_END( ( ooe )( platform ) )
 
 #endif	// OOE_FOUNDATION_IO_DIRECTORY_HPP

@@ -4,6 +4,8 @@
 
 #include <cerrno>
 
+#include <sys/stat.h>
+
 #include "foundation/io/directory.hpp"
 #include "foundation/io/error.hpp"
 
@@ -66,6 +68,25 @@ directory::iterator directory::begin( void ) const
 directory::iterator directory::end( void ) const
 {
 	return iterator( 0, 0 );
+}
+
+//--- make_directory -------------------------------------------------------------------------------
+void make_directory( const std::string& path )
+{
+	if ( mkdir( path.c_str(), 0700 ) )
+		throw error::io( "make_directory: " ) <<
+			"Unable to make directory \"" << path << "\": " << error::number( errno );
+}
+
+//--- exists ---------------------------------------------------------------------------------------
+bool exists( const std::string& path )
+{
+	struct stat status;
+
+	if ( stat( path.c_str(), &status ) && errno == ENOENT )
+		return false;
+
+	return true;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
