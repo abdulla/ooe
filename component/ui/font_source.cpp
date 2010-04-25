@@ -3,6 +3,8 @@
 #include <cmath>
 
 #include "component/ui/font_source.hpp"
+#include "foundation/io/directory.hpp"
+#include "foundation/io/file.hpp"
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
 
@@ -42,14 +44,22 @@ void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u32 x, 
 		std::memcpy( target, source, bitmap.metric.width );
 }
 
+const uncompressed_image& write_image( const uncompressed_image& image, const std::string& path )
+{
+	file file( descriptor( path, descriptor::write_new ) );
+	file.write( image.get(), image.byte_size() );
+	return image;
+}
+
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
-font_source::font_source( font::face& face_, u32 face_size_ )
-	: mutex(), face( face_ ), face_size( face_size_ ), source_size( get_width( face, face_size ) ),
-	first( face.number( font::face::first ) ), glyphs( face.number( font::face::glyphs ) )
+font_source::font_source( const std::string& root_, font::face& face_, u32 face_size_ )
+	: root( root_ ), mutex(), face( face_ ), face_size( face_size_ ),
+	source_size( get_width( face, face_size ) ), first( face.number( font::face::first ) ),
+	glyphs( face.number( font::face::glyphs ) )
 {
 }
 
@@ -90,14 +100,24 @@ font_source::glyph_type font_source::glyph( up_t char_code ) const
 image font_source::read( u32 x, u32 y, u8 level )
 {
 	uncompressed_image image( page_wide, page_wide, image_type );
-	std::memset( image.get(), 0, image.byte_size() );
+	std::string path( root );
+	u32 level_inverse = log2( source_size / page_wide ) - level;
+	path << '/' << x << '_' << y << '_' << level_inverse << ".raw";
 
+	if ( exists( path ) )
+	{
+		file file( path );
+		file.read( image.get(), image.byte_size() );
+		return image;
+	}
+
+	std::memset( image.get(), 0, image.byte_size() );
 	u32 level_size = face_size >> level;
 	u32 glyphs_per_row = source_size / face_size;
 	up_t char_code = x * page_wide / level_size + ( y * page_wide / level_size ) * glyphs_per_row;
 
 	if ( char_code >= glyphs )
-		return image;
+		return write_image( image, path );
 
 	if ( level_size >= page_wide )
 	{
@@ -108,7 +128,7 @@ image font_source::read( u32 x, u32 y, u8 level )
 		lock lock( mutex );
 		font::bitmap bitmap = face.character( char_code + first, level_size );
 		copy_partial( image, bitmap, x_offset, y_offset );
-		return image;
+		return write_image( image, path );
 	}
 
 	for ( u32 j = 0, glyphs_per_page = page_wide / level_size; j != glyphs_per_page; ++j )
@@ -118,7 +138,7 @@ image font_source::read( u32 x, u32 y, u8 level )
 			u32 code = char_code + i + j * glyphs_per_row;
 
 			if ( code >= glyphs )
-				return image;
+				return write_image( image, path );
 
 			lock lock( mutex );
 			font::bitmap bitmap = face.character( code + first, level_size );
@@ -126,7 +146,7 @@ image font_source::read( u32 x, u32 y, u8 level )
 		}
 	}
 
-	return image;
+	return write_image( image, path );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

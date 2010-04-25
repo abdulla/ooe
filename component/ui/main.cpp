@@ -160,7 +160,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	font::library font_library;
 	font::face font_face( font_library, root + "../resource/font/vera-sans.ttf" );
-	font_source source( font_face, 512 );
+	font_source source( root + "../cache/font-vera-sans", font_face, 512 );
 	thread_pool pool;
 	virtual_texture vt( device, source, pool );
 

@@ -1,5 +1,6 @@
 binary/
 build/
+cache/
 library/
 .sconf_temp/
 .sconsign.dblite
