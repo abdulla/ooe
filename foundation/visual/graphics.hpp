@@ -37,8 +37,7 @@ struct texture
 	enum type
 	{
 		nearest,
-		bilinear,
-		trilinear
+		linear
 	};
 
 	virtual ~texture( void ) {}
@@ -180,7 +179,7 @@ struct device
 	virtual u32 limit( limit_type ) const = 0;
 
 	virtual texture_type texture
-		( const image_pyramid&, texture::type = texture::trilinear, bool = true ) const = 0;
+		( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
 	virtual buffer_type buffer
 		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
 	virtual target_type target( u32, u32, image::type ) const = 0;

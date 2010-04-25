@@ -58,7 +58,7 @@ image_pyramid make_pyramid( u32 table_size )
 texture_type make_cache( const device_type& device, const physical_source& source, u32 cache_size )
 {
 	image_pyramid pyramid( cache_size, cache_size, source.format() );
-	return device->texture( pyramid, texture::bilinear, false );
+	return device->texture( pyramid, texture::linear, false );
 }
 
 void write_pyramid( image_pyramid& pyramid, const virtual_texture::key_type& key,

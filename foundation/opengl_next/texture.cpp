@@ -132,12 +132,7 @@ void set_filter( ooe::texture::type filter )
 		mag_filter = NEAREST;
 		break;
 
-	case ooe::texture::bilinear:
-		min_filter = LINEAR_MIPMAP_NEAREST;
-		mag_filter = LINEAR;
-		break;
-
-	case ooe::texture::trilinear:
+	case ooe::texture::linear:
 		min_filter = LINEAR_MIPMAP_LINEAR;
 		mag_filter = LINEAR;
 		break;
