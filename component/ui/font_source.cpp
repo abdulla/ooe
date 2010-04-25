@@ -57,9 +57,9 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
 font_source::font_source( const std::string& root_, font::face& face_, u32 face_size_ )
-	: root( root_ ), mutex(), face( face_ ), face_size( face_size_ ),
+	: mutex(), root( root_ ), face( face_ ), face_size( face_size_ ),
 	source_size( get_width( face, face_size ) ), first( face.number( font::face::first ) ),
-	glyphs( face.number( font::face::glyphs ) )
+	glyphs( face.number( font::face::glyphs ) ), level_limit( log2( source_size / page_wide ) )
 {
 }
 
@@ -101,8 +101,7 @@ image font_source::read( u32 x, u32 y, u8 level )
 {
 	uncompressed_image image( page_wide, page_wide, image_type );
 	std::string path( root );
-	u32 level_inverse = log2( source_size / page_wide ) - level;
-	path << '/' << x << '_' << y << '_' << level_inverse << ".raw";
+	path << '/' << x << '_' << y << '_' << level_limit - level << ".raw";
 
 	if ( exists( path ) )
 	{

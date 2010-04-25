@@ -28,13 +28,14 @@ public:
 	virtual image read( u32, u32, u8 );
 
 private:
-	const std::string root;
 	ooe::mutex mutex;
+	const std::string root;
 	font::face& face;
 	const u32 face_size;
 	const u32 source_size;
 	const u32 first;
 	const u32 glyphs;
+	const u32 level_limit;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
