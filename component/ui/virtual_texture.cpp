@@ -154,7 +154,7 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool 
 			cache_map::iterator find = map.find( key );
 			cache_list::iterator end = list.end();
 
-			// check if page has already been loaded
+			// check if page has already been loaded (or is loading)
 			if ( find != map.end() )
 			{
 				find->second->_3 = locked;
@@ -162,8 +162,9 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool 
 				continue;
 			}
 
-			++loads;
 			async( pool, make_function( read_source ), source, queue, key, locked );
+			map.insert( cache_map::value_type( key, end ) );
+			++loads;
 		}
 	}
 }
@@ -210,7 +211,7 @@ void virtual_texture::write( void )
 
 		page->_2 = value._0;
 		page->_3 = value._1;
-		map.insert( cache_map::value_type( page->_2, page ) );
+		map[ page->_2 ] = page;
 		list.splice( end, list, page );
 
 		f32 table_x = divide( page->_0, cache_size );
