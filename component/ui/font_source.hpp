@@ -21,6 +21,8 @@ public:
 	virtual u32 size( void ) const;
 	virtual image::type format( void ) const;
 	virtual u16 page_size( void ) const;
+
+	u32 font_size( void ) const;
 	glyph_type glyph( up_t ) const;
 
 	virtual image read( u32, u32, u8 );
@@ -28,8 +30,8 @@ public:
 private:
 	ooe::mutex mutex;
 	font::face& face;
-	const u32 font_size;
-	const u32 width;
+	const u32 face_size;
+	const u32 source_size;
 	const u32 first;
 	const u32 glyphs;
 };

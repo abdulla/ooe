@@ -9,12 +9,12 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 const image::type image_type = image::y_u8;
-const u16 page_width = 256;
+const u16 page_wide = 256;
 
-u32 get_width( const font::face& face, u32 font_size )
+u32 get_width( const font::face& face, u32 face_size )
 {
 	u32 root = std::sqrt( face.number( font::face::glyphs ) );
-	return bit_round_up( root ) * font_size;
+	return bit_round_up( root ) * face_size;
 }
 
 void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
@@ -25,8 +25,8 @@ void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x,
 	u8* target = image.as< u8 >();
 	const u8* source = bitmap.data + x + y * bitmap.metric.width;
 
-	u32 width = std::min< u32 >( page_width, bitmap.metric.width - x );
-	u32 height = std::min< u32 >( page_width, bitmap.metric.height - y );
+	u32 width = std::min< u32 >( page_wide, bitmap.metric.width - x );
+	u32 height = std::min< u32 >( page_wide, bitmap.metric.height - y );
 
 	for ( u32 i = 0; i != height; ++i, target += image.width, source += bitmap.metric.width )
 		std::memcpy( target, source, width );
@@ -47,8 +47,8 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
-font_source::font_source( font::face& face_, u32 font_size_ )
-	: mutex(), face( face_ ), font_size( font_size_ ), width( get_width( face, font_size ) ),
+font_source::font_source( font::face& face_, u32 face_size_ )
+	: mutex(), face( face_ ), face_size( face_size_ ), source_size( get_width( face, face_size ) ),
 	first( face.number( font::face::first ) ), glyphs( face.number( font::face::glyphs ) )
 {
 }
@@ -59,7 +59,7 @@ font_source::~font_source( void )
 
 u32 font_source::size( void ) const
 {
-	return width;
+	return source_size;
 }
 
 image::type font_source::format( void ) const
@@ -69,51 +69,60 @@ image::type font_source::format( void ) const
 
 u16 font_source::page_size( void ) const
 {
-	return page_width;
+	return page_wide;
+}
+
+u32 font_source::font_size( void ) const
+{
+	return face_size;
 }
 
 font_source::glyph_type font_source::glyph( up_t char_code ) const
 {
 	char_code = std::min< up_t >( 0, char_code - first );
-	return glyph_type( ( char_code / width ) * font_size, ( char_code % width ) * font_size );
+	return glyph_type
+	(
+		( char_code / source_size ) * face_size,
+		( char_code % source_size ) * face_size
+	);
 }
 
 image font_source::read( u32 x, u32 y, u8 level )
 {
-	uncompressed_image image( page_width, page_width, image_type );
+	uncompressed_image image( page_wide, page_wide, image_type );
 	std::memset( image.get(), 0, image.byte_size() );
 
-	u32 resize = font_size >> level;
-	u32 glyphs_per_row = width / font_size;
-	up_t char_code = ( x + y * glyphs_per_row / resize ) * page_width / resize + first;
+	u32 level_size = face_size >> level;
+	u32 glyphs_per_row = source_size / face_size;
+	up_t char_code = x * page_wide / level_size + ( y * page_wide / level_size ) * glyphs_per_row;
 
-	if ( char_code >= glyphs + first )
+	if ( char_code >= glyphs )
 		return image;
 
-	if ( resize >= page_width )
+	if ( level_size >= page_wide )
 	{
-		u32 pages_per_glyph = resize / page_width;
-		u32 x_offset = ( x % pages_per_glyph ) * page_width;
-		u32 y_offset = ( y % pages_per_glyph ) * page_width;
+		u32 pages_per_glyph = level_size / page_wide;
+		u32 x_offset = ( x % pages_per_glyph ) * page_wide;
+		u32 y_offset = ( y % pages_per_glyph ) * page_wide;
 
 		lock lock( mutex );
-		font::bitmap bitmap = face.character( char_code, resize );
+		font::bitmap bitmap = face.character( char_code + first, level_size );
 		copy_partial( image, bitmap, x_offset, y_offset );
 		return image;
 	}
 
-	for ( u32 j = 0, glyphs_per_page = page_width / resize; j != glyphs_per_page; ++j )
+	for ( u32 j = 0, glyphs_per_page = page_wide / level_size; j != glyphs_per_page; ++j )
 	{
 		for ( u32 i = 0; i != glyphs_per_page; ++i )
 		{
 			u32 code = char_code + i + j * glyphs_per_row;
 
-			if ( code >= glyphs + first )
+			if ( code >= glyphs )
 				return image;
 
 			lock lock( mutex );
-			font::bitmap bitmap = face.character( code, resize );
-			copy_square( image, bitmap, i * resize, j * resize );
+			font::bitmap bitmap = face.character( code + first, level_size );
+			copy_square( image, bitmap, i * level_size, j * level_size );
 		}
 	}
 
