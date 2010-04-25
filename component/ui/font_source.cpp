@@ -85,7 +85,6 @@ image font_source::read( u32 x, u32 y, u8 level )
 
 	u32 resize = font_size >> level;
 	u32 glyphs_per_row = width / font_size;
-	u32 glyphs_per_page = page_width / resize;
 	up_t char_code = ( x + y * glyphs_per_row / resize ) * page_width / resize + first;
 
 	if ( char_code >= glyphs + first )
@@ -103,7 +102,7 @@ image font_source::read( u32 x, u32 y, u8 level )
 		return image;
 	}
 
-	for ( u32 j = 0; j != glyphs_per_page; ++j )
+	for ( u32 j = 0, glyphs_per_page = page_width / resize; j != glyphs_per_page; ++j )
 	{
 		for ( u32 i = 0; i != glyphs_per_page; ++i )
 		{
