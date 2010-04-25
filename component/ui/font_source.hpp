@@ -33,8 +33,8 @@ private:
 	font::face& face;
 	const u32 face_size;
 	const u32 source_size;
-	const u32 first;
 	const u32 glyphs;
+	const u32 first;
 	const u32 level_limit;
 };
 

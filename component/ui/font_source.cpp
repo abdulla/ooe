@@ -58,8 +58,8 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 //--- font_source ----------------------------------------------------------------------------------
 font_source::font_source( const std::string& root_, font::face& face_, u32 face_size_ )
 	: mutex(), root( root_ ), face( face_ ), face_size( face_size_ ),
-	source_size( get_width( face, face_size ) ), first( face.number( font::face::first ) ),
-	glyphs( face.number( font::face::glyphs ) ), level_limit( log2( source_size / page_wide ) )
+	source_size( get_width( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
+	first( face.number( font::face::first ) ), level_limit( log2( source_size / page_wide ) )
 {
 }
 
