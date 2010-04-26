@@ -21,9 +21,9 @@ c8 transform( c8 c )
 
 std::string get_root( const std::string& root, font::face& face )
 {
-	std::string path( root );
-	path << '/' << face.string( font::face::family ) << '-' << face.string( font::face::style );
-	std::transform( path.begin(), path.end(), path.begin(), transform );
+	std::string suffix = face.string( font::face::family ) + '-' + face.string( font::face::style );
+	std::transform( suffix.begin(), suffix.end(), suffix.begin(), transform );
+	std::string path = root + '/' + suffix;
 
 	if ( !exists( path ) )
 		make_directory( path );
