@@ -1,14 +1,14 @@
-varying vec2 texcoord;
-
-uniform struct vsampler2D
+struct vsampler2D
 {
 	float page_ratio;
 	float page_log2;
 	sampler2D page_cache;
 	sampler2D page_table;
-} vt;
+};
 
 vec4 vtexture2D( vsampler2D, vec2 );
+uniform vsampler2D vt;
+varying vec2 texcoord;
 
 void main( void )
 {

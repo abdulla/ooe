@@ -1,4 +1,4 @@
-uniform struct vsampler2D
+struct vsampler2D
 {
 	float page_ratio;
 	float page_log2;
