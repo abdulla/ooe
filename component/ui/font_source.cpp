@@ -45,7 +45,7 @@ memory open_memory( const std::string& root, u32 glyphs, u8 level_limit )
 	if ( desc.size() < size )
 		desc.resize( size );
 
-	return desc;
+	return memory( desc, memory::read_write );
 }
 
 void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
