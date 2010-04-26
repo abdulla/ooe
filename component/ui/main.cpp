@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "component/ui/font_source.hpp"
+#include "component/ui/text_layout.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/visual/event_queue.hpp"
@@ -172,12 +172,18 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	buffer_type point = point_buffer( device );
 	block_type block = program->block( index_buffer( device ) );
+	vt.input( "vt", block );
 	block->input( "vertex", 2, point );
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
+	text_layout layout( device, source );
+	block_type text = layout.block( program, "t", 0 );
+	vt.input( "vt", text );
+	text->input( "projection", orthographic( 0, width, height, 0 ) );
+	text->input( "model_view", mat4::identity );
+
 	u16 page_size = source.page_size();
-	vt.input( "vt", block );
 
 	for ( u32 size = source.size(), i = size / page_size; i; i >>= 1 )
 		vt.load( 0, 0, size, source.font_size() * 2, log2( i ) );
@@ -195,6 +201,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 		frame->clear();
 		device->draw( block, frame );
+		device->draw( text, frame );
 		device->swap();
 
 		up_t pending = vt.pending();
