@@ -28,14 +28,15 @@ private:
 //--- metric ---------------------------------------------------------------------------------------
 struct metric
 {
-	const s32 left;
-	const s32 top;
-	const u32 x;
-	const u32 y;
-	const u32 width;
-	const u32 height;
+	bool valid;
+	s32 left;
+	s32 top;
+	u32 x;
+	u32 y;
+	u32 width;
+	u32 height;
 
-	metric( s32, s32, u32, u32, u32, u32 );
+	metric( bool, s32, s32, u32, u32, u32, u32 );
 };
 
 //--- bitmap ---------------------------------------------------------------------------------------

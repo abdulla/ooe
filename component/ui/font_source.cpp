@@ -37,6 +37,17 @@ u32 get_size( const font::face& face, u32 face_size )
 	return bit_round_up( root ) * face_size;
 }
 
+memory open_memory( const std::string& root, u32 glyphs, u8 level_limit )
+{
+	descriptor desc( root + "/metric", descriptor::read_write );
+	up_t size = sizeof( font::metric ) * glyphs * level_limit;
+
+	if ( desc.size() < size )
+		desc.resize( size );
+
+	return desc;
+}
+
 void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
 {
 	if ( x >= bitmap.metric.width || y >= bitmap.metric.height )
@@ -69,6 +80,20 @@ const uncompressed_image& write_image( const uncompressed_image& image, const st
 	return image;
 }
 
+void write_metric( const memory& memory, up_t char_code, u32 glyphs, u8 level_inverse,
+	const font::metric& metric )
+{
+	font::metric* metrics = memory.as< font::metric >() + char_code + glyphs * level_inverse;
+	*metrics = metric;
+	metrics->valid = true;
+}
+
+font::metric& read_metric( const memory& memory, up_t char_code, u32 glyphs, u8 level_inverse )
+{
+	font::metric* metrics = memory.as< font::metric >() + char_code + glyphs * level_inverse;
+	return *metrics;
+}
+
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -78,7 +103,7 @@ font_source::font_source( font::face& face_, u32 face_size_, const std::string& 
 	: face( face_ ), face_size( face_size_ ), root( get_root( root_, face ) ),
 	source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
 	first( face.number( font::face::first ) ), level_limit( log2( source_size / page_wide ) ),
-	mutex()
+	mutex(), memory( open_memory( root, glyphs, level_limit ) )
 {
 	if ( !is_bit_round( face_size ) )
 		throw error::runtime( "font_source: " ) <<
@@ -109,21 +134,37 @@ u32 font_source::font_size( void ) const
 	return face_size;
 }
 
-font_source::glyph_type font_source::glyph( up_t char_code ) const
+font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
 {
+	if ( level > level_limit )
+		throw error::runtime( "font_source: " ) <<
+			"Mipmap level " << level << " > maximum level " << level_limit;
+
 	char_code = std::min< up_t >( 0, char_code - first );
+	u8 level_inverse = level_limit - level;
+	font::metric& metric = read_metric( memory, char_code, glyphs, level_inverse );
+
+	if ( !metric.valid )
+	{
+		metric = face.character( char_code, face_size >> level ).metric;
+		write_metric( memory, char_code, glyphs, level_inverse, metric );
+	}
+
 	return glyph_type
 	(
-		( char_code / source_size ) * face_size,
-		( char_code % source_size ) * face_size
+		( char_code * face_size ) % source_size,
+		( char_code * face_size ) / source_size,
+		metric
 	);
 }
 
 image font_source::read( u32 x, u32 y, u8 level )
 {
+	// note: arguments will be verified by virtual_texture, no need to here
 	uncompressed_image image( page_wide, page_wide, image_type );
 	std::string path( root );
-	path << '/' << x << '_' << y << '_' << level_limit - level << ".raw";
+	u8 level_inverse = level_limit - level;
+	path << '/' << x << '_' << y << '_' << level_inverse << ".raw";
 
 	if ( exists( path ) )
 	{
@@ -145,10 +186,12 @@ image font_source::read( u32 x, u32 y, u8 level )
 		u32 pages_per_glyph = level_size / page_wide;
 		u32 x_offset = ( x % pages_per_glyph ) * page_wide;
 		u32 y_offset = ( y % pages_per_glyph ) * page_wide;
+		char_code += first;
 
 		lock lock( mutex );
-		font::bitmap bitmap = face.character( char_code + first, level_size );
+		font::bitmap bitmap = face.character( char_code, level_size );
 		copy_partial( image, bitmap, x_offset, y_offset );
+		write_metric( memory, char_code, glyphs, level_inverse, bitmap.metric );
 		return write_image( image, path );
 	}
 
@@ -161,9 +204,11 @@ image font_source::read( u32 x, u32 y, u8 level )
 			if ( code >= glyphs )
 				return write_image( image, path );
 
+			code += first;
 			lock lock( mutex );
-			font::bitmap bitmap = face.character( code + first, level_size );
+			font::bitmap bitmap = face.character( code, level_size );
 			copy_square( image, bitmap, i * level_size, j * level_size );
+			write_metric( memory, code, glyphs, level_inverse, bitmap.metric );
 		}
 	}
 

@@ -25,8 +25,9 @@ library::~library( void )
 }
 
 //--- metric ---------------------------------------------------------------------------------------
-metric::metric( s32 left_, s32 top_, u32 x_, u32 y_, u32 width_, u32 height_ )
-	: left( left_ ), top( top_ ), x( x_ ), y( y_ ), width( width_ ), height( height_ )
+metric::metric( bool valid_, s32 left_, s32 top_, u32 x_, u32 y_, u32 width_, u32 height_ )
+	: valid( valid_ ), left( left_ ), top( top_ ), x( x_ ), y( y_ ), width( width_ ),
+	height( height_ )
 {
 }
 
@@ -88,10 +89,10 @@ bitmap face::character( up_t char_code, u32 size )
 	if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
 		throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
 	else if ( FT_Load_Char( face_, char_code, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
-		return bitmap( metric( 0, 0, 0, 0, 0, 0 ), 0 );
+		return bitmap( metric( false, 0, 0, 0, 0, 0, 0 ), 0 );
 
 	FT_GlyphSlot glyph = face_->glyph;
-	font::metric metric( glyph->bitmap_left, glyph->bitmap_top, glyph->advance.x >> 6,
+	font::metric metric( true, glyph->bitmap_left, glyph->bitmap_top, glyph->advance.x >> 6,
 		glyph->advance.y >> 6, glyph->bitmap.width, glyph->bitmap.rows );
 	return bitmap( metric, glyph->bitmap.buffer );
 }
