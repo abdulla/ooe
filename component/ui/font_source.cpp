@@ -140,7 +140,7 @@ font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
 		throw error::runtime( "font_source: " ) <<
 			"Mipmap level " << level << " > maximum level " << level_limit;
 
-	char_code = std::min< up_t >( 0, char_code - first );
+	char_code = first >= char_code ? 0 : char_code - first;
 	u8 level_inverse = level_limit - level;
 	font::metric& metric = read_metric( memory, char_code, glyphs, level_inverse );
 
@@ -150,10 +150,11 @@ font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
 		write_metric( memory, char_code, glyphs, level_inverse, metric );
 	}
 
+	u32 glyphs_per_row = source_size / face_size;
 	return glyph_type
 	(
-		( char_code * face_size ) % source_size,
-		( char_code * face_size ) / source_size,
+		( char_code % glyphs_per_row ) * face_size,
+		( char_code / glyphs_per_row ) * face_size,
 		metric
 	);
 }
