@@ -71,9 +71,15 @@ directory::iterator directory::end( void ) const
 }
 
 //--- make_directory -------------------------------------------------------------------------------
-void make_directory( const std::string& path )
+void make_directory( const std::string& in )
 {
-	if ( mkdir( path.c_str(), 0700 ) )
+	c8 path[ PATH_MAX ];
+
+	if ( !realpath( in.c_str(), path ) )
+		throw error::io( "make_directory: " ) <<
+			"Unable to canonicalize \"" << in << "\": " << error::number( errno );
+
+	if ( mkdir( path, 0700 ) )
 		throw error::io( "make_directory: " ) <<
 			"Unable to make directory \"" << path << "\": " << error::number( errno );
 }
