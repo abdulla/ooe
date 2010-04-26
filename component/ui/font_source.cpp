@@ -1,5 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <cctype>
 #include <cmath>
 
 #include "component/ui/font_source.hpp"
@@ -13,7 +14,24 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 const image::type image_type = image::y_u8;
 const u16 page_wide = 256;
 
-u32 get_width( const font::face& face, u32 face_size )
+c8 transform( c8 c )
+{
+	return std::isspace( c ) ? '-' : std::tolower( c );
+}
+
+std::string get_root( const std::string& root, font::face& face )
+{
+	std::string path( root );
+	path << '/' << face.string( font::face::family ) << '-' << face.string( font::face::style );
+	std::transform( path.begin(), path.end(), path.begin(), transform );
+
+	if ( !exists( path ) )
+		make_directory( path );
+
+	return path;
+}
+
+u32 get_size( const font::face& face, u32 face_size )
 {
 	u32 root = std::sqrt( face.number( font::face::glyphs ) );
 	return bit_round_up( root ) * face_size;
@@ -56,11 +74,15 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
-font_source::font_source( const std::string& root_, font::face& face_, u32 face_size_ )
-	: mutex(), root( root_ ), face( face_ ), face_size( face_size_ ),
-	source_size( get_width( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
-	first( face.number( font::face::first ) ), level_limit( log2( source_size / page_wide ) )
+font_source::font_source( font::face& face_, u32 face_size_, const std::string& root_ )
+	: face( face_ ), face_size( face_size_ ), root( get_root( root_, face ) ),
+	source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
+	first( face.number( font::face::first ) ), level_limit( log2( source_size / page_wide ) ),
+	mutex()
 {
+	if ( !is_bit_round( face_size ) )
+		throw error::runtime( "font_source: " ) <<
+			"Font size " << face_size << " is not a power of 2";
 }
 
 font_source::~font_source( void )
