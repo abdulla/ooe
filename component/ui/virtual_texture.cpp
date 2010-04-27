@@ -128,9 +128,8 @@ virtual_texture::
 void virtual_texture::input( const std::string& name, block_type& block ) const
 {
 	u16 page_size = source.page_size();
-	f32 page_log2 = log2( page_size ) - 1;	// minus one to force more detail
 	block->input( name + ".page_ratio", divide( page_size, cache_size ) );
-	block->input( name + ".page_log2", page_log2 );
+	block->input( name + ".page_log2", f32( log2( page_size ) ) );
 	block->input( name + ".page_cache", cache );
 	block->input( name + ".page_table", table );
 }
