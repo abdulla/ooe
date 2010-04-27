@@ -34,7 +34,7 @@ std::string get_root( const std::string& root, font::face& face )
 {
 	std::string suffix = face.string( font::face::family ) + '-' + face.string( font::face::style );
 	std::transform( suffix.begin(), suffix.end(), suffix.begin(), transform );
-	std::string path = root + '/' + suffix;
+	std::string path = canonicalized( root ) + '/' + suffix;
 
 	if ( !exists( path ) )
 		make_directory( path );
