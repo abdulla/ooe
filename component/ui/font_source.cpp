@@ -48,10 +48,10 @@ u32 get_size( const font::face& face, u32 face_size )
 	return bit_round_up( root ) * face_size;
 }
 
-memory open_memory( const std::string& root, u32 glyphs, u8 level_limit )
+memory open_memory( const std::string& root, u32 glyphs, u8 levels )
 {
 	descriptor desc( root + "/metric", descriptor::read_write );
-	up_t size = sizeof( source_metric ) * glyphs * level_limit;
+	up_t size = sizeof( source_metric ) * glyphs * levels;
 
 	if ( desc.size() < size )
 		desc.resize( size );
@@ -112,7 +112,7 @@ font_source::font_source( font::face& face_, u32 face_size_, const std::string& 
 	: face( face_ ), face_size( face_size_ ), root( get_root( root_, face ) ),
 	source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
 	first( face.number( font::face::first ) ), level_limit( log2( source_size / page_wide ) ),
-	mutex(), memory( open_memory( root, glyphs, level_limit ) )
+	mutex(), memory( open_memory( root, glyphs, level_limit + 1 ) )
 {
 	if ( !is_bit_round( face_size ) )
 		throw error::runtime( "font_source: " ) <<
@@ -197,10 +197,9 @@ image font_source::read( u32 x, u32 y, u8 level )
 		u32 pages_per_glyph = level_size / page_wide;
 		u32 x_offset = ( x % pages_per_glyph ) * page_wide;
 		u32 y_offset = ( y % pages_per_glyph ) * page_wide;
-		char_code += first;
 
 		lock lock( mutex );
-		font::bitmap bitmap = face.character( char_code, level_size );
+		font::bitmap bitmap = face.character( char_code + first, level_size );
 		copy_partial( image, bitmap, x_offset, y_offset );
 		write_metric( memory, char_code, glyphs, level_inverse, bitmap.metric );
 		return write_image( image, path );
@@ -215,9 +214,8 @@ image font_source::read( u32 x, u32 y, u8 level )
 			if ( code >= glyphs )
 				return write_image( image, path );
 
-			code += first;
 			lock lock( mutex );
-			font::bitmap bitmap = face.character( code, level_size );
+			font::bitmap bitmap = face.character( code + first, level_size );
 			copy_square( image, bitmap, i * level_size, j * level_size );
 			write_metric( memory, code, glyphs, level_inverse, bitmap.metric );
 		}
