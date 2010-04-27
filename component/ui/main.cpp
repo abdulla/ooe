@@ -159,7 +159,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
 	font::library font_library;
-	font::face font_face( font_library, root + "../resource/font/vera-sans.ttf" );
+	font::face font_face( font_library, root + "../resource/font/times-serif.ttf" );
 	font_source source( font_face, 512, root + "../cache" );
 	thread_pool pool;
 	virtual_texture vt( device, source, pool );
@@ -178,7 +178,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
 	text_layout layout( device, vt, source );
-	block_type text = layout.block( program, "stZ", 0 );
+	block_type text = layout.block( program, "tMy", 1 );
 	vt.input( "vt", text );
 	text->input( "projection", orthographic( 0, width, height, 0 ) );
 	text->input( "model_view", mat4::identity );
