@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include <cerrno>
+#include <climits>
+#include <cstdlib>
 
 #include <sys/stat.h>
 
@@ -70,16 +72,22 @@ directory::iterator directory::end( void ) const
 	return iterator( 0, 0 );
 }
 
-//--- make_directory -------------------------------------------------------------------------------
-void make_directory( const std::string& in )
+//--- canonicalized --------------------------------------------------------------------------------
+std::string canonicalized( const std::string& path )
 {
-	c8 path[ PATH_MAX ];
+	c8 buffer[ PATH_MAX ];
 
-	if ( !realpath( in.c_str(), path ) )
+	if ( !realpath( path.c_str(), buffer ) )
 		throw error::io( "make_directory: " ) <<
-			"Unable to canonicalize \"" << in << "\": " << error::number( errno );
+			"Unable to canonicalize \"" << path << "\": " << error::number( errno );
 
-	if ( mkdir( path, 0700 ) )
+	return buffer;
+}
+
+//--- make_directory -------------------------------------------------------------------------------
+void make_directory( const std::string& path )
+{
+	if ( mkdir( path.c_str(), 0700 ) )
 		throw error::io( "make_directory: " ) <<
 			"Unable to make directory \"" << path << "\": " << error::number( errno );
 }

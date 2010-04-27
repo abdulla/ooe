@@ -54,6 +54,7 @@ private:
 };
 
 //--------------------------------------------------------------------------------------------------
+std::string canonicalized( const std::string& ) OOE_VISIBLE;
 void make_directory( const std::string& ) OOE_VISIBLE;
 bool exists( const std::string& ) OOE_VISIBLE;
 
