@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include "component/ui/text_layout.hpp"
 #include "foundation/utility/arithmetic.hpp"
 
@@ -10,31 +8,19 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 const up_t index_size = 6;
 const up_t point_size = 4 * 4;
 
-u32 add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size, u32 x )
+u32 add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size, s32 x, s32 y, u32 max )
 {
 	const font::metric& m = glyph._2;
-	std::cout << std::boolalpha << "( " << m.left << ", " << m.top << ", " << m.x << ", " << m.y <<
-		", " << m.width << ", " << m.height << " )\n";
 
-	f32 x_min = x;
-	f32 x_max = x + m.width;
-	f32 y_min = m.top;
-	f32 y_max = m.top + m.height;
-
-	std::cout << "x_min: " << x_min << '\n';
-	std::cout << "x_max: " << x_max << '\n';
-	std::cout << "y_min: " << y_min << '\n';
-	std::cout << "y_max: " << y_max << '\n';
+	f32 x_min = x + m.left;
+	f32 x_max = x + m.width + m.left;
+	f32 y_min = y + ( max - m.top );
+	f32 y_max = y + m.height + ( max - m.top );
 
 	f32 u_min = divide( glyph._0, size );
 	f32 u_max = divide( glyph._0 + m.width, size );
 	f32 v_min = divide( glyph._1, size );
 	f32 v_max = divide( glyph._1 + m.height, size );
-
-	std::cout << "u_min: " << u_min << '\n';
-	std::cout << "u_max: " << u_max << '\n';
-	std::cout << "v_min: " << v_min << '\n';
-	std::cout << "v_max: " << v_max << '\n';
 
 	// top left
 	value[ 0 ] = x_min;
@@ -97,14 +83,15 @@ block_type text_layout::block( const program_type& program, const std::string& t
 		map_type map = point->map( buffer::write );
 		f32* value = static_cast< f32* >( map->data );
 		u32 size = source.size();
-		u32 x = 0;
+		s32 x = 0;
+		s32 y = 0;
+		u32 max = source.font_size();
 
 		for ( std::string::const_iterator i = text.begin(), end = text.end(); i != end;
 			++i, value += point_size )
 		{
-			std::cout << "processing char: " << *i << '\n';
 			font_source::glyph_type glyph = source.glyph( *i, level );
-			x += add_glyph( glyph, value, size, x );
+			x += add_glyph( glyph, value, size, x, y, max );
 			vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
 		}
 	}
