@@ -140,21 +140,21 @@ font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
 		throw error::runtime( "font_source: " ) <<
 			"Mipmap level " << level << " > maximum level " << level_limit;
 
-	char_code = first >= char_code ? 0 : char_code - first;
+	u32 code = first >= char_code ? 0 : char_code - first;
 	u8 level_inverse = level_limit - level;
-	font::metric& metric = read_metric( memory, char_code, glyphs, level_inverse );
+	font::metric& metric = read_metric( memory, code, glyphs, level_inverse );
 
 	if ( !metric.valid )
 	{
 		metric = face.character( char_code, face_size >> level ).metric;
-		write_metric( memory, char_code, glyphs, level_inverse, metric );
+		write_metric( memory, code, glyphs, level_inverse, metric );
 	}
 
 	u32 glyphs_per_row = source_size / face_size;
 	return glyph_type
 	(
-		( char_code % glyphs_per_row ) * face_size,
-		( char_code / glyphs_per_row ) * face_size,
+		( code % glyphs_per_row ) * face_size,
+		( code / glyphs_per_row ) * face_size,
 		metric
 	);
 }
