@@ -177,8 +177,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
-	text_layout layout( device, source );
-	block_type text = layout.block( program, "t", 0 );
+	text_layout layout( device, vt, source );
+	block_type text = layout.block( program, "stZ", 0 );
 	vt.input( "vt", text );
 	text->input( "projection", orthographic( 0, width, height, 0 ) );
 	text->input( "model_view", mat4::identity );

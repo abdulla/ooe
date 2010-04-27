@@ -14,6 +14,17 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 const image::type image_type = image::y_u8;
 const u16 page_wide = 256;
 
+struct source_metric
+	: public font::metric
+{
+	bool valid;
+
+	source_metric( const font::metric& metric_, bool valid_ )
+		: metric( metric_ ), valid( valid_ )
+	{
+	}
+};
+
 c8 transform( c8 c )
 {
 	return std::isspace( c ) ? '-' : std::tolower( c );
@@ -40,7 +51,7 @@ u32 get_size( const font::face& face, u32 face_size )
 memory open_memory( const std::string& root, u32 glyphs, u8 level_limit )
 {
 	descriptor desc( root + "/metric", descriptor::read_write );
-	up_t size = sizeof( font::metric ) * glyphs * level_limit;
+	up_t size = sizeof( source_metric ) * glyphs * level_limit;
 
 	if ( desc.size() < size )
 		desc.resize( size );
@@ -83,15 +94,13 @@ const uncompressed_image& write_image( const uncompressed_image& image, const st
 void write_metric( const memory& memory, up_t char_code, u32 glyphs, u8 level_inverse,
 	const font::metric& metric )
 {
-	font::metric* metrics = memory.as< font::metric >() + char_code + glyphs * level_inverse;
-	*metrics = metric;
-	metrics->valid = true;
+	source_metric* metrics = memory.as< source_metric >() + char_code + glyphs * level_inverse;
+	*metrics = source_metric( metric, true );
 }
 
-font::metric& read_metric( const memory& memory, up_t char_code, u32 glyphs, u8 level_inverse )
+source_metric& read_metric( const memory& memory, up_t char_code, u32 glyphs, u8 level_inverse )
 {
-	font::metric* metrics = memory.as< font::metric >() + char_code + glyphs * level_inverse;
-	return *metrics;
+	return memory.as< source_metric >()[ char_code + glyphs * level_inverse ];
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -142,11 +151,12 @@ font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
 
 	u32 code = first >= char_code ? 0 : char_code - first;
 	u8 level_inverse = level_limit - level;
-	font::metric& metric = read_metric( memory, code, glyphs, level_inverse );
+	source_metric& metric = read_metric( memory, code, glyphs, level_inverse );
 
 	if ( !metric.valid )
 	{
-		metric = face.character( char_code, face_size >> level ).metric;
+		font::bitmap bitmap = face.character( char_code, face_size >> level );
+		metric = source_metric( bitmap.metric, true );
 		write_metric( memory, code, glyphs, level_inverse, metric );
 	}
 

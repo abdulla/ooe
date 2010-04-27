@@ -10,14 +10,16 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 const up_t index_size = 6;
 const up_t point_size = 4 * 4;
 
-void add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size )
+u32 add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size, u32 x )
 {
-	const font::metric& metric = glyph._2;
+	const font::metric& m = glyph._2;
+	std::cout << std::boolalpha << "( " << m.left << ", " << m.top << ", " << m.x << ", " << m.y <<
+		", " << m.width << ", " << m.height << " )\n";
 
-	f32 x_min = 0;
-	f32 x_max = metric.width;
-	f32 y_min = 0;
-	f32 y_max = metric.height;
+	f32 x_min = x;
+	f32 x_max = x + m.width;
+	f32 y_min = m.top;
+	f32 y_max = m.top + m.height;
 
 	std::cout << "x_min: " << x_min << '\n';
 	std::cout << "x_max: " << x_max << '\n';
@@ -25,9 +27,9 @@ void add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size )
 	std::cout << "y_max: " << y_max << '\n';
 
 	f32 u_min = divide( glyph._0, size );
-	f32 u_max = divide( glyph._0 + metric.width, size );
+	f32 u_max = divide( glyph._0 + m.width, size );
 	f32 v_min = divide( glyph._1, size );
-	f32 v_max = divide( glyph._1 + metric.height, size );
+	f32 v_max = divide( glyph._1 + m.height, size );
 
 	std::cout << "u_min: " << u_min << '\n';
 	std::cout << "u_max: " << u_max << '\n';
@@ -57,6 +59,8 @@ void add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size )
 	value[ 13 ] = y_min;
 	value[ 14 ] = u_max;
 	value[ 15 ] = v_min;
+
+	return m.width + m.left;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -64,8 +68,9 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- text_layout ----------------------------------------------------------------------------------
-text_layout::text_layout( const device_type& device_, const font_source& source_ )
-	: device( device_ ), source( source_ )
+text_layout::
+	text_layout( const device_type& device_, virtual_texture& vt_, const font_source& source_ )
+	: device( device_ ), vt( vt_ ), source( source_ )
 {
 }
 
@@ -92,12 +97,15 @@ block_type text_layout::block( const program_type& program, const std::string& t
 		map_type map = point->map( buffer::write );
 		f32* value = static_cast< f32* >( map->data );
 		u32 size = source.size();
+		u32 x = 0;
 
 		for ( std::string::const_iterator i = text.begin(), end = text.end(); i != end;
 			++i, value += point_size )
 		{
 			std::cout << "processing char: " << *i << '\n';
-			add_glyph( source.glyph( *i, level ), value, size );
+			font_source::glyph_type glyph = source.glyph( *i, level );
+			x += add_glyph( glyph, value, size, x );
+			vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
 		}
 	}
 
