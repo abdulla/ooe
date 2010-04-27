@@ -8,7 +8,8 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 const up_t index_size = 6;
 const up_t point_size = 4 * 4;
 
-u32 add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size, s32 x, s32 y, u32 max )
+u32 add_glyph
+	( const font_source::glyph_type& glyph, f32* value, u32 size, s32 x, s32 y, u32 max, u8 level )
 {
 	const font::metric& m = glyph._2;
 
@@ -18,9 +19,9 @@ u32 add_glyph( const font_source::glyph_type& glyph, f32* value, u32 size, s32 x
 	f32 y_max = y + m.height + ( max - m.top );
 
 	f32 u_min = divide( glyph._0, size );
-	f32 u_max = divide( glyph._0 + m.width, size );
+	f32 u_max = divide( glyph._0 + ( m.width << level ), size );
 	f32 v_min = divide( glyph._1, size );
-	f32 v_max = divide( glyph._1 + m.height, size );
+	f32 v_max = divide( glyph._1 + ( m.height << level ), size );
 
 	// top left
 	value[ 0 ] = x_min;
@@ -91,7 +92,7 @@ block_type text_layout::block( const program_type& program, const std::string& t
 			++i, value += point_size )
 		{
 			font_source::glyph_type glyph = source.glyph( *i, level );
-			x += add_glyph( glyph, value, size, x, y, max );
+			x += add_glyph( glyph, value, size, x, y, max, level );
 			vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
 		}
 	}
