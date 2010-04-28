@@ -87,8 +87,8 @@ region_type get_region( const physical_source& source, u8 level_limit,
 	u32 page_size = source.page_size();
 	u32 page_x1 = floor( x >> level, page_size );
 	u32 page_y1 = floor( y >> level, page_size );
-	u32 page_x2 = ceiling( ( x + width ) >> level, page_size );
-	u32 page_y2 = ceiling( ( y + height ) >> level, page_size );
+	u32 page_x2 = page_x1 + std::max( ceiling( width >> level, page_size ), 1u );
+	u32 page_y2 = page_y1 + std::max( ceiling( height >> level, page_size ), 1u );
 	return region_type( page_x1, page_x2, page_y1, page_y2 );
 }
 
