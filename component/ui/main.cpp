@@ -171,7 +171,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	shader_vector vector;
 	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
-	vector.push_back( make_shader( device, root, shader::fragment, "null.fs" ) );
+	vector.push_back( make_shader( device, root, shader::fragment, "font.fs" ) );
 	vector.push_back( make_shader( device, root, shader::fragment, "virtual_texture.fs" ) );
 	program_type program = device->program( vector );
 
@@ -181,6 +181,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "vertex", 2, point );
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
+
+	device->set( device::blend, true );
+	block->input( "colour", 255, 255, 0 );
 
 	u32 source_size = source.size();
 	u16 page_size = source.page_size();

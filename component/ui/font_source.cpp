@@ -11,7 +11,7 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const image::type image_type = image::y_u8;
+const image::type image_type = image::a_u8;
 const u16 page_wide = 256;
 
 struct source_metric
