@@ -15,35 +15,35 @@ const f32 height = 640;
 u32 acceleration = 4;
 
 //--- process_key ----------------------------------------------------------------------------------
-void process_key( u32 value, bool press, vec3& translate, vec3& scale )
+void process_key( u32 value, bool press, vec3& translate, vec3& scale, std::string& string )
 {
 	if ( !press )
 		return;
 
 	switch ( value )
 	{
-	case 'd':
-		translate.x -= acceleration;
-		break;
-
-	case 'a':
+	case key_left:
 		translate.x += acceleration;
 		break;
 
-	case 's':
-		translate.y -= acceleration;
+	case key_right:
+		translate.x -= acceleration;
 		break;
 
-	case 'w':
+	case key_up:
 		translate.y += acceleration;
 		break;
 
-	case 'c':
-		scale.x = scale.y -= acceleration;
+	case key_down:
+		translate.y -= acceleration;
 		break;
 
-	case ' ':
+	case '=':
 		scale.x = scale.y += acceleration;
+		break;
+
+	case '-':
+		scale.x = scale.y -= acceleration;
 		break;
 
 	case '.':
@@ -54,18 +54,21 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale )
 		acceleration = acceleration ? acceleration >> 1 : 1;
 		break;
 
-	case 'q':
+	case key_escape:
 		executable::quit();
 		break;
 
 	default:
+		string += value;
 		break;
 	}
 }
 
 //--- process_events -------------------------------------------------------------------------------
-void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epoch_t timeout )
+std::string process_events
+	( event_queue& event_queue, vec3& translate, vec3& scale, epoch_t timeout )
 {
+	std::string string;
 	event event;
 
 	for ( event::type type; ( type = event_queue.next_event( event, timeout ) );
@@ -78,7 +81,7 @@ void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epo
 			break;
 
 		case event::key_flag:
-			process_key( event.key.value, event.key.press, translate, scale );
+			process_key( event.key.value, event.key.press, translate, scale, string );
 			break;
 
 		case event::exit:
@@ -89,6 +92,8 @@ void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epo
 			break;
 		}
 	}
+
+	return string;
 }
 
 shader_type make_shader( const device_type& device, const std::string& root, shader::type type,
@@ -177,18 +182,15 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "coords", 2, point );
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
-	text_layout layout( device, vt, source );
-	block_type text = layout.block( program, "tMy", 1 );
-	vt.input( "vt", text );
-	text->input( "projection", orthographic( 0, width, height, 0 ) );
-	text->input( "model_view", mat4::identity );
-
+	u32 source_size = source.size();
 	u16 page_size = source.page_size();
-
-	for ( u32 size = source.size(), i = size / page_size; i; i >>= 1 )
-		vt.load( 0, 0, size, source.font_size() * 2, log2( i ) );
-
+	u32 font_size = source.font_size();
+	vt.load( 0, 0, source_size, font_size, log2( source_size / page_size ) - 1 );
 	vt.write();
+
+	std::string string;
+	text_layout layout( device, vt, source );
+	block_type text;
 
 	frame_type frame = device->default_frame( width, height );
 	vec3 translate( width / 2, height / 2, 0 );
@@ -201,11 +203,24 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 		frame->clear();
 		device->draw( block, frame );
-		device->draw( text, frame );
+
+		if ( text )
+			device->draw( text, frame );
+
 		device->swap();
 
 		up_t pending = vt.pending();
-		process_events( event_queue, translate, scale, epoch_t( pending ? 0 : 3600, 0 ) );
+		std::string suffix =
+			process_events( event_queue, translate, scale, epoch_t( pending ? 0 : 3600, 0 ) );
+
+		if ( !suffix.empty() )
+		{
+			string += suffix;
+			text = layout.block( program, string, 4 );
+			vt.input( "vt", text );
+			text->input( "projection", orthographic( 0, width, height, 0 ) );
+			text->input( "model_view", mat4::identity );
+		}
 
 		if ( pending )
 			vt.write();
