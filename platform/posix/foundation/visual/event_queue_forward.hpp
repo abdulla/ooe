@@ -10,6 +10,22 @@
 typedef struct _XDisplay Display;
 #endif	// OOE_X_HEADER_INCLUDED
 
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+enum key_type
+{
+	key_escape		= 0xff1b,
+	key_backspace	= 0xff08,
+	key_return		= 0xff0d,
+
+	key_left		= 0xff51,
+	key_right		= 0xff53,
+	key_up			= 0xff52,
+	key_down		= 0xff54
+};
+
+OOE_NAMESPACE_END( ( ooe ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
 struct OOE_VISIBLE event_queue
