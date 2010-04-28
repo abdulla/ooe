@@ -91,7 +91,7 @@ block_type text_layout::block( const program_type& program, const std::string& t
 		for ( std::string::const_iterator i = text.begin(), end = text.end(); i != end;
 			++i, value += point_size )
 		{
-			font_source::glyph_type glyph = source.glyph( *i, level );
+			font_source::glyph_type glyph = source.glyph( u8( *i ), level );
 			x += add_glyph( glyph, value, size, x, y, max, level );
 			vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
 		}
