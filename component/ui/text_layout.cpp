@@ -90,7 +90,7 @@ block_type text_layout::block( const program_type& program, const std::string& t
 		u32 size = source.size();
 		s32 x = 0;
 		s32 y = 0;
-		u32 max = source.font_size();
+		u32 max = source.font_size() >> level;
 
 		for ( std::string::const_iterator i = text.begin(), end = text.end(); i != end;
 			++i, value += point_size )
