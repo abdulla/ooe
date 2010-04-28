@@ -64,6 +64,8 @@ text_layout::
 block_type text_layout::block( const program_type& program, const std::string& text, u8 level )
 {
 	buffer_type index = device->buffer( sizeof( u16 ) * index_size * text.size(), buffer::index );
+
+	if ( !text.empty() )
 	{
 		map_type map = index->map( buffer::write );
 		u16* value = static_cast< u16* >( map->data );
@@ -80,6 +82,8 @@ block_type text_layout::block( const program_type& program, const std::string& t
 	}
 
 	buffer_type point = device->buffer( sizeof( f32 ) * point_size * text.size(), buffer::point );
+
+	if ( !text.empty() )
 	{
 		map_type map = point->map( buffer::write );
 		f32* value = static_cast< f32* >( map->data );
