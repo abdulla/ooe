@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/library.hpp"
-#include "foundation/opengl_next/symbol.hpp"
+#include "foundation/opengl/symbol.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

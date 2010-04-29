@@ -1,9 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_CONTEXT_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_CONTEXT_HPP
+#ifndef OOE_FOUNDATION_OPENGL_CONTEXT_HPP
+#define OOE_FOUNDATION_OPENGL_CONTEXT_HPP
 
-#include "foundation/opengl_next/context_forward.hpp"
+#include "foundation/opengl/context_forward.hpp"
 #include "foundation/utility/macro.hpp"
 
 namespace ooe
@@ -17,4 +17,4 @@ namespace ooe
 	void context_swap( const view_data&, platform::context_type ) OOE_VISIBLE;
 }
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_CONTEXT_HPP
+#endif	// OOE_FOUNDATION_OPENGL_CONTEXT_HPP

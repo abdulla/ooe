@@ -3,7 +3,7 @@
 #include <AppKit/AppKit.h>
 #include <OpenGL/OpenGL.h>
 
-#include "foundation/opengl_next/context.hpp"
+#include "foundation/opengl/context.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/view.hpp"
 

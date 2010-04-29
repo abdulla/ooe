@@ -4,7 +4,7 @@
 #include <GL/glx.h>
 #undef GLX_GLXEXT_PROTOTYPES
 
-#include "foundation/opengl_next/context.hpp"
+#include "foundation/opengl/context.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/event_queue.hpp"
 

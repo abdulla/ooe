@@ -4,15 +4,15 @@
 #include <iterator>
 #include <set>
 
-#include "foundation/opengl_next/block.hpp"
-#include "foundation/opengl_next/buffer.hpp"
-#include "foundation/opengl_next/context.hpp"
-#include "foundation/opengl_next/frame.hpp"
-#include "foundation/opengl_next/program.hpp"
-#include "foundation/opengl_next/shader.hpp"
-#include "foundation/opengl_next/symbol.hpp"
-#include "foundation/opengl_next/target.hpp"
-#include "foundation/opengl_next/texture.hpp"
+#include "foundation/opengl/block.hpp"
+#include "foundation/opengl/buffer.hpp"
+#include "foundation/opengl/context.hpp"
+#include "foundation/opengl/frame.hpp"
+#include "foundation/opengl/program.hpp"
+#include "foundation/opengl/shader.hpp"
+#include "foundation/opengl/symbol.hpp"
+#include "foundation/opengl/target.hpp"
+#include "foundation/opengl/texture.hpp"
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 

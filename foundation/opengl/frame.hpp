@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_FRAME_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_FRAME_HPP
+#ifndef OOE_FOUNDATION_OPENGL_FRAME_HPP
+#define OOE_FOUNDATION_OPENGL_FRAME_HPP
 
 #include <map>
 
@@ -55,4 +55,4 @@ struct frame
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_FRAME_HPP
+#endif	// OOE_FOUNDATION_OPENGL_FRAME_HPP

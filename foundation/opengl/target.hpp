@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_TARGET_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_TARGET_HPP
+#ifndef OOE_FOUNDATION_OPENGL_TARGET_HPP
+#define OOE_FOUNDATION_OPENGL_TARGET_HPP
 
 #include "foundation/visual/graphics.hpp"
 
@@ -20,4 +20,4 @@ struct target
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_TARGET_HPP
+#endif	// OOE_FOUNDATION_OPENGL_TARGET_HPP

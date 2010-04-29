@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_BUFFER_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_BUFFER_HPP
+#ifndef OOE_FOUNDATION_OPENGL_BUFFER_HPP
+#define OOE_FOUNDATION_OPENGL_BUFFER_HPP
 
 #include "foundation/visual/graphics.hpp"
 
@@ -33,4 +33,4 @@ struct buffer
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_BUFFER_HPP
+#endif	// OOE_FOUNDATION_OPENGL_BUFFER_HPP

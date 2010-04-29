@@ -78,7 +78,7 @@ build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.includ
 build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
 build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
 build.Linkable( 'maths', 'foundation/maths' )
-build.Linkable( 'opengl_next', 'foundation/opengl_next', 'io', configure = OpenGLConfigure )
+build.Linkable( 'opengl', 'foundation/opengl', 'io', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
 build.Linkable( 'visual', 'foundation/visual', 'image parallel', ooe.qtkit.framework,
 	ooe.freetype.include_path, configure = VisualConfigure )

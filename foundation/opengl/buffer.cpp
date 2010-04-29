@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-#include "foundation/opengl_next/buffer.hpp"
-#include "foundation/opengl_next/symbol.hpp"
+#include "foundation/opengl/buffer.hpp"
+#include "foundation/opengl/symbol.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )

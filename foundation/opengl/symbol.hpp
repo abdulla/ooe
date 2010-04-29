@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_SYMBOL_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_SYMBOL_HPP
+#ifndef OOE_FOUNDATION_OPENGL_SYMBOL_HPP
+#define OOE_FOUNDATION_OPENGL_SYMBOL_HPP
 
 #include "foundation/utility/fundamental.hpp"
 
@@ -276,4 +276,4 @@ extern DrawElements_t* DrawElements;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_SYMBOL_HPP
+#endif	// OOE_FOUNDATION_OPENGL_SYMBOL_HPP

@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_SHADER_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_SHADER_HPP
+#ifndef OOE_FOUNDATION_OPENGL_SHADER_HPP
+#define OOE_FOUNDATION_OPENGL_SHADER_HPP
 
 #include "foundation/visual/graphics.hpp"
 
@@ -18,4 +18,4 @@ struct shader
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_SHADER_HPP
+#endif	// OOE_FOUNDATION_OPENGL_SHADER_HPP

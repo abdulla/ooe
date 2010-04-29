@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_OPENGL_NEXT_BLOCK_HPP
-#define OOE_FOUNDATION_OPENGL_NEXT_BLOCK_HPP
+#ifndef OOE_FOUNDATION_OPENGL_BLOCK_HPP
+#define OOE_FOUNDATION_OPENGL_BLOCK_HPP
 
 #include <map>
 
@@ -51,4 +51,4 @@ private:
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_NEXT_BLOCK_HPP
+#endif	// OOE_FOUNDATION_OPENGL_BLOCK_HPP

@@ -1,10 +1,10 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/opengl_next/buffer.hpp"
-#include "foundation/opengl_next/frame.hpp"
-#include "foundation/opengl_next/symbol.hpp"
-#include "foundation/opengl_next/target.hpp"
-#include "foundation/opengl_next/texture.hpp"
+#include "foundation/opengl/buffer.hpp"
+#include "foundation/opengl/frame.hpp"
+#include "foundation/opengl/symbol.hpp"
+#include "foundation/opengl/target.hpp"
+#include "foundation/opengl/texture.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/tuple.hpp"
 
