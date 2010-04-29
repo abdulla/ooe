@@ -78,7 +78,6 @@ build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.includ
 build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
 build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
 build.Linkable( 'maths', 'foundation/maths' )
-build.Linkable( 'opengl', 'foundation/opengl', configure = OpenGLConfigure )
 build.Linkable( 'opengl_next', 'foundation/opengl_next', 'io', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
 build.Linkable( 'visual', 'foundation/visual', 'image parallel', ooe.qtkit.framework,
@@ -113,7 +112,6 @@ build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 build.Linkable( 'unit', 'test/unit', 'io executable' )
 
 #--- external --------------------------------------------------------------------------------------
-build.Executable( 'chunked', 'external/chunked', 'executable scene visual' )
 build.Executable( 'hello', 'external/hello/server', 'executable ipc' )
 build.Executable( 'memoryrpc_input', 'external/memoryrpc/input', 'executable ipc' )
 build.Executable( 'memoryrpc_noop', 'external/memoryrpc/noop', 'executable ipc' )
@@ -125,5 +123,4 @@ build.Executable( 'socketrpc_noop', 'external/socketrpc/noop', 'executable ipc' 
 build.Executable( 'socketrpc_output', 'external/socketrpc/output', 'executable ipc' )
 build.Executable( 'socketrpc_server', 'external/socketrpc/server', 'executable ipc' )
 
-build.Linkable( 'scene', 'external/scene', 'image io maths parallel' )
 build.Linkable( 'hello', 'external/hello', 'javascript lua python registry' )
