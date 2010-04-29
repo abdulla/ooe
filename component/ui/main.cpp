@@ -22,6 +22,12 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale, std::stri
 
 	switch ( value )
 	{
+	case key_shift_left:
+	case key_shift_right:
+	case key_super_left:
+	case key_super_right:
+		break;
+
 	case key_left:
 		translate.x += acceleration;
 		break;
@@ -157,14 +163,14 @@ buffer_type index_buffer( const device_type& device )
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
 	// graphics library must be preloaded for linux
-	library library( root + "../library/libopengl_next" + library::suffix, library::global_lazy );
+	library library( root + "../library/libopengl" + library::suffix, library::global_lazy );
 
 	event_queue event_queue;
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
 	font::library font_library;
-	font::face font_face( font_library, root + "../resource/font/times-serif.ttf" );
+	font::face font_face( font_library, root + "../resource/font/myriadpro-sans.otf" );
 	font_source source( font_face, 512, root + "../cache" );
 	thread_pool pool;
 	virtual_texture vt( device, source, pool );
