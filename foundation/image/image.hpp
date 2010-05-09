@@ -10,6 +10,10 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 class descriptor;
+class image;
+
+typedef image ( * decoder_type )( const descriptor& );
+typedef void ( * encoder_type )( const image&, const descriptor& );
 
 //--- image ----------------------------------------------------------------------------------------
 class image
