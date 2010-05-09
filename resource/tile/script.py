@@ -21,7 +21,6 @@ if __name__ == '__main__':
 
 	image = Image.open( options.file )
 	type = image.format.lower()
-	page_size = options.page_size
 	image_size = image.size[ 0 ]
 
 	if image_size != image.size[ 1 ]:
@@ -37,9 +36,9 @@ if __name__ == '__main__':
 		image_size = bit_round_down
 		print 'done.'
 
-	metadata = open( os.path.join( options.directory, 'metadata' ), 'w' )
-	metadata.write( '%s %u %u' % ( type, page_size, image_size ) )
 	level_limit = int( math.log( image_size / page_size, 2 ) ) + 1
+	metadata = open( os.path.join( options.directory, 'metadata' ), 'w' )
+	metadata.write( '%s %u' % ( type, level_limit ) )
 
 	print 'Processing "%s":' % options.file
 	print '\tImage size:   ', image_size
