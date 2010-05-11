@@ -3,8 +3,10 @@
 #include <cmath>
 
 #include "component/ui/text_layout.hpp"
+#include "component/ui/tile_source.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/image/png.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/view.hpp"
 
@@ -169,11 +171,15 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
 
+	decoder_map map;
+	map.insert( decoder_map::value_type( "png", uncompressed_decode< png::decode > ) );
+	tile_source tile_source( root + "../cache/blue-marble", map );
+
 	font::library font_library;
 	font::face font_face( font_library, root + "../resource/font/myriadpro-sans.otf" );
-	font_source source( font_face, 512, root + "../cache" );
+	font_source font_source( font_face, 512, root + "../cache" );
 	thread_pool pool;
-	virtual_texture vt( device, source, pool );
+	virtual_texture vt( device, font_source, pool );
 
 	shader_vector vector;
 	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
@@ -191,14 +197,14 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	device->set( device::blend, true );
 	block->input( "colour", 255, 255, 0 );
 
-	u32 source_size = source.size();
-	u16 page_size = source.page_size();
-	u32 font_size = source.font_size();
+	u32 source_size = font_source.size();
+	u16 page_size = font_source.page_size();
+	u32 font_size = font_source.font_size();
 	vt.load( 0, 0, source_size, font_size, log2( source_size / page_size ) - 1 );
 	vt.write();
 
 	std::string string;
-	text_layout layout( device, vt, source );
+	text_layout layout( device, vt, font_source );
 	block_type text;
 
 	frame_type frame = device->default_frame( width, height );
