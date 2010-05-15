@@ -5,6 +5,41 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/event_queue.hpp"
 
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+
+enum
+{
+	raw_shift_left		= 56,
+	raw_shift_right		= 60,
+	raw_command_left	= 55,
+	raw_command_right	= 54
+};
+
+typedef tuple< u32, bool > modifier_tuple;
+
+modifier_tuple modifier( NSEvent* event )
+{
+	switch ( event.keyCode )
+	{
+	case raw_shift_left:
+		return modifier_tuple( key_shift_left, event.modifierFlags & NSShiftKeyMask );
+
+	case raw_shift_right:
+		return modifier_tuple( key_shift_right, event.modifierFlags & NSShiftKeyMask );
+
+	case raw_command_left:
+		return modifier_tuple( key_command_left, event.modifierFlags & NSCommandKeyMask );
+
+	case raw_command_right:
+		return modifier_tuple( key_command_right, event.modifierFlags & NSCommandKeyMask );
+
+	default:
+		return modifier_tuple( 0, false );
+	}
+}
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
 //--- event_queue ----------------------------------------------------------------------------------
@@ -31,6 +66,8 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	if ( !nsevent )
 		return event::none;
 
+	modifier_tuple tuple;
+
 	switch ( nsevent.type )
 	{
 	case NSMouseMoved:
@@ -47,13 +84,23 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 
 		return event::motion_flag;
 
+	case NSFlagsChanged:
+		tuple = modifier( nsevent );
+
+		if ( !tuple._0 )
+			return event::ignore;
+
+		event.key.value = tuple._0;
+		event.key.press = tuple._1;
+		return event::key_flag;
+
 	case NSKeyDown:
-		event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
+		event.key.value = [ nsevent.characters characterAtIndex: 0 ];
 		event.key.press = true;
 		return event::key_flag;
 
 	case NSKeyUp:
-		event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
+		event.key.value = [ nsevent.characters characterAtIndex: 0 ];
 		event.key.press = false;
 		return event::key_flag;
 

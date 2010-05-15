@@ -26,8 +26,8 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale, std::stri
 	{
 	case key_shift_left:
 	case key_shift_right:
-	case key_super_left:
-	case key_super_right:
+	case key_command_left:
+	case key_command_right:
 		break;
 
 	case key_left:
