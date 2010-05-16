@@ -17,21 +17,21 @@ enum
 
 typedef tuple< u32, bool > modifier_tuple;
 
-modifier_tuple modifier( NSEvent* event )
+modifier_tuple modifier( NSEvent* nsevent )
 {
-	switch ( event.keyCode )
+	switch ( nsevent.keyCode )
 	{
 	case raw_shift_left:
-		return modifier_tuple( key_shift_left, event.modifierFlags & NSShiftKeyMask );
+		return modifier_tuple( key_shift_left, nsevent.modifierFlags & NSShiftKeyMask );
 
 	case raw_shift_right:
-		return modifier_tuple( key_shift_right, event.modifierFlags & NSShiftKeyMask );
+		return modifier_tuple( key_shift_right, nsevent.modifierFlags & NSShiftKeyMask );
 
 	case raw_command_left:
-		return modifier_tuple( key_command_left, event.modifierFlags & NSCommandKeyMask );
+		return modifier_tuple( key_command_left, nsevent.modifierFlags & NSCommandKeyMask );
 
 	case raw_command_right:
-		return modifier_tuple( key_command_right, event.modifierFlags & NSCommandKeyMask );
+		return modifier_tuple( key_command_right, nsevent.modifierFlags & NSCommandKeyMask );
 
 	default:
 		return modifier_tuple( 0, false );
@@ -95,43 +95,31 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 		return event::key_flag;
 
 	case NSKeyDown:
-		event.key.value = [ nsevent.characters characterAtIndex: 0 ];
-		event.key.press = true;
-		return event::key_flag;
-
 	case NSKeyUp:
-		event.key.value = [ nsevent.characters characterAtIndex: 0 ];
-		event.key.press = false;
+		event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
+		event.key.press = nsevent.type == NSKeyDown;
+
+		if ( nsevent.modifierFlags & NSShiftKeyMask )
+			event.key.value = tolower( event.key.value );
+
 		return event::key_flag;
 
 	case NSLeftMouseDown:
+	case NSLeftMouseUp:
 		event.button.value = 0;
-		event.button.press = true;
+		event.button.press = nsevent.type == NSLeftMouseDown;
 		return event::button_flag;
 
 	case NSRightMouseDown:
+	case NSRightMouseUp:
 		event.button.value = 1;
-		event.button.press = true;
+		event.button.press = nsevent.type == NSRightMouseDown;
 		return event::button_flag;
 
 	case NSOtherMouseDown:
-		event.button.value = 2;
-		event.button.press = true;
-		return event::button_flag;
-
-	case NSLeftMouseUp:
-		event.button.value = 0;
-		event.button.press = false;
-		return event::button_flag;
-
-	case NSRightMouseUp:
-		event.button.value = 1;
-		event.button.press = false;
-		return event::button_flag;
-
 	case NSOtherMouseUp:
 		event.button.value = 2;
-		event.button.press = false;
+		event.button.press = nsevent.type == NSOtherMouseDown;
 		return event::button_flag;
 
 	default:

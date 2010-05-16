@@ -66,31 +66,21 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 		warp();
 		return event::motion_flag;
 
+	case KeyPress:
 	case KeyRelease:
 		event.key.value = XLookupKeysym( &xevent.xkey, 0 );
-		event.key.press = false;
+		event.key.press = xevent.type == KeyPress;
 		return event::key_flag;
-
-	case KeyPress:
-		event.key.value = XLookupKeysym( &xevent.xkey, 0 );
-		event.key.press = true;
-		return event::key_flag;
-
-	case ButtonRelease:
-		event.button.value = xevent.xbutton.button;
-		event.button.press = false;
-		return event::button_flag;
 
 	case ButtonPress:
+	case ButtonRelease:
 		event.button.value = xevent.xbutton.button;
-		event.button.press = true;
+		event.button.press = xevent.type == ButtonPress;
 		return event::button_flag;
 
 	case ClientMessage:
-		if ( xevent.xclient.data.l[ 0 ] == static_cast< sp_t >( wm_delete ) )
-			return event::exit;
-		else
-			return event::ignore;
+		return xevent.xclient.data.l[ 0 ] == static_cast< sp_t >( wm_delete ) ?
+			event::exit : event::ignore;
 
 	default:
 		return event::ignore;
