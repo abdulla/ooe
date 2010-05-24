@@ -195,7 +195,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	block->input( "projection", orthographic( 0, width, height, 0 ) );
 
 	device->set( device::blend, true );
-	block->input( "colour", 255, 255, 0 );
+	block->input( "colour", 255, 255, 255 );
 
 	u32 source_size = font_source.size();
 	u16 page_size = font_source.page_size();
