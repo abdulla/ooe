@@ -28,12 +28,24 @@ struct physical_source
 	virtual image read( u32, u32, u8 ) = 0;
 };
 
+//--- pyramid_index --------------------------------------------------------------------------------
+struct pyramid_index
+{
+	u32 x;
+	u32 y;
+	u8 level;
+
+	pyramid_index( void );
+	pyramid_index( u32, u32, u8 );
+};
+
+bool operator <( const pyramid_index&, const pyramid_index& );
+
 //--- virtual_texture ------------------------------------------------------------------------------
 class virtual_texture
 {
 public:
-	typedef tuple< u32, u32, u8 > key_type;
-	typedef tuple< key_type, bool, atom_ptr< image > > pending_type;
+	typedef tuple< pyramid_index, bool, atom_ptr< image > > pending_type;
 	typedef ooe::queue< pending_type > pending_queue;
 
 	virtual_texture( const device_type&, physical_source&, thread_pool& );
@@ -46,9 +58,9 @@ public:
 	void write( void );
 
 private:
-	typedef tuple< u32, u32, key_type, bool > value_type;
-	typedef std::list< value_type > cache_list;
-	typedef std::map< key_type, cache_list::iterator > cache_map;
+	typedef tuple< u32, u32, pyramid_index, bool > cache_type;
+	typedef std::list< cache_type > cache_list;
+	typedef std::map< pyramid_index, cache_list::iterator > cache_map;
 	typedef std::bitset< sizeof( up_t ) * 8 > cache_bitset;
 
 	physical_source& source;

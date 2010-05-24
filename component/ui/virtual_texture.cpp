@@ -11,6 +11,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 typedef tuple< u32, u32, u32, u32 > region_type;
 const image::type table_format = image::rgb_f32;
+const u8 invalid_level = 255;
 
 u32 table_width( const device_type& device, const physical_source& source )
 {
@@ -61,11 +62,11 @@ texture_type make_cache( const device_type& device, const physical_source& sourc
 	return device->texture( pyramid, texture::linear, false );
 }
 
-void write_pyramid( image_pyramid& pyramid, const virtual_texture::key_type& key,
-	f32 x, f32 y, f32 pow_level )
+void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, f32 x, f32 y,
+	f32 pow_level )
 {
-	u32 width = pyramid.width >> key._2;
-	f32* rgb = pyramid[ key._2 ].as< f32 >() + ( key._0 + key._1 * width ) * 3;
+	u32 width = pyramid.width >> index.level;
+	f32* rgb = pyramid[ index.level ].as< f32 >() + ( index.x + index.y * width ) * 3;
 	rgb[ 0 ] = x;
 	rgb[ 1 ] = y;
 	rgb[ 2 ] = pow_level;
@@ -93,15 +94,31 @@ region_type get_region( const physical_source& source, u8 level_limit,
 }
 
 void read_source( physical_source& source, virtual_texture::pending_queue& queue,
-	virtual_texture::key_type key, bool locked )
+	pyramid_index index, bool locked )
 {
-	atom_ptr< ooe::image > image( new ooe::image( source.read( key._0, key._1, key._2 ) ) );
-	queue.enqueue( make_tuple( key, locked, image ) );
+	atom_ptr< ooe::image > image( new ooe::image( source.read( index.x, index.y, index.level ) ) );
+	queue.enqueue( make_tuple( index, locked, image ) );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- pyramid_index --------------------------------------------------------------------------------
+pyramid_index::pyramid_index( void )
+	: x( 0 ), y( 0 ), level( 0 )
+{
+}
+
+pyramid_index::pyramid_index( u32 x_, u32 y_, u8 level_ )
+	: x( x_ ), y( y_ ), level( level_ )
+{
+}
+
+bool operator <( const pyramid_index& i, const pyramid_index& j )
+{
+	return i.x < j.x || i.y < j.y || i.level < j.level;
+}
 
 //--- virtual_texture ------------------------------------------------------------------------------
 virtual_texture::
@@ -116,7 +133,7 @@ virtual_texture::
 	for ( u32 y = 0; y != cache_size; y += page_size )
 	{
 		for ( u32 x = 0; x != cache_size; x += page_size )
-			list.push_back( value_type( x, y, key_type( 0, 0, 255 ), false ) );
+			list.push_back( cache_type( x, y, pyramid_index( 0, 0, invalid_level ), false ) );
 	}
 
 	u8 level = pyramid.size() - 1;
@@ -149,8 +166,8 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool 
 	{
 		for ( u32 i = region._0; i != region._1; ++i )
 		{
-			key_type key( i, j, level );
-			cache_map::iterator find = map.find( key );
+			pyramid_index index( i, j, level );
+			cache_map::iterator find = map.find( index );
 			cache_list::iterator end = list.end();
 
 			// check if page has already been loaded (or is loading)
@@ -161,8 +178,8 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool 
 				continue;
 			}
 
-			async( pool, make_function( read_source ), source, queue, key, locked );
-			map.insert( cache_map::value_type( key, end ) );
+			async( pool, make_function( read_source ), source, queue, index, locked );
+			map.insert( cache_map::value_type( index, end ) );
 			++loads;
 		}
 	}
@@ -177,7 +194,7 @@ void virtual_texture::unlock( u32 x, u32 y, u32 width, u32 height, u8 level )
 	{
 		for ( u32 i = region._0; i != region._1; ++i )
 		{
-			cache_map::iterator find = map.find( key_type( i, j, level ) );
+			cache_map::iterator find = map.find( pyramid_index( i, j, level ) );
 
 			if ( find != map.end() )
 				find->second->_3 = false;
@@ -201,11 +218,11 @@ void virtual_texture::write( void )
 			throw error::runtime( "virtual_texture: " ) << "All pages are locked";
 
 		// if page has been previously assigned, evict entry
-		if ( page->_2._2 != 255 )
+		if ( page->_2.level != invalid_level )
 		{
 			map.erase( page->_2 );
 			write_pyramid( pyramid, page->_2, -1, -1, -1 );
-			bitset.set( page->_2._2 );
+			bitset.set( page->_2.level );
 		}
 
 		page->_2 = value._0;
@@ -215,9 +232,9 @@ void virtual_texture::write( void )
 
 		f32 table_x = divide( page->_0, cache_size );
 		f32 table_y = divide( page->_1, cache_size );
-		f32 pow_level = std::pow( 2, level_limit - value._0._2 );
+		f32 pow_level = std::pow( 2, level_limit - value._0.level );
 		write_pyramid( pyramid, page->_2, table_x, table_y, pow_level );
-		bitset.set( value._0._2 );
+		bitset.set( value._0.level );
 
 		cache->write( *value._2, page->_0, page->_1 );
 	}
