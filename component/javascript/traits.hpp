@@ -249,7 +249,7 @@ template< typename t >
 	struct to< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
 	static void call( const v8::Handle< v8::Value >& value,
-		typename call_traits< t >::reference tuple )
+		typename call_traits< t >::reference BOOST_PP_EXPR_IF( LIMIT, tuple ) )
 	{
 		if ( !value->IsArray() )
 			throw error::javascript() << "Value is not an array";

@@ -38,8 +38,6 @@ template< typename type >
 	free( value );
 }
 
-//--- linked_ptr -----------------------------------------------------------------------------------
-
 //--- scoped_base ----------------------------------------------------------------------------------
 template< typename type, void ( * function )( type* ) >
 	class scoped_base

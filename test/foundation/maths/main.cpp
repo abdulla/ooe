@@ -2,7 +2,7 @@
 
 #include "test/unit/program.hpp"
 
-//--- main ---------------------------------------------------------------------
+//--- main -----------------------------------------------------------------------------------------
 extern "C" ooe::s32 main( ooe::s32 argc, ooe::c8** argv/*, ooe::c8** envp*/ )
 {
 	return ooe::unit::launch( argc, argv );
