@@ -109,6 +109,7 @@ build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
 build.Executable( 'parallel_test', 'test/foundation/parallel', 'parallel unit' )
 build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 
+build.Linkable( 'mock', 'test/mock' )
 build.Linkable( 'unit', 'test/unit', 'io executable' )
 
 #--- external --------------------------------------------------------------------------------------

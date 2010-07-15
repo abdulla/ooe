@@ -11,110 +11,93 @@
 #include "foundation/utility/tuple.hpp"
 #include "test/unit/runner.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
+
+template< typename, up_t >
+	struct insert_test;
+
+//--- unit::fixture --------------------------------------------------------------------------------
+template< typename setup, typename data >
+	struct fixture
+	: private data
 {
-	namespace unit
+	template< up_t i >
+		void test( setup& )
 	{
-		class group_base;
+		std::cerr << "Fix test group: Test " << i << " is empty\n";
+		fail();
+	}
+};
 
-		template< typename, typename, up_t >
-			class group;
+//--- unit::group_base -----------------------------------------------------------------------------
+class group_base
+{
+public:
+	typedef void ( * function_type )( void* );
+	typedef std::vector< function_type > vector_type;
+	typedef vector_type::const_iterator iterator_type;
 
-		template< typename, typename >
-			struct fixture;
+	virtual ~group_base( void ) {}
+	virtual opaque_ptr create_setup( void ) = 0;
 
-		template< typename, up_t >
-			struct insert_test;
+	iterator_type begin( void ) const;
+	iterator_type end( void ) const;
+	void insert( function_type ) OOE_VISIBLE;
 
-		template< typename group >
-			struct insert_test< group, 0 >;
+private:
+	vector_type vector;
+};
 
-		template< typename group, void ( group::fixture_type::* )( typename group::setup_type& ) >
-			void invoke_test( void* );
+//--- unit::group ----------------------------------------------------------------------------------
+template< typename setup, typename data, up_t size >
+	class group
+	: public group_base
+{
+public:
+	typedef setup setup_type;
+	typedef fixture< setup_type, data > fixture_type;
+
+	group( const std::string& name, runner& runner = global_runner )
+		: group_base()
+	{
+		insert_test< group, size >::call( *this );
+		runner.insert( name, *this );
 	}
 
-//--- unit::group_base ---------------------------------------------------------
-	class unit::group_base
+private:
+	virtual opaque_ptr create_setup( void )
 	{
-	public:
-		typedef void ( * function_type )( void* );
-		typedef std::vector< function_type > vector_type;
-		typedef vector_type::const_iterator iterator_type;
-
-		virtual ~group_base( void ) {}
-		virtual opaque_ptr create_setup( void ) = 0;
-
-		iterator_type begin( void ) const;
-		iterator_type end( void ) const;
-		void insert( function_type ) OOE_VISIBLE;
-
-	private:
-		vector_type vector;
-	};
-
-//--- unit::group --------------------------------------------------------------
-	template< typename setup, typename data, up_t size >
-		class unit::group
-		: public group_base
-	{
-	public:
-		typedef setup setup_type;
-		typedef fixture< setup_type, data > fixture_type;
-
-		group( const std::string& name, runner& runner = global_runner )
-			: group_base()
-		{
-			insert_test< group, size >::call( *this );
-			runner.insert( name, *this );
-		}
-
-	private:
-		virtual opaque_ptr create_setup( void )
-		{
-			return opaque_ptr( new setup_type, destroy< setup_type > );
-		}
-	};
-
-//--- unit::fixture ------------------------------------------------------------
-	template< typename setup, typename data >
-		struct unit::fixture
-		: private data
-	{
-		template< up_t i >
-			void test( setup& )
-		{
-			std::cerr << "Fix test group: Test " << i << " is empty\n";
-			fail();
-		}
-	};
-
-//--- unit::insert_test --------------------------------------------------------
-	template< typename group, up_t i >
-		struct unit::insert_test
-	{
-		static void call( group_base& base )
-		{
-			insert_test< group, i - 1 >::call( base );
-			base.insert( invoke_test< group, &group::fixture_type::template test< i - 1 > > );
-		}
-	};
-
-	template< typename group >
-		struct unit::insert_test< group, 0 >
-	{
-		static void call( group_base& )
-		{
-		}
-	};
-
-//--- unit::invoke_test --------------------------------------------------------
-	template< typename group,
-		void ( group::fixture_type::* member )( typename group::setup_type& ) >
-		void unit::invoke_test( void* pointer )
-	{
-		typename group::fixture_type instance;
-		( instance.*member )( *static_cast< typename group::setup_type* >( pointer ) );
+		return opaque_ptr( new setup_type, destroy< setup_type > );
 	}
+};
+
+//--- unit::invoke_test ----------------------------------------------------------------------------
+template< typename group, void ( group::fixture_type::* member )( typename group::setup_type& ) >
+	void invoke_test( void* pointer )
+{
+	typename group::fixture_type instance;
+	( instance.*member )( *static_cast< typename group::setup_type* >( pointer ) );
 }
+
+//--- unit::insert_test ----------------------------------------------------------------------------
+template< typename group, up_t i >
+	struct insert_test
+{
+	static void call( group_base& base )
+	{
+		insert_test< group, i - 1 >::call( base );
+		base.insert( invoke_test< group, &group::fixture_type::template test< i - 1 > > );
+	}
+};
+
+template< typename group >
+	struct insert_test< group, 0 >
+{
+	static void call( group_base& )
+	{
+	}
+};
+
+OOE_NAMESPACE_END( ( ooe )( unit ) )
 
 #endif	// OOE_TEST_UNIT_GROUP_HPP
