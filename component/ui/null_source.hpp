@@ -19,10 +19,10 @@ public:
 	virtual image::type format( void ) const;
 	virtual u16 page_size( void ) const;
 
-	virtual image read( u32, u32, u8 );
-
 private:
 	const u32 size_;
+
+	virtual image read( const pyramid_index& );
 };
 
 OOE_NAMESPACE_END( ( ooe ) )

@@ -16,18 +16,6 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 class virtual_texture;
 
-//--- physical_source ------------------------------------------------------------------------------
-struct physical_source
-{
-	virtual ~physical_source( void ) {}
-
-	virtual u32 size( void ) const = 0;
-	virtual image::type format( void ) const = 0;
-	virtual u16 page_size( void ) const = 0;
-
-	virtual image read( u32, u32, u8 ) = 0;
-};
-
 //--- pyramid_index --------------------------------------------------------------------------------
 struct pyramid_index
 {
@@ -41,43 +29,82 @@ struct pyramid_index
 
 bool operator <( const pyramid_index&, const pyramid_index& );
 
-//--- virtual_texture ------------------------------------------------------------------------------
-class virtual_texture
+//--- physical_source ------------------------------------------------------------------------------
+struct physical_source
+{
+	virtual ~physical_source( void ) {}
+
+	virtual u32 size( void ) const = 0;
+	virtual image::type format( void ) const = 0;
+	virtual u16 page_size( void ) const = 0;
+
+	virtual image read( const pyramid_index& ) = 0;
+};
+
+//--- page_cache -----------------------------------------------------------------------------------
+class page_cache
 {
 public:
-	typedef tuple< pyramid_index, bool, atom_ptr< image > > pending_type;
-	typedef ooe::queue< pending_type > pending_queue;
+	page_cache( const device_type&, thread_pool&, image::type, u16 );
 
-	virtual_texture( const device_type&, physical_source&, thread_pool& );
-
-	void input( const std::string&, block_type& ) const;
+	image::type format( void ) const;
 	up_t pending( void ) const;
 
-	void load( u32, u32, u32, u32, u8, bool = false );
-	void unlock( u32, u32, u32, u32, u8 );
 	void write( void );
 
 private:
-	typedef tuple< u32, u32, pyramid_index, bool > cache_type;
+	typedef tuple< virtual_texture*, pyramid_index > key_type;
+	typedef tuple< u32, u32, key_type, bool > cache_type;
 	typedef std::list< cache_type > cache_list;
-	typedef std::map< pyramid_index, cache_list::iterator > cache_map;
-	typedef std::bitset< sizeof( up_t ) * 8 > cache_bitset;
+	typedef std::map< key_type, cache_list::iterator > cache_map;
+	typedef tuple< key_type, bool, atom_ptr< image > > pending_type;
+	typedef ooe::queue< pending_type > pending_queue;
 
-	physical_source& source;
 	thread_pool& pool;
-	const u32 table_size;
-	const u32 cache_size;
 
-	image_pyramid pyramid;
-	texture_type table;
+	const u32 cache_size;
+	const image::type cache_format;
 	texture_type cache;
 
 	cache_list list;
 	cache_map map;
-	cache_bitset bitset;
 
 	up_t loads;
 	pending_queue queue;
+
+	void read( virtual_texture&, pyramid_index, bool );
+	void load( virtual_texture&, const pyramid_index&, bool );
+	void unlock( virtual_texture&, const pyramid_index& );
+	void evict( virtual_texture& );
+
+	friend class virtual_texture;
+};
+
+//--- virtual_texture ------------------------------------------------------------------------------
+class virtual_texture
+{
+public:
+	virtual_texture( const device_type&, page_cache&, physical_source& );
+	~virtual_texture( void );
+
+	void input( const std::string&, block_type& ) const;
+	void load( u32, u32, u32, u32, u8, bool = false );
+	void unlock( u32, u32, u32, u32, u8 );
+
+private:
+	typedef std::bitset< sizeof( up_t ) * 8 > table_bitset;
+
+	page_cache& cache;
+	physical_source& source;
+
+	const u32 table_size;
+	image_pyramid pyramid;
+	texture_type table;
+	table_bitset bitset;
+
+	void write( void );
+
+	friend class page_cache;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )

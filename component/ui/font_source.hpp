@@ -38,7 +38,7 @@ private:
 	ooe::mutex mutex;
 	ooe::memory memory;
 
-	virtual image read( u32, u32, u8 );
+	virtual image read( const pyramid_index& );
 };
 
 OOE_NAMESPACE_END( ( ooe ) )

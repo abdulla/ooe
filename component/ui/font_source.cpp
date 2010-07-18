@@ -169,13 +169,13 @@ font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
 	);
 }
 
-image font_source::read( u32 x, u32 y, u8 level )
+image font_source::read( const pyramid_index& index )
 {
 	// note: arguments will be verified by virtual_texture, no need to here
 	uncompressed_image image( page_wide, page_wide, image_type );
 	std::string path( root );
-	u8 level_inverse = level_limit - level;
-	path << '/' << x << '_' << y << '_' << level_inverse << ".raw";
+	u8 level_inverse = level_limit - index.level;
+	path << '/' << index.x << '_' << index.y << '_' << level_inverse << ".raw";
 
 	if ( exists( path ) )
 	{
@@ -185,9 +185,10 @@ image font_source::read( u32 x, u32 y, u8 level )
 	}
 
 	std::memset( image.get(), 0, image.byte_size() );
-	u32 level_size = face_size >> level;
+	u32 level_size = face_size >> index.level;
 	u32 glyphs_per_row = source_size / face_size;
-	up_t char_code = x * page_wide / level_size + ( y * page_wide / level_size ) * glyphs_per_row;
+	up_t char_code =
+		index.x * page_wide / level_size + ( index.y * page_wide / level_size ) * glyphs_per_row;
 
 	if ( char_code >= glyphs )
 		return write_image( image, path );
@@ -195,8 +196,8 @@ image font_source::read( u32 x, u32 y, u8 level )
 	if ( level_size >= page_wide )
 	{
 		u32 pages_per_glyph = level_size / page_wide;
-		u32 x_offset = ( x % pages_per_glyph ) * page_wide;
-		u32 y_offset = ( y % pages_per_glyph ) * page_wide;
+		u32 x_offset = ( index.x % pages_per_glyph ) * page_wide;
+		u32 y_offset = ( index.y % pages_per_glyph ) * page_wide;
 
 		lock lock( mutex );
 		font::bitmap bitmap = face.character( char_code + first, level_size );

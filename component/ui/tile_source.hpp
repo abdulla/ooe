@@ -31,7 +31,7 @@ private:
 	u16 page_size_;
 	u8 level_limit;
 
-	virtual image read( u32, u32, u8 );
+	virtual image read( const pyramid_index& );
 };
 
 OOE_NAMESPACE_END( ( ooe ) )

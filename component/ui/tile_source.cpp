@@ -84,10 +84,10 @@ u16 tile_source::page_size( void ) const
 	return page_size_;
 }
 
-image tile_source::read( u32 x, u32 y, u8 level )
+image tile_source::read( const pyramid_index& index )
 {
 	std::string path( root );
-	path << '/' << x << '_' << y << '_' << level_limit - level << '.' << type;
+	path << '/' << index.x << '_' << index.y << '_' << level_limit - index.level << '.' << type;
 	return decoder( path );
 }
 

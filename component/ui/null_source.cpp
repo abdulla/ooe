@@ -31,13 +31,13 @@ u16 null_source::page_size( void ) const
 	return 256;
 }
 
-image null_source::read( u32 i, u32 j, u8 level )
+image null_source::read( const pyramid_index& index )
 {
 	// this should be encoded with they x, y, and level
 	uncompressed_image image( 256, 256, image::rgba_u8 );
 	u8* rgba = image.as< u8 >();
-	u8 r = i * 256 * 255 / ( size_ >> level );
-	u8 g = j * 256 * 255 / ( size_ >> level );
+	u8 r = index.x * 256 * 255 / ( size_ >> index.level );
+	u8 g = index.y * 256 * 255 / ( size_ >> index.level );
 
 	for ( u32 y = 0; y != image.height; ++y )
 	{

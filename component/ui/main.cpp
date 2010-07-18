@@ -179,7 +179,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	font::face font_face( font_library, root + "../resource/font/myriadpro-sans.otf" );
 	font_source font_source( font_face, 512, root + "../cache" );
 	thread_pool pool;
-	virtual_texture vt( device, font_source, pool );
+	page_cache cache( device, pool, font_source.format(), font_source.page_size() );
+	virtual_texture vt( device, cache, font_source );
 
 	shader_vector vector;
 	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
@@ -201,7 +202,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	u16 page_size = font_source.page_size();
 	u32 font_size = font_source.font_size();
 	vt.load( 0, 0, source_size, font_size, log2( source_size / page_size ) - 1 );
-	vt.write();
+	cache.write();
 
 	std::string string;
 	text_layout layout( device, vt, font_source );
@@ -224,7 +225,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 		device->swap();
 
-		up_t pending = vt.pending();
+		up_t pending = cache.pending();
 		std::string suffix =
 			process_events( event_queue, translate, scale, epoch_t( pending ? 0 : 3600, 0 ) );
 
@@ -238,7 +239,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 		}
 
 		if ( pending )
-			vt.write();
+			cache.write();
 	}
 
 	return true;
