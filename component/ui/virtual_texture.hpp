@@ -57,6 +57,7 @@ private:
 	typedef tuple< u32, u32, key_type, bool > cache_type;
 	typedef std::list< cache_type > cache_list;
 	typedef std::map< key_type, cache_list::iterator > cache_map;
+	typedef std::multimap< virtual_texture*, cache_list::iterator > page_map;
 	typedef tuple< key_type, bool, atom_ptr< image > > pending_type;
 	typedef ooe::queue< pending_type > pending_queue;
 
@@ -68,6 +69,7 @@ private:
 
 	cache_list list;
 	cache_map map;
+	page_map pages;
 
 	up_t loads;
 	pending_queue queue;

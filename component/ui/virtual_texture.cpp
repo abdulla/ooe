@@ -114,12 +114,13 @@ bool operator <( const pyramid_index& i, const pyramid_index& j )
 page_cache::page_cache
 	( const device_type& device, thread_pool& pool_, image::type cache_format_, u16 page_size )
 	: pool( pool_ ), cache_size( cache_width( device, page_size ) ), cache_format( cache_format_ ),
-	cache( make_cache( device, cache_size, cache_format ) ), list(), map(), loads( 0 ), queue()
+	cache( make_cache( device, cache_size, cache_format ) ), list(), map(), pages(), loads( 0 ),
+	queue()
 {
 	for ( u32 y = 0; y != cache_size; y += page_size )
 	{
 		for ( u32 x = 0; x != cache_size; x += page_size )
-			list.push_back( cache_type( x, y, key_type( 0, pyramid_index() ), false ) );
+			list.push_back( make_tuple( x, y, key_type( 0, pyramid_index() ), false ) );
 	}
 }
 
@@ -188,15 +189,17 @@ void page_cache::write( void )
 			virtual_texture& texture = *page->_2._0;
 			const pyramid_index& index = page->_2._1;
 
-			map.erase( page->_2 );
 			write_pyramid( texture.pyramid, index, -1, -1, -1 );
 			texture.bitset.set( index.level );
 			dirty.push_back( &texture );
+
+			map.erase( page->_2 );
 		}
 
 		page->_2 = value._0;
 		page->_3 = value._1;
-		map[ page->_2 ] = page;
+		pages.insert( page_map::value_type( value._0._0, page ) );
+		map[ value._0 ] = page;
 		list.splice( end, list, page );
 
 		virtual_texture& texture = *page->_2._0;
@@ -204,6 +207,7 @@ void page_cache::write( void )
 		f32 table_x = divide( page->_0, cache_size );
 		f32 table_y = divide( page->_1, cache_size );
 		f32 pow_level = std::pow( 2, texture.pyramid.size() - index.level - 1 );
+
 		write_pyramid( texture.pyramid, index, table_x, table_y, pow_level );
 		texture.bitset.set( index.level );
 		dirty.push_back( &texture );
@@ -217,13 +221,18 @@ void page_cache::write( void )
 
 void page_cache::evict( virtual_texture& texture )
 {
-	for ( cache_list::iterator i = list.begin(), end = list.end(); i != end; ++i )
+	typedef std::pair< page_map::iterator, page_map::iterator > pair_type;
+	pair_type pair = pages.equal_range( &texture );
+	cache_list::iterator begin = list.begin();
+
+	while ( pair.first != pair.second )
 	{
-		if ( i->_2._0 != &texture )
-			continue;
+		cache_list::iterator i = pair.first->second;
+		pages.erase( pair.first++ );
 
 		i->_2._0 = 0;
 		i->_3 = false;
+		list.splice( begin, list, i );
 	}
 }
 
