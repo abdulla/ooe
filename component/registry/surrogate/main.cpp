@@ -65,7 +65,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 	load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
 
 	ipc::memory::server server( surrogate_path, nameservice );
-	ipc::barrier_notify( std::string( surrogate_path ) + ".g" );
+	ipc::barrier_notify( std::string( surrogate_path ) + ".b" );
 
 	while ( !executable::has_signal() && server.decode() ) {}
 

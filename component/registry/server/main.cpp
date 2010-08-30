@@ -30,7 +30,7 @@ interface::vector_type load_server( const std::string& );
 std::string surrogate( const std::string& path )
 {
 	std::string name = ipc::unique_name();
-	ipc::barrier_wait wait( name + ".g" );
+	ipc::barrier_wait wait( name + ".b" );
 	fork_io fork;
 
 	if ( fork.is_child() )
