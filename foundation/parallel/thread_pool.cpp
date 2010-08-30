@@ -14,7 +14,7 @@ class thread_unit
 {
 public:
 	thread_unit( void )
-		: state( true ), thread( thread::function_type( *this, &thread_unit::main ), 0 )
+		: state( true ), thread( make_function( *this, &thread_unit::main ), 0 )
 	{
 	}
 

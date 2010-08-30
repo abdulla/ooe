@@ -52,10 +52,11 @@ protected:
 
 //--- queue ----------------------------------------------------------------------------------------
 template< typename t >
-	struct queue
+	class queue
 	: private queue_base
 {
-	typedef queue_node< t > node_type;
+public:
+	typedef t value_type;
 
 	queue( void )
 		: queue_base( new node_type( t() ) )
@@ -128,6 +129,9 @@ template< typename t >
 		delete static_cast< node_type* >( head_ptr );
 		return true;
 	}
+
+private:
+	typedef queue_node< t > node_type;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
