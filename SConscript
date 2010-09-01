@@ -1,5 +1,10 @@
 ### Copyright (C) 2010 Abdulla Kamar. All rights reserved. ###
 
+import sys
+
+module = sys.modules.get('platform')
+if module: reload(module)
+
 from platform.build import *
 
 Import( 'variables variant' )
