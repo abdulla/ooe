@@ -14,7 +14,7 @@ class Build( object ):
 	of libraries and programs. It drives SCons underneath, setting up the environment as per the
 	requirements of OOE.
 	"""
-	DEBUG_DEFINES	= Split( '_FORTIFY_SOURCE=2 _GLIBCXX_PROFILE' )
+	DEBUG_DEFINES	= Split( '_FORTIFY_SOURCE=2' )
 	DEBUG_FLAGS		= Split( '-O0 -g2 -fno-inline -fstack-protector-all' )
 
 	# visibility is set in release only, otherwise backtrace() won't work in debug
