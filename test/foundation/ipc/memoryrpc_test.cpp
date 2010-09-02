@@ -115,7 +115,6 @@ public:
 
 private:
 	typedef scoped_ptr< scoped_fork > fork_ptr;
-
 	fork_ptr fork;
 
 	void start_server( const std::string& name ) const
