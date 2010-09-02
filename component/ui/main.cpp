@@ -3,10 +3,8 @@
 #include <cmath>
 
 #include "component/ui/text_layout.hpp"
-#include "component/ui/tile_source.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/image/png.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/view.hpp"
 
@@ -170,10 +168,6 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	event_queue event_queue;
 	view view( event_queue, width, height, false );
 	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
-
-	decoder_map map;
-	map.insert( decoder_map::value_type( "png", uncompressed_decode< png::decode > ) );
-	tile_source tile_source( root + "../cache/blue-marble", map );
 
 	font::library font_library;
 	font::face font_face( font_library, root + "../resource/font/myriadpro-sans.otf" );
