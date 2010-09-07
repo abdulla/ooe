@@ -12,12 +12,14 @@ class nameservice
 	: private noncopyable
 {
 public:
-	typedef tuple< std::string, std::string > map_tuple;
-	typedef std::vector< map_tuple > list_type;
+	typedef tuple< std::string, std::string > tuple_type;
+	typedef std::vector< tuple_type > list_type;
 
 	nameservice( void ) OOE_VISIBLE;
 
+	void upgrade( const list_type& ) OOE_VISIBLE;
 	operator const ipc::switchboard&( void ) const OOE_VISIBLE;
+
 	index_t find( const std::string&, const std::string& ) const;
 	list_type list( void ) const;
 	std::string doc( const std::string&, const std::string& ) const;
@@ -44,7 +46,7 @@ public:
 
 private:
 	typedef std::vector< const c8* > vector_type;
-	typedef std::map< map_tuple, index_t > map_type;
+	typedef std::map< tuple_type, index_t > map_type;
 
 	ipc::switchboard switchboard;
 	vector_type vector;

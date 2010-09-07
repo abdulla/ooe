@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <set>
+
 #include "foundation/ipc/nameservice.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
@@ -48,6 +50,23 @@ up_t ipc_doc( const any& any, io_buffer& buffer, pool& pool )
 	return return_write< std::string >( buffer, pool, doc );
 }
 
+up_t ipc_upgrade( const any&, io_buffer&, pool& )
+{
+	throw error::runtime( "ipc::nameservice: " ) << "Server upgraded, function missing";
+}
+
+void load_switchboard( switchboard& switchboard, any any )
+{
+	if ( switchboard.insert_direct( ipc_find, any ) != 1 )
+		throw error::runtime( "ipc::nameservice: " ) << "\"find\" not at index 1";
+	else if ( switchboard.insert_direct( ipc_list, any ) != 2 )
+		throw error::runtime( "ipc::nameservice: " ) << "\"list\" not at index 2";
+	else if ( switchboard.insert_direct( ipc_find_all, any ) != 3 )
+		throw error::runtime( "ipc::nameservice: " ) << "\"find_all\" not at index 3";
+	else if ( switchboard.insert_direct( ipc_doc, any ) != 4 )
+		throw error::runtime( "ipc::nameservice: " ) << "\"doc\" not at index 4";
+}
+
 const up_t index_adjust = 5;
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
@@ -58,14 +77,58 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 nameservice::nameservice( void )
 	: switchboard(), vector(), map()
 {
-	if ( switchboard.insert_direct( ipc_find, this ) != 1 )
-		throw error::runtime( "ipc::nameservice: " ) << "\"find\" not at index 1";
-	else if ( switchboard.insert_direct( ipc_list, this ) != 2 )
-		throw error::runtime( "ipc::nameservice: " ) << "\"list\" not at index 2";
-	else if ( switchboard.insert_direct( ipc_find_all, this ) != 3 )
-		throw error::runtime( "ipc::nameservice: " ) << "\"find_all\" not at index 3";
-	else if ( switchboard.insert_direct( ipc_doc, this ) != 4 )
-		throw error::runtime( "ipc::nameservice: " ) << "\"doc\" not at index 4";
+	load_switchboard( switchboard, this );
+}
+
+void nameservice::upgrade( const list_type& names )
+{
+	typedef std::set< tuple_type > set_type;
+	set_type set;
+	vector_type upgrade_vector;
+	ipc::switchboard upgrade_switchboard;
+	load_switchboard( upgrade_switchboard, this );
+
+	for ( up_t i = 0, end = names.size(); i != end; ++i )
+	{
+		const tuple_type& name = names[ i ];
+		index_t index = i + index_adjust;
+		set.insert( name );
+
+		std::pair< map_type::iterator, bool > pair =
+			map.insert( map_type::value_type( names[ i ], index ) );
+		switchboard::tuple_type tuple( 0, 0 );
+
+		if ( pair.second )
+		{
+			upgrade_vector.push_back( 0 );
+			tuple = switchboard::tuple_type( ipc_upgrade, 0 );
+		}
+		else
+		{
+			upgrade_vector.push_back( vector[ pair.first->second - index_adjust ] );
+			tuple = switchboard[ pair.first->second ];
+			pair.first->second = index;
+		}
+
+		if ( upgrade_switchboard.insert_direct( tuple._0, tuple._1 ) != index )
+			throw error::runtime( "ipc::nameservice: " ) <<
+				'\"' << name._0 << "\" of type \"" << name._1 << "\" not at index " << index;
+	}
+
+	set_type::const_iterator set_end = set.end();
+
+	for ( map_type::iterator i = map.begin(), end = map.end(); i != end; ++i )
+	{
+		if ( set.find( i->first ) != set_end )
+			continue;
+
+		upgrade_vector.push_back( vector[ i->second - index_adjust ] );
+		switchboard::tuple_type tuple = switchboard[ i->second ];
+		i->second = upgrade_switchboard.insert_direct( tuple._0, tuple._1 );
+	}
+
+	vector.swap( upgrade_vector );
+	switchboard.swap( upgrade_switchboard );
 }
 
 nameservice::operator const ipc::switchboard&( void ) const
@@ -75,24 +138,24 @@ nameservice::operator const ipc::switchboard&( void ) const
 
 index_t nameservice::find( const std::string& name, const std::string& type ) const
 {
-	map_type::const_iterator i = map.find( map_tuple( name, type ) );
+	map_type::const_iterator i = map.find( tuple_type( name, type ) );
 	return i == map.end() ? ~index_t( 0 ) : i->second;
 }
 
 nameservice::list_type nameservice::list( void ) const
 {
 	list_type value;
-	value.reserve( map.size() );
+	value.resize( map.size() );
 
 	for ( map_type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
-		value.push_back( i->first );
+		value[ i->second - index_adjust ] = i->first;
 
 	return value;
 }
 
 std::string nameservice::doc( const std::string& name, const std::string& type ) const
 {
-	map_type::const_iterator i = map.find( map_tuple( name, type ) );
+	map_type::const_iterator i = map.find( tuple_type( name, type ) );
 
 	if ( i == map.end() )
 		throw error::runtime( "ipc::nameservice: " ) <<
@@ -108,7 +171,7 @@ void nameservice::insert_direct( const std::string& name, const std::string& typ
 	vector_type::iterator i = vector.begin();
 	std::advance( i, index - index_adjust );
 	vector.insert( i, doc_ );
-	map.insert( map_type::value_type( map_tuple( name, type ), index ) );
+	map.insert( map_type::value_type( tuple_type( name, type ), index ) );
 }
 
 void nameservice::insert_direct( const std::string& name, const std::string& type, const c8* doc_,

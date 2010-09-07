@@ -24,11 +24,14 @@ class switchboard
 public:
 	typedef up_t ( * call_type )( const any&, io_buffer&, pool& );
 	typedef tuple< up_t/* result size */, up_t/* error size */ > size_type;
+	typedef tuple< call_type, any > tuple_type;
 
 	switchboard( void ) OOE_VISIBLE;
 
+	void swap( switchboard& );
 	size_type execute( index_t, io_buffer&, pool& ) const;
 	index_t insert_direct( call_type, any ) OOE_VISIBLE;
+	tuple_type operator []( index_t ) const OOE_VISIBLE;
 
 	template< typename t >
 		index_t insert( t function, typename enable_if< is_function_pointer< t > >::type* = 0 )
@@ -46,9 +49,7 @@ public:
 	}
 
 private:
-	typedef tuple< call_type, any > vector_tuple;
-	typedef std::vector< vector_tuple > vector_type;
-
+	typedef std::vector< tuple_type > vector_type;
 	vector_type vector;
 };
 

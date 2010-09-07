@@ -30,6 +30,11 @@ switchboard::switchboard( void )
 	insert_direct( ipc_null, 0 );
 }
 
+void switchboard::swap( switchboard& other )
+{
+	vector.swap( other.vector );
+}
+
 switchboard::size_type switchboard::execute( index_t index, io_buffer& buffer, pool& pool ) const
 {
 	bool executed = false;
@@ -42,7 +47,7 @@ switchboard::size_type switchboard::execute( index_t index, io_buffer& buffer, p
 			throw error::runtime( "ipc::switchboard: " ) <<
 				"Unable to execute function, index " << index << " out of range";
 
-		const vector_tuple& tuple = vector[ index ];
+		const tuple_type& tuple = vector[ index ];
 		executed = true;
 		result_size = tuple._0( tuple._1, buffer, pool );
 	}
@@ -69,8 +74,13 @@ switchboard::size_type switchboard::execute( index_t index, io_buffer& buffer, p
 
 index_t switchboard::insert_direct( call_type call, any any )
 {
-	vector.push_back( vector_tuple( call, any ) );
+	vector.push_back( tuple_type( call, any ) );
 	return vector.size() - 1;
+}
+
+switchboard::tuple_type switchboard::operator []( index_t index ) const
+{
+	return vector[ index ];
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
