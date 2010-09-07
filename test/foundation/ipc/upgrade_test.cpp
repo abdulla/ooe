@@ -20,7 +20,7 @@ void function_3( u32 )
 
 typedef unit::group< anonymous_t, anonymous_t, 1 > group_type;
 typedef group_type::fixture_type fixture_type;
-group_type group( "memory upgrade" );
+group_type group( "upgrade" );
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
