@@ -112,9 +112,9 @@ template< typename a, typename b >
 template< typename a, typename b >
 	struct tuple_less< 0, a, b >
 {
-	static bool call( const a&, const b& )
+	static bool call( const a& x, const b& y )
 	{
-		return false;
+		return at< 0 >( x ) < at< 0 >( y );
 	}
 };
 
@@ -137,7 +137,7 @@ template< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, typename s )
 {
 	typedef tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, s ) > a;
 	typedef tuple< BOOST_PP_ENUM_PARAMS( OOE_PP_LIMIT, t ) > b;
-	return tuple_less< tuple_size< a >::value, a, b >::call( x, y );
+	return tuple_less< tuple_size< a >::value - 1, a, b >::call( x, y );
 }
 
 //--- tuple_print ----------------------------------------------------------------------------------
@@ -432,8 +432,8 @@ template< typename a, typename b >
 {
 	static bool call( const a& x, const b& y )
 	{
-		return at< MINUS >( x ) == at< MINUS >( y ) &&
-			tuple_equal< MINUS, a, b >::call( x, y );
+		return tuple_equal< MINUS, a, b >::call( x, y ) &&
+			at< MINUS >( x ) == at< MINUS >( y );
 	}
 };
 
@@ -443,9 +443,9 @@ template< typename a, typename b >
 {
 	static bool call( const a& x, const b& y )
 	{
-		return at< MINUS >( x ) < at< MINUS >( y ) ||
+		return tuple_less< MINUS, a, b >::call( x, y ) ||
 			( !( at< MINUS >( y ) < at< MINUS >( x ) ) &&
-			tuple_less< MINUS, a, b >::call( x, y ) );
+			at< LIMIT >( x ) < at< LIMIT >( y ) );
 	}
 };
 
