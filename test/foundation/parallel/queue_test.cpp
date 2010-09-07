@@ -42,7 +42,7 @@ template<>
 
 	for ( s32 i = 0; i != 10000; ++i )
 	{
-		s32 value;
+		s32 value = 0;
 		OOE_CHECK( "queue.dequeue( value )", queue.dequeue( value ) );
 		OOE_CHECK( value << " == " << i, value == i );
 	}
