@@ -12,7 +12,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 //--- descriptor -----------------------------------------------------------------------------------
 up_t descriptor::splice( const ooe::descriptor& desc, up_t bytes )
 {
-	s64 spliced;
+	off_t spliced = bytes;
 
 	if ( sendfile( get(), desc.get(), 0, &spliced, 0, 0 ) )
 		throw error::io( "descriptor: " ) <<

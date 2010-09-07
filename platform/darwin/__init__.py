@@ -4,8 +4,8 @@ class ooe:
 	compiler = 'platform/darwin/compiler'
 	include_path = '/sw/include'
 	library_path = '/sw/lib'
-	cxx_flags = '-m32 -march=core2'
-	link_flags = '-m32 -Wl,-undefined,dynamic_lookup'
+	cxx_flags = '-march=core2'
+	link_flags = '-Wl,-undefined,dynamic_lookup'
 	release_flags = ''
 
 	class appkit:
