@@ -170,7 +170,7 @@ template<>
 	ipc::memory::list::result_type result_1 = list();
 
 	for ( list_iterator i = result_1.begin(), end = result_1.end(); i != end; ++i )
-		std::cout << "list = " << i->_0 << ' ' << i->_1 << '\n';
+		std::cout << "list = " << *i << '\n';
 
 	//--- find -------------------------------------------------------------------------------------
 	ipc::memory::find find( client );
