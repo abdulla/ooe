@@ -39,7 +39,7 @@ u32 target_format( image::type format )
 
 	//--------------------------------------------------------------------------
 	default:
-		throw error::runtime( "opengl::texture: " ) << "Unknown image format: " << format;
+		throw error::runtime( "opengl::target: " ) << "Unknown image format: " << format;
 	}
 }
 

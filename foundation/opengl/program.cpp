@@ -38,9 +38,6 @@ try
 
 	LinkProgram( id );
 	check_status( id, LINK_STATUS, "Link" );
-
-	ValidateProgram( id );
-	check_status( id, VALIDATE_STATUS, "Validate" );
 }
 catch ( ... )
 {
@@ -60,6 +57,12 @@ block_type program::block( const buffer_type& buffer ) const
 frame_type program::frame( u32 width, u32 height ) const
 {
 	return new opengl::frame( id, width, height );
+}
+
+void check_program( u32 id )
+{
+	ValidateProgram( id );
+	check_status( id, VALIDATE_STATUS, "Validate" );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

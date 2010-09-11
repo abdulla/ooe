@@ -33,6 +33,10 @@ void load_symbols( void )
 	TexSubImage2D = find< TexSubImage2D_t >( "glTexSubImage2D" );
 	CompressedTexImage2D = find< CompressedTexImage2D_t >( "glCompressedTexImage2D" );
 	CompressedTexSubImage2D = find< CompressedTexSubImage2D_t >( "glCompressedTexSubImage2D" );
+	TexImage3D = find< TexImage3D_t >( "glTexImage3D" );
+	TexSubImage3D = find< TexSubImage3D_t >( "glTexSubImage3D" );
+	CompressedTexImage3D = find< CompressedTexImage3D_t >( "glCompressedTexImage3D" );
+	CompressedTexSubImage3D = find< CompressedTexSubImage3D_t >( "glCompressedTexSubImage3D" );
 	TexParameteri = find< TexParameteri_t >( "glTexParameteri" );
 	GenerateMipmap = find< GenerateMipmap_t >( "glGenerateMipmap" );
 
@@ -112,6 +116,10 @@ TexImage2D_t* TexImage2D;
 TexSubImage2D_t* TexSubImage2D;
 CompressedTexImage2D_t* CompressedTexImage2D;
 CompressedTexSubImage2D_t* CompressedTexSubImage2D;
+TexImage3D_t* TexImage3D;
+TexSubImage3D_t* TexSubImage3D;
+CompressedTexImage3D_t* CompressedTexImage3D;
+CompressedTexSubImage3D_t* CompressedTexSubImage3D;
 TexParameteri_t* TexParameteri;
 GenerateMipmap_t* GenerateMipmap;
 

@@ -46,6 +46,15 @@ struct texture
 
 typedef shared_ptr< texture > texture_type;
 
+//--- texture_array --------------------------------------------------------------------------------
+struct texture_array
+{
+	virtual ~texture_array( void ) {}
+	virtual void write( const image&, u32, u32, u32 ) = 0;
+};
+
+typedef shared_ptr< texture_array > texture_array_type;
+
 //--- map ------------------------------------------------------------------------------------------
 struct map
 {
@@ -126,6 +135,7 @@ struct block
 	virtual void input( const std::string&, const mat4& ) = 0;
 
 	virtual void input( const std::string&, const texture_type& ) = 0;
+	virtual void input( const std::string&, const texture_array_type& ) = 0;
 	virtual void input( const std::string&, u8, const buffer_type& ) = 0;
 };
 
@@ -137,7 +147,7 @@ typedef shared_ptr< struct frame > frame_type;
 struct frame
 {
 	virtual ~frame( void ) {}
-	virtual void read( const std::string&, image::type, buffer_type& ) const = 0;
+	virtual void read( const std::string&, image::type, buffer_type& ) = 0;
 	virtual void write( const std::string&, const std::string&, const frame_type& ) = 0;
 	virtual void clear( void ) = 0;
 
@@ -168,7 +178,8 @@ struct device
 	{
 		draw_buffers,
 		texture_size,
-		texture_units
+		texture_units,
+		array_size
 	};
 
 	virtual ~device( void ) {}
@@ -180,6 +191,7 @@ struct device
 
 	virtual texture_type texture
 		( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
+	virtual texture_array_type texture_array( u32, u32, u32, image::type ) const = 0;
 	virtual buffer_type buffer
 		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
 	virtual target_type target( u32, u32, image::type ) const = 0;

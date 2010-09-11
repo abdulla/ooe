@@ -12,11 +12,11 @@ typedef tuple< u32, u32 > compressed_tuple;
 typedef tuple< u32, u32, u32 > uncompressed_tuple;
 
 //--- compressed_format ----------------------------------------------------------------------------
-compressed_tuple compressed_format( const image_pyramid& pyramid )
+compressed_tuple compressed_format( u32 width, u32 height, image::type format )
 {
-	u32 size = ( ( pyramid.width + 3 ) / 4 ) * ( ( pyramid.height + 3 ) / 4 );
+	u32 size = ( ( width + 3 ) / 4 ) * ( ( height + 3 ) / 4 );
 
-	switch ( pyramid.format )
+	switch ( format )
 	{
 	//--- dxt ------------------------------------------------------------------
 	case image::rgba_dxt1:
@@ -31,14 +31,14 @@ compressed_tuple compressed_format( const image_pyramid& pyramid )
 	//--------------------------------------------------------------------------
 	default:
 		throw error::runtime( "opengl::texture: " ) <<
-			"Unknown compressed image format: " << pyramid.format;
+			"Unknown compressed image format: " << format;
 	}
 }
 
 //--- uncompressed_format --------------------------------------------------------------------------
-uncompressed_tuple uncompressed_format( const image_pyramid& pyramid )
+uncompressed_tuple uncompressed_format( image::type format )
 {
-	switch ( pyramid.format )
+	switch ( format )
 	{
 	case image::bgr_u8:
 		return uncompressed_tuple( RGB8, BGR, UNSIGNED_BYTE );
@@ -115,12 +115,12 @@ uncompressed_tuple uncompressed_format( const image_pyramid& pyramid )
 	//--------------------------------------------------------------------------
 	default:
 		throw error::runtime( "opengl::texture: " ) <<
-			"Unknown uncompressed image format: " << pyramid.format;
+			"Unknown uncompressed image format: " << format;
 	}
 }
 
 //--- set_filter -----------------------------------------------------------------------------------
-void set_filter( ooe::texture::type filter )
+void set_filter( u32 target, ooe::texture::type filter )
 {
 	u32 min_filter;
 	u32 mag_filter;
@@ -141,36 +141,63 @@ void set_filter( ooe::texture::type filter )
 		throw error::runtime( "opengl::texture: " ) << "Unknown filter type: " << filter;
 	}
 
-	TexParameteri( TEXTURE_2D, TEXTURE_MIN_FILTER, min_filter );
-	TexParameteri( TEXTURE_2D, TEXTURE_MAG_FILTER, mag_filter );
-	TexParameteri( TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE );
-	TexParameteri( TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE );
+	TexParameteri( target, TEXTURE_MIN_FILTER, min_filter );
+	TexParameteri( target, TEXTURE_MAG_FILTER, mag_filter );
+	TexParameteri( target, TEXTURE_WRAP_S, CLAMP_TO_EDGE );
+	TexParameteri( target, TEXTURE_WRAP_T, CLAMP_TO_EDGE );
 }
 
 //--- set_levels -----------------------------------------------------------------------------------
-void set_levels( bool generate_mipmap, u32 levels )
+void set_levels( u32 target, bool generate_mipmap, u8 levels )
 {
 	if ( generate_mipmap )
-		GenerateMipmap( TEXTURE_2D );
+		GenerateMipmap( target );
 	else
-		TexParameteri( TEXTURE_2D, TEXTURE_MAX_LEVEL, levels ? levels - 1 : 0 );
+		TexParameteri( target, TEXTURE_MAX_LEVEL, levels ? levels - 1 : 0 );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-//--- texture --------------------------------------------------------------------------------------
-texture::texture( const image_pyramid& pyramid, bool generate_mipmap_ )
-	: id(), width( pyramid.width ), height( pyramid.height ), format( pyramid.format ),
-	levels( pyramid.size() ), generate_mipmap( generate_mipmap_ )
+//--- texture_id -----------------------------------------------------------------------------------
+texture_id::texture_id( void )
+	: id()
 {
 	GenTextures( 1, const_cast< u32* >( &id ) );
 }
 
-texture::~texture( void )
+texture_id::~texture_id( void )
 {
 	DeleteTextures( 1, &id );
+}
+
+//--- compressed_id --------------------------------------------------------------------------------
+compressed_id::compressed_id( u32 width, u32 height, image::type format )
+	: internal(), size()
+{
+	compressed_tuple tuple = compressed_format( width, height, format );
+	const_cast< u32& >( internal ) = tuple._0;
+	const_cast< u32& >( size ) = tuple._1;
+}
+
+//--- uncompressed_id ------------------------------------------------------------------------------
+uncompressed_id::uncompressed_id( image::type format )
+	: external(), data_type()
+{
+	uncompressed_tuple tuple = uncompressed_format( format );
+	const_cast< u32& >( external ) = tuple._1;
+	const_cast< u32& >( data_type ) = tuple._2;
+}
+
+//--- texture --------------------------------------------------------------------------------------
+texture::texture( const image_pyramid& pyramid, texture::type filter, bool generate_mipmap_ )
+	: texture_id(), width( pyramid.width ), height( pyramid.height ), format( pyramid.format ),
+	levels( pyramid.size() ), generate_mipmap( generate_mipmap_ )
+{
+	BindTexture( TEXTURE_2D, id );
+	set_filter( TEXTURE_2D, filter );
+	set_levels( TEXTURE_2D, generate_mipmap, levels );
 }
 
 void texture::verify( const image& image, u32 x, u32 y, u8 level ) const
@@ -196,19 +223,11 @@ void texture::verify( const image& image, u32 x, u32 y, u8 level ) const
 //--- compressed_texture ---------------------------------------------------------------------------
 compressed_texture::compressed_texture
 	( const image_pyramid& pyramid, texture::type filter, bool generate_mipmap_ )
-	: texture( pyramid, generate_mipmap_ ), internal(), size()
+	: texture( pyramid, filter, generate_mipmap_ ), compressed_id( width, height, format )
 {
-	compressed_tuple tuple = compressed_format( pyramid );
-	const_cast< u32& >( internal ) = tuple._0;
-	const_cast< u32& >( size ) = tuple._1;
-
-	BindTexture( TEXTURE_2D, id );
-	set_filter( filter );
-	set_levels( generate_mipmap, levels );
-
-	for ( u32 i = 0; i != levels; ++i )
-		CompressedTexImage2D
-			( TEXTURE_2D, i, internal, width >> i, height >> i, 0, size, pyramid[ i ] );
+	for ( u8 i = 0; i != levels; ++i )
+		CompressedTexImage2D( TEXTURE_2D, i, internal, width >> i, height >> i, 0, size,
+			pyramid[ i ] );
 
 	if ( !levels )
 		CompressedTexImage2D( TEXTURE_2D, 0, internal, width, height, 0, size, 0 );
@@ -218,8 +237,8 @@ void compressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 {
 	verify( image, x, y, level );
 	BindTexture( TEXTURE_2D, id );
-	CompressedTexSubImage2D
-		( TEXTURE_2D, level, x, y, image.width, image.height, internal, size, image.ptr() );
+	CompressedTexSubImage2D( TEXTURE_2D, level, x, y, image.width, image.height, internal, size,
+		image.get() );
 
 	if ( generate_mipmap )
 		GenerateMipmap( TEXTURE_2D );
@@ -228,33 +247,83 @@ void compressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 //--- uncompressed_texture -------------------------------------------------------------------------
 uncompressed_texture::uncompressed_texture
 	( const image_pyramid& pyramid, texture::type filter, bool generate_mipmap_ )
-	: texture( pyramid, generate_mipmap_ ), external(), type()
+	: texture( pyramid, filter, generate_mipmap_ ), uncompressed_id( format )
 {
-	uncompressed_tuple tuple = uncompressed_format( pyramid );
-	const_cast< u32& >( external ) = tuple._1;
-	const_cast< u32& >( type ) = tuple._2;
+	u32 internal = uncompressed_format( format )._0;
 
-	BindTexture( TEXTURE_2D, id );
-	set_filter( filter );
-	set_levels( generate_mipmap, levels );
-
-	for ( u32 i = 0; i != levels; ++i )
-		TexImage2D
-			( TEXTURE_2D, i, tuple._0, width >> i, height >> i, 0, external, type, pyramid[ i ] );
+	for ( u8 i = 0; i != levels; ++i )
+		TexImage2D( TEXTURE_2D, i, internal, width >> i, height >> i, 0, external, data_type,
+			pyramid[ i ] );
 
 	if ( !levels )
-		TexImage2D( TEXTURE_2D, 0, tuple._0, width, height, 0, external, type, 0 );
+		TexImage2D( TEXTURE_2D, 0, internal, width, height, 0, external, data_type, 0 );
 }
 
 void uncompressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 {
 	verify( image, x, y, level );
 	BindTexture( TEXTURE_2D, id );
-	TexSubImage2D
-		( TEXTURE_2D, level, x, y, image.width, image.height, external, type, image.ptr() );
+	TexSubImage2D( TEXTURE_2D, level, x, y, image.width, image.height, external, data_type,
+		image.get() );
 
 	if ( generate_mipmap )
 		GenerateMipmap( TEXTURE_2D );
+}
+
+//--- texture_array --------------------------------------------------------------------------------
+texture_array::texture_array( u32 width_, u32 height_, u32 depth_, image::type format_ )
+	: texture_id(), width( width_ ), height( height_ ), depth( depth_ ), format( format_ )
+{
+	BindTexture( TEXTURE_2D_ARRAY, id );
+	set_filter( TEXTURE_2D_ARRAY, texture::linear );
+	set_levels( TEXTURE_2D_ARRAY, false, 1 );
+}
+
+void texture_array::verify( const image& image, u32 x, u32 y, u32 index ) const
+{
+	if ( index >= depth )
+		throw error::runtime( "opengl::texture_array: " ) <<
+			"Index " << index << " is out of range";
+	else if ( image.width + x > width || image.height + y > height )
+		throw error::runtime( "opengl::texture: " ) <<
+			"Image size " << image.width << 'x' << image.height << " and offset " << x << ", " <<
+			y << " is outside of texture size " << width << 'x' << height;
+	else if ( image.format != format )
+		throw error::runtime( "opengl::texture: " ) <<
+			"Image format " << image.format << " != texture format " << format;
+}
+
+//--- compressed_texture_array ---------------------------------------------------------------------
+compressed_texture_array::
+	compressed_texture_array( u32 width_, u32 height_, u32 depth_, image::type format_ )
+	: texture_array( width_, height_, depth_, format_ ), compressed_id( width, height, format )
+{
+	CompressedTexImage3D( TEXTURE_2D_ARRAY, 0, internal, width, height, depth, 0, size, 0 );
+}
+
+void compressed_texture_array::write( const image& image, u32 x, u32 y, u32 index )
+{
+	verify( image, x, y, index );
+	BindTexture( TEXTURE_2D_ARRAY, id );
+	CompressedTexSubImage3D( TEXTURE_2D_ARRAY, 0, x, y, index, image.width, image.height, 1,
+		internal, size, image.get() );
+}
+
+//--- uncompressed_texture_array -------------------------------------------------------------------
+uncompressed_texture_array::
+	uncompressed_texture_array( u32 width_, u32 height_, u32 depth_, image::type format_ )
+	: texture_array( width_, height_, depth_, format_ ), uncompressed_id( format )
+{
+	u32 internal = uncompressed_format( format )._0;
+	TexImage3D( TEXTURE_2D_ARRAY, 0, internal, width, height, depth, 0, external, data_type, 0 );
+}
+
+void uncompressed_texture_array::write( const image& image, u32 x, u32 y, u32 index )
+{
+	verify( image, x, y, index );
+	BindTexture( TEXTURE_2D_ARRAY, id );
+	TexSubImage3D( TEXTURE_2D_ARRAY, 0, x, y, index, image.width, image.height, 1, external,
+		data_type, image.get() );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

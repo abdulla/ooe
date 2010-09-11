@@ -16,7 +16,7 @@ public:
 	default_frame( u32, u32 );
 	virtual ~default_frame( void );
 
-	virtual void read( const std::string&, image::type, buffer_type& ) const;
+	virtual void read( const std::string&, image::type, buffer_type& );
 	virtual void write( const std::string&, const std::string&, const frame_type& );
 	virtual void clear( void );
 
@@ -38,19 +38,21 @@ struct frame
 	const u32 program;
 	const u32 width;
 	const u32 height;
-	mutable bool check;
+	bool do_check;
 	colour_vector colours;
-	mutable location_map locations;
+	location_map locations;
 
 	frame( u32, u32, u32 );
 	virtual ~frame( void );
 
-	virtual void read( const std::string&, image::type, buffer_type& ) const;
+	virtual void read( const std::string&, image::type, buffer_type& );
 	virtual void write( const std::string&, const std::string&, const frame_type& );
 	virtual void clear( void );
 
 	virtual void output( const std::string&, const texture_type& );
 	virtual void output( const std::string&, const target_type& );
+
+	void check( void );
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

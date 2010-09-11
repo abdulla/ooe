@@ -105,12 +105,16 @@ enum
 	STATIC_READ					= 0x88E5,
 	PIXEL_PACK_BUFFER			= 0x88EB,
 
+	MAX_ARRAY_TEXTURE_LAYERS	= 0x88FF,
+
 	FRAGMENT_SHADER				= 0x8B30,
 	VERTEX_SHADER				= 0x8B31,
 	COMPILE_STATUS				= 0x8B81,
 	LINK_STATUS					= 0x8B82,
 	VALIDATE_STATUS				= 0x8B83,
 	INFO_LOG_LENGTH				= 0x8B84,
+
+	TEXTURE_2D_ARRAY			= 0x8C1A,
 
 	READ_FRAMEBUFFER			= 0x8CA8,
 	DRAW_FRAMEBUFFER			= 0x8CA9,
@@ -134,10 +138,15 @@ typedef void ( GenTextures_t )( s32, u32* );
 typedef void ( DeleteTextures_t )( s32, const u32* );
 typedef void ( BindTexture_t )( u32, u32 );
 typedef void ( ActiveTexture_t )( u32 );
-typedef void ( TexImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
+typedef void ( TexImage2D_t )( u32, s32, u32, s32, s32, s32, u32, u32, const void* );
 typedef void ( TexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, u32, const void* );
 typedef void ( CompressedTexImage2D_t )( u32, s32, u32, s32, s32, s32, s32, const void* );
 typedef void ( CompressedTexSubImage2D_t )( u32, s32, s32, s32, s32, s32, u32, s32, const void* );
+typedef void ( TexImage3D_t )( u32, s32, u32, s32, s32, s32, s32, u32, u32, const void* );
+typedef void ( TexSubImage3D_t )( u32, s32, s32, s32, s32, s32, s32, s32, u32, u32, const void* );
+typedef void ( CompressedTexImage3D_t )( u32, s32, u32, s32, s32, s32, s32, s32, const void* );
+typedef void ( CompressedTexSubImage3D_t )
+	( u32, s32, s32, s32, s32, s32, s32, s32, u32, s32, const void* );
 typedef void ( TexParameteri_t )( u32, u32, s32 );
 typedef void ( GenerateMipmap_t )( u32 );
 
@@ -214,6 +223,10 @@ extern TexImage2D_t* TexImage2D;
 extern TexSubImage2D_t* TexSubImage2D;
 extern CompressedTexImage2D_t* CompressedTexImage2D;
 extern CompressedTexSubImage2D_t* CompressedTexSubImage2D;
+extern TexImage3D_t* TexImage3D;
+extern TexSubImage3D_t* TexSubImage3D;
+extern CompressedTexImage3D_t* CompressedTexImage3D;
+extern CompressedTexSubImage3D_t* CompressedTexSubImage3D;
 extern TexParameteri_t* TexParameteri;
 extern GenerateMipmap_t* GenerateMipmap;
 
