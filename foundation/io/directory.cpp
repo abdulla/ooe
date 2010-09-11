@@ -72,8 +72,8 @@ directory::iterator directory::end( void ) const
 	return iterator( 0, 0 );
 }
 
-//--- canonicalized --------------------------------------------------------------------------------
-std::string canonicalized( const std::string& path )
+//--- canonical_path -------------------------------------------------------------------------------
+std::string canonical_path( const std::string& path )
 {
 	c8 buffer[ PATH_MAX ];
 
