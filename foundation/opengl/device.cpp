@@ -99,7 +99,7 @@ class device
 	: public ooe::device
 {
 public:
-	device( const ooe::view_data& );
+	device( const ooe::view_data&, bool );
 	virtual ~device( void );
 
 	virtual void draw( const block_type&, const frame_type& );
@@ -127,13 +127,13 @@ private:
 	s32 array_size_limit;
 };
 
-device::device( const ooe::view_data& view_ )
+device::device( const ooe::view_data& view_, bool sync )
 try
 	: view( view_ ), context( context_construct( view ) ), attributes(), draw_buffers_limit(),
 	texture_size_limit(), texture_units_limit(), array_size_limit()
 {
 	context_current( view, context );
-	context_sync( view, context, true );
+	context_sync( view, context, sync );
 	load_symbols();
 
 	GetIntegerv( MAX_DRAW_BUFFERS, &draw_buffers_limit );
@@ -320,7 +320,7 @@ frame_type device::default_frame( u32 width, u32 height ) const
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-extern "C" device_type OOE_VISIBLE device_open( const view_data& view )
+extern "C" device_type OOE_VISIBLE device_open( const view_data& view, bool sync )
 {
-	return new opengl::device( view );
+	return new opengl::device( view, sync );
 }
