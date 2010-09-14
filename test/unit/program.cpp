@@ -45,7 +45,7 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
 				"\n"
 				"Options:\n"
 				"    -s             Enable stdout in tests\n"
-				"    -t <timeout>  Time out for each test\n"
+				"    -t <timeout>   Time out for each test\n"
 				"    -l             List all groups of tests\n";
 
 			return false;

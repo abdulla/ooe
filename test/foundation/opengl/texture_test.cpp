@@ -98,7 +98,7 @@ template<>
 template<>
 	void fixture_type::test< 0 >( anonymous_t& )
 {
-	std::cerr << "test texture arrays\n";
+	std::cerr << "test texture array\n";
 
 	std::string root = executable::path()._0;
 	library library( root + "../library/libopengl" + library::suffix, library::global_lazy );
