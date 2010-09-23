@@ -97,10 +97,12 @@ bool exists( const std::string& path )
 {
 	struct stat status;
 
-	if ( stat( path.c_str(), &status ) && errno == ENOENT )
+	if ( !stat( path.c_str(), &status ) )
+		return true;
+	else if ( errno == ENOENT )
 		return false;
-
-	return true;
+	else
+		throw error::io( "exists: " ) << "Unable to stat: " << error::number( errno );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
