@@ -1,11 +1,28 @@
 ### Copyright (C) 2010 Abdulla Kamar. All rights reserved. ###
 
+from os import getenv
 from os.path import join
 
-### variables ##################################################################
-variables = Variables()
-variables.Add( EnumVariable( 'variant', 'build variant', 'debug', ( 'debug', 'release' ) ) )
-variant = ARGUMENTS.get( 'variant', 'debug' )
+output = join( getenv( 'SCONS_OUTPUT', '/tmp' ), 'ooe' )
 
-Export( 'variables variant' )
-SConscript( 'SConscript', variant_dir = join( 'build', variant ), duplicate = 0 )
+### variables ######################################################################################
+variables = Variables()
+variables.Add( PathVariable( 'output', 'output path', output ) )
+variables.Add( EnumVariable( 'variant', 'build variant', 'debug', ( 'debug', 'release' ) ) )
+
+output = ARGUMENTS.get( 'output', output )
+variant = ARGUMENTS.get( 'variant', 'debug' )
+path = join( output, variant )
+
+### actions ########################################################################################
+actions = [
+	Mkdir( join( path, 'cache' ) ),
+	Copy( join( path, 'resource' ), 'resource' )
+]
+
+for action in actions:
+	Execute( action )
+
+Export( 'variables' )
+SConsignFile( join( output, 'sconsign' ) )
+SConscript( 'SConscript', variant_dir = path, duplicate = 0 )

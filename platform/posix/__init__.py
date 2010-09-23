@@ -2,11 +2,13 @@
 
 class ooe:
 	compiler = 'g++'
-	include_path = ''
-	library_path = ''
 	cxx_flags = '-march=native'
+	include_path = ''
+
+	linker = 'g++'
 	link_flags = '-Wl,--allow-shlib-undefined -Wl,--as-needed'
 	release_flags = '-Wl,--strip-all -Wl,--gc-sections'
+	library_path = ''
 
 	class appkit:
 		framework = ''

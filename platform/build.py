@@ -1,9 +1,11 @@
 ### Copyright (C) 2010 Abdulla Kamar. All rights reserved. ###
 
 import sys
+from os.path import join
 
 from SCons.Environment import Environment
-from SCons.Script import Glob, Help
+from SCons.Node.FS import File
+from SCons.Script import Entry, Glob, Help
 from SCons.Script.SConscript import Configure
 from SCons.Util import Split
 
@@ -44,20 +46,26 @@ class Build( object ):
 		Keyword arguments:
 		variables -- The SCons variables to use with the SCons environment.
 		"""
-		self.environment = Environment( CPPPATH = '#', LIBPATH = '#library',
-			CXXFLAGS = self.FUNCTION_FLAGS + self.WARNING_FLAGS )
+		self.environment = Environment( CPPPATH = '#', LIBPATH = 'library',
+			CXXFLAGS = self.FUNCTION_FLAGS + self.WARNING_FLAGS, variables = variables )
 		self.platform = self.environment[ 'PLATFORM' ]
+		Help( variables.GenerateHelpText( self.environment ) )
 
 		exec 'from ' + self.platform + ' import *'
-		self.environment.Replace( CXX = ooe.compiler )
-		self.environment.Append( CXXFLAGS = Split( ooe.cxx_flags ) )
-		self.environment.Append( CPPPATH =
-			Split( '#/platform/' + self.platform + ' ' + ooe.include_path ) )
-		self.environment.Append( LIBPATH = Split( ooe.library_path ) )
-		self.environment.Append( LINKFLAGS = Split( ooe.link_flags ) )
 
-		Help( variables.GenerateHelpText( self.environment ) )
-		self.environment.Replace( variables = variables )
+		self.environment.Replace( CXX = ooe.compiler )
+		self.environment.Append( CXXFLAGS = Split( ooe.cxx_flags ),
+			CPPPATH = Split( '#/platform/' + self.platform + ' ' + ooe.include_path ) )
+
+		self.environment.Replace( LINK = ooe.linker )
+		self.environment.Append( LINKFLAGS = Split( ooe.link_flags ),
+			LIBPATH = Split( ooe.library_path ) )
+
+		if self.environment[ 'variant' ] == 'release':
+			self.environment.Append( CXXFLAGS = self.RELEASE_FLAGS,
+				LINKFLAGS = Split( ooe.release_flags ) )
+		else:
+			self.environment.Append( CXXFLAGS = self.DEBUG_FLAGS, CPPDEFINES = self.DEBUG_DEFINES )
 
 		if not sys.stdout.isatty():
 			for key in self.COLOURS.iterkeys(): self.COLOURS[ key ] = ''
@@ -70,21 +78,6 @@ class Build( object ):
 			'\t%s[LD]%s $TARGET' % ( self.COLOURS[ 'cyan' ], self.COLOURS[ 'none' ] )
 		self.environment[ 'SHLINKCOMSTR' ] =\
 			'\t%s[LD]%s $TARGET' % ( self.COLOURS[ 'yellow' ], self.COLOURS[ 'none' ] )
-
-	def Configure( self, is_release ):
-		"""Configures the build object.
-
-		Keyword arguments:
-		is_release -- Whether this should be a release or debug build.
-		"""
-		exec 'from ' + self.platform + ' import *'
-
-		if is_release:
-			self.environment.Append( CXXFLAGS = self.RELEASE_FLAGS )
-			self.environment.Append( LINKFLAGS = Split( ooe.release_flags ) )
-		else:
-			self.environment.Append( CXXFLAGS = self.DEBUG_FLAGS )
-			self.environment.Append( CPPDEFINES = self.DEBUG_DEFINES )
 
 	def Configurable( self, include_path = None, library_path = None, configure = None ):
 		"""Creates a configurable target.
@@ -106,7 +99,9 @@ class Build( object ):
 		if build.GetOption( 'clean' ) or build.GetOption( 'help' ):
 			return build
 
-		setup = Configure( build )
+		conf_dir = join( build[ 'output' ], 'configure' )
+		log_file = join( conf_dir, 'log' )
+		setup = Configure( build, conf_dir = conf_dir, log_file = log_file )
 
 		if configure:
 			configure( self.platform, setup )
@@ -140,7 +135,7 @@ class Build( object ):
 		if libraries:
 			build.Append( LIBS = Split( libraries ) )
 
-		library = build.SharedLibrary( '#library/lib' + name, files )
+		library = build.SharedLibrary( join( 'library', 'lib' + name ), files )
 		build.SideEffect( effects, library )
 
 	def Executable( self, name, directories, libraries = None, frameworks = None,
@@ -162,8 +157,8 @@ class Build( object ):
 		files, effects = self.FindFiles( directories )
 
 		if self.platform == 'posix':
-			build.Append( RPATH = "'$$$${ORIGIN}/../library'" )
-			build.Append( LINKFLAGS = '-Wl,-rpath-link,library' )
+			build.Append( RPATH = "'$$$${ORIGIN}/../library'",
+				LINKFLAGS = '-Wl,-rpath-link,' + Entry( 'library' ).get_abspath() )
 		elif self.platform == 'darwin':
 			build.Append( LINKFLAGS = '-Wl,-rpath,@executable_path/../library' )
 
@@ -173,9 +168,10 @@ class Build( object ):
 		if libraries:
 			build.Append( LIBS = Split( libraries ) )
 
-		program = build.Program( '#binary/' + name, files )
+		path = join( 'binary', name )
+		program = build.Program( path, files )
 		build.SideEffect( effects, program )
-		build.Clean( program, '#binary/' + name + '.log' )
+		build.Clean( program, path + '.log' )
 
 	def FindFiles( self, directories ):
 		"""Finds source files in the given directories, and their platform-specific equivalents.
@@ -184,16 +180,18 @@ class Build( object ):
 		directories -- A whitespace-separated list of directories that contain source code. This
 			list should not include the platform-specific directories.
 		"""
-		path = 'platform/' + self.platform
+		path = join( 'platform', self.platform )
 		files = []
 		effects = []
 
 		for directory in Split( directories ):
-			files += Glob( directory + '/*.cpp' )
-			files += Glob( path + '/' + directory + '/*.cpp' )
-			files += Glob( path + '/' + directory + '/*.mm' )
+			platform_path = join( path, directory )
 
-			effects += Glob( directory + '/*.rpo' )
-			effects += Glob( path + '/' + directory + '/*.rpo' )
+			files += Glob( join( directory, '*.cpp' ) )
+			files += Glob( join( platform_path, '*.cpp' ) )
+			files += Glob( join( platform_path, '*.mm' ) )
+
+			effects += Glob( join( directory, '*.rpo' ) )
+			effects += Glob( join( platform_path, '*.rpo' ) )
 
 		return files, effects

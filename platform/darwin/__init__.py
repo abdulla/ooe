@@ -2,11 +2,13 @@
 
 class ooe:
 	compiler = 'platform/darwin/compiler'
-	include_path = '/sw/include'
-	library_path = '/sw/lib'
 	cxx_flags = '-march=core2'
+	include_path = '/sw/include'
+
+	linker = 'g++'
 	link_flags = '-Wl,-undefined,dynamic_lookup'
 	release_flags = ''
+	library_path = '/sw/lib'
 
 	class appkit:
 		framework = 'AppKit'

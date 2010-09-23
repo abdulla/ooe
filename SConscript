@@ -7,7 +7,7 @@ if module: reload(module)
 
 from platform.build import *
 
-Import( 'variables variant' )
+Import( 'variables' )
 
 ### configure ######################################################################################
 def ImageConfigure( platform, setup ):
@@ -70,7 +70,6 @@ def VisualConfigure( platform, setup ):
 
 ### build ##########################################################################################
 build = Build( variables )
-build.Configure( variant == 'release' )
 exec 'from platform.' + build.platform + ' import *'
 
 #--- foundation ------------------------------------------------------------------------------------
@@ -95,7 +94,7 @@ build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'python_host', 'component/python/host', 'executable python registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Executable( 'surrogate', 'component/registry/surrogate', 'executable registry' )
-build.Executable( 'ui', 'component/ui', 'executable maths visual' )
+build.Executable( 'ui', 'component/ui/server', 'executable maths ui' )
 
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
@@ -103,10 +102,12 @@ build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_pat
 build.Linkable( 'python', 'component/python', 'io', library_path = ooe.python.library_path,
 	configure = PythonConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
+build.Linkable( 'ui', 'component/ui', 'visual' )
 
 #--- test ------------------------------------------------------------------------------------------
 build.Executable( 'registry_test', 'test/component/registry',
 	'javascript lua python registry unit' )
+build.Executable( 'ui_test', 'test/component/ui', 'ui unit' )
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
