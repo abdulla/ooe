@@ -8,12 +8,12 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
+typedef opengl::block::location_map location_map;
 typedef s32 ( function_type )( u32, const c8* );
 
-s32 find( s32 id, opengl::block::location_map& locations, const std::string& name,
-	function_type function )
+s32 find( s32 id, location_map& locations, const std::string& name, function_type function )
 {
-	opengl::block::location_map::const_iterator i = locations.find( name );
+	location_map::const_iterator i = locations.find( name );
 
 	if ( i != locations.end() )
 		return i->second;
@@ -23,7 +23,7 @@ s32 find( s32 id, opengl::block::location_map& locations, const std::string& nam
 	if ( location == -1 )
 		throw error::runtime( "opengl::block: " ) << "Variable \"" << name << "\" does not exist";
 
-	locations.insert( opengl::block::location_map::value_type( name, location ) );
+	locations.insert( location_map::value_type( name, location ) );
 	return location;
 }
 
