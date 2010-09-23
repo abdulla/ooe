@@ -87,7 +87,7 @@ protected:
 private:
 	const shared_free< void > data;
 
-	image( u32, u32, type, const shared_free< void >& );
+	image( u32, u32, type, const shared_free< void >& ) OOE_VISIBLE;
 
 	friend class image_pyramid;
 };
