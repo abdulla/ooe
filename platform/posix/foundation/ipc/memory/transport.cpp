@@ -23,7 +23,7 @@ transport::transport( bool created_ )
 {
 }
 
-BOOST_STATIC_ASSERT( executable::static_page_size >
+OOE_STATIC_ASSERT( executable::static_page_size >
 	sizeof( unnamed_semaphore ) * 2 + ooe::ipc::memory::transport::private_size );
 
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )

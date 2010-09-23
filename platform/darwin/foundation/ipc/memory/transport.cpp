@@ -61,7 +61,7 @@ transport::transport( ooe::socket& socket )
 {
 }
 
-BOOST_STATIC_ASSERT( executable::static_page_size > ooe::ipc::memory::transport::private_size );
+OOE_STATIC_ASSERT( executable::static_page_size > ooe::ipc::memory::transport::private_size );
 
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
