@@ -55,12 +55,8 @@ const void* module::find( const std::string& name ) const
 
 void module::insert( const std::string& name, const opaque_ptr& pointer )
 {
-	map_type::const_iterator i = map.find( name );
-
-	if ( i != map.end() )
+	if ( !map.insert( map_type::value_type( name, pointer ) ).second )
 		throw error::runtime( "module: " ) << "Unable to insert \"" << name << "\", facade exists";
-
-	map.insert( map_type::value_type( name, pointer ) );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

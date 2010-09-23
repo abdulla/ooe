@@ -62,10 +62,8 @@ void insert( registry::type type, const std::string& path )
 {
 	info_tuple info( type, path );
 
-	if ( set.find( info ) != set.end() )
+	if ( !set.insert( info ).second )
 		throw error::runtime( "registry: " ) << "Module " << info << " exists";
-	else
-		set.insert( info );
 
 	interface::vector_type vector;
 
@@ -106,12 +104,11 @@ registry::info_vector find( const interface::vector_type& names )
 
 		for ( pair_type j = map.equal_range( *i ); j.first != j.second; ++j.first )
 		{
-			histogram_map::iterator k = histogram.find( j.first->second );
-
-			if ( k == histogram.end() )
+			std::pair< histogram_map::iterator, bool > pair =
 				histogram.insert( histogram_map::value_type( j.first->second, 1 ) );
-			else
-				++k->second;
+
+			if ( !pair.second )
+				++pair.first->second;
 		}
 	}
 
