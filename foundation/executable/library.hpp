@@ -37,32 +37,32 @@ namespace ooe
 		void* find( const std::string& ) const;
 		static void* find( const std::string&, find_type );
 
-		template< typename type >
-			type* find( const std::string& name,
-			typename enable_if< is_function< type > >::type* = 0 ) const
+		template< typename t >
+			t* find( const std::string& name,
+			typename enable_if< is_function< t > >::type* = 0 ) const
 		{
-			return ptr_cast< type* >( find( name ) );
+			return ptr_cast< t* >( find( name ) );
 		}
 
-		template< typename type >
-			type* find( const std::string& name,
-			typename disable_if< is_function< type > >::type* = 0 ) const
+		template< typename t >
+			t* find( const std::string& name,
+			typename disable_if< is_function< t > >::type* = 0 ) const
 		{
-			return static_cast< type* >( find( name ) );
+			return static_cast< t* >( find( name ) );
 		}
 
-		template< typename type >
-			static type* find( const std::string& name, find_type flag,
-			typename enable_if< is_function< type > >::type* = 0 )
+		template< typename t >
+			static t* find( const std::string& name, find_type flag,
+			typename enable_if< is_function< t > >::type* = 0 )
 		{
-			return ptr_cast< type* >( find( name, flag ) );
+			return ptr_cast< t* >( find( name, flag ) );
 		}
 
-		template< typename type >
-			static type* find( const std::string& name, find_type flag,
-			typename disable_if< is_function< type > >::type* = 0 )
+		template< typename t >
+			static t* find( const std::string& name, find_type flag,
+			typename disable_if< is_function< t > >::type* = 0 )
 		{
-			return static_cast< type* >( find( name, flag ) );
+			return static_cast< t* >( find( name, flag ) );
 		}
 
 	private:
