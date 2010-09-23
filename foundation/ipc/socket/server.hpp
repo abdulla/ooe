@@ -43,7 +43,7 @@ private:
 class OOE_VISIBLE server
 {
 public:
-	server( const address&, const switchboard& );
+	server( const address&, const ipc::switchboard& );
 	~server( void );
 
 	void accept( void );

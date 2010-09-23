@@ -81,7 +81,7 @@ namespace ooe
 	{
 		static up_t call( NO_SPECIALISATION_DEFINED ) OOE_CONST
 		{
-			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+			OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 			return 0;
 		}
 	};
@@ -91,7 +91,7 @@ namespace ooe
 	{
 		static up_t call( const u8*, NO_SPECIALISATION_DEFINED ) OOE_CONST
 		{
-			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+			OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 			return 0;
 		}
 	};
@@ -101,7 +101,7 @@ namespace ooe
 	{
 		static up_t call( u8*, NO_SPECIALISATION_DEFINED ) OOE_CONST
 		{
-			BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+			OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 			return 0;
 		}
 	};

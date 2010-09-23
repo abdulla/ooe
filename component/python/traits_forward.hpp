@@ -59,7 +59,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename = void >
 {
 	static void call( PyObject*, NO_SPECIALISATION_DEFINED ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 	}
 };
 
@@ -68,7 +68,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename = void >
 {
 	static PyObject* call( NO_SPECIALISATION_DEFINED ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 		return 0;
 	}
 };
@@ -273,7 +273,7 @@ template< typename INVALID_USAGE >
 {
 	static void call( PyObject* object, INVALID_USAGE )
 	{
-		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 	}
 };
 
@@ -309,7 +309,7 @@ template< typename INVALID_USAGE >
 {
 	static PyObject* call( INVALID_USAGE )
 	{
-		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 		return 0;
 	}
 };

@@ -9,14 +9,20 @@
 	#include <tr1/type_traits>
 	#include <boost/type_traits/function_traits.hpp>
 
+	#define OOE_IS_EMPTY( type )			traits::is_empty< type >
+	#define OOE_STATIC_ASSERT( boolean )	BOOST_STATIC_ASSERT( boolean )
+
 	namespace traits = std::tr1;
 #else
 	#if !defined( BOOST_MSVC_FULL_VER ) && !defined( BOOST_MSVC_FULL_VER_WORKAROUND_GUARD )
-	#define BOOST_MSVC_FULL_VER 0
-	#define BOOST_MSVC_FULL_VER_WORKAROUND_GUARD 0
+		#define BOOST_MSVC_FULL_VER 0
+		#define BOOST_MSVC_FULL_VER_WORKAROUND_GUARD 0
 	#endif
 
 	#include <boost/type_traits.hpp>
+
+	#define OOE_IS_EMPTY( type )			false_type
+	#define OOE_STATIC_ASSERT( boolean )	typedef bool BOOST_JOIN( STATIC_ASSERT, __LINE__ )
 
 	namespace traits = boost;
 #endif
@@ -152,7 +158,7 @@ template< typename a, typename b >
 //--- is_empty -------------------------------------------------------------------------------------
 template< typename t >
 	struct is_empty
-	: public traits::is_empty< typename no_ref< t >::type >
+	: public OOE_IS_EMPTY( typename no_ref< t >::type )
 {
 };
 

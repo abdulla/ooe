@@ -38,7 +38,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename = void >
 {
 	static void call( stack&, NO_SPECIALISATION_DEFINED, s32 ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 	}
 };
 
@@ -47,7 +47,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename = void >
 {
 	static void call( stack&, NO_SPECIALISATION_DEFINED ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 	}
 };
 
@@ -187,7 +187,7 @@ template< typename INVALID_USAGE >
 {
 	static void call( stack&, INVALID_USAGE, s32 ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 	}
 };
 
@@ -222,7 +222,7 @@ template< typename INVALID_USAGE >
 {
 	static void call( stack&, INVALID_USAGE ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 	}
 };
 

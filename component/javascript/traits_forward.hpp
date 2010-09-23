@@ -29,7 +29,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename = void >
 {
 	static void call( const v8::Handle< v8::Value >&, NO_SPECIALISATION_DEFINED ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 	}
 };
 
@@ -38,7 +38,7 @@ template< typename NO_SPECIALISATION_DEFINED, typename = void >
 {
 	static v8::Handle< v8::Value > call( NO_SPECIALISATION_DEFINED ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
 		return v8::Undefined();
 	}
 };
@@ -226,7 +226,7 @@ template< typename INVALID_USAGE >
 {
 	static void call( const v8::Handle< v8::Value >& value, INVALID_USAGE ) OOE_CONST
 	{
-		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 	}
 };
 
@@ -265,7 +265,7 @@ template< typename INVALID_USAGE >
 {
 	static v8::Handle< v8::Value > call( INVALID_USAGE )
 	{
-		BOOST_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
 		return v8::Undefined();
 	}
 };
