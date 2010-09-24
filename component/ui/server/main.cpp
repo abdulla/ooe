@@ -5,6 +5,7 @@
 #include "component/ui/text_layout.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/parallel/thread_pool.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/view.hpp"
 
@@ -167,7 +168,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
 	event_queue event_queue;
 	view view( event_queue, width, height, false );
-	device_type device = library.find< device_type ( const view_data& ) >( "device_open" )( view );
+	device_type device =
+		library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, true );
 
 	font::library font_library;
 	font::face font_face( font_library, root + "../resource/font/myriadpro-sans.otf" );
