@@ -42,7 +42,7 @@ u8 image_pyramid::size( void ) const
 	return vector.size();
 }
 
-shared_free< void > image_pyramid::operator []( u8 level ) const
+image::data_type image_pyramid::operator []( u8 level ) const
 {
 	return vector[ level ];
 }

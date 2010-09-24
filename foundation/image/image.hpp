@@ -19,6 +19,8 @@ typedef void ( * encoder_type )( const image&, const descriptor& );
 class image
 {
 public:
+	typedef shared_free< void > data_type;
+
 	enum
 	{
 		uncompressed = 0,
@@ -74,7 +76,7 @@ public:
 		return data.get();
 	}
 
-	shared_free< void > ptr( void ) const
+	data_type ptr( void ) const
 	{
 		return data;
 	}
@@ -85,9 +87,9 @@ protected:
 	image( u32, u32, type, function_type );
 
 private:
-	const shared_free< void > data;
+	const data_type data;
 
-	image( u32, u32, type, const shared_free< void >& ) OOE_VISIBLE;
+	image( u32, u32, type, const data_type& ) OOE_VISIBLE;
 
 	friend class image_pyramid;
 };

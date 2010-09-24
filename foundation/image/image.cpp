@@ -27,7 +27,7 @@ image::image( u32 width_, u32 height_, type format_, function_type byte_size )
 {
 }
 
-image::image( u32 width_, u32 height_, type format_, const shared_free< void >& data_ )
+image::image( u32 width_, u32 height_, type format_, const data_type& data_ )
 	: width( width_ ), height( height_ ), format( format_ ), data( data_ )
 {
 }

@@ -25,10 +25,10 @@ public:
 	void push_back( const ooe::image& );
 	ooe::image image( u8 ) const;
 	u8 size( void ) const;
-	shared_free< void > operator []( u8 ) const;
+	ooe::image::data_type operator []( u8 ) const;
 
 private:
-	std::vector< shared_free< void > > vector;
+	std::vector< ooe::image::data_type > vector;
 };
 
 //--- texture --------------------------------------------------------------------------------------
