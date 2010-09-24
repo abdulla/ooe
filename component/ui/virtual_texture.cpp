@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "component/ui/virtual_texture.hpp"
+#include "foundation/parallel/thread_pool.hpp"
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
@@ -10,41 +11,50 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 typedef tuple< u32, u32, u32, u32 > region_type;
-const image::type table_format = image::rgb_f32;
+typedef std::pair< page_cache::page_map::iterator, page_cache::page_map::iterator > pair_type;
+const image::type table_format = image::rg_f32;
+const u8 table_channels = 2;
 
-u32 table_width( const device_type& device, const physical_source& source )
-{
-	u32 table_size = ceiling< u32 >( source.size(), source.page_size() );
-	u32 size_limit = device->limit( device::texture_size );
-
-	if ( table_size > size_limit )
-		throw error::runtime( "virtual_texture: " ) <<
-			"Page table size " << table_size << " > device texture size " << size_limit;
-
-	return table_size;
-}
-
-u32 cache_width( const device_type& device, u16 page_size )
+u32 check_page_size( u16 page_size )
 {
 	if ( !is_bit_round( page_size ) )
 		throw error::runtime( "physical_cache: " ) <<
 			"Page size " << page_size << " is not a power of 2";
 
-	return round_down< u32 >( device->limit( device::texture_size ), page_size );
+	return page_size;
+}
+
+physical_source& check_source( physical_source& source, page_cache& cache )
+{
+	image::type source_format = source.format();
+	image::type cache_format = cache.format();
+	u16 source_page_size = source.page_size();
+	u16 cache_page_size = cache.page_size();
+
+	if ( source_format != cache_format )
+		throw error::runtime( "virtual_texture: " ) <<
+			"Source format " << source_format << " != cache format " << cache_format;
+	else if ( source_page_size != cache_page_size )
+		throw error::runtime( "virtual_texture: " ) <<
+			"Source page size " << source_page_size << " != cache page size " << cache_page_size;
+
+	return source;
 }
 
 image make_image( u32 size )
 {
 	uncompressed_image image( size, size, table_format );
 
-	for ( f32* i = image.as< f32 >(), * end = i + image.width * image.height * 3; i != end; ++i )
+	for ( f32* i = image.as< f32 >(), * end = i + image.width * image.height * table_channels;
+		i != end; ++i )
 		*i = -1;
 
 	return image;
 }
 
-image_pyramid make_pyramid( u32 table_size )
+image_pyramid make_pyramid( const physical_source& source )
 {
+	u32 table_size = ceiling< u32 >( source.size(), source.page_size() );
 	image_pyramid pyramid( make_image( table_size ) );
 
 	for ( u32 x = table_size >> 1; x; x >>= 1 )
@@ -53,20 +63,23 @@ image_pyramid make_pyramid( u32 table_size )
 	return pyramid;
 }
 
-texture_type make_cache( const device_type& device, u32 cache_size, image::type format )
+texture_type make_table( const device_type& device, const image_pyramid& pyramid )
 {
-	image_pyramid pyramid( cache_size, cache_size, format );
-	return device->texture( pyramid, texture::linear, false );
+	return device->texture( pyramid, texture::nearest, false );
 }
 
-void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, f32 x, f32 y,
-	f32 pow_level )
+texture_array_type make_array( const device_type& device, image::type format, u16 page_size )
+{
+	u32 size = device->limit( device::array_size );
+	return device->texture_array( page_size, page_size, size, format );
+}
+
+void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, f32 i, f32 pow_level )
 {
 	u32 width = pyramid.width >> index.level;
-	f32* rgb = pyramid[ index.level ].as< f32 >() + ( index.x + index.y * width ) * 3;
-	rgb[ 0 ] = x;
-	rgb[ 1 ] = y;
-	rgb[ 2 ] = pow_level;
+	f32* rg = pyramid[ index.level ].as< f32 >() + ( index.x + index.y * width ) * table_channels;
+	rg[ 0 ] = i;
+	rg[ 1 ] = pow_level;
 }
 
 region_type get_region( const physical_source& source, u8 level_limit,
@@ -90,6 +103,33 @@ region_type get_region( const physical_source& source, u8 level_limit,
 	return region_type( page_x1, page_x2, page_y1, page_y2 );
 }
 
+void insert_page( page_cache::page_map& pages, const page_cache::cache_list::iterator& i )
+{
+	pair_type pair = pages.equal_range( i->_1._0 );
+
+	for ( ; pair.first != pair.second; ++pair.first )
+	{
+		if ( pair.first->second == i )
+			return;
+	}
+
+	pages.insert( pair.first, page_cache::page_map::value_type( i->_1._0, i ) );
+}
+
+void erase_page( page_cache::page_map& pages, const page_cache::cache_list::iterator& i )
+{
+	pair_type pair = pages.equal_range( i->_1._0 );
+
+	for ( ; pair.first != pair.second; ++pair.first )
+	{
+		if ( pair.first->second == i )
+		{
+			pages.erase( pair.first );
+			return;
+		}
+	}
+}
+
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -107,26 +147,27 @@ pyramid_index::pyramid_index( u32 x_, u32 y_, u8 level_ )
 
 bool operator <( const pyramid_index& i, const pyramid_index& j )
 {
-	return i.x < j.x || i.y < j.y || i.level < j.level;
+	return i.x < j.x || ( i.x == j.x && i.y < j.y ) || ( i.y == j.y && i.level < j.level );
 }
 
 //--- page_cache -----------------------------------------------------------------------------------
 page_cache::page_cache
-	( const device_type& device, thread_pool& pool_, image::type cache_format_, u16 page_size )
-	: pool( pool_ ), cache_size( cache_width( device, page_size ) ), cache_format( cache_format_ ),
-	cache( make_cache( device, cache_size, cache_format ) ), list(), map(), pages(), loads( 0 ),
-	queue()
+	( const device_type& device, thread_pool& pool_, image::type cache_format, u16 size )
+	: pool( pool_ ), format_( cache_format ), page_size_( check_page_size( size ) ),
+	array( make_array( device, format_, page_size_ ) ), list(), map(), pages(), loads( 0 ), queue()
 {
-	for ( u32 y = 0; y != cache_size; y += page_size )
-	{
-		for ( u32 x = 0; x != cache_size; x += page_size )
-			list.push_back( make_tuple( x, y, key_type( 0, pyramid_index() ), false ) );
-	}
+	for ( u16 i = 0, end = device->limit( device::array_size ); i != end; ++i )
+		list.push_back( cache_type( i, key_type( 0, pyramid_index() ), false ) );
 }
 
 image::type page_cache::format( void ) const
 {
-	return cache_format;
+	return format_;
+}
+
+u16 page_cache::page_size( void ) const
+{
+	return page_size_;
 }
 
 up_t page_cache::pending( void ) const
@@ -137,26 +178,25 @@ up_t page_cache::pending( void ) const
 void page_cache::read( virtual_texture& texture, pyramid_index index, bool locked )
 {
 	atom_ptr< ooe::image > image( new ooe::image( texture.source.read( index ) ) );
-	queue.enqueue( make_tuple( key_type( &texture, index ), locked, image ) );
+	queue.enqueue( pending_type( key_type( &texture, index ), locked, image ) );
 }
 
 void page_cache::load( virtual_texture& texture, const pyramid_index& index, bool locked )
 {
-	const key_type key( &texture, index );
-	cache_map::iterator find = map.find( key );
-	cache_list::iterator end = list.end();
+	cache_list::iterator null;
+	cache_map::value_type value( key_type( &texture, index ), null );
+	std::pair< cache_map::iterator, bool > pair = map.insert( value );
 
-	if ( find != map.end() )
+	if ( pair.second )
 	{
-		find->second->_3 = locked;
-		list.splice( end, list, find->second );
-		return;
+		async( pool, make_function( *this, &page_cache::read ), texture, index, locked );
+		++loads;
 	}
-
-	async( pool, make_function( *this, &page_cache::read ), texture, index, locked );
-	// insert index in to map to prevent duplicate loads
-	map.insert( cache_map::value_type( key, end ) );
-	++loads;
+	else if ( pair.first->second != null )
+	{
+		pair.first->second->_2 = locked;
+		list.splice( list.end(), list, pair.first->second );
+	}
 }
 
 void page_cache::unlock( virtual_texture& texture, const pyramid_index& index )
@@ -164,7 +204,7 @@ void page_cache::unlock( virtual_texture& texture, const pyramid_index& index )
 	cache_map::iterator find = map.find( key_type( &texture, index ) );
 
 	if ( find != map.end() )
-		find->second->_3 = false;
+		find->second->_2 = false;
 }
 
 void page_cache::write( void )
@@ -178,41 +218,40 @@ void page_cache::write( void )
 		// find least-recently-used unlocked page
 		cache_list::iterator page = list.begin();
 		cache_list::iterator end = list.end();
-		for ( ; page != end && page->_3; ++page ) {}
+		for ( ; page != end && page->_2; ++page ) {}
 
 		if ( page == end )
 			throw error::runtime( "virtual_texture: " ) << "All pages are locked";
 
 		// if page has been previously assigned, evict entry
-		if ( page->_2._0 )
+		if ( page->_1._0 )
 		{
-			virtual_texture& texture = *page->_2._0;
-			const pyramid_index& index = page->_2._1;
+			virtual_texture& texture = *page->_1._0;
+			const pyramid_index& index = page->_1._1;
 
-			write_pyramid( texture.pyramid, index, -1, -1, -1 );
+			write_pyramid( texture.pyramid, index, -1, -1 );
 			texture.bitset.set( index.level );
 			dirty.push_back( &texture );
 
-			map.erase( page->_2 );
+			map.erase( page->_1 );
+			erase_page( pages, page );
 		}
 
-		page->_2 = value._0;
-		page->_3 = value._1;
-		pages.insert( page_map::value_type( value._0._0, page ) );
+		page->_1 = value._0;
+		page->_2 = value._1;
 		map[ value._0 ] = page;
+		insert_page( pages, page );
 		list.splice( end, list, page );
 
-		virtual_texture& texture = *page->_2._0;
-		const pyramid_index& index = page->_2._1;
-		f32 table_x = divide( page->_0, cache_size );
-		f32 table_y = divide( page->_1, cache_size );
-		f32 pow_level = std::pow( 2, texture.pyramid.size() - index.level - 1 );
+		virtual_texture& texture = *page->_1._0;
+		const pyramid_index& index = page->_1._1;
+		f32 pow_level = std::pow( 2.f, texture.pyramid.size() - index.level - 1 );
 
-		write_pyramid( texture.pyramid, index, table_x, table_y, pow_level );
+		write_pyramid( texture.pyramid, index, page->_0, pow_level );
 		texture.bitset.set( index.level );
 		dirty.push_back( &texture );
 
-		cache->write( *value._2, page->_0, page->_1 );
+		array->write( *value._2, 0, 0, page->_0 );
 	}
 
 	for ( dirty_type::iterator i = dirty.begin(), end = dirty.end(); i != end; ++i )
@@ -221,7 +260,6 @@ void page_cache::write( void )
 
 void page_cache::evict( virtual_texture& texture )
 {
-	typedef std::pair< page_map::iterator, page_map::iterator > pair_type;
 	pair_type pair = pages.equal_range( &texture );
 	cache_list::iterator begin = list.begin();
 
@@ -230,8 +268,8 @@ void page_cache::evict( virtual_texture& texture )
 		cache_list::iterator i = pair.first->second;
 		pages.erase( pair.first++ );
 
-		i->_2._0 = 0;
-		i->_3 = false;
+		i->_1._0 = 0;
+		i->_2 = false;
 		list.splice( begin, list, i );
 	}
 }
@@ -239,9 +277,8 @@ void page_cache::evict( virtual_texture& texture )
 //--- virtual_texture ------------------------------------------------------------------------------
 virtual_texture::
 	virtual_texture( const device_type& device, page_cache& cache_, physical_source& source_ )
-	: cache( cache_ ), source( source_ ), table_size( table_width( device, source ) ),
-	pyramid( make_pyramid( table_size ) ),
-	table( device->texture( pyramid, texture::nearest, false ) ), bitset()
+	: cache( cache_ ), source( check_source( source_, cache ) ), pyramid( make_pyramid( source ) ),
+	table( make_table( device, pyramid ) ), bitset()
 {
 	u32 size = source.size();
 	load( 0, 0, size, size, pyramid.size() - 1, true );
@@ -254,10 +291,8 @@ virtual_texture::~virtual_texture( void )
 
 void virtual_texture::input( const std::string& name, block_type& block ) const
 {
-	u16 page_size = source.page_size();
-	block->input( name + ".page_ratio", divide( page_size, cache.cache_size ) );
-	block->input( name + ".page_log2", f32( log2( page_size ) ) );
-	block->input( name + ".page_cache", cache.cache );
+	block->input( name + ".page_log2", f32( log2( source.page_size() ) ) );
+	block->input( name + ".page_cache", cache.array );
 	block->input( name + ".page_table", table );
 }
 

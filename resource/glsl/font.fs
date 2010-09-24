@@ -1,8 +1,9 @@
+#extension GL_EXT_gpu_shader4 : enable
+
 struct vsampler2D
 {
-	float page_ratio;
 	float page_log2;
-	sampler2D page_cache;
+	sampler2DArray page_cache;
 	sampler2D page_table;
 };
 
