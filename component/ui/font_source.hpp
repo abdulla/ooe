@@ -4,6 +4,7 @@
 #define OOE_COMPONENT_UI_FONT_SOURCE_HPP
 
 #include "component/ui/virtual_texture.hpp"
+#include "foundation/parallel/lock.hpp"
 #include "foundation/visual/font.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -35,7 +36,7 @@ private:
 	const u32 first;
 	const u8 level_limit;
 
-	ooe::mutex mutex;
+	mutable ooe::mutex mutex;
 	ooe::memory memory;
 
 	virtual image read( const pyramid_index& );

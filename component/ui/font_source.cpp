@@ -8,6 +8,7 @@
 #include "foundation/io/file.hpp"
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
+#include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -34,7 +35,7 @@ std::string get_root( const std::string& root, font::face& face )
 {
 	std::string suffix = face.string( font::face::family ) + '-' + face.string( font::face::style );
 	std::transform( suffix.begin(), suffix.end(), suffix.begin(), transform );
-	std::string path = canonicalized( root ) + '/' + suffix;
+	std::string path = canonical_path( root ) + '/' + suffix;
 
 	if ( !exists( path ) )
 		make_directory( path );
@@ -155,9 +156,9 @@ font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
 
 	if ( !metric.valid )
 	{
+		lock lock( mutex );
 		font::bitmap bitmap = face.character( char_code, face_size >> level );
 		metric = source_metric( bitmap.metric, true );
-		write_metric( memory, code, glyphs, level_inverse, metric );
 	}
 
 	u32 glyphs_per_row = source_size / face_size;
