@@ -2,8 +2,9 @@
 
 #include <cstdlib>
 
-#include "foundation/io/memory.hpp"
 #include "component/ui/tile_source.hpp"
+#include "foundation/io/memory.hpp"
+#include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -38,6 +39,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 tile_source::tile_source( const std::string& root_, const decoder_map& map )
 	: root( root_ ), type(), decoder(), size_(), format_(), page_size_(), level_limit()
 {
+	// TODO: use boost::ptree for configuration
 	memory memory( root + "/metadata" );
 	std::string metadata( memory.as< c8 >(), memory.size() );
 	vector_type vector = words( metadata.begin(), --metadata.end() );
