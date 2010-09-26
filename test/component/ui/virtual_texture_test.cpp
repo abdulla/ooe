@@ -6,8 +6,6 @@
 
 #include "component/ui/virtual_texture.hpp"
 #include "foundation/parallel/thread_pool.hpp"
-#include "foundation/executable/library.hpp"
-#include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
 #include "test/unit/group.hpp"
 
@@ -192,7 +190,7 @@ template<>
 	u32 size = source.size();
 	u16 page_size = source.page_size();
 
-	for ( u8 i = 0, end = log2( size / page_size ) + 1; i != end; ++i )
+	for ( u8 i = 6, end = log2( size / page_size ) + 1; i != end; ++i )
 	{
 		vt.load( 0, 0, size, size, i );
 
