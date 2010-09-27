@@ -7,7 +7,7 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-image::type validate( image::type format, bool compressed )
+image::type check( image::type format, bool compressed )
 {
 	if ( is_compressed( format ) == compressed )
 		return format;
@@ -34,7 +34,7 @@ image::image( u32 width_, u32 height_, type format_, const data_type& data_ )
 
 //--- uncompressed_image ---------------------------------------------------------------------------
 uncompressed_image::uncompressed_image( u32 width_, u32 height_, type format_ )
-	: image( width_, height_, validate( format_, false ),
+	: image( width_, height_, check( format_, false ),
 	reinterpret_cast< function_type >( &uncompressed_image::byte_size ) )
 {
 }
@@ -42,7 +42,7 @@ uncompressed_image::uncompressed_image( u32 width_, u32 height_, type format_ )
 uncompressed_image::uncompressed_image( const image& image_ )
 	: image( image_ )
 {
-	validate( format, false );
+	check( format, false );
 }
 
 u8 uncompressed_image::channels( void ) const
@@ -140,7 +140,7 @@ up_t uncompressed_image::byte_size( void ) const
 
 //--- compressed_image -----------------------------------------------------------------------------
 compressed_image::compressed_image( u32 width_, u32 height_, type format_ )
-	: image( width_, height_, validate( format_, true ),
+	: image( width_, height_, check( format_, true ),
 	reinterpret_cast< function_type >( &compressed_image::byte_size ) )
 {
 }
@@ -148,7 +148,7 @@ compressed_image::compressed_image( u32 width_, u32 height_, type format_ )
 compressed_image::compressed_image( const image& image_ )
 	: image( image_ )
 {
-	validate( format, true );
+	check( format, true );
 }
 
 u8 compressed_image::channels( void ) const

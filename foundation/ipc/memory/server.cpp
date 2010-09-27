@@ -22,7 +22,7 @@ void signal_handler( s32 code, siginfo_t* info, void* context )
 	servlet* servlet = servlet_tls;
 
 	if ( servlet )
-		servlet->verify( info->si_addr );
+		servlet->check( info->si_addr );
 
 	prior_handler( code, info, context );
 }
@@ -137,7 +137,7 @@ void servlet::migrate( socket& socket, semaphore& semaphore, server& server )
 	server.unlink( link, false );
 }
 
-void servlet::verify( const void* pointer )
+void servlet::check( const void* pointer )
 {
 	bool inside =
 		buffer.is_internal() ? transport.in_canary( pointer ) : allocator.in_canary( pointer );

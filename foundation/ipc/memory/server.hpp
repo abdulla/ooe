@@ -17,7 +17,7 @@ public:
 
 	void join( void );
 	void migrate( ooe::socket&, semaphore&, server& );
-	void verify( const void* );
+	void check( const void* );
 
 private:
 	memory::transport transport;

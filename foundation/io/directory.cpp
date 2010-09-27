@@ -13,8 +13,7 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- validate -------------------------------------------------------------------------------------
-const descriptor& validate( const descriptor& desc )
+const descriptor& check( const descriptor& desc )
 {
 	if ( desc.type() != descriptor::directory )
 		throw error::io( "directory: " ) << "Descriptor is not a directory";
@@ -49,7 +48,7 @@ std::string directory_iterator::dereference( void ) const
 
 //--- directory ------------------------------------------------------------------------------------
 directory::directory( const descriptor& desc )
-	: dir( platform::directory_open( validate( desc ) ) )
+	: dir( platform::directory_open( check( desc ) ) )
 {
 	if ( !dir )
 		throw error::io( "directory: " ) << "Unable to open directory: " << error::number( errno );

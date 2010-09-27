@@ -10,7 +10,7 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const descriptor& validate( const descriptor& desc )
+const descriptor& check( const descriptor& desc )
 {
 	descriptor::node_type type = desc.type();
 
@@ -26,7 +26,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- file -----------------------------------------------------------------------------------------
 file::file( const descriptor& desc )
-	: descriptor( validate( desc ) )
+	: descriptor( check( desc ) )
 {
 }
 

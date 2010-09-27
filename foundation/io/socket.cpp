@@ -12,14 +12,12 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- control_message ------------------------------------------------------------------------------
 struct control_message
 	: public cmsghdr
 {
 	s32 fd;
 };
 
-//--- family ---------------------------------------------------------------------------------------
 s32 family( internet_query::type type )
 {
 	switch ( type )
@@ -38,8 +36,7 @@ s32 family( internet_query::type type )
 	}
 }
 
-//--- validate -------------------------------------------------------------------------------------
-const descriptor& validate( const descriptor& desc )
+const descriptor& check( const descriptor& desc )
 {
 	if ( desc.type() != descriptor::socket )
 		throw error::io( "socket: " ) << "Descriptor is not a socket";
@@ -53,7 +50,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- socket ---------------------------------------------------------------------------------------
 socket::socket( const ooe::descriptor& desc )
-	: platform::socket( validate( desc ) )
+	: platform::socket( check( desc ) )
 {
 }
 

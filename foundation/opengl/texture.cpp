@@ -200,7 +200,7 @@ texture::texture( const image_pyramid& pyramid, texture::type filter, bool gener
 	set_levels( TEXTURE_2D, generate_mipmap, levels );
 }
 
-void texture::verify( const image& image, u32 x, u32 y, u8 level ) const
+void texture::check( const image& image, u32 x, u32 y, u8 level ) const
 {
 	u32 w = width >> level;
 	u32 h = height >> level;
@@ -235,7 +235,7 @@ compressed_texture::compressed_texture
 
 void compressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 {
-	verify( image, x, y, level );
+	check( image, x, y, level );
 	BindTexture( TEXTURE_2D, id );
 	CompressedTexSubImage2D( TEXTURE_2D, level, x, y, image.width, image.height, internal, size,
 		image.get() );
@@ -261,7 +261,7 @@ uncompressed_texture::uncompressed_texture
 
 void uncompressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 {
-	verify( image, x, y, level );
+	check( image, x, y, level );
 	BindTexture( TEXTURE_2D, id );
 	TexSubImage2D( TEXTURE_2D, level, x, y, image.width, image.height, external, data_type,
 		image.get() );
@@ -279,7 +279,7 @@ texture_array::texture_array( u32 width_, u32 height_, u32 depth_, image::type f
 	set_levels( TEXTURE_2D_ARRAY, false, 1 );
 }
 
-void texture_array::verify( const image& image, u32 x, u32 y, u32 index ) const
+void texture_array::check( const image& image, u32 x, u32 y, u32 index ) const
 {
 	if ( index >= depth )
 		throw error::runtime( "opengl::texture_array: " ) <<
@@ -303,7 +303,7 @@ compressed_texture_array::
 
 void compressed_texture_array::write( const image& image, u32 x, u32 y, u32 index )
 {
-	verify( image, x, y, index );
+	check( image, x, y, index );
 	BindTexture( TEXTURE_2D_ARRAY, id );
 	CompressedTexSubImage3D( TEXTURE_2D_ARRAY, 0, x, y, index, image.width, image.height, 1,
 		internal, size, image.get() );
@@ -320,7 +320,7 @@ uncompressed_texture_array::
 
 void uncompressed_texture_array::write( const image& image, u32 x, u32 y, u32 index )
 {
-	verify( image, x, y, index );
+	check( image, x, y, index );
 	BindTexture( TEXTURE_2D_ARRAY, id );
 	TexSubImage3D( TEXTURE_2D_ARRAY, 0, x, y, index, image.width, image.height, 1, external,
 		data_type, image.get() );

@@ -28,8 +28,8 @@ protected:
 	}
 };
 
-//--- validate -------------------------------------------------------------------------------------
-inline void validate( error_t error, const u8* data )
+//--- check ----------------------------------------------------------------------------------------
+inline void check( error_t error, const u8* data )
 {
 	switch ( error )
 	{
@@ -84,7 +84,7 @@ inline void load_header( shared_allocator& allocator, io_buffer& buffer )
 	up_t preserve = stream_size< bool_t, error_t >::call( internal, error );
 	buffer.preserve( preserve );
 
-	validate( error, buffer.get() );
+	check( error, buffer.get() );
 
 	if ( OOE_UNLIKELY( !internal ) )
 	{

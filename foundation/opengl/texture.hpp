@@ -52,7 +52,7 @@ protected:
 	const bool generate_mipmap;
 
 	texture( const image_pyramid&, texture::type, bool );
-	void verify( const image&, u32, u32, u8 ) const;
+	void check( const image&, u32, u32, u8 ) const;
 };
 
 struct compressed_texture
@@ -80,7 +80,7 @@ protected:
 	const image::type format;
 
 	texture_array( u32, u32, u32, image::type );
-	void verify( const image&, u32, u32, u32 ) const;
+	void check( const image&, u32, u32, u32 ) const;
 };
 
 struct compressed_texture_array
