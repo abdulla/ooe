@@ -107,7 +107,6 @@ build.Linkable( 'ui', 'component/ui', 'visual' )
 #--- test ------------------------------------------------------------------------------------------
 build.Executable( 'registry_test', 'test/component/registry',
 	'javascript lua python registry unit' )
-build.Executable( 'ui_test', 'test/component/ui', 'ui unit' )
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
