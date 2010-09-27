@@ -245,7 +245,7 @@ void page_cache::write( void )
 
 		virtual_texture& texture = *page->_1._0;
 		const pyramid_index& index = page->_1._1;
-		f32 pow_level = std::pow( 2.f, texture.pyramid.size() - index.level - 1 );
+		f32 pow_level = exp2( texture.pyramid.size() - index.level - 1 );
 
 		write_pyramid( texture.pyramid, index, page->_0, pow_level );
 		texture.bitset.set( index.level );
