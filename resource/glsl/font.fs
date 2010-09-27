@@ -2,7 +2,7 @@
 
 struct vsampler2D
 {
-	float page_log2;
+	vec2 bias_range;
 	sampler2DArray page_cache;
 	sampler2D page_table;
 };

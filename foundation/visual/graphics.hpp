@@ -137,6 +137,21 @@ struct block
 	virtual void input( const std::string&, const texture_type& ) = 0;
 	virtual void input( const std::string&, const texture_array_type& ) = 0;
 	virtual void input( const std::string&, u8, const buffer_type& ) = 0;
+
+	void input( const std::string& name, f64 x )
+	{
+		input( name, f32( x ) );
+	}
+
+	void input( const std::string& name, f64 x, f64 y )
+	{
+		input( name, f32( x ), f32( y ) );
+	}
+
+	void input( const std::string& name, f64 x, f64 y, f64 z )
+	{
+		input( name, f32( x ), f32( y ), f32( z ) );
+	}
 };
 
 typedef shared_ptr< block > block_type;
