@@ -147,7 +147,7 @@ pyramid_index::pyramid_index( u32 x_, u32 y_, u8 level_ )
 
 bool operator <( const pyramid_index& i, const pyramid_index& j )
 {
-	return i.x < j.x || ( i.x == j.x && i.y < j.y ) || ( i.y == j.y && i.level < j.level );
+	return i.x < j.x || ( i.x == j.x && ( i.y < j.y || ( i.y == j.y && i.level < j.level ) ) );
 }
 
 //--- page_cache -----------------------------------------------------------------------------------
