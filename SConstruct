@@ -16,7 +16,9 @@ path = join( output, variant )
 
 ### actions ########################################################################################
 actions = [
+	Delete( join( path, 'cache' ) ),
 	Mkdir( join( path, 'cache' ) ),
+	Delete( join( path, 'resource' ) ),
 	Copy( join( path, 'resource' ), 'resource' )
 ]
 
