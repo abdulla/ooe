@@ -2,6 +2,7 @@
 
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/maths/maths.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
@@ -14,10 +15,9 @@ const f32 height = 480;
 const u32 texture_size = 256;
 const image::type texture_format = image::rgb_u8;
 
-shader_type make_shader( const device_type& device, const std::string& root, shader::type type,
-	const std::string& name )
+shader_type make_shader( const device_type& device, const std::string& path, shader::type type )
 {
-	return device->shader( name, root + "../resource/glsl/" + name, type );
+	return device->shader( memory_vector( 1, descriptor( path ) ), type );
 }
 
 buffer_type point_buffer( const device_type& device )
@@ -109,8 +109,8 @@ template<>
 		library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, false );
 
 	shader_vector vector;
-	vector.push_back( make_shader( device, root, shader::vertex, "unit.vs" ) );
-	vector.push_back( make_shader( device, root, shader::fragment, "unit.fs" ) );
+	vector.push_back( make_shader( device, root + "../resource/glsl/unit.vs", shader::vertex ) );
+	vector.push_back( make_shader( device, root + "../resource/glsl/unit.fs", shader::fragment ) );
 	program_type program = device->program( vector );
 
 	const s32 array_size = device->limit( device::array_size );

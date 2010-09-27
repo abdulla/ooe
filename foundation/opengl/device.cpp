@@ -112,7 +112,7 @@ public:
 	virtual texture_array_type texture_array( u32, u32, u32, image::type ) const;
 	virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
 	virtual target_type target( u32, u32, image::type ) const;
-	virtual shader_type shader( const std::string&, const descriptor&, shader::type ) const;
+	virtual shader_type shader( const memory_vector&, shader::type ) const;
 	virtual program_type program( const shader_vector& ) const;
 	virtual frame_type default_frame( u32, u32 ) const;
 
@@ -302,10 +302,9 @@ target_type device::target( u32 width, u32 height, image::type format ) const
 	return new opengl::target( width, height, format );
 }
 
-shader_type device::
-	shader( const std::string& source, const descriptor& desc, shader::type type ) const
+shader_type device::shader( const memory_vector& vector, shader::type type ) const
 {
-	return new opengl::shader( source, desc, type );
+	return new opengl::shader( vector, type );
 }
 
 program_type device::program( const shader_vector& vector ) const

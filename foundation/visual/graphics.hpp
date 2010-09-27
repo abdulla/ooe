@@ -5,31 +5,20 @@
 
 #include <vector>
 
-#include "foundation/io/descriptor.hpp"
+#include "foundation/io/memory.hpp"
+#include "foundation/io/vfs.hpp"
 #include "foundation/image/image.hpp"
-#include "foundation/maths/maths.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- image_pyramid --------------------------------------------------------------------------------
-class OOE_VISIBLE image_pyramid
-{
-public:
-	const u32 width;
-	const u32 height;
-	const ooe::image::type format;
+class image_pyramid;
 
-	image_pyramid( const ooe::image& );
-	image_pyramid( u32, u32, ooe::image::type );
+template< u8 >
+	class matrix;
 
-	void push_back( const ooe::image& );
-	ooe::image image( u8 ) const;
-	u8 size( void ) const;
-	ooe::image::data_type operator []( u8 ) const;
-
-private:
-	std::vector< ooe::image::data_type > vector;
-};
+typedef matrix< 3 > mat3;
+typedef matrix< 4 > mat4;
+typedef std::vector< memory > memory_vector;
 
 //--- texture --------------------------------------------------------------------------------------
 struct texture
@@ -210,12 +199,46 @@ struct device
 	virtual buffer_type buffer
 		( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
 	virtual target_type target( u32, u32, image::type ) const = 0;
-	virtual shader_type shader( const std::string&, const descriptor&, shader::type ) const = 0;
+	virtual shader_type shader( const memory_vector&, shader::type ) const = 0;
 	virtual program_type program( const shader_vector& ) const = 0;
 	virtual frame_type default_frame( u32, u32 ) const = 0;
 };
 
 typedef shared_ptr< device > device_type;
+
+//--- image_pyramid --------------------------------------------------------------------------------
+class OOE_VISIBLE image_pyramid
+{
+public:
+	const u32 width;
+	const u32 height;
+	const ooe::image::type format;
+
+	image_pyramid( const ooe::image& );
+	image_pyramid( u32, u32, ooe::image::type );
+
+	void push_back( const ooe::image& );
+	ooe::image image( u8 ) const;
+	u8 size( void ) const;
+	ooe::image::data_type operator []( u8 ) const;
+
+private:
+	std::vector< ooe::image::data_type > vector;
+};
+
+//--- shader_include -------------------------------------------------------------------------------
+class OOE_VISIBLE shader_include
+{
+public:
+	shader_include( const device_type&, const ooe::vfs& );
+	void push_back( const std::string& );
+	shader_type compile( const std::string&, shader::type ) const;
+
+private:
+	const device_type& device;
+	const ooe::vfs& vfs;
+	memory_vector vector;
+};
 
 OOE_NAMESPACE_END( ( ooe ) )
 

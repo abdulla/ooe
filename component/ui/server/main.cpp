@@ -5,6 +5,7 @@
 #include "component/ui/text_layout.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/maths/maths.hpp"
 #include "foundation/parallel/thread_pool.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/view.hpp"
@@ -103,13 +104,8 @@ std::string process_events
 	return string;
 }
 
-shader_type make_shader( const device_type& device, const std::string& root, shader::type type,
-	const std::string& name )
-{
-	return device->shader( name, root + "../resource/glsl/" + name, type );
-}
-
-buffer_type point_buffer( const device_type& device )
+//--- make_point -----------------------------------------------------------------------------------
+buffer_type make_point( const device_type& device )
 {
 	buffer_type point = device->buffer( sizeof( f32 ) * 4 * 4, buffer::point );
 	{
@@ -143,7 +139,8 @@ buffer_type point_buffer( const device_type& device )
 	return point;
 }
 
-buffer_type index_buffer( const device_type& device )
+//--- make_index -----------------------------------------------------------------------------------
+buffer_type make_index( const device_type& device )
 {
 	buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
 	{
@@ -158,6 +155,21 @@ buffer_type index_buffer( const device_type& device )
 		value[ 5 ] = 3;
 	}
 	return index;
+}
+
+//--- make_shaders ---------------------------------------------------------------------------------
+shader_vector make_shaders( const device_type& device, const std::string& root )
+{
+	vfs vfs;
+	vfs.insert( root + "../resource/glsl", "/" );
+	shader_include include( device, vfs );
+	include.push_back( "virtual_texture.hs" );
+
+	shader_vector vector;
+	vector.push_back( include.compile( "null.vs", shader::vertex ) );
+	vector.push_back( include.compile( "font.fs", shader::fragment ) );
+	vector.push_back( include.compile( "virtual_texture.fs", shader::fragment ) );
+	return vector;
 }
 
 //--- launch ---------------------------------------------------------------------------------------
@@ -178,14 +190,11 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 	page_cache cache( device, pool, font_source.format(), font_source.page_size() );
 	virtual_texture vt( device, cache, font_source );
 
-	shader_vector vector;
-	vector.push_back( make_shader( device, root, shader::vertex, "null.vs" ) );
-	vector.push_back( make_shader( device, root, shader::fragment, "font.fs" ) );
-	vector.push_back( make_shader( device, root, shader::fragment, "virtual_texture.fs" ) );
+	shader_vector vector = make_shaders( device, root );
 	program_type program = device->program( vector );
 
-	buffer_type point = point_buffer( device );
-	block_type block = program->block( index_buffer( device ) );
+	buffer_type point = make_point( device );
+	block_type block = program->block( make_index( device ) );
 	vt.input( "vt", block );
 	block->input( "vertex", 2, point );
 	block->input( "coords", 2, point );

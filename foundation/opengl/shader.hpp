@@ -12,7 +12,7 @@ struct shader
 {
 	const u32 id;
 
-	shader( const std::string&, const descriptor&, type );
+	shader( const memory_vector&, type );
 	virtual ~shader( void );
 };
 

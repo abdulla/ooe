@@ -5,6 +5,12 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+//--- map ------------------------------------------------------------------------------------------
+map::map( void* data_, up_t size_ )
+	: data( data_ ), size( size_ )
+{
+}
+
 //--- image_pyramid --------------------------------------------------------------------------------
 image_pyramid::image_pyramid( const ooe::image& i )
 	: width( i.width ), height( i.height ), format( i.format ), vector( 1, i.ptr() )
@@ -47,10 +53,31 @@ image::data_type image_pyramid::operator []( u8 level ) const
 	return vector[ level ];
 }
 
-//--- map ------------------------------------------------------------------------------------------
-map::map( void* data_, up_t size_ )
-	: data( data_ ), size( size_ )
+//--- shader_include -------------------------------------------------------------------------------
+shader_include::shader_include( const device_type& device_, const ooe::vfs& vfs_ )
+	: device( device_ ), vfs( vfs_ ), vector()
 {
+}
+
+void shader_include::push_back( const std::string& path )
+{
+	vector.push_back( vfs[ path ] );
+}
+
+shader_type shader_include::compile( const std::string& path, shader::type type ) const
+{
+	memory_vector copy = vector;
+	copy.push_back( vfs[ path ] );
+
+	try
+	{
+		return device->shader( copy, type );
+	}
+	catch ( error::runtime& error )
+	{
+		throw error::runtime( "shader_include: " ) <<
+			"Unable to compile \"" << path << "\": " << error.what();
+	}
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

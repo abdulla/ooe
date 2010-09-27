@@ -7,7 +7,6 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-//--- get_stage ------------------------------------------------------------------------------------
 u32 get_stage( shader::type stage )
 {
 	switch ( stage )
@@ -23,18 +22,40 @@ u32 get_stage( shader::type stage )
 	}
 }
 
+const c8* stage_name( shader::type stage )
+{
+	switch ( stage )
+	{
+	case shader::vertex:
+		return "Vertex";
+
+	case shader::fragment:
+		return "Fragment";
+
+	default:
+		throw error::runtime( "opengl::shader: " ) << "Unknown shader type: " << stage;
+	}
+}
+
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- shader ---------------------------------------------------------------------------------------
-shader::shader( const std::string& name, const descriptor& desc, type stage )
+shader::shader( const memory_vector& vector, type stage )
+try
 	: id( CreateShader( get_stage( stage ) ) )
 {
-	memory memory( desc );
-	const c8* string = memory.as< c8 >();
-	s32 size = memory.size();
-	ShaderSource( id, 1, &string, &size );
+	std::vector< const c8* > data;
+	std::vector< s32 > size;
+
+	for ( memory_vector::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
+	{
+		data.push_back( i->as< c8 >() );
+		size.push_back( i->size() );
+	}
+
+	ShaderSource( id, vector.size(), &data[ 0 ], &size[ 0 ] );
 	CompileShader( id );
 
 	s32 status;
@@ -43,11 +64,15 @@ shader::shader( const std::string& name, const descriptor& desc, type stage )
 	if ( status )
 		return;
 
-	GetShaderiv( id, INFO_LOG_LENGTH, &size );
-	scoped_array< c8 > array( new c8[ size ] );
-	GetShaderInfoLog( id, size, 0, array );
-	throw error::runtime( "opengl::shader: " ) <<
-		"Unable to compile \"" << name << "\":\n" << array;
+	s32 length;
+	GetShaderiv( id, INFO_LOG_LENGTH, &length );
+	scoped_array< c8 > array( new c8[ length ] );
+	GetShaderInfoLog( id, length, 0, array );
+	throw error::runtime( "opengl::shader: " ) << stage_name( stage ) << " shader:\n" << array;
+}
+catch ( ... )
+{
+	this->~shader();
 }
 
 shader::~shader( void )
