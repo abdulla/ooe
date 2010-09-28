@@ -58,7 +58,7 @@ image_pyramid make_pyramid( const physical_source& source )
 	image_pyramid pyramid( make_image( table_size ) );
 
 	for ( u32 x = table_size >> 1; x; x >>= 1 )
-		pyramid.push_back( make_image( x ) );
+		pyramid.insert( make_image( x ) );
 
 	return pyramid;
 }

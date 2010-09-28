@@ -22,7 +22,7 @@ image_pyramid::image_pyramid( u32 width_, u32 height_, ooe::image::type format_ 
 {
 }
 
-void image_pyramid::push_back( const ooe::image& i )
+void image_pyramid::insert( const ooe::image& i )
 {
 	u32 level_width = width >> vector.size();
 	u32 level_height = height >> vector.size();
@@ -59,7 +59,7 @@ shader_include::shader_include( const device_type& device_, const ooe::vfs& vfs_
 {
 }
 
-void shader_include::push_back( const std::string& path )
+void shader_include::insert( const std::string& path )
 {
 	vector.push_back( vfs[ path ] );
 }

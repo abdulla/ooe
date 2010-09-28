@@ -217,7 +217,7 @@ public:
 	image_pyramid( const ooe::image& );
 	image_pyramid( u32, u32, ooe::image::type );
 
-	void push_back( const ooe::image& );
+	void insert( const ooe::image& );
 	ooe::image image( u8 ) const;
 	u8 size( void ) const;
 	ooe::image::data_type operator []( u8 ) const;
@@ -231,7 +231,7 @@ class OOE_VISIBLE shader_include
 {
 public:
 	shader_include( const device_type&, const ooe::vfs& );
-	void push_back( const std::string& );
+	void insert( const std::string& );
 	shader_type compile( const std::string&, shader::type ) const;
 
 private:

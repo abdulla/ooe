@@ -21,11 +21,11 @@ public:
 	~thread_unit( void )
 	{
 		state = false;
-		push_back( new task< void ( void ) >( function< void ( void ) >() ) );
+		insert( new task< void ( void ) >( function< void ( void ) >() ) );
 		thread.join();
 	}
 
-	void push_back( const task_type& task )
+	void insert( const task_type& task )
 	{
 		{
 			lock lock( mutex );
@@ -81,7 +81,7 @@ thread_pool::thread_pool( void )
 
 void thread_pool::insert( const task_type& task )
 {
-	vector[ index ].as< thread_unit >()->push_back( task );
+	vector[ index ].as< thread_unit >()->insert( task );
 	++index %= vector.size();
 }
 

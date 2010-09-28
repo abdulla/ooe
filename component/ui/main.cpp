@@ -163,7 +163,7 @@ shader_vector make_shaders( const device_type& device, const std::string& root )
 	vfs vfs;
 	vfs.insert( root + "../resource/glsl", "/" );
 	shader_include include( device, vfs );
-	include.push_back( "virtual_texture.hs" );
+	include.insert( "virtual_texture.hs" );
 
 	shader_vector vector;
 	vector.push_back( include.compile( "null.vs", shader::vertex ) );
