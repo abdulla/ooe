@@ -14,7 +14,7 @@ namespace
 		uncompressed_image image;
 
 		data( void )
-			: image( 16, 16, uncompressed_image::rgb_u8 )
+			: image( 16, 16, uncompressed_image::rgba_u8 )
 		{
 		}
 	};
@@ -36,14 +36,14 @@ namespace ooe
 
 			OOE_CHECK( "image.width == 16", image.width == 16 );
 			OOE_CHECK( "image.height == 16", image.height == 16 );
-			OOE_CHECK( "image.format == uncompressed_image::rgb_u8",
-				image.format == uncompressed_image::rgb_u8 );
+			OOE_CHECK( "image.format == uncompressed_image::rgba_u8",
+				image.format == uncompressed_image::rgba_u8 );
 			OOE_CHECK( "image.get()", image.get() );
-			OOE_CHECK( "image.channels() == 3", image.channels() == 3 );
+			OOE_CHECK( "image.channels() == 4", image.channels() == 4 );
 			OOE_CHECK( "image.channel_size() == 1", image.channel_size() == 1 );
-			OOE_CHECK( "image.pixel_size() == 3", image.pixel_size() == 3 );
-			OOE_CHECK( "image.row_size() == 48", image.row_size() == 48 );
-			OOE_CHECK( "image.byte_size() == 768", image.byte_size() == 768 );
+			OOE_CHECK( "image.pixel_size() == 4", image.pixel_size() == 4 );
+			OOE_CHECK( "image.row_size() == 64", image.row_size() == 64 );
+			OOE_CHECK( "image.byte_size() == 1024", image.byte_size() == 1024 );
 		}
 
 		template<>
