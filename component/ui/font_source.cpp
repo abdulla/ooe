@@ -9,10 +9,11 @@
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const image::type image_type = image::a_u8;
+const image::type image_type = image::rgba_u8;
 const u16 page_wide = 256;
 
 struct source_metric
@@ -65,24 +66,25 @@ void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x,
 	if ( x >= bitmap.metric.width || y >= bitmap.metric.height )
 		return;
 
-	u8* target = image.as< u8 >();
+	u8* target = image.as< u8 >() + 3 /* alpha */;
 	const u8* source = bitmap.data + x + y * bitmap.metric.width;
 
 	u32 width = std::min< u32 >( page_wide, bitmap.metric.width - x );
 	u32 height = std::min< u32 >( page_wide, bitmap.metric.height - y );
 
-	for ( u32 i = 0; i != height; ++i, target += image.width, source += bitmap.metric.width )
-		std::memcpy( target, source, width );
+	for ( u32 i = 0; i != height;
+		++i, target += image.row_size(), source += bitmap.metric.width )
+		skip_out( source, source + width, target, image.channels() );
 }
 
 void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
 {
-	u8* target = image.as< u8 >() + x + y * image.width;
+	u8* target = image.as< u8 >() + ( x + y * image.width ) * image.pixel_size() + 3 /* alpha */;
 	const u8* source = bitmap.data;
 
 	for ( u32 i = 0; i != bitmap.metric.height;
-		++i, target += image.width, source += bitmap.metric.width )
-		std::memcpy( target, source, bitmap.metric.width );
+		++i, target += image.row_size(), source += bitmap.metric.width )
+		skip_out( source, source + bitmap.metric.width, target, image.channels() );
 }
 
 const uncompressed_image& write_image( const uncompressed_image& image, const std::string& path )
