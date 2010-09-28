@@ -44,7 +44,6 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
 //--- event_queue ----------------------------------------------------------------------------------
 event_queue::event_queue( void )
-	: delta( false )
 {
 	if ( ![ NSApplication sharedApplication ] )
 		throw error::runtime( "executable: " ) << "Unable to initialise shared application";
@@ -74,14 +73,8 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	case NSLeftMouseDragged:
 	case NSRightMouseDragged:
 	case NSOtherMouseDragged:
-		CGGetLastMouseDelta( &event.motion.x, &event.motion.y );
-
-		if ( !delta )
-		{
-			delta = true;
-			return event::ignore;
-		}
-
+		event.motion.x = nsevent.locationInWindow.x;
+		event.motion.y = nsevent.locationInWindow.y;
 		return event::motion_flag;
 
 	case NSFlagsChanged:
@@ -106,20 +99,13 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 
 	case NSLeftMouseDown:
 	case NSLeftMouseUp:
-		event.button.value = 0;
-		event.button.press = nsevent.type == NSLeftMouseDown;
-		return event::button_flag;
-
 	case NSRightMouseDown:
 	case NSRightMouseUp:
-		event.button.value = 1;
-		event.button.press = nsevent.type == NSRightMouseDown;
-		return event::button_flag;
-
 	case NSOtherMouseDown:
 	case NSOtherMouseUp:
-		event.button.value = 2;
-		event.button.press = nsevent.type == NSOtherMouseDown;
+		event.button.value = nsevent.buttonNumber;
+		event.button.press = nsevent.type == NSLeftMouseDown || nsevent.type == NSRightMouseDown ||
+			nsevent.type == NSOtherMouseDown;
 		return event::button_flag;
 
 	default:

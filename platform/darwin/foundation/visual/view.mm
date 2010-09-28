@@ -6,18 +6,6 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/view.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
-
-void warp( NSWindow* window )
-{
-	NSRect rect = window.frame;
-	rect.origin.y = CGDisplayPixelsHigh( kCGDirectMainDisplay ) - rect.origin.y - rect.size.height;
-	CGPoint point = { rect.origin.x + rect.size.width / 2, rect.origin.y + rect.size.height / 2 };
-	CGWarpMouseCursorPosition( point );
-}
-
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
-
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
 //--- view_data ------------------------------------------------------------------------------------
@@ -41,7 +29,7 @@ view_data::view_data( const event_queue&, u16 width, u16 height, bool full )
 
 	if ( TransformProcessType( &serial, kProcessTransformToForegroundApplication ) ||
 		SetFrontProcess( &serial ) )
-		throw error::runtime( "view: " ) << "Unable to set process to foreground";
+		throw error::runtime( "view: " ) << "Unable to move process to foreground";
 
 	NSRect rect = { { 0, 0 }, { width, height } };
 	window = [ [ NSWindow alloc ] initWithContentRect: rect styleMask: NSTitledWindowMask
@@ -64,10 +52,6 @@ view_data::~view_data( void )
 view::view( const event_queue& queue, u16 width, u16 height, bool full )
 	: view_data( queue, width, height, full ), platform::view()
 {
-	warp( window );
-	CGAssociateMouseAndMouseCursorPosition( false );
-	CGDisplayHideCursor( kCGDirectMainDisplay );
-
 	if ( !full )
 		return;
 

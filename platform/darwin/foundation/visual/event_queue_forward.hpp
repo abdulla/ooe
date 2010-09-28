@@ -37,8 +37,6 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 class OOE_VISIBLE event_queue
 {
 protected:
-	mutable bool delta;
-
 	event_queue( void );
 };
 
