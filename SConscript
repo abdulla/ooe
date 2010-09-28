@@ -94,7 +94,7 @@ build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'python_host', 'component/python/host', 'executable python registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Executable( 'surrogate', 'component/registry/surrogate', 'executable registry' )
-build.Executable( 'ui', 'component/ui/server', 'executable maths ui' )
+build.Executable( 'ui', 'component/ui', 'executable maths visual' )
 
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
@@ -102,7 +102,6 @@ build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_pat
 build.Linkable( 'python', 'component/python', 'io', library_path = ooe.python.library_path,
 	configure = PythonConfigure )
 build.Linkable( 'registry', 'component/registry', 'ipc' )
-build.Linkable( 'ui', 'component/ui', 'visual' )
 
 #--- test ------------------------------------------------------------------------------------------
 build.Executable( 'registry_test', 'test/component/registry',

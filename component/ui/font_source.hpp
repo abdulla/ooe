@@ -16,7 +16,7 @@ class font_source
 public:
 	typedef tuple< u32, u32, font::metric > glyph_type;
 
-	font_source( font::face&, u32, const std::string& ) OOE_VISIBLE;
+	font_source( font::face&, u32, const std::string& );
 	virtual ~font_source( void );
 
 	virtual u32 size( void ) const;

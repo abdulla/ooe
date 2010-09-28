@@ -12,7 +12,7 @@ class null_source
 	: public physical_source
 {
 public:
-	null_source( u32 ) OOE_VISIBLE;
+	null_source( u32 );
 	virtual ~null_source( void );
 
 	virtual u32 size( void ) const;

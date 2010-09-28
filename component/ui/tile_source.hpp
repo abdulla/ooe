@@ -14,7 +14,7 @@ class tile_source
 	: public physical_source
 {
 public:
-	tile_source( const std::string&, const decoder_map& ) OOE_VISIBLE;
+	tile_source( const std::string&, const decoder_map& );
 	virtual ~tile_source( void );
 
 	virtual u32 size( void ) const;
