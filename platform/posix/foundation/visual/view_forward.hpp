@@ -23,16 +23,12 @@ class view_data
 {
 public:
 	const event_queue& queue;
-	u16 width;
-	u16 height;
 	up_t window;
 	mutable XVisualInfo* visual_info;
 
 protected:
-	view_data( const event_queue&, u16, u16 );
+	view_data( const event_queue& );
 	~view_data( void );
-
-	void warp( void );
 };
 
 class view
@@ -41,7 +37,6 @@ protected:
 	XRRScreenConfiguration* config;
 	u16 resize;
 	u16 rotate;
-	up_t cursor;
 
 	view( const event_queue&, bool );
 	~view( void );

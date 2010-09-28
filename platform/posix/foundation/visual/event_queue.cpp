@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include <cerrno>
 
 #include <poll.h>
@@ -17,7 +15,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
 //--- event_queue ----------------------------------------------------------------------------------
 event_queue::event_queue( void )
-	: display( XOpenDisplay( 0 ) ), wm_delete(), x(), y(), warp()
+	: display( XOpenDisplay( 0 ) ), wm_delete()
 {
 	if ( !display )
 		throw error::runtime( "view: " ) << "Unable to open display connection";
@@ -57,13 +55,8 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	switch ( xevent.type )
 	{
 	case MotionNotify:
-		event.motion.x = xevent.xmotion.x - x;
-		event.motion.y = xevent.xmotion.y - y;
-
-		if ( !event.motion.x && !event.motion.y )
-			return event::ignore;
-
-		warp();
+		event.motion.x = xevent.xmotion.x;
+		event.motion.y = xevent.xmotion.y;
 		return event::motion_flag;
 
 	case KeyPress:
