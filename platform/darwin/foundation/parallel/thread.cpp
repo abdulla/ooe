@@ -4,8 +4,8 @@
 
 namespace ooe
 {
-	void thread::yield( void )
-	{
-		pthread_yield_np();
-	}
+    void thread::yield( void )
+    {
+        pthread_yield_np();
+    }
 }

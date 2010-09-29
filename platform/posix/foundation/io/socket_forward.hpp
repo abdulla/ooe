@@ -10,12 +10,12 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
 class socket
-	: public ooe::descriptor
+    : public ooe::descriptor
 {
 protected:
-	socket( const descriptor& );
+    socket( const descriptor& );
 };
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )
 
-#endif	// OOE_PLATFORM_POSIX_FOUNDATION_IO_SOCKET_FORWARD_HPP
+#endif  // OOE_PLATFORM_POSIX_FOUNDATION_IO_SOCKET_FORWARD_HPP

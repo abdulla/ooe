@@ -16,364 +16,364 @@ exception_tuple get_exception( void );
 
 //--- make_capsule ---------------------------------------------------------------------------------
 inline PyObject* make_capsule
-	( void* pointer, const std::type_info& type, PyCapsule_Destructor gc = 0 )
+    ( void* pointer, const std::type_info& type, PyCapsule_Destructor gc = 0 )
 {
-	PyObject* object = valid( PyCapsule_New( pointer, 0, gc ) );
+    PyObject* object = valid( PyCapsule_New( pointer, 0, gc ) );
 
-	if ( PyCapsule_SetContext( object, const_cast< std::type_info* >( &type ) ) )
-		throw error::python() << "Unable to set context of capsule";
+    if ( PyCapsule_SetContext( object, const_cast< std::type_info* >( &type ) ) )
+        throw error::python() << "Unable to set context of capsule";
 
-	return object;
+    return object;
 }
 
 //--- get_pointer ----------------------------------------------------------------------------------
 inline void* get_pointer( PyObject* object, const std::type_info& type_x )
 {
-	if ( !PyCapsule_CheckExact( object ) )
-		throw error::python() << "Object is not a capsule";
+    if ( !PyCapsule_CheckExact( object ) )
+        throw error::python() << "Object is not a capsule";
 
-	void* type_info = PyCapsule_GetContext( object );
+    void* type_info = PyCapsule_GetContext( object );
 
-	if ( !type_info )
-		throw error::python() << "Object does not contain type information";
+    if ( !type_info )
+        throw error::python() << "Object does not contain type information";
 
-	const std::type_info& type_y = *static_cast< std::type_info* >( type_info );
+    const std::type_info& type_y = *static_cast< std::type_info* >( type_info );
 
-	if ( type_x != type_y )
-		throw error::python() << "Types do not match, \"" << demangle( type_x.name() ) <<
-			"\" != \"" << demangle( type_y.name() ) << '\"';
+    if ( type_x != type_y )
+        throw error::python() << "Types do not match, \"" << demangle( type_x.name() ) <<
+            "\" != \"" << demangle( type_y.name() ) << '\"';
 
-	return PyCapsule_GetPointer( object, 0 );
+    return PyCapsule_GetPointer( object, 0 );
 }
 
 //--- destroy --------------------------------------------------------------------------------------
 template< typename t >
-	void destroy( PyObject* object )
+    void destroy( PyObject* object )
 {
-	delete ptr_cast< t* >( PyCapsule_GetPointer( object, 0 ) );
+    delete ptr_cast< t* >( PyCapsule_GetPointer( object, 0 ) );
 }
 
 //--- traits: default ------------------------------------------------------------------------------
 template< typename NO_SPECIALISATION_DEFINED, typename = void >
-	struct as
+    struct as
 {
-	static void call( PyObject*, NO_SPECIALISATION_DEFINED ) OOE_CONST
-	{
-		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
-	}
+    static void call( PyObject*, NO_SPECIALISATION_DEFINED ) OOE_CONST
+    {
+        OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+    }
 };
 
 template< typename NO_SPECIALISATION_DEFINED, typename = void >
-	struct from
+    struct from
 {
-	static PyObject* call( NO_SPECIALISATION_DEFINED ) OOE_CONST
-	{
-		OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
-		return 0;
-	}
+    static PyObject* call( NO_SPECIALISATION_DEFINED ) OOE_CONST
+    {
+        OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
+        return 0;
+    }
 };
 
 //--- traits: empty --------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_empty< t > >::type >
+    struct as< t, typename enable_if< is_empty< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference )
-	{
-		if ( object != Py_None )
-			throw error::python() << "Object is not none";
-	}
+    static void call( PyObject* object, typename call_traits< t >::reference )
+    {
+        if ( object != Py_None )
+            throw error::python() << "Object is not none";
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_empty< t > >::type >
+    struct from< t, typename enable_if< is_empty< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type )
-	{
-		Py_RETURN_NONE;
-	}
+    static PyObject* call( typename call_traits< t >::param_type )
+    {
+        Py_RETURN_NONE;
+    }
 };
 
 //--- traits: boolean ------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< component::is_boolean< t > >::type >
+    struct as< t, typename enable_if< component::is_boolean< t > >::type >
 {
-	static void call( PyObject* object, bool& boolean )
-	{
-		if ( !PyBool_Check( object ) )
-			throw error::python() << "Object is not a boolean";
+    static void call( PyObject* object, bool& boolean )
+    {
+        if ( !PyBool_Check( object ) )
+            throw error::python() << "Object is not a boolean";
 
-		boolean = object == Py_True;
-	}
+        boolean = object == Py_True;
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< component::is_boolean< t > >::type >
+    struct from< t, typename enable_if< component::is_boolean< t > >::type >
 {
-	static PyObject* call( bool boolean )
-	{
-		if ( boolean )
-			Py_RETURN_TRUE;
-		else
-			Py_RETURN_FALSE;
-	}
+    static PyObject* call( bool boolean )
+    {
+        if ( boolean )
+            Py_RETURN_TRUE;
+        else
+            Py_RETURN_FALSE;
+    }
 };
 
 //--- traits: integral -----------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< component::is_integral< t > >::type >
+    struct as< t, typename enable_if< component::is_integral< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference integral )
-	{
-		if ( !PyLong_Check( object ) )
-			throw error::python() << "Object is not a integral number";
+    static void call( PyObject* object, typename call_traits< t >::reference integral )
+    {
+        if ( !PyLong_Check( object ) )
+            throw error::python() << "Object is not a integral number";
 
-		convert( object, integral );
-	}
+        convert( object, integral );
+    }
 
-	static void convert( PyObject* object, long& integral )
-	{
-		integral = PyLong_AsLong( object );
-	}
+    static void convert( PyObject* object, long& integral )
+    {
+        integral = PyLong_AsLong( object );
+    }
 
-	static void convert( PyObject* object, unsigned long& integral )
-	{
-		integral = PyLong_AsUnsignedLong( object );
-	}
+    static void convert( PyObject* object, unsigned long& integral )
+    {
+        integral = PyLong_AsUnsignedLong( object );
+    }
 
-	static void convert( PyObject* object, long long& integral )
-	{
-		integral = PyLong_AsLongLong( object );
-	}
+    static void convert( PyObject* object, long long& integral )
+    {
+        integral = PyLong_AsLongLong( object );
+    }
 
-	static void convert( PyObject* object, unsigned long long& integral )
-	{
-		integral = PyLong_AsUnsignedLongLong( object );
-	}
+    static void convert( PyObject* object, unsigned long long& integral )
+    {
+        integral = PyLong_AsUnsignedLongLong( object );
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< component::is_integral< t > >::type >
+    struct from< t, typename enable_if< component::is_integral< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type integral )
-	{
-		return valid( convert( integral ) );
-	}
+    static PyObject* call( typename call_traits< t >::param_type integral )
+    {
+        return valid( convert( integral ) );
+    }
 
-	static PyObject* convert( long integral )
-	{
-		return PyLong_FromLong( integral );
-	}
+    static PyObject* convert( long integral )
+    {
+        return PyLong_FromLong( integral );
+    }
 
-	static PyObject* convert( unsigned long integral )
-	{
-		return PyLong_FromUnsignedLong( integral );
-	}
+    static PyObject* convert( unsigned long integral )
+    {
+        return PyLong_FromUnsignedLong( integral );
+    }
 
-	static PyObject* convert( long long integral )
-	{
-		return PyLong_FromLongLong( integral );
-	}
+    static PyObject* convert( long long integral )
+    {
+        return PyLong_FromLongLong( integral );
+    }
 
-	static PyObject* convert( unsigned long long integral )
-	{
-		return PyLong_FromUnsignedLongLong( integral );
-	}
+    static PyObject* convert( unsigned long long integral )
+    {
+        return PyLong_FromUnsignedLongLong( integral );
+    }
 };
 
 //--- traits: floating-point -----------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< component::is_floating_point< t > >::type >
+    struct as< t, typename enable_if< component::is_floating_point< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference floating_point )
-	{
-		if ( !PyFloat_Check( object ) )
-			throw error::python() << "Object is not a floating-point number";
+    static void call( PyObject* object, typename call_traits< t >::reference floating_point )
+    {
+        if ( !PyFloat_Check( object ) )
+            throw error::python() << "Object is not a floating-point number";
 
-		floating_point = PyFloat_AS_DOUBLE( object );
-	}
+        floating_point = PyFloat_AS_DOUBLE( object );
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< component::is_floating_point< t > >::type >
+    struct from< t, typename enable_if< component::is_floating_point< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type floating_point )
-	{
-		return valid( PyFloat_FromDouble( floating_point ) );
-	}
+    static PyObject* call( typename call_traits< t >::param_type floating_point )
+    {
+        return valid( PyFloat_FromDouble( floating_point ) );
+    }
 };
 
 //--- traits: string -------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_string< t > >::type >
+    struct as< t, typename enable_if< is_string< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference string )
-	{
-		if ( !PyUnicode_Check( object ) )
-			throw error::python() << "Object is not a string";
+    static void call( PyObject* object, typename call_traits< t >::reference string )
+    {
+        if ( !PyUnicode_Check( object ) )
+            throw error::python() << "Object is not a string";
 
-		sp_t size;
-		const c8* data = _PyUnicode_AsStringAndSize( object, &size );
-		string = string_make< typename no_ref< t >::type >( data, size );
-	}
+        sp_t size;
+        const c8* data = _PyUnicode_AsStringAndSize( object, &size );
+        string = string_make< typename no_ref< t >::type >( data, size );
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_string< t > >::type >
+    struct from< t, typename enable_if< is_string< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type string )
-	{
-		return valid( PyUnicode_FromStringAndSize( string_data( string ), string_size( string ) ) );
-	}
+    static PyObject* call( typename call_traits< t >::param_type string )
+    {
+        return valid( PyUnicode_FromStringAndSize( string_data( string ), string_size( string ) ) );
+    }
 };
 
 //--- traits: pointer ------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< component::is_pointer< t > >::type >
+    struct as< t, typename enable_if< component::is_pointer< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference pointer )
-	{
-		pointer = ptr_cast< typename no_ref< t >::type >
-			( get_pointer( object, typeid( typename no_qual< t >::type ) ) );
-	}
+    static void call( PyObject* object, typename call_traits< t >::reference pointer )
+    {
+        pointer = ptr_cast< typename no_ref< t >::type >
+            ( get_pointer( object, typeid( typename no_qual< t >::type ) ) );
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< component::is_pointer< t > >::type >
+    struct from< t, typename enable_if< component::is_pointer< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type pointer )
-	{
-		return make_capsule( ptr_cast( pointer ), typeid( typename no_qual< t >::type ) );
-	}
+    static PyObject* call( typename call_traits< t >::param_type pointer )
+    {
+        return make_capsule( ptr_cast( pointer ), typeid( typename no_qual< t >::type ) );
+    }
 };
 
 //--- traits: class --------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< component::is_class< t > >::type >
+    struct as< t, typename enable_if< component::is_class< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference class_ )
-	{
-		typedef typename no_ref< t >::type type;
-		class_ = *ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
-	}
+    static void call( PyObject* object, typename call_traits< t >::reference class_ )
+    {
+        typedef typename no_ref< t >::type type;
+        class_ = *ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< component::is_class< t > >::type >
+    struct from< t, typename enable_if< component::is_class< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type class_ )
-	{
-		typedef typename no_ref< t >::type type;
-		return make_capsule( new type( class_ ), typeid( type ), destroy< type > );
-	}
+    static PyObject* call( typename call_traits< t >::param_type class_ )
+    {
+        typedef typename no_ref< t >::type type;
+        return make_capsule( new type( class_ ), typeid( type ), destroy< type > );
+    }
 };
 
 //--- traits: construct ----------------------------------------------------------------------------
 template< typename INVALID_USAGE >
-	struct as< INVALID_USAGE, typename enable_if< is_construct< INVALID_USAGE > >::type >
+    struct as< INVALID_USAGE, typename enable_if< is_construct< INVALID_USAGE > >::type >
 {
-	static void call( PyObject* object, INVALID_USAGE )
-	{
-		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
-	}
+    static void call( PyObject* object, INVALID_USAGE )
+    {
+        OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_construct< t > >::type >
+    struct from< t, typename enable_if< is_construct< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type construct )
-	{
-		typedef typename t::value_type type;
-		return make_capsule( construct, typeid( type ), destroy< type > );
-	}
+    static PyObject* call( typename call_traits< t >::param_type construct )
+    {
+        typedef typename t::value_type type;
+        return make_capsule( construct, typeid( type ), destroy< type > );
+    }
 };
 
 //--- traits: destruct -----------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_destruct< t > >::type >
+    struct as< t, typename enable_if< is_destruct< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference destruct )
-	{
-		typedef typename t::value_type type;
-		destruct = ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
+    static void call( PyObject* object, typename call_traits< t >::reference destruct )
+    {
+        typedef typename t::value_type type;
+        destruct = ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
 
-		if (PyCapsule_SetDestructor( object, 0 ) )
-			throw error::python() << "Unable to set destructor of capsule";
+        if (PyCapsule_SetDestructor( object, 0 ) )
+            throw error::python() << "Unable to set destructor of capsule";
 
-		if ( PyCapsule_SetContext( object, 0 ) )
-			throw error::python() << "Unable to set context of capsule";
-	}
+        if ( PyCapsule_SetContext( object, 0 ) )
+            throw error::python() << "Unable to set context of capsule";
+    }
 };
 
 template< typename INVALID_USAGE >
-	struct from< INVALID_USAGE, typename enable_if< is_destruct< INVALID_USAGE > >::type >
+    struct from< INVALID_USAGE, typename enable_if< is_destruct< INVALID_USAGE > >::type >
 {
-	static PyObject* call( INVALID_USAGE )
-	{
-		OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
-		return 0;
-	}
+    static PyObject* call( INVALID_USAGE )
+    {
+        OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
+        return 0;
+    }
 };
 
 //--- traits: array --------------------------------------------------------------------------------
 template< typename t >
-	struct as< t, typename enable_if< is_array< t > >::type >
+    struct as< t, typename enable_if< is_array< t > >::type >
 {
-	static void call( PyObject* object, typename call_traits< t >::reference array )
-	{
-		if ( !PyList_Check( object ) )
-			throw error::python() << "Object is not a list";
+    static void call( PyObject* object, typename call_traits< t >::reference array )
+    {
+        if ( !PyList_Check( object ) )
+            throw error::python() << "Object is not a list";
 
-		typedef typename no_ref< t >::type type;
-		up_t py_size = PyList_GET_SIZE( object );
-		up_t array_size = extent< type >::value;
+        typedef typename no_ref< t >::type type;
+        up_t py_size = PyList_GET_SIZE( object );
+        up_t array_size = extent< type >::value;
 
-		if ( py_size != array_size )
-			throw error::python() << "Array in python is of size " << py_size <<
-				", array is of size " << array_size;
+        if ( py_size != array_size )
+            throw error::python() << "Array in python is of size " << py_size <<
+                ", array is of size " << array_size;
 
-		for ( up_t i = 0; i != array_size; ++i )
-			as< typename remove_extent< type >::type >::
-				call( PyList_GET_ITEM( object, i ), array[ i ] );
-	}
+        for ( up_t i = 0; i != array_size; ++i )
+            as< typename remove_extent< type >::type >::
+                call( PyList_GET_ITEM( object, i ), array[ i ] );
+    }
 };
 
 template< typename t >
-	struct from< t, typename enable_if< is_array< t > >::type >
+    struct from< t, typename enable_if< is_array< t > >::type >
 {
-	static PyObject* call( typename call_traits< t >::param_type array )
-	{
-		typedef typename no_ref< t >::type type;
-		up_t array_size = extent< type >::value;
-		python::object object = valid( PyList_New( array_size ) );
+    static PyObject* call( typename call_traits< t >::param_type array )
+    {
+        typedef typename no_ref< t >::type type;
+        up_t array_size = extent< type >::value;
+        python::object object = valid( PyList_New( array_size ) );
 
-		for ( up_t i = 0; i != array_size; ++i )
-			PyList_SET_ITEM( object, i,
-				from< typename remove_extent< type >::type >::call( array[ i ] ) );
+        for ( up_t i = 0; i != array_size; ++i )
+            PyList_SET_ITEM( object, i,
+                from< typename remove_extent< type >::type >::call( array[ i ] ) );
 
-		return object.release();
-	}
+        return object.release();
+    }
 };
 
 //--- get_exception --------------------------------------------------------------------------------
 inline exception_tuple get_exception( void )
 {
-	object py_type;
-	object py_value;
-	object py_backtrace;
-	PyErr_Fetch( &py_type, &py_value, &py_backtrace );
-	PyErr_NormalizeException( &py_type, &py_value, &py_backtrace );
+    object py_type;
+    object py_value;
+    object py_backtrace;
+    PyErr_Fetch( &py_type, &py_value, &py_backtrace );
+    PyErr_NormalizeException( &py_type, &py_value, &py_backtrace );
 
-	object str_value = py_value.str();
-	object str_backtrace = py_value.str();
+    object str_value = py_value.str();
+    object str_backtrace = py_value.str();
 
-	std::string value;
-	std::string backtrace;
-	as< std::string >::call( str_value, value );
-	as< std::string >::call( str_backtrace, backtrace );
+    std::string value;
+    std::string backtrace;
+    as< std::string >::call( str_value, value );
+    as< std::string >::call( str_backtrace, backtrace );
 
-	return exception_tuple( value, backtrace );
+    return exception_tuple( value, backtrace );
 }
 
 OOE_NAMESPACE_END( ( ooe )( python ) )
 
-#endif	// OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP
+#endif  // OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP

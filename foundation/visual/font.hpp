@@ -13,70 +13,70 @@ OOE_NAMESPACE_BEGIN( ( ooe )( font ) )
 
 //--- library --------------------------------------------------------------------------------------
 struct OOE_VISIBLE library
-	: private noncopyable
+    : private noncopyable
 {
 public:
-	library( void );
-	~library( void );
+    library( void );
+    ~library( void );
 
 private:
-	FT_Library freetype;
+    FT_Library freetype;
 
-	friend class face;
+    friend class face;
 };
 
 //--- metric ---------------------------------------------------------------------------------------
 struct metric
 {
-	s32 left;
-	s32 top;
-	u32 x;
-	u32 y;
-	u32 width;
-	u32 height;
+    s32 left;
+    s32 top;
+    u32 x;
+    u32 y;
+    u32 width;
+    u32 height;
 
-	metric( s32, s32, u32, u32, u32, u32 );
+    metric( s32, s32, u32, u32, u32, u32 );
 };
 
 //--- bitmap ---------------------------------------------------------------------------------------
 struct bitmap
 {
-	font::metric metric;
-	const u8* data;
+    font::metric metric;
+    const u8* data;
 
-	bitmap( const font::metric&, const u8* );
+    bitmap( const font::metric&, const u8* );
 };
 
 //--- face -----------------------------------------------------------------------------------------
 class OOE_VISIBLE face
-	: private noncopyable
+    : private noncopyable
 {
 public:
-	enum string_type
-	{
-		family,
-		style
-	};
+    enum string_type
+    {
+        family,
+        style
+    };
 
-	enum number_type
-	{
-		glyphs,
-		strikes,
-		first
-	};
+    enum number_type
+    {
+        glyphs,
+        strikes,
+        first
+    };
 
-	face( const library&, const descriptor& );
-	~face( void );
+    face( const library&, const descriptor& );
+    ~face( void );
 
-	std::string string( string_type ) const;
-	u32 number( number_type ) const;
-	bitmap character( up_t, u32 );
+    std::string string( string_type ) const;
+    u32 number( number_type ) const;
+    bitmap character( up_t, u32 );
 
 private:
-	ooe::memory memory;
-	FT_Face face_;
+    ooe::memory memory;
+    FT_Face face_;
 };
 
 OOE_NAMESPACE_END( ( ooe )( font ) )
 
-#endif	// OOE_FOUNDATION_VISUAL_FONT_HPP
+#endif  // OOE_FOUNDATION_VISUAL_FONT_HPP

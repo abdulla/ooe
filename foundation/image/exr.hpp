@@ -8,11 +8,11 @@
 
 namespace ooe
 {
-	namespace exr
-	{
-		uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
-		uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
-	}
+    namespace exr
+    {
+        uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
+        uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
+    }
 }
 
-#endif	// OOE_FOUNDATION_IMAGE_EXR_HPP
+#endif  // OOE_FOUNDATION_IMAGE_EXR_HPP

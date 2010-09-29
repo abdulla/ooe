@@ -16,47 +16,47 @@ typedef tuple< s32 /* in */, s32 /* out */, s32 /* error */ > io_triplet;
 //--- fork_id --------------------------------------------------------------------------------------
 struct fork_id
 {
-	pid_t pid;
+    pid_t pid;
 
-	fork_id( void );
-	fork_id( const io_triplet& );
+    fork_id( void );
+    fork_id( const io_triplet& );
 };
 
 //--- fork_io --------------------------------------------------------------------------------------
 class OOE_VISIBLE fork_io
 {
 public:
-	enum wait_type
-	{
-		failure,
-		success,
-		waiting
-	};
+    enum wait_type
+    {
+        failure,
+        success,
+        waiting
+    };
 
-	fork_io( void );
-	fork_io( const io_triplet& );
-	~fork_io( void );
+    fork_io( void );
+    fork_io( const io_triplet& );
+    ~fork_io( void );
 
-	wait_type wait( bool = true ) const;
-	void signal( s32 ) const;
-	bool is_child( void ) const;
+    wait_type wait( bool = true ) const;
+    void signal( s32 ) const;
+    bool is_child( void ) const;
 
-	static void execute( const std::string&, ... ) OOE_NORETURN OOE_SENTINEL;
-	static void exit( bool ) OOE_NORETURN;
+    static void execute( const std::string&, ... ) OOE_NORETURN OOE_SENTINEL;
+    static void exit( bool ) OOE_NORETURN;
 
 private:
-	shared_ptr< const fork_id > id;
+    shared_ptr< const fork_id > id;
 };
 
 //--- scoped_fork ----------------------------------------------------------------------------------
 struct OOE_VISIBLE scoped_fork
-	: public fork_io
+    : public fork_io
 {
-	scoped_fork( void );
-	scoped_fork( const io_triplet& );
-	~scoped_fork( void );
+    scoped_fork( void );
+    scoped_fork( const io_triplet& );
+    ~scoped_fork( void );
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_EXECUTABLE_FORK_IO_HPP
+#endif  // OOE_FOUNDATION_EXECUTABLE_FORK_IO_HPP

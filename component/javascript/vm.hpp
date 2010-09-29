@@ -13,21 +13,21 @@ OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 class OOE_VISIBLE vm
 {
 public:
-	typedef void ( * function_type )( v8::Handle< v8::Object > );
+    typedef void ( * function_type )( v8::Handle< v8::Object > );
 
-	vm( void );
-	~vm( void );
+    vm( void );
+    ~vm( void );
 
-	void load( const std::string&, const descriptor& );
-	void collect( void );
+    void load( const std::string&, const descriptor& );
+    void collect( void );
 
-	up_t size( void ) const;
-	std::string version( void ) const;
+    up_t size( void ) const;
+    std::string version( void ) const;
 
-	void setup( function_type );
+    void setup( function_type );
 
 private:
-	v8::Persistent< v8::Context > context;
+    v8::Persistent< v8::Context > context;
 };
 
 //--- object_instance ------------------------------------------------------------------------------
@@ -35,4 +35,4 @@ v8::Handle< v8::Object > make_object( void*, const std::type_info& ) OOE_VISIBLE
 
 OOE_NAMESPACE_END( ( ooe )( javascript ) )
 
-#endif	// OOE_COMPONENT_JAVASCRIPT_VM_HPP
+#endif  // OOE_COMPONENT_JAVASCRIPT_VM_HPP

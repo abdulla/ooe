@@ -9,4 +9,4 @@ void inject( void*, void* );
 
 OOE_NAMESPACE_END( ( ooe )( mock ) )
 
-#endif	// OOE_TEST_MOCK_INJECT_HPP
+#endif  // OOE_TEST_MOCK_INJECT_HPP

@@ -6,5 +6,5 @@ varying vec2 texcoord;
 
 void main( void )
 {
-	gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );
+    gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );
 }

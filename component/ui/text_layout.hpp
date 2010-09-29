@@ -11,16 +11,16 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 class text_layout
 {
 public:
-	text_layout( const device_type&, virtual_texture&, const font_source& );
+    text_layout( const device_type&, virtual_texture&, const font_source& );
 
-	block_type block( const program_type&, const std::string&, u8 );
+    block_type block( const program_type&, const std::string&, u8 );
 
 private:
-	const device_type& device;
-	virtual_texture& vt;
-	const font_source& source;
+    const device_type& device;
+    virtual_texture& vt;
+    const font_source& source;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_COMPONENT_UI_TEXT_LAYOUT_HPP
+#endif  // OOE_COMPONENT_UI_TEXT_LAYOUT_HPP

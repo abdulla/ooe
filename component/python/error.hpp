@@ -8,18 +8,18 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( error ) )
 
 struct OOE_VISIBLE python
-	: virtual public runtime
+    : virtual public runtime
 {
-	python( void )
-		: runtime( "python: " )
-	{
-	}
+    python( void )
+        : runtime( "python: " )
+    {
+    }
 
-	virtual ~python( void ) throw()
-	{
-	}
+    virtual ~python( void ) throw()
+    {
+    }
 };
 
 OOE_NAMESPACE_END( ( ooe )( error ) )
 
-#endif	// OOE_COMPONENT_PYTHON_ERROR_HPP
+#endif  // OOE_COMPONENT_PYTHON_ERROR_HPP

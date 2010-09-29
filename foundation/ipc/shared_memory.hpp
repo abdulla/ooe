@@ -11,56 +11,56 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 class shared_memory_base
 {
 public:
-	std::string name( void ) const OOE_VISIBLE;
-	void unlink( void ) OOE_VISIBLE;
+    std::string name( void ) const OOE_VISIBLE;
+    void unlink( void ) OOE_VISIBLE;
 
 protected:
-	shared_memory_base( const std::string&, bool );
-	~shared_memory_base( void );
+    shared_memory_base( const std::string&, bool );
+    ~shared_memory_base( void );
 
 private:
-	std::string name_;
-	bool unlinkable;
+    std::string name_;
+    bool unlinkable;
 };
 
 //--- shared_memory --------------------------------------------------------------------------------
 struct OOE_VISIBLE shared_memory
-	: public shared_memory_base, public descriptor, public ooe::memory
+    : public shared_memory_base, public descriptor, public ooe::memory
 {
-	enum type
-	{
-		open,
-		create
-	};
+    enum type
+    {
+        open,
+        create
+    };
 
-	shared_memory( const std::string&, type = open, up_t = 0 );
-	shared_memory( const std::string&, const ooe::descriptor& );
-	~shared_memory( void );
+    shared_memory( const std::string&, type = open, up_t = 0 );
+    shared_memory( const std::string&, const ooe::descriptor& );
+    ~shared_memory( void );
 
-	using memory::get;
-	using memory::size;
+    using memory::get;
+    using memory::size;
 };
 
 //--- locked_memory --------------------------------------------------------------------------------
 struct OOE_VISIBLE locked_memory
-	: public shared_memory
+    : public shared_memory
 {
-	locked_memory( const std::string&, type = open, up_t = 0 );
-	~locked_memory( void );
+    locked_memory( const std::string&, type = open, up_t = 0 );
+    ~locked_memory( void );
 };
 
 //--- memory_lock ----------------------------------------------------------------------------------
 class OOE_VISIBLE memory_lock
-	: private noncopyable
+    : private noncopyable
 {
 public:
-	memory_lock( shared_memory& );
-	~memory_lock( void );
+    memory_lock( shared_memory& );
+    ~memory_lock( void );
 
 private:
-	shared_memory& memory;
+    shared_memory& memory;
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
 
-#endif	// OOE_FOUNDATION_IPC_SHARED_MEMORY_HPP
+#endif  // OOE_FOUNDATION_IPC_SHARED_MEMORY_HPP

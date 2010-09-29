@@ -6,29 +6,29 @@
 
 namespace
 {
-	using namespace ooe;
+    using namespace ooe;
 
-	bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
-	{
-		javascript::vm vm;
-		vm.setup( javascript::component_setup );
+    bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
+    {
+        javascript::vm vm;
+        vm.setup( javascript::component_setup );
 
-		for ( s32 i = 1; i < argc; ++i )
-		{
-			const c8* name = std::strrchr( argv[ i ], '/' );
+        for ( s32 i = 1; i < argc; ++i )
+        {
+            const c8* name = std::strrchr( argv[ i ], '/' );
 
-			if ( !name )
-				continue;
+            if ( !name )
+                continue;
 
-			vm.load( name + 1, descriptor( argv[ i ] ) );
-		}
+            vm.load( name + 1, descriptor( argv[ i ] ) );
+        }
 
-		return true;
-	}
+        return true;
+    }
 }
 
 //--- main ---------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )
 {
-	return executable::launch( launch, argc, argv );
+    return executable::launch( launch, argc, argv );
 }

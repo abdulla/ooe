@@ -8,14 +8,14 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 struct shader
-	: public ooe::shader
+    : public ooe::shader
 {
-	const u32 id;
+    const u32 id;
 
-	shader( const memory_vector&, type );
-	virtual ~shader( void );
+    shader( const memory_vector&, type );
+    virtual ~shader( void );
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_SHADER_HPP
+#endif  // OOE_FOUNDATION_OPENGL_SHADER_HPP

@@ -7,24 +7,24 @@
 
 namespace ooe
 {
-	namespace error
-	{
-		struct io;
-	}
+    namespace error
+    {
+        struct io;
+    }
 
-	struct OOE_VISIBLE error::io
-		: virtual public runtime
-	{
-		io( const c8* string_ )
-			: runtime( "io: " )
-		{
-			*this << string_;
-		}
+    struct OOE_VISIBLE error::io
+        : virtual public runtime
+    {
+        io( const c8* string_ )
+            : runtime( "io: " )
+        {
+            *this << string_;
+        }
 
-		virtual ~io( void ) throw()
-		{
-		}
-	};
+        virtual ~io( void ) throw()
+        {
+        }
+    };
 }
 
-#endif	// OOE_FOUNDATION_IO_ERROR_HPP
+#endif  // OOE_FOUNDATION_IO_ERROR_HPP

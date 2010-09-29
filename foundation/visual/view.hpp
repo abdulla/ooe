@@ -9,24 +9,24 @@
 
 namespace ooe
 {
-	struct event_queue;
+    struct event_queue;
 
 //--- view_data ----------------------------------------------------------------
-	class view_data
-		: private noncopyable, public platform::view_data
-	{
-	protected:
-		view_data( const event_queue&, u16, u16, bool );
-		~view_data( void );
-	};
+    class view_data
+        : private noncopyable, public platform::view_data
+    {
+    protected:
+        view_data( const event_queue&, u16, u16, bool );
+        ~view_data( void );
+    };
 
 //--- view ---------------------------------------------------------------------
-	struct OOE_VISIBLE view
-		: public view_data, private platform::view
-	{
-		view( const event_queue&, u16, u16, bool );
-		~view( void );
-	};
+    struct OOE_VISIBLE view
+        : public view_data, private platform::view
+    {
+        view( const event_queue&, u16, u16, bool );
+        ~view( void );
+    };
 }
 
-#endif	// OOE_FOUNDATION_VISUAL_VIEW_HPP
+#endif  // OOE_FOUNDATION_VISUAL_VIEW_HPP

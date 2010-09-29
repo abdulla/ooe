@@ -17,15 +17,15 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 template<>
 template<>
-	void fixture_type::test< 0 >( anonymous_t& )
+    void fixture_type::test< 0 >( anonymous_t& )
 {
-	std::cerr << "mapping the same shared memory region twice\n";
+    std::cerr << "mapping the same shared memory region twice\n";
 
-	const char path[] = "/ooe.test.shared-memory";
-	ipc::shared_memory memory_1( path, ipc::shared_memory::create, executable::static_page_size );
-	ipc::shared_memory memory_2( path );
+    const char path[] = "/ooe.test.shared-memory";
+    ipc::shared_memory memory_1( path, ipc::shared_memory::create, executable::static_page_size );
+    ipc::shared_memory memory_2( path );
 
-	OOE_CHECK( "memory_1 != memory_2", memory_1.get() != memory_2.get() );
+    OOE_CHECK( "memory_1 != memory_2", memory_1.get() != memory_2.get() );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

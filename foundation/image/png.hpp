@@ -8,13 +8,13 @@
 
 namespace ooe
 {
-	namespace png
-	{
-		uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
-		uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
+    namespace png
+    {
+        uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
+        uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
 
-		void encode( const uncompressed_image&, const descriptor& ) OOE_VISIBLE;
-	}
+        void encode( const uncompressed_image&, const descriptor& ) OOE_VISIBLE;
+    }
 }
 
-#endif	// OOE_FOUNDATION_IMAGE_PNG_HPP
+#endif  // OOE_FOUNDATION_IMAGE_PNG_HPP

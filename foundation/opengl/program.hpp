@@ -8,19 +8,19 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 struct program
-	: public ooe::program
+    : public ooe::program
 {
-	const u32 id;
+    const u32 id;
 
-	program( const shader_vector& );
-	virtual ~program( void );
+    program( const shader_vector& );
+    virtual ~program( void );
 
-	virtual block_type block( const buffer_type& ) const;
-	virtual frame_type frame( u32, u32 ) const;
+    virtual block_type block( const buffer_type& ) const;
+    virtual frame_type frame( u32, u32 ) const;
 };
 
 void check_program( u32 );
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_PROGRAM_HPP
+#endif  // OOE_FOUNDATION_OPENGL_PROGRAM_HPP

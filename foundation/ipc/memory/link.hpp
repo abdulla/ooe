@@ -17,60 +17,60 @@ class server;
 class link_listen
 {
 public:
-	link_listen( const std::string& );
-	~link_listen( void );
+    link_listen( const std::string& );
+    ~link_listen( void );
 
-	ooe::socket accept( void ) const;
+    ooe::socket accept( void ) const;
 
 private:
-	mutable std::string path;
-	ooe::listen listen;
+    mutable std::string path;
+    ooe::listen listen;
 };
 
 //--- link_server ----------------------------------------------------------------------------------
 class link_server
 {
 public:
-	enum type
-	{
-		idle,
-		work,
-		move
-	};
+    enum type
+    {
+        idle,
+        work,
+        move
+    };
 
-	link_server( const ooe::socket&, link_t, server& );
-	~link_server( void );
+    link_server( const ooe::socket&, link_t, server& );
+    ~link_server( void );
 
-	void migrate( ooe::socket& );
+    void migrate( ooe::socket& );
 
 private:
-	ooe::socket socket;
-	socket_pair pair;
+    ooe::socket socket;
+    socket_pair pair;
 
-	const link_t link;
-	atom< type > state;
-	ooe::thread thread;
+    const link_t link;
+    atom< type > state;
+    ooe::thread thread;
 
-	void* main( void* );
+    void* main( void* );
 };
 
 //--- link_client ----------------------------------------------------------------------------------
 class link_client
 {
 public:
-	link_client( const std::string&, transport& );
-	~link_client( void );
+    link_client( const std::string&, transport& );
+    ~link_client( void );
 
-	operator bool( void ) const;
+    operator bool( void ) const;
 
 private:
-	ooe::connect connect;
-	atom< bool > state;
-	ooe::thread thread;
+    ooe::connect connect;
+    atom< bool > state;
+    ooe::thread thread;
 
-	void* main( void* );
+    void* main( void* );
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_LINK_HPP
+#endif  // OOE_FOUNDATION_IPC_MEMORY_LINK_HPP

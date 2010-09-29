@@ -11,26 +11,26 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 class OOE_VISIBLE client
 {
 public:
-	client( const std::string& );
-	~client( void );
+    client( const std::string& );
+    ~client( void );
 
-	operator memory::transport&( void );
+    operator memory::transport&( void );
 
 private:
-	typedef scoped_ptr< memory::transport > transport_ptr;
-	typedef scoped_ptr< memory::link_client > link_ptr;
+    typedef scoped_ptr< memory::transport > transport_ptr;
+    typedef scoped_ptr< memory::link_client > link_ptr;
 
-	transport_ptr transport;
-	link_ptr link_client;
+    transport_ptr transport;
+    link_ptr link_client;
 };
 
 //--- client_data ----------------------------------------------------------------------------------
 struct OOE_PACKED client_data
 {
-	link_t link;
-	c8 name[ transport::private_size - sizeof( link_t ) ];
+    link_t link;
+    c8 name[ transport::private_size - sizeof( link_t ) ];
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP
+#endif  // OOE_FOUNDATION_IPC_MEMORY_CLIENT_HPP

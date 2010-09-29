@@ -8,30 +8,30 @@
 #include "foundation/utility/macro.hpp"
 
 #ifdef __OBJC__
-	@class Sight;
+    @class Sight;
 #else
-	struct Sight;
+    struct Sight;
 #endif
 
 namespace ooe
 {
-	namespace platform
-	{
-		class sight;
-	}
+    namespace platform
+    {
+        class sight;
+    }
 
-	class platform::sight
-	{
-	protected:
-		typedef function< void ( const u8* ) > call_type;
+    class platform::sight
+    {
+    protected:
+        typedef function< void ( const u8* ) > call_type;
 
-		sight( const call_type&, u16, u16 );
-		~sight( void ) OOE_VISIBLE;
+        sight( const call_type&, u16, u16 );
+        ~sight( void ) OOE_VISIBLE;
 
-	private:
-		call_type call;
-		Sight* id;
-	};
+    private:
+        call_type call;
+        Sight* id;
+    };
 }
 
-#endif	// OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_SIGHT_FORWARD_HPP
+#endif  // OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_SIGHT_FORWARD_HPP

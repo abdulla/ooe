@@ -11,23 +11,23 @@
 
 namespace ooe
 {
-	typedef tuple< std::time_t /* seconds */, std::time_t /* nanoseconds */ > epoch_t;
+    typedef tuple< std::time_t /* seconds */, std::time_t /* nanoseconds */ > epoch_t;
 
-	class OOE_VISIBLE timer
-	{
-	public:
-		timer( void );
+    class OOE_VISIBLE timer
+    {
+    public:
+        timer( void );
 
-		f32 update( void );
-		f32 elapsed( void ) const;
-		epoch_t get( void ) const;
+        f32 update( void );
+        f32 elapsed( void ) const;
+        epoch_t get( void ) const;
 
-		static epoch_t epoch( void );
-		static epoch_t sleep( epoch_t );
+        static epoch_t epoch( void );
+        static epoch_t sleep( epoch_t );
 
-	private:
-		epoch_t time;
-	};
+    private:
+        epoch_t time;
+    };
 }
 
-#endif	// OOE_FOUNDATION_EXECUTABLE_TIMER_HPP
+#endif  // OOE_FOUNDATION_EXECUTABLE_TIMER_HPP

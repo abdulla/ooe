@@ -13,4 +13,4 @@ using boost::noncopyable;
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_UTILITY_NONCOPYABLE_HPP
+#endif  // OOE_FOUNDATION_UTILITY_NONCOPYABLE_HPP

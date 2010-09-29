@@ -3,7 +3,7 @@
 EXTENSION=`echo "$@" | awk -F ' ' '{ printf $NF }' | cut -d . -f 2`
 
 if [ "$EXTENSION" = 'mm' ]; then
-	exec g++ $@
+    exec g++ $@
 else
-	exec g++-4 $@
+    exec g++-4 $@
 fi

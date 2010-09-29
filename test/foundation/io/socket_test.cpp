@@ -15,34 +15,34 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 class setup
 {
 public:
-	setup( void )
-		: pair( make_pair() ), poll( make_pair() )
-	{
-		u32 value = 0xdeadbeef;
-		descriptor desc( _PATH_TMP "test-file", descriptor::read_write | descriptor::truncate );
-		file( desc ).write( &value, sizeof( value ) );
-		pair._0.send( desc );
-	}
+    setup( void )
+        : pair( make_pair() ), poll( make_pair() )
+    {
+        u32 value = 0xdeadbeef;
+        descriptor desc( _PATH_TMP "test-file", descriptor::read_write | descriptor::truncate );
+        file( desc ).write( &value, sizeof( value ) );
+        pair._0.send( desc );
+    }
 
-	descriptor receive( void )
-	{
-		return pair._1.receive();
-	}
+    descriptor receive( void )
+    {
+        return pair._1.receive();
+    }
 
-	socket get( void ) const
-	{
-		return poll._1;
-	}
+    socket get( void ) const
+    {
+        return poll._1;
+    }
 
-	void* shutdown( void* )
-	{
-		poll._1.shutdown( socket::read );
-		return 0;
-	}
+    void* shutdown( void* )
+    {
+        poll._1.shutdown( socket::read );
+        return 0;
+    }
 
 private:
-	socket_pair pair;
-	socket_pair poll;
+    socket_pair pair;
+    socket_pair poll;
 };
 
 typedef unit::group< setup, anonymous_t, 3 > group_type;
@@ -55,43 +55,43 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 template<>
 template<>
-	void fixture_type::test< 0 >( setup& setup )
+    void fixture_type::test< 0 >( setup& setup )
 {
-	std::cerr << "send/receive descriptor\n";
+    std::cerr << "send/receive descriptor\n";
 
-	u32 value;
-	file file( setup.receive() );
-	file.seek( 0, file::begin );
-	file.read( &value, sizeof( value ) );
+    u32 value;
+    file file( setup.receive() );
+    file.seek( 0, file::begin );
+    file.read( &value, sizeof( value ) );
 
-	OOE_CHECK( "value == 0xdeadbeef", value == 0xdeadbeef );
+    OOE_CHECK( "value == 0xdeadbeef", value == 0xdeadbeef );
 }
 
 template<>
 template<>
-	void fixture_type::test< 1 >( setup& setup )
+    void fixture_type::test< 1 >( setup& setup )
 {
-	std::cerr << "poll on shutdown\n";
+    std::cerr << "poll on shutdown\n";
 
-	socket poll_socket( setup.get() );
-	thread thread( make_function( setup, &setup::shutdown ), 0 );
+    socket poll_socket( setup.get() );
+    thread thread( make_function( setup, &setup::shutdown ), 0 );
 
-	poll poll;
-	poll.insert( poll_socket );
-	poll.wait();
+    poll poll;
+    poll.insert( poll_socket );
+    poll.wait();
 
-	thread.join();
+    thread.join();
 }
 
 template<>
 template<>
-	void fixture_type::test< 2 >( setup& )
+    void fixture_type::test< 2 >( setup& )
 {
-	std::cerr << "internet query for localhost\n";
+    std::cerr << "internet query for localhost\n";
 
-	internet_query query( "localhost", "http" );
-	std::cout << "Number of addresses for \"localhost\": " <<
-		std::distance( query.begin(), query.end() ) << '\n';
+    internet_query query( "localhost", "http" );
+    std::cout << "Number of addresses for \"localhost\": " <<
+        std::distance( query.begin(), query.end() ) << '\n';
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

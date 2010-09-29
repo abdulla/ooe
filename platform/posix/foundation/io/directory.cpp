@@ -12,13 +12,13 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 //--- directory_open -------------------------------------------------------------------------------
 DIR* directory_open( const ooe::descriptor& desc )
 {
-	s32 fd = dup( desc.get() );
+    s32 fd = dup( desc.get() );
 
-	if ( fcntl( fd, F_SETFD, FD_CLOEXEC ) )
-		throw error::io( "directory: " ) <<
-			"Unable to set close-on-exec: " << error::number( errno );
+    if ( fcntl( fd, F_SETFD, FD_CLOEXEC ) )
+        throw error::io( "directory: " ) <<
+            "Unable to set close-on-exec: " << error::number( errno );
 
-	return fdopendir( fd );
+    return fdopendir( fd );
 }
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )

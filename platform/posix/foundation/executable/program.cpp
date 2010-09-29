@@ -7,21 +7,21 @@
 namespace ooe
 {
 //--- executable ---------------------------------------------------------------
-	bool executable::path( c8* buffer, up_t size )
-	{
-		sp_t length = readlink( "/proc/self/exe", buffer, size - 1 );
+    bool executable::path( c8* buffer, up_t size )
+    {
+        sp_t length = readlink( "/proc/self/exe", buffer, size - 1 );
 
-		if ( length == -1 )
-			return false;
+        if ( length == -1 )
+            return false;
 
-		buffer[ length ] = 0;
-		return true;
-	}
+        buffer[ length ] = 0;
+        return true;
+    }
 
 //--- platform -----------------------------------------------------------------
-	bool platform::launch( executable::launch_type launch,
-		const std::string& root, const std::string& name, s32 argc, c8** argv )
-	{
-		return launch( root, name, argc, argv );
-	}
+    bool platform::launch( executable::launch_type launch,
+        const std::string& root, const std::string& name, s32 argc, c8** argv )
+    {
+        return launch( root, name, argc, argv );
+    }
 }

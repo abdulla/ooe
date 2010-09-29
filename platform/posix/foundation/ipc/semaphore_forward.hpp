@@ -10,27 +10,27 @@
 
 namespace ooe
 {
-	namespace platform
-	{
-		namespace ipc
-		{
-			class unnamed_semaphore;
-		}
-	}
+    namespace platform
+    {
+        namespace ipc
+        {
+            class unnamed_semaphore;
+        }
+    }
 
 //--- platform::ipc::unnamed_semaphore -----------------------------------------
-	class platform::ipc::unnamed_semaphore
-	{
-	public:
-		unnamed_semaphore( u32 );
-		~unnamed_semaphore( void );
+    class platform::ipc::unnamed_semaphore
+    {
+    public:
+        unnamed_semaphore( u32 );
+        ~unnamed_semaphore( void );
 
-		void up( void );
-		void down( void );
+        void up( void );
+        void down( void );
 
-	private:
-		sem_t sem;
-	};
+    private:
+        sem_t sem;
+    };
 }
 
-#endif	// OOE_PLATFORM_POSIX_FOUNDATION_IPC_SEMAPHORE_FORWARD_HPP
+#endif  // OOE_PLATFORM_POSIX_FOUNDATION_IPC_SEMAPHORE_FORWARD_HPP

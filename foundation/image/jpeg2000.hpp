@@ -8,13 +8,13 @@
 
 namespace ooe
 {
-	namespace jpeg2000
-	{
-		uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
-		uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
+    namespace jpeg2000
+    {
+        uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
+        uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
 
-		void encode( const uncompressed_image&, const descriptor& desc ) OOE_VISIBLE;
-	}
+        void encode( const uncompressed_image&, const descriptor& desc ) OOE_VISIBLE;
+    }
 }
 
-#endif	// OOE_FOUNDATION_IMAGE_JPEG2000_HPP
+#endif  // OOE_FOUNDATION_IMAGE_JPEG2000_HPP

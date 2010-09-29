@@ -23,43 +23,43 @@ typedef std::list< servlet_ptr >::iterator servlet_iterator;
 class servlet
 {
 public:
-	servlet( servlet_iterator, ooe::socket&, const ipc::switchboard&, server& );
+    servlet( servlet_iterator, ooe::socket&, const ipc::switchboard&, server& );
 
-	void join( void );
-	void migrate( ooe::socket& );
+    void join( void );
+    void migrate( ooe::socket& );
 
 private:
-	servlet_iterator iterator;
-	ooe::socket socket;
-	const ipc::switchboard& switchboard;
+    servlet_iterator iterator;
+    ooe::socket socket;
+    const ipc::switchboard& switchboard;
 
-	bool state;
-	ooe::thread thread;
+    bool state;
+    ooe::thread thread;
 
-	void* main( void* );
+    void* main( void* );
 };
 
 //--- server ---------------------------------------------------------------------------------------
 class OOE_VISIBLE server
 {
 public:
-	server( const address&, const ipc::switchboard& );
-	~server( void );
+    server( const address&, const ipc::switchboard& );
+    ~server( void );
 
-	void accept( void );
-	void erase( servlet_iterator ) OOE_HIDDEN;
+    void accept( void );
+    void erase( servlet_iterator ) OOE_HIDDEN;
 
-	void relink( ooe::socket& );
-	void migrate( ooe::socket& );
+    void relink( ooe::socket& );
+    void migrate( ooe::socket& );
 
 private:
-	ooe::listen listen;
-	const ipc::switchboard& switchboard;
+    ooe::listen listen;
+    const ipc::switchboard& switchboard;
 
-	ooe::mutex mutex;
-	servlet_list list;
+    ooe::mutex mutex;
+    servlet_list list;
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )
 
-#endif	// OOE_FOUNDATION_IPC_SOCKET_SERVER_HPP
+#endif  // OOE_FOUNDATION_IPC_SOCKET_SERVER_HPP

@@ -20,50 +20,50 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 class OOE_VISIBLE semaphore
 {
 public:
-	enum type
-	{
-		open,
-		create
-	};
+    enum type
+    {
+        open,
+        create
+    };
 
-	semaphore( const std::string&, type = open, u32 = 1 );
-	~semaphore( void );
+    semaphore( const std::string&, type = open, u32 = 1 );
+    ~semaphore( void );
 
-	void up( void );
-	void down( void );
+    void up( void );
+    void down( void );
 
-	std::string name( void ) const;
-	void unlink( void );
+    std::string name( void ) const;
+    void unlink( void );
 
 private:
-	std::string name_;
-	bool unlinkable;
-	sem_t* const sem;
+    std::string name_;
+    bool unlinkable;
+    sem_t* const sem;
 
-	friend class memory::transport;
+    friend class memory::transport;
 };
 
 //--- process_lock ---------------------------------------------------------------------------------
 class OOE_VISIBLE process_lock
-	: private noncopyable
+    : private noncopyable
 {
 public:
-	process_lock( ipc::semaphore& );
-	~process_lock( void );
+    process_lock( ipc::semaphore& );
+    ~process_lock( void );
 
 private:
-	ipc::semaphore& semaphore;
+    ipc::semaphore& semaphore;
 };
 
 //--- barrier_wait ---------------------------------------------------------------------------------
 class OOE_VISIBLE barrier_wait
 {
 public:
-	barrier_wait( const std::string& );
-	~barrier_wait( void );
+    barrier_wait( const std::string& );
+    ~barrier_wait( void );
 
 private:
-	ipc::semaphore semaphore;
+    ipc::semaphore semaphore;
 };
 
 //--- barrier_notify -------------------------------------------------------------------------------
@@ -71,4 +71,4 @@ void barrier_notify( const std::string& ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
 
-#endif	// OOE_FOUNDATION_IPC_SEMAPHORE_HPP
+#endif  // OOE_FOUNDATION_IPC_SEMAPHORE_HPP

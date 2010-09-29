@@ -19,38 +19,38 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- directory_iterator ---------------------------------------------------------------------------
 class directory_iterator
-	: public boost::iterator_facade< directory_iterator, std::string,
-	boost::single_pass_traversal_tag, std::string >
+    : public boost::iterator_facade< directory_iterator, std::string,
+    boost::single_pass_traversal_tag, std::string >
 {
 private:
-	DIR* dir;
-	dirent* entry;
+    DIR* dir;
+    dirent* entry;
 
-	explicit directory_iterator( DIR*, dirent* );
+    explicit directory_iterator( DIR*, dirent* );
 
-	void increment( void ) OOE_VISIBLE;
-	bool equal( const directory_iterator& ) const OOE_VISIBLE;
-	std::string dereference( void ) const OOE_VISIBLE;
+    void increment( void ) OOE_VISIBLE;
+    bool equal( const directory_iterator& ) const OOE_VISIBLE;
+    std::string dereference( void ) const OOE_VISIBLE;
 
-	friend class directory;
-	friend class boost::iterator_core_access;
+    friend class directory;
+    friend class boost::iterator_core_access;
 };
 
 //--- directory ------------------------------------------------------------------------------------
 class OOE_VISIBLE directory
-	: private noncopyable
+    : private noncopyable
 {
 public:
-	typedef directory_iterator iterator;
+    typedef directory_iterator iterator;
 
-	directory( const descriptor& );
-	~directory( void );
+    directory( const descriptor& );
+    ~directory( void );
 
-	iterator begin( void ) const;
-	iterator end( void ) const;
+    iterator begin( void ) const;
+    iterator end( void ) const;
 
 private:
-	DIR* dir;
+    DIR* dir;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -60,4 +60,4 @@ bool exists( const std::string& ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_IO_DIRECTORY_HPP
+#endif  // OOE_FOUNDATION_IO_DIRECTORY_HPP

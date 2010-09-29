@@ -3,5 +3,5 @@ varying vec2 texcoord;
 
 void main( void )
 {
-	gl_FragColor = vtexture2D( vt, texcoord );
+    gl_FragColor = vtexture2D( vt, texcoord );
 }

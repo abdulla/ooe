@@ -10,24 +10,24 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- file -----------------------------------------------------------------------------------------
 struct OOE_VISIBLE file
-	: public descriptor
+    : public descriptor
 {
-	enum seek_type
-	{
-		current,
-		begin,
-		end
-	};
+    enum seek_type
+    {
+        current,
+        begin,
+        end
+    };
 
-	file( const descriptor& );
+    file( const descriptor& );
 
-	void sync( void ) const;
+    void sync( void ) const;
 
-	up_t read( void*, up_t );
-	up_t write( const void*, up_t );
+    up_t read( void*, up_t );
+    up_t write( const void*, up_t );
 
-	void seek( sp_t, seek_type = current );
-	up_t tell( void ) const;
+    void seek( sp_t, seek_type = current );
+    up_t tell( void ) const;
 };
 
 //--- make_pipe ------------------------------------------------------------------------------------
@@ -36,4 +36,4 @@ file_pair make_pipe( void ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_IO_FILE_HPP
+#endif  // OOE_FOUNDATION_IO_FILE_HPP

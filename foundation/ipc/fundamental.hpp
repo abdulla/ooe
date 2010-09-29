@@ -65,4 +65,4 @@ typedef u32 length_t;
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
 
-#endif	// OOE_FOUNDATION_IPC_FUNDAMENTAL_HPP
+#endif  // OOE_FOUNDATION_IPC_FUNDAMENTAL_HPP

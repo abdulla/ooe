@@ -10,13 +10,13 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 class transport
 {
 protected:
-	bool created;
-	unnamed_semaphore* in;
-	unnamed_semaphore* out;
+    bool created;
+    unnamed_semaphore* in;
+    unnamed_semaphore* out;
 
-	transport( bool );
+    transport( bool );
 };
 
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
-#endif	// OOE_PLATFORM_POSIX_FOUNDATION_IPC_MEMORY_TRANSPORT_FORWARD_HPP
+#endif  // OOE_PLATFORM_POSIX_FOUNDATION_IPC_MEMORY_TRANSPORT_FORWARD_HPP

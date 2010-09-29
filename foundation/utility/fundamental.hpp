@@ -14,9 +14,9 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 typedef boost::mpl::vector< signed char, signed short, signed int, signed long,
-	signed long long > signed_types;
+    signed long long > signed_types;
 typedef boost::mpl::vector< unsigned char, unsigned short, unsigned int, unsigned long,
-	unsigned long long > unsigned_types;
+    unsigned long long > unsigned_types;
 typedef boost::mpl::vector< float, double, long double > float_types;
 typedef boost::mpl::vector< char, wchar_t > char_types;
 
@@ -25,12 +25,12 @@ typedef boost::mpl::reverse< boost::mpl::pop_back< unsigned_types >::type >::typ
 
 //--- find_size ------------------------------------------------------------------------------------
 template< typename sequence, unsigned size >
-	struct find_size
+    struct find_size
 {
-	typedef boost::mpl::placeholders::_ _;
-	typedef boost::is_same< boost::mpl::sizeof_< _ >, boost::mpl::size_t< size > > predicate;
-	typedef typename boost::mpl::find_if< sequence, predicate >::type iterator;
-	typedef typename boost::mpl::deref< iterator >::type type;
+    typedef boost::mpl::placeholders::_ _;
+    typedef boost::is_same< boost::mpl::sizeof_< _ >, boost::mpl::size_t< size > > predicate;
+    typedef typename boost::mpl::find_if< sequence, predicate >::type iterator;
+    typedef typename boost::mpl::deref< iterator >::type type;
 };
 
 //--- fundamental ----------------------------------------------------------------------------------
@@ -63,4 +63,4 @@ struct anonymous_t {};
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_FOUNDATION_UTILITY_FUNDAMENTAL_HPP
+#endif  // OOE_FOUNDATION_UTILITY_FUNDAMENTAL_HPP

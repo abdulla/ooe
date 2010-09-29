@@ -12,59 +12,59 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 class servlet
 {
 public:
-	servlet( const std::string&, link_t, const ipc::switchboard&, server& );
-	servlet( ooe::socket&, link_t, const ipc::switchboard&, server& );
+    servlet( const std::string&, link_t, const ipc::switchboard&, server& );
+    servlet( ooe::socket&, link_t, const ipc::switchboard&, server& );
 
-	void join( void );
-	void migrate( ooe::socket&, semaphore&, server& );
-	void check( const void* );
+    void join( void );
+    void migrate( ooe::socket&, semaphore&, server& );
+    void check( const void* );
 
 private:
-	memory::transport transport;
-	const link_t link;
-	const ipc::switchboard& switchboard;
+    memory::transport transport;
+    const link_t link;
+    const ipc::switchboard& switchboard;
 
-	scoped_ptr< const memory::link_listen > link_listen;
-	scoped_ptr< memory::link_server > link_server;
+    scoped_ptr< const memory::link_listen > link_listen;
+    scoped_ptr< memory::link_server > link_server;
 
-	shared_allocator allocator;
-	io_buffer buffer;
+    shared_allocator allocator;
+    io_buffer buffer;
 
-	atom< bool > state;
-	ooe::thread thread;
+    atom< bool > state;
+    ooe::thread thread;
 
-	void* main( void* );
+    void* main( void* );
 };
 
 //--- server ---------------------------------------------------------------------------------------
 class server
 {
 public:
-	server( const std::string&, const switchboard& ) OOE_VISIBLE;
-	~server( void ) OOE_VISIBLE;
+    server( const std::string&, const switchboard& ) OOE_VISIBLE;
+    ~server( void ) OOE_VISIBLE;
 
-	bool decode( void ) OOE_VISIBLE;
-	std::string name( void ) const;
+    bool decode( void ) OOE_VISIBLE;
+    std::string name( void ) const;
 
-	link_t link( pid_t, time_t );
-	void unlink( link_t, bool );
-	atom_ptr< servlet > find( link_t ) const;
+    link_t link( pid_t, time_t );
+    void unlink( link_t, bool );
+    atom_ptr< servlet > find( link_t ) const;
 
-	void migrate( ooe::socket& ) OOE_VISIBLE;
-	void relink( ooe::socket& ) OOE_VISIBLE;
+    void migrate( ooe::socket& ) OOE_VISIBLE;
+    void relink( ooe::socket& ) OOE_VISIBLE;
 
 private:
-	typedef std::map< link_t, atom_ptr< servlet > > servlet_map;
+    typedef std::map< link_t, atom_ptr< servlet > > servlet_map;
 
-	mutable ipc::semaphore semaphore;
-	memory::transport transport;
-	const switchboard& external;
-	switchboard internal;
+    mutable ipc::semaphore semaphore;
+    memory::transport transport;
+    const switchboard& external;
+    switchboard internal;
 
-	link_t seed;
-	servlet_map map;
+    link_t seed;
+    servlet_map map;
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
 
-#endif	// OOE_FOUNDATION_IPC_MEMORY_SERVER_HPP
+#endif  // OOE_FOUNDATION_IPC_MEMORY_SERVER_HPP

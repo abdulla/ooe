@@ -6,9 +6,9 @@
 #include "foundation/utility/fundamental.hpp"
 
 #ifdef __OBJC__
-	@class NSWindow;
+    @class NSWindow;
 #else
-	struct NSWindow;
+    struct NSWindow;
 #endif
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
@@ -16,10 +16,10 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 class view_data
 {
 public:
-	NSWindow* window;
+    NSWindow* window;
 
 protected:
-	view_data( void );
+    view_data( void );
 };
 
 struct view
@@ -29,4 +29,4 @@ struct view
 OOE_NAMESPACE_END( ( ooe )( platform ) )
 
 
-#endif	// OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_VIEW_FORWARD_HPP
+#endif  // OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_VIEW_FORWARD_HPP

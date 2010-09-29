@@ -1,19 +1,19 @@
 make all constructors explicit
-	- something that should have been done a long time ago, but wasn't, due to laziness
+    - something that should have been done a long time ago, but wasn't, due to laziness
 
 use openctm for models
-	- no need for custom model format
+    - no need for custom model format
 
 add translate/localisation functions
-	- use gettext or similar
+    - use gettext or similar
 
 extend setup_path
-	- use GetModuleFileName() under windows
-	- read /proc/curproc/file on freebsd
-	- would using realpath() help to resolve paths?
+    - use GetModuleFileName() under windows
+    - read /proc/curproc/file on freebsd
+    - would using realpath() help to resolve paths?
 
 extend socket descriptor send and receive
-	- use WSADuplicateSocket() under windows
+    - use WSADuplicateSocket() under windows
 
 lexical_cast/numeric_cast
-	- used boost *_casts, they are simpler and do more verification
+    - used boost *_casts, they are simpler and do more verification

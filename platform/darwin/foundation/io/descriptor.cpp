@@ -12,13 +12,13 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 //--- descriptor -----------------------------------------------------------------------------------
 up_t descriptor::splice( const ooe::descriptor& desc, up_t bytes )
 {
-	off_t spliced = bytes;
+    off_t spliced = bytes;
 
-	if ( sendfile( get(), desc.get(), 0, &spliced, 0, 0 ) )
-		throw error::io( "descriptor: " ) <<
-			"Unable to splice " << bytes << " bytes: " << error::number( errno );
+    if ( sendfile( get(), desc.get(), 0, &spliced, 0, 0 ) )
+        throw error::io( "descriptor: " ) <<
+            "Unable to splice " << bytes << " bytes: " << error::number( errno );
 
-	return spliced;
+    return spliced;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

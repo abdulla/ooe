@@ -8,30 +8,30 @@
 
 namespace ooe
 {
-	namespace error
-	{
-		struct lua;
-	}
+    namespace error
+    {
+        struct lua;
+    }
 
-	struct OOE_VISIBLE error::lua
-		: virtual public runtime
-	{
-		lua( ooe::lua::stack& stack )
-			: runtime( "lua: " )
-		{
-			*this << stack.to_lstring( -1 );
-			stack.pop( 1 );
-		}
+    struct OOE_VISIBLE error::lua
+        : virtual public runtime
+    {
+        lua( ooe::lua::stack& stack )
+            : runtime( "lua: " )
+        {
+            *this << stack.to_lstring( -1 );
+            stack.pop( 1 );
+        }
 
-		lua( void )
-			: runtime( "lua: " )
-		{
-		}
+        lua( void )
+            : runtime( "lua: " )
+        {
+        }
 
-		virtual ~lua( void ) throw()
-		{
-		}
-	};
+        virtual ~lua( void ) throw()
+        {
+        }
+    };
 }
 
-#endif	// OOE_COMPONENT_LUA_ERROR_HPP
+#endif  // OOE_COMPONENT_LUA_ERROR_HPP

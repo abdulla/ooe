@@ -34,4 +34,4 @@ bool launch( executable::launch_type, const std::string&, const std::string&, s3
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )
 
-#endif	// OOE_FOUNDATION_EXECUTABLE_PROGRAM_HPP
+#endif  // OOE_FOUNDATION_EXECUTABLE_PROGRAM_HPP

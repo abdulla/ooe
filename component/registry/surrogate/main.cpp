@@ -14,62 +14,62 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 //--- load_nameservice -----------------------------------------------------------------------------
 void load_nameservice( ipc::nameservice& nameservice, const module& module )
 {
-	const interface::vector_type& names = module.names();
-	const module::vector_type& docs = module.docs();
-	const facade::remote::vector_type& remotes = static_cast< const facade::remote* >
-		( module.find( typeid( facade::remote ).name() ) )->get();
-	const facade::local::vector_type& locals = static_cast< const facade::local* >
-		( module.find( typeid( facade::local ).name() ) )->get();
-	up_t size = names.size();
+    const interface::vector_type& names = module.names();
+    const module::vector_type& docs = module.docs();
+    const facade::remote::vector_type& remotes = static_cast< const facade::remote* >
+        ( module.find( typeid( facade::remote ).name() ) )->get();
+    const facade::local::vector_type& locals = static_cast< const facade::local* >
+        ( module.find( typeid( facade::local ).name() ) )->get();
+    up_t size = names.size();
 
-	if ( remotes.size() != size || locals.size() != size )
-		throw error::runtime( "surrogate: " ) << "Incorrect number of callbacks";
+    if ( remotes.size() != size || locals.size() != size )
+        throw error::runtime( "surrogate: " ) << "Incorrect number of callbacks";
 
-	for ( up_t i = 0; i != size; ++i )
-		nameservice.insert_direct
-			( names[ i ]._0, names[ i ]._1, docs[ i ], remotes[ i ], locals[ i ] );
+    for ( up_t i = 0; i != size; ++i )
+        nameservice.insert_direct
+            ( names[ i ]._0, names[ i ]._1, docs[ i ], remotes[ i ], locals[ i ] );
 }
 
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
-	const c8* library_path = 0;
-	const c8* surrogate_path = 0;
+    const c8* library_path = 0;
+    const c8* surrogate_path = 0;
 
-	for ( s32 option; ( option = getopt( argc, argv, "l:s:" ) ) != -1; )
-	{
-		switch ( option )
-		{
-		case 'l':
-			library_path = optarg;
-			break;
+    for ( s32 option; ( option = getopt( argc, argv, "l:s:" ) ) != -1; )
+    {
+        switch ( option )
+        {
+        case 'l':
+            library_path = optarg;
+            break;
 
-		case 's':
-			surrogate_path = optarg;
-			break;
+        case 's':
+            surrogate_path = optarg;
+            break;
 
-		default:
-			std::cout <<
-				"    -l <path>  Path of library module to load in to surrogate\n"
-				"    -s <path>  Path to use for surrogate\n";
+        default:
+            std::cout <<
+                "    -l <path>  Path of library module to load in to surrogate\n"
+                "    -s <path>  Path to use for surrogate\n";
 
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 
-	if ( !library_path || !surrogate_path )
-		return false;
+    if ( !library_path || !surrogate_path )
+        return false;
 
-	library library( library_path );
-	ipc::nameservice nameservice;
-	load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
+    library library( library_path );
+    ipc::nameservice nameservice;
+    load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
 
-	ipc::memory::server server( surrogate_path, nameservice );
-	ipc::barrier_notify( std::string( surrogate_path ) + ".b" );
+    ipc::memory::server server( surrogate_path, nameservice );
+    ipc::barrier_notify( std::string( surrogate_path ) + ".b" );
 
-	while ( !executable::has_signal() && server.decode() ) {}
+    while ( !executable::has_signal() && server.decode() ) {}
 
-	return true;
+    return true;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -77,5 +77,5 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 //--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )
 {
-	return executable::launch( launch, argc, argv );
+    return executable::launch( launch, argc, argv );
 }

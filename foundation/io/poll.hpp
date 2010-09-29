@@ -14,29 +14,29 @@
 namespace ooe
 {
 //--- poll ---------------------------------------------------------------------
-	class OOE_VISIBLE poll
-	{
-	public:
-		enum type
-		{
-			error,
-			disconnect,
-			input
-		};
+    class OOE_VISIBLE poll
+    {
+    public:
+        enum type
+        {
+            error,
+            disconnect,
+            input
+        };
 
-		typedef function< void ( const descriptor&, type ) > function_type;
+        typedef function< void ( const descriptor&, type ) > function_type;
 
-		void insert( const descriptor&, const function_type& = function_type() );
-		void wait( void ) const;
+        void insert( const descriptor&, const function_type& = function_type() );
+        void wait( void ) const;
 
-	private:
-		typedef tuple< descriptor, function_type > datum_tuple;
-		typedef std::vector< datum_tuple > datum_vector;
-		typedef std::vector< pollfd > fd_vector;
+    private:
+        typedef tuple< descriptor, function_type > datum_tuple;
+        typedef std::vector< datum_tuple > datum_vector;
+        typedef std::vector< pollfd > fd_vector;
 
-		datum_vector data;
-		mutable fd_vector fds;
-	};
+        datum_vector data;
+        mutable fd_vector fds;
+    };
 }
 
-#endif	// OOE_FOUNDATION_IO_POLL_HPP
+#endif  // OOE_FOUNDATION_IO_POLL_HPP

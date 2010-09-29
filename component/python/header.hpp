@@ -9,4 +9,4 @@
 
 #include <python3.1/Python.h>
 
-#endif	// OOE_COMPONENT_PYTHON_HEADER_HPP
+#endif  // OOE_COMPONENT_PYTHON_HEADER_HPP

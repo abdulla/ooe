@@ -7,6 +7,6 @@ varying vec2 texcoord;
 
 void main( void )
 {
-	gl_Position = projection * vec4( vertex, 0, 1 );
-	texcoord = coords;
+    gl_Position = projection * vec4( vertex, 0, 1 );
+    texcoord = coords;
 }

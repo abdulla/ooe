@@ -8,10 +8,10 @@
 
 namespace ooe
 {
-	namespace unit
-	{
-		s32 launch( s32, c8** ) OOE_VISIBLE;
-	}
+    namespace unit
+    {
+        s32 launch( s32, c8** ) OOE_VISIBLE;
+    }
 }
 
-#endif	// OOE_TEST_UNIT_PROGRAM_HPP
+#endif  // OOE_TEST_UNIT_PROGRAM_HPP

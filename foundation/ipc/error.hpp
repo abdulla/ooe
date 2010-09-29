@@ -10,59 +10,59 @@ OOE_NAMESPACE_BEGIN( ( ooe )( error ) )
 
 enum ipc
 {
-	none,
-	exception,
-	link
+    none,
+    exception,
+    link
 };
 
 //--- rpc ------------------------------------------------------------------------------------------
 struct OOE_VISIBLE rpc
-	: virtual public runtime
+    : virtual public runtime
 {
-	const bool executed;
+    const bool executed;
 
-	rpc( bool executed_ )
-		: runtime( "ipc: " ), executed( executed_ )
-	{
-		*this << "Executed: " << ( executed ? "true" : "false" ) << '\n';
-	}
+    rpc( bool executed_ )
+        : runtime( "ipc: " ), executed( executed_ )
+    {
+        *this << "Executed: " << ( executed ? "true" : "false" ) << '\n';
+    }
 
-	virtual ~rpc( void ) throw()
-	{
-	}
+    virtual ~rpc( void ) throw()
+    {
+    }
 };
 
 //--- verification ---------------------------------------------------------------------------------
 struct OOE_VISIBLE verification
-	: virtual public runtime
+    : virtual public runtime
 {
-	verification( const void* value, u8 index )
-		: runtime( "ipc: " )
-	{
-		using ooe::operator <<;
-		*this << "Invalid pointer " << ptr( value ) << " in argument " << index;
-	}
+    verification( const void* value, u8 index )
+        : runtime( "ipc: " )
+    {
+        using ooe::operator <<;
+        *this << "Invalid pointer " << ptr( value ) << " in argument " << index;
+    }
 
-	virtual ~verification( void ) throw()
-	{
-	}
+    virtual ~verification( void ) throw()
+    {
+    }
 };
 
 //--- connection -----------------------------------------------------------------------------------
 struct OOE_VISIBLE connection
-	: virtual public runtime
+    : virtual public runtime
 {
-	connection( void )
-		: runtime( "ipc: " )
-	{
-		*this << "Connection down";
-	}
+    connection( void )
+        : runtime( "ipc: " )
+    {
+        *this << "Connection down";
+    }
 
-	virtual ~connection( void ) throw()
-	{
-	}
+    virtual ~connection( void ) throw()
+    {
+    }
 };
 
 OOE_NAMESPACE_END( ( ooe )( error ) )
 
-#endif	// OOE_FOUNDATION_IPC_ERROR_HPP
+#endif  // OOE_FOUNDATION_IPC_ERROR_HPP

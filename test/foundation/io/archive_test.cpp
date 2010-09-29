@@ -19,22 +19,22 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 template<>
 template<>
-	void fixture_type::test< 0 >( anonymous_t& )
+    void fixture_type::test< 0 >( anonymous_t& )
 {
-	std::cerr << "iterate through an archive\n";
+    std::cerr << "iterate through an archive\n";
 
-	std::string path = executable::path()._0;
-	archive archive( descriptor( path + "../resource/test/archive.zip" ) );
-	archive::file stored = archive.open( "stored" );
-	archive::file deflated = archive.open( "deflated" );
+    std::string path = executable::path()._0;
+    archive archive( descriptor( path + "../resource/test/archive.zip" ) );
+    archive::file stored = archive.open( "stored" );
+    archive::file deflated = archive.open( "deflated" );
 
-	OOE_CHECK( "sizes of match", stored.size() == deflated.size() );
-	OOE_CHECK( "data matches", !std::memcmp( stored.get(), deflated.get(), stored.size() ) );
+    OOE_CHECK( "sizes of match", stored.size() == deflated.size() );
+    OOE_CHECK( "data matches", !std::memcmp( stored.get(), deflated.get(), stored.size() ) );
 
-	up_t j = 1;
+    up_t j = 1;
 
-	for ( archive::iterator i = archive.begin(), end = archive.end(); i != end; ++i, ++j )
-		std::cout << j << ": " << *i << '\n';
+    for ( archive::iterator i = archive.begin(), end = archive.end(); i != end; ++i, ++j )
+        std::cout << j << ": " << *i << '\n';
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

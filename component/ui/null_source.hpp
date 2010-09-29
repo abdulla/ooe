@@ -9,22 +9,22 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- null_source ----------------------------------------------------------------------------------
 class null_source
-	: public physical_source
+    : public physical_source
 {
 public:
-	null_source( u32 );
-	virtual ~null_source( void );
+    null_source( u32 );
+    virtual ~null_source( void );
 
-	virtual u32 size( void ) const;
-	virtual image::type format( void ) const;
-	virtual u16 page_size( void ) const;
+    virtual u32 size( void ) const;
+    virtual image::type format( void ) const;
+    virtual u16 page_size( void ) const;
 
 private:
-	const u32 size_;
+    const u32 size_;
 
-	virtual image read( const pyramid_index& );
+    virtual image read( const pyramid_index& );
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_COMPONENT_UI_NULL_SOURCE_HPP
+#endif  // OOE_COMPONENT_UI_NULL_SOURCE_HPP

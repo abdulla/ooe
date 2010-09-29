@@ -13,117 +13,117 @@ void load_symbols( void );
 //--- constants ------------------------------------------------------------------------------------
 enum
 {
-	TRIANGLES					= 0x0004,
+    TRIANGLES                   = 0x0004,
 
-	SRC_ALPHA					= 0x0302,
-	ONE_MINUS_SRC_ALPHA			= 0x0303,
+    SRC_ALPHA                   = 0x0302,
+    ONE_MINUS_SRC_ALPHA         = 0x0303,
 
-	BACK_LEFT					= 0x0402,
+    BACK_LEFT                   = 0x0402,
 
-	DEPTH_TEST					= 0x0B71,
-	BLEND						= 0x0BE2,
+    DEPTH_TEST                  = 0x0B71,
+    BLEND                       = 0x0BE2,
 
-	UNPACK_ALIGNMENT			= 0x0CF5,
-	PACK_ALIGNMENT				= 0x0D05,
+    UNPACK_ALIGNMENT            = 0x0CF5,
+    PACK_ALIGNMENT              = 0x0D05,
 
-	MAX_TEXTURE_SIZE			= 0x0D33,
-	TEXTURE_2D					= 0x0DE1,
+    MAX_TEXTURE_SIZE            = 0x0D33,
+    TEXTURE_2D                  = 0x0DE1,
 
-	UNSIGNED_BYTE				= 0x1401,
-	UNSIGNED_SHORT				= 0x1403,
-	UNSIGNED_INT				= 0x1405,
-	FLOAT						= 0x1406,
-	HALF_FLOAT					= 0x140B,
+    UNSIGNED_BYTE               = 0x1401,
+    UNSIGNED_SHORT              = 0x1403,
+    UNSIGNED_INT                = 0x1405,
+    FLOAT                       = 0x1406,
+    HALF_FLOAT                  = 0x140B,
 
-	RED							= 0x1903,
-	ALPHA						= 0x1906,
-	RGB							= 0x1907,
-	RGBA						= 0x1908,
-	LUMINANCE					= 0x1909,
-	LUMINANCE_ALPHA				= 0x190A,
+    RED                         = 0x1903,
+    ALPHA                       = 0x1906,
+    RGB                         = 0x1907,
+    RGBA                        = 0x1908,
+    LUMINANCE                   = 0x1909,
+    LUMINANCE_ALPHA             = 0x190A,
 
-	EXTENSIONS					= 0x1F03,
+    EXTENSIONS                  = 0x1F03,
 
-	NEAREST						= 0x2600,
-	LINEAR						= 0x2601,
-	NEAREST_MIPMAP_NEAREST		= 0x2700,
-	LINEAR_MIPMAP_LINEAR		= 0x2703,
+    NEAREST                     = 0x2600,
+    LINEAR                      = 0x2601,
+    NEAREST_MIPMAP_NEAREST      = 0x2700,
+    LINEAR_MIPMAP_LINEAR        = 0x2703,
 
-	TEXTURE_MAG_FILTER			= 0x2800,
-	TEXTURE_MIN_FILTER			= 0x2801,
-	TEXTURE_WRAP_S				= 0x2802,
-	TEXTURE_WRAP_T				= 0x2803,
+    TEXTURE_MAG_FILTER          = 0x2800,
+    TEXTURE_MIN_FILTER          = 0x2801,
+    TEXTURE_WRAP_S              = 0x2802,
+    TEXTURE_WRAP_T              = 0x2803,
 
-	ALPHA8						= 0x803C,
-	LUMINANCE8					= 0x8040,
-	LUMINANCE8_ALPHA8			= 0x8045,
-	RGB8						= 0x8051,
-	RGBA8						= 0x8058,
+    ALPHA8                      = 0x803C,
+    LUMINANCE8                  = 0x8040,
+    LUMINANCE8_ALPHA8           = 0x8045,
+    RGB8                        = 0x8051,
+    RGBA8                       = 0x8058,
 
-	BGR							= 0x80E0,
-	BGRA						= 0x80E1,
+    BGR                         = 0x80E0,
+    BGRA                        = 0x80E1,
 
-	CLAMP_TO_EDGE				= 0x812F,
-	TEXTURE_MAX_LEVEL			= 0x813D,
+    CLAMP_TO_EDGE               = 0x812F,
+    TEXTURE_MAX_LEVEL           = 0x813D,
 
-	RG							= 0x8227,
-	R8							= 0x8229,
-	RG8							= 0x822B,
-	R16F						= 0x822D,
-	R32F						= 0x822E,
-	RG16F						= 0x822F,
-	RG32F						= 0x8230,
+    RG                          = 0x8227,
+    R8                          = 0x8229,
+    RG8                         = 0x822B,
+    R16F                        = 0x822D,
+    R32F                        = 0x822E,
+    RG16F                       = 0x822F,
+    RG32F                       = 0x8230,
 
-	COMPRESSED_RGBA_S3TC_DXT1	= 0x83F1,
-	COMPRESSED_RGBA_S3TC_DXT3	= 0x83F2,
-	COMPRESSED_RGBA_S3TC_DXT5	= 0x83F3,
+    COMPRESSED_RGBA_S3TC_DXT1   = 0x83F1,
+    COMPRESSED_RGBA_S3TC_DXT3   = 0x83F2,
+    COMPRESSED_RGBA_S3TC_DXT5   = 0x83F3,
 
-	TEXTURE0					= 0x84C0,
+    TEXTURE0                    = 0x84C0,
 
-	RGBA32F						= 0x8814,
-	RGB32F						= 0x8815,
-	ALPHA32F					= 0x8816,
-	LUMINANCE32F				= 0x8818,
-	LUMINANCE_ALPHA32F			= 0x8819,
-	RGBA16F						= 0x881A,
-	RGB16F						= 0x881B,
-	ALPHA16F					= 0x881C,
-	LUMINANCE16F				= 0x881E,
-	LUMINANCE_ALPHA16F			= 0x881F,
+    RGBA32F                     = 0x8814,
+    RGB32F                      = 0x8815,
+    ALPHA32F                    = 0x8816,
+    LUMINANCE32F                = 0x8818,
+    LUMINANCE_ALPHA32F          = 0x8819,
+    RGBA16F                     = 0x881A,
+    RGB16F                      = 0x881B,
+    ALPHA16F                    = 0x881C,
+    LUMINANCE16F                = 0x881E,
+    LUMINANCE_ALPHA16F          = 0x881F,
 
-	MAX_DRAW_BUFFERS			= 0x8824,
-	MAX_TEXTURE_IMAGE_UNITS		= 0x8872,
+    MAX_DRAW_BUFFERS            = 0x8824,
+    MAX_TEXTURE_IMAGE_UNITS     = 0x8872,
 
-	ARRAY_BUFFER				= 0x8892,
-	ELEMENT_ARRAY_BUFFER		= 0x8893,
-	READ_ONLY					= 0x88B8,
-	WRITE_ONLY					= 0x88B9,
-	READ_WRITE					= 0x88BA,
-	STREAM_DRAW					= 0x88E0,
-	STREAM_READ					= 0x88E1,
-	STATIC_DRAW					= 0x88E4,
-	STATIC_READ					= 0x88E5,
-	PIXEL_PACK_BUFFER			= 0x88EB,
+    ARRAY_BUFFER                = 0x8892,
+    ELEMENT_ARRAY_BUFFER        = 0x8893,
+    READ_ONLY                   = 0x88B8,
+    WRITE_ONLY                  = 0x88B9,
+    READ_WRITE                  = 0x88BA,
+    STREAM_DRAW                 = 0x88E0,
+    STREAM_READ                 = 0x88E1,
+    STATIC_DRAW                 = 0x88E4,
+    STATIC_READ                 = 0x88E5,
+    PIXEL_PACK_BUFFER           = 0x88EB,
 
-	MAX_ARRAY_TEXTURE_LAYERS	= 0x88FF,
+    MAX_ARRAY_TEXTURE_LAYERS    = 0x88FF,
 
-	FRAGMENT_SHADER				= 0x8B30,
-	VERTEX_SHADER				= 0x8B31,
-	COMPILE_STATUS				= 0x8B81,
-	LINK_STATUS					= 0x8B82,
-	VALIDATE_STATUS				= 0x8B83,
-	INFO_LOG_LENGTH				= 0x8B84,
+    FRAGMENT_SHADER             = 0x8B30,
+    VERTEX_SHADER               = 0x8B31,
+    COMPILE_STATUS              = 0x8B81,
+    LINK_STATUS                 = 0x8B82,
+    VALIDATE_STATUS             = 0x8B83,
+    INFO_LOG_LENGTH             = 0x8B84,
 
-	TEXTURE_2D_ARRAY			= 0x8C1A,
+    TEXTURE_2D_ARRAY            = 0x8C1A,
 
-	READ_FRAMEBUFFER			= 0x8CA8,
-	DRAW_FRAMEBUFFER			= 0x8CA9,
-	FRAMEBUFFER_COMPLETE		= 0x8CD5,
-	COLOR_ATTACHMENT0			= 0x8CE0,
-	RENDERBUFFER				= 0x8D41,
+    READ_FRAMEBUFFER            = 0x8CA8,
+    DRAW_FRAMEBUFFER            = 0x8CA9,
+    FRAMEBUFFER_COMPLETE        = 0x8CD5,
+    COLOR_ATTACHMENT0           = 0x8CE0,
+    RENDERBUFFER                = 0x8D41,
 
-	DEPTH_BUFFER_BIT			= 0x00000100,
-	COLOR_BUFFER_BIT			= 0x00004000
+    DEPTH_BUFFER_BIT            = 0x00000100,
+    COLOR_BUFFER_BIT            = 0x00004000
 };
 
 //--- typedefs -------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ typedef void ( TexImage3D_t )( u32, s32, u32, s32, s32, s32, s32, u32, u32, cons
 typedef void ( TexSubImage3D_t )( u32, s32, s32, s32, s32, s32, s32, s32, u32, u32, const void* );
 typedef void ( CompressedTexImage3D_t )( u32, s32, u32, s32, s32, s32, s32, s32, const void* );
 typedef void ( CompressedTexSubImage3D_t )
-	( u32, s32, s32, s32, s32, s32, s32, s32, u32, s32, const void* );
+    ( u32, s32, s32, s32, s32, s32, s32, s32, u32, s32, const void* );
 typedef void ( TexParameteri_t )( u32, u32, s32 );
 typedef void ( GenerateMipmap_t )( u32 );
 
@@ -289,4 +289,4 @@ extern DrawElements_t* DrawElements;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-#endif	// OOE_FOUNDATION_OPENGL_SYMBOL_HPP
+#endif  // OOE_FOUNDATION_OPENGL_SYMBOL_HPP

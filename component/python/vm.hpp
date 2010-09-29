@@ -12,22 +12,22 @@ OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 class OOE_VISIBLE vm
 {
 public:
-	typedef void ( * function_type )( PyObject* );
+    typedef void ( * function_type )( PyObject* );
 
-	vm( void );
-	~vm( void );
+    vm( void );
+    ~vm( void );
 
-	void load( const std::string&, const descriptor& );
-	void collect( void );
+    void load( const std::string&, const descriptor& );
+    void collect( void );
 
-	std::string version( void ) const;
+    std::string version( void ) const;
 
-	void setup( function_type );
+    void setup( function_type );
 
 private:
-	PyObject* globals;
+    PyObject* globals;
 };
 
 OOE_NAMESPACE_END( ( ooe )( python ) )
 
-#endif	// OOE_COMPONENT_PYTHON_VM_HPP
+#endif  // OOE_COMPONENT_PYTHON_VM_HPP

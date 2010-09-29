@@ -9,15 +9,15 @@
 
 namespace ooe
 {
-	struct OOE_VISIBLE sight
-		: private noncopyable, private platform::sight
-	{
-		using platform::sight::call_type;
+    struct OOE_VISIBLE sight
+        : private noncopyable, private platform::sight
+    {
+        using platform::sight::call_type;
 
-		sight( const call_type&, u16, u16 );
+        sight( const call_type&, u16, u16 );
 
-		static uncompressed_image::type format( void );
-	};
+        static uncompressed_image::type format( void );
+    };
 }
 
-#endif	// OOE_FOUNDATION_VISUAL_SIGHT_HPP
+#endif  // OOE_FOUNDATION_VISUAL_SIGHT_HPP

@@ -10,7 +10,7 @@ std::string value;
 
 void set_output( up_t size )
 {
-	value = std::string( size, '.' );
+    value = std::string( size, '.' );
 }
 
 void call_noop( void )
@@ -19,7 +19,7 @@ void call_noop( void )
 
 const c8* call_output( void )
 {
-	return value.c_str();
+    return value.c_str();
 }
 
 void call_input( const c8* )
@@ -28,20 +28,20 @@ void call_input( const c8* )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-	ipc::nameservice nameservice;
-	nameservice.insert( "set_output", set_output );
-	nameservice.insert( "call_noop", call_noop );
-	nameservice.insert( "call_output", call_output );
-	nameservice.insert( "call_input", call_input );
+    ipc::nameservice nameservice;
+    nameservice.insert( "set_output", set_output );
+    nameservice.insert( "call_noop", call_noop );
+    nameservice.insert( "call_output", call_output );
+    nameservice.insert( "call_input", call_input );
 
-	std::string local_name = ipc::local_name( "ooe" );
-	unlink( local_name.c_str() );
-	ipc::socket::server server( local_address( local_name ), nameservice );
+    std::string local_name = ipc::local_name( "ooe" );
+    unlink( local_name.c_str() );
+    ipc::socket::server server( local_address( local_name ), nameservice );
 
-	while ( !executable::has_signal() )
-		server.accept();
+    while ( !executable::has_signal() )
+        server.accept();
 
-	return true;
+    return true;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -49,5 +49,5 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 //--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )
 {
-	return executable::launch( launch, argc, argv );
+    return executable::launch( launch, argc, argv );
 }

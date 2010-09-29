@@ -15,4 +15,4 @@ std::string unique_name( void ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
 
-#endif	// OOE_FOUNDATION_IPC_NAME_HPP
+#endif  // OOE_FOUNDATION_IPC_NAME_HPP

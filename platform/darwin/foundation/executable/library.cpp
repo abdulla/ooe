@@ -4,5 +4,5 @@
 
 namespace ooe
 {
-	const c8 library::suffix[] = ".dylib";
+    const c8 library::suffix[] = ".dylib";
 }

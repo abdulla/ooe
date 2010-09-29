@@ -15,15 +15,15 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 template<>
 template<>
-	void fixture_type::test< 0 >( anonymous_t& )
+    void fixture_type::test< 0 >( anonymous_t& )
 {
-	std::cerr << "iterate through a directory\n";
+    std::cerr << "iterate through a directory\n";
 
-	directory dir( descriptor( "." ) );
-	up_t j = 1;
+    directory dir( descriptor( "." ) );
+    up_t j = 1;
 
-	for ( directory::iterator i = dir.begin(), end = dir.end(); i != end; ++i, ++j )
-		std::cout << j << ": " << *i << '\n';
+    for ( directory::iterator i = dir.begin(), end = dir.end(); i != end; ++i, ++j )
+        std::cout << j << ": " << *i << '\n';
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

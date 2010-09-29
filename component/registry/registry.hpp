@@ -9,27 +9,27 @@
 namespace ooe
 {
 //--- registry -----------------------------------------------------------------
-	class OOE_VISIBLE registry
-	{
-	public:
-		enum type
-		{
-			server,
-			library
-		};
+    class OOE_VISIBLE registry
+    {
+    public:
+        enum type
+        {
+            server,
+            library
+        };
 
-		typedef tuple< type, std::string > info_tuple;
-		typedef std::vector< info_tuple > info_vector;
+        typedef tuple< type, std::string > info_tuple;
+        typedef std::vector< info_tuple > info_vector;
 
-		registry( void );
+        registry( void );
 
-		info_vector find( const interface& );
-		void insert( type, const std::string& );
-		std::string surrogate( const std::string& );
+        info_vector find( const interface& );
+        void insert( type, const std::string& );
+        std::string surrogate( const std::string& );
 
-	private:
-		ipc::memory::client client;
-	};
+    private:
+        ipc::memory::client client;
+    };
 }
 
-#endif	// OOE_COMPONENT_REGISTRY_REGISTRY_HPP
+#endif  // OOE_COMPONENT_REGISTRY_REGISTRY_HPP

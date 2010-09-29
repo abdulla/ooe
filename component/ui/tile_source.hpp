@@ -11,29 +11,29 @@ typedef std::map< std::string, decoder_type > decoder_map;
 
 //--- tile_source ----------------------------------------------------------------------------------
 class tile_source
-	: public physical_source
+    : public physical_source
 {
 public:
-	tile_source( const std::string&, const decoder_map& );
-	virtual ~tile_source( void );
+    tile_source( const std::string&, const decoder_map& );
+    virtual ~tile_source( void );
 
-	virtual u32 size( void ) const;
-	virtual image::type format( void ) const;
-	virtual u16 page_size( void ) const;
+    virtual u32 size( void ) const;
+    virtual image::type format( void ) const;
+    virtual u16 page_size( void ) const;
 
 private:
-	const std::string root;
-	std::string type;
-	decoder_type decoder;
+    const std::string root;
+    std::string type;
+    decoder_type decoder;
 
-	u32 size_;
-	image::type format_;
-	u16 page_size_;
-	u8 level_limit;
+    u32 size_;
+    image::type format_;
+    u16 page_size_;
+    u8 level_limit;
 
-	virtual image read( const pyramid_index& );
+    virtual image read( const pyramid_index& );
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif	// OOE_COMPONENT_UI_TILE_SOURCE_HPP
+#endif  // OOE_COMPONENT_UI_TILE_SOURCE_HPP

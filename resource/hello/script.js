@@ -7,19 +7,19 @@ var module = ooe.component.load( result[ 0 ] );
 //--- run functions --------------------------------------------------------------------------------
 function printer( name )
 {
-	for ( var i in module )
-	{
-		var value = module[ i ];
+    for ( var i in module )
+    {
+        var value = module[ i ];
 
-		if ( typeof( value ) == 'function' )
-			this[ i.substr( 0, i.indexOf( '/' ) ) ] = value;
-	}
+        if ( typeof( value ) == 'function' )
+            this[ i.substr( 0, i.indexOf( '/' ) ) ] = value;
+    }
 
-	this.value = this.construct( name );
-	this.said = function()
-	{
-		this.say( this.value );
-	}
+    this.value = this.construct( name );
+    this.said = function()
+    {
+        this.say( this.value );
+    }
 }
 
 var heap = new printer( 'hello javascript gc' );
@@ -34,12 +34,12 @@ var alphabet = { a: 9, b: 8, c: 7 };
 alphabet = heap.stdmap( alphabet );
 
 for ( var i in alphabet )
-	print( i, alphabet[ i ] );
+    print( i, alphabet[ i ] );
 
 alphabet = heap.stdset( alphabet );
 
 for ( var i in alphabet )
-	print( i, alphabet[ i ] );
+    print( i, alphabet[ i ] );
 
 //--- print hello ----------------------------------------------------------------------------------
 print( 'hello javascript' );

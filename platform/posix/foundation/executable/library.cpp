@@ -4,5 +4,5 @@
 
 namespace ooe
 {
-	const c8 library::suffix[] = ".so";
+    const c8 library::suffix[] = ".so";
 }
