@@ -65,6 +65,7 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	if ( !nsevent )
 		return event::none;
 
+	NSView* view;
 	modifier_tuple tuple;
 
 	switch ( nsevent.type )
@@ -73,8 +74,13 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 	case NSLeftMouseDragged:
 	case NSRightMouseDragged:
 	case NSOtherMouseDragged:
+		view = nsevent.window.contentView;
+
+		if ( ![ view mouse: nsevent.locationInWindow inRect: view.bounds ] )
+			return event::ignore;
+
 		event.motion.x = nsevent.locationInWindow.x;
-		event.motion.y = nsevent.locationInWindow.y;
+		event.motion.y = view.bounds.size.height - nsevent.locationInWindow.y;
 		return event::motion_flag;
 
 	case NSFlagsChanged:
