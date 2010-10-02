@@ -224,7 +224,7 @@ template< typename t >
 template< typename INVALID_USAGE >
     struct to< INVALID_USAGE, typename enable_if< is_construct< INVALID_USAGE > >::type >
 {
-    static void call( const v8::Handle< v8::Value >& value, INVALID_USAGE ) OOE_CONST
+    static void call( const v8::Handle< v8::Value >&, INVALID_USAGE ) OOE_CONST
     {
         OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
     }

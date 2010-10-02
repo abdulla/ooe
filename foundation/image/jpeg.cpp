@@ -24,7 +24,7 @@ namespace
 
     //--- error manager functions ----------------------------------------------
     template< typename type >
-        void OOE_NORETURN jpeg_error( jpeg_common_struct* common )
+        void jpeg_error( jpeg_common_struct* common )
     {
         c8 string[ JMSG_LENGTH_MAX ];
         common->err->format_message( common, string );

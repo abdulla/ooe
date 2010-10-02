@@ -5,7 +5,6 @@
 
 #include <v8.h>
 
-#include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( error ) )

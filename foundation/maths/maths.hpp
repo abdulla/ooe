@@ -17,7 +17,7 @@ const f32 pi_inverse = .3183098861837906715377675267450287f;
 const f32 epsilon = std::numeric_limits< f32 >::epsilon() * 10;
 
 template< u8 >
-    class vector;
+    struct vector;
 
 template< u8 >
     class matrix;

@@ -268,7 +268,8 @@ template< typename t >
 template< typename t >
     struct from< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-    static v8::Handle< v8::Value > call( typename call_traits< t >::param_type tuple )
+    static v8::Handle< v8::Value >
+        call( typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, tuple ) )
     {
         v8::Handle< v8::Array > array = v8::Array::New( LIMIT );
         BOOST_PP_REPEAT( LIMIT, TUPLE_FROM, ~ )

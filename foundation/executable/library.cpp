@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "foundation/executable/library.hpp"
-#include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 
 namespace

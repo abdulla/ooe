@@ -61,7 +61,7 @@ private:
 };
 
 template<>
-    struct result< void >
+    class result< void >
 {
 public:
     typedef void return_type;

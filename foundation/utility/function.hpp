@@ -23,7 +23,7 @@ template< typename >
     struct invoke_null;
 
 template< typename >
-    struct function;
+    class function;
 
 //--- make_function --------------------------------------------------------------------------------
 template< typename type, typename pointer >

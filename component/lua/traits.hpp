@@ -8,204 +8,202 @@
 #include "component/lua/traits_forward.hpp"
 #include "foundation/utility/tuple.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
+
+//--- to -------------------------------------------------------------------------------------------
+template< typename t >
+    struct to< t, typename enable_if< is_sequence< t > >::type >;
+
+template< typename t >
+    struct to< t, typename enable_if< is_set< t > >::type >;
+
+template< typename t >
+    struct to< t, typename enable_if< is_map< t > >::type >;
+
+template< typename t >
+    struct to< t, typename enable_if< is_pair< t > >::type >;
+
+//--- push -----------------------------------------------------------------------------------------
+template< typename t >
+    struct push< t, typename enable_if< is_sequence< t > >::type >;
+
+template< typename t >
+    struct push< t, typename enable_if< is_set< t > >::type >;
+
+template< typename t >
+    struct push< t, typename enable_if< is_map< t > >::type >;
+
+template< typename t >
+    struct push< t, typename enable_if< is_pair< t > >::type >;
+
+//--- traits: sequence -----------------------------------------------------------------------------
+template< typename t >
+    struct to< t, typename enable_if< is_sequence< t > >::type >
 {
-    namespace lua
+    static void call( stack& stack, typename call_traits< t >::reference container, s32 index )
     {
-//--- lua::to ------------------------------------------------------------------
-        template< typename t >
-            struct to< t, typename enable_if< is_sequence< t > >::type >;
+        typedef typename no_ref< t >::type type;
+        type_check( stack, index, lua::type::table );
 
-        template< typename t >
-            struct to< t, typename enable_if< is_set< t > >::type >;
+        up_t table_size = stack.objlen( index );
+        type out;
+        reserve( out, table_size );
 
-        template< typename t >
-            struct to< t, typename enable_if< is_map< t > >::type >;
+        for ( up_t i = 0; i != table_size; ++i )
+        {
+            stack.raw_geti( index, i + 1 );
 
-        template< typename t >
-            struct to< t, typename enable_if< is_pair< t > >::type >;
+            typename type::value_type element;
+            to< typename type::value_type >::call( stack, element, -1 );
+            out.push_back( element );
 
-//--- lua::push ----------------------------------------------------------------
-        template< typename t >
-            struct push< t, typename enable_if< is_sequence< t > >::type >;
+            stack.pop( 1 );
+        }
 
-        template< typename t >
-            struct push< t, typename enable_if< is_set< t > >::type >;
-
-        template< typename t >
-            struct push< t, typename enable_if< is_map< t > >::type >;
-
-        template< typename t >
-            struct push< t, typename enable_if< is_pair< t > >::type >;
+        container.swap( out );
     }
+};
 
-//--- lua::traits: sequence ----------------------------------------------------
-    template< typename t >
-        struct lua::to< t, typename enable_if< is_sequence< t > >::type >
+template< typename t >
+    struct push< t, typename enable_if< is_sequence< t > >::type >
+{
+    static void call( stack& stack, typename call_traits< t >::param_type container )
     {
-        static void call( stack& stack, typename call_traits< t >::reference container, s32 index )
+        typedef typename no_ref< t >::type type;
+        stack.create_table( container.size() );
+        up_t index = 1;
+
+        for ( typename type::const_iterator i = container.begin(), end = container.end();
+            i != end; ++i, ++index )
         {
-            typedef typename no_ref< t >::type type;
-            type_check( stack, index, lua::type::table );
-
-            up_t table_size = stack.objlen( index );
-            type out;
-            reserve( out, table_size );
-
-            for ( up_t i = 0; i != table_size; ++i )
-            {
-                stack.raw_geti( index, i + 1 );
-
-                typename type::value_type element;
-                to< typename type::value_type >::call( stack, element, -1 );
-                out.push_back( element );
-
-                stack.pop( 1 );
-            }
-
-            container.swap( out );
+            push< typename type::value_type >::call( stack, *i );
+            stack.raw_seti( -2, index );
         }
-    };
+    }
+};
 
-    template< typename t >
-        struct lua::push< t, typename enable_if< is_sequence< t > >::type >
+//--- traits: set ----------------------------------------------------------------------------------
+template< typename t >
+    struct to< t, typename enable_if< is_set< t > >::type >
+{
+    static void call( stack& stack, typename call_traits< t >::reference set, s32 index )
     {
-        static void call( stack& stack, typename call_traits< t >::param_type container )
+        typedef typename no_ref< t >::type type;
+        type_check( stack, index, lua::type::table );
+
+        type out;
+        stack.push_nil();
+
+        for ( ; stack.next( index ); stack.pop( 1 ) )
         {
-            typedef typename no_ref< t >::type type;
-            stack.create_table( container.size() );
-            up_t index = 1;
-
-            for ( typename type::const_iterator i = container.begin(), end = container.end();
-                i != end; ++i, ++index )
-            {
-                push< typename type::value_type >::call( stack, *i );
-                stack.raw_seti( -2, index );
-            }
+            typename type::key_type key;
+            to< typename type::key_type >::call( stack, key, -2 );
+            out.insert( key );
         }
-    };
 
-//--- lua::traits: set ---------------------------------------------------------
-    template< typename t >
-        struct lua::to< t, typename enable_if< is_set< t > >::type >
+        set.swap( out );
+    }
+};
+
+template< typename t >
+    struct push< t, typename enable_if< is_set< t > >::type >
+{
+    static void call( stack& stack, typename call_traits< t >::param_type set )
     {
-        static void call( stack& stack, typename call_traits< t >::reference set, s32 index )
+        typedef typename no_ref< t >::type type;
+        stack.create_table( 0, set.size() );
+
+        for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
         {
-            typedef typename no_ref< t >::type type;
-            type_check( stack, index, lua::type::table );
-
-            type out;
-            stack.push_nil();
-
-            for ( ; stack.next( index ); stack.pop( 1 ) )
-            {
-                typename type::key_type key;
-                to< typename type::key_type >::call( stack, key, -2 );
-                out.insert( key );
-            }
-
-            set.swap( out );
+            push< typename type::key_type >::call( stack, *i );
+            push< bool >::call( stack, true );
+            stack.raw_set( -3 );
         }
-    };
+    }
+};
 
-    template< typename t >
-        struct lua::push< t, typename enable_if< is_set< t > >::type >
+//--- traits: map ----------------------------------------------------------------------------------
+template< typename t >
+    struct to< t, typename enable_if< is_map< t > >::type >
+{
+    static void call( stack& stack, typename call_traits< t >::reference map, s32 index )
     {
-        static void call( stack& stack, typename call_traits< t >::param_type set )
+        typedef typename no_ref< t >::type type;
+        type_check( stack, index, lua::type::table );
+
+        type out;
+        stack.push_nil();
+
+        for ( ; stack.next( index ); stack.pop( 1 ) )
         {
-            typedef typename no_ref< t >::type type;
-            stack.create_table( 0, set.size() );
-
-            for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
-            {
-                push< typename type::key_type >::call( stack, *i );
-                push< bool >::call( stack, true );
-                stack.raw_set( -3 );
-            }
+            typename type::key_type key;
+            to< typename type::key_type >::call( stack, key, -2 );
+            typename type::mapped_type mapped;
+            to< typename type::mapped_type >::call( stack, mapped, -1 );
+            out.insert( typename type::value_type( key, mapped ) );
         }
-    };
 
-//--- lua::traits: map ---------------------------------------------------------
-    template< typename t >
-        struct lua::to< t, typename enable_if< is_map< t > >::type >
+        map.swap( out );
+    }
+};
+
+template< typename t >
+    struct push< t, typename enable_if< is_map< t > >::type >
+{
+    static void call( stack& stack, typename call_traits< t >::param_type map )
     {
-        static void call( stack& stack, typename call_traits< t >::reference map, s32 index )
+        typedef typename no_ref< t >::type type;
+        stack.create_table( 0, map.size() );
+
+        for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
         {
-            typedef typename no_ref< t >::type type;
-            type_check( stack, index, lua::type::table );
-
-            type out;
-            stack.push_nil();
-
-            for ( ; stack.next( index ); stack.pop( 1 ) )
-            {
-                typename type::key_type key;
-                to< typename type::key_type >::call( stack, key, -2 );
-                typename type::mapped_type mapped;
-                to< typename type::mapped_type >::call( stack, mapped, -1 );
-                out.insert( typename type::value_type( key, mapped ) );
-            }
-
-            map.swap( out );
+            push< typename type::key_type >::call( stack, i->first );
+            push< typename type::mapped_type >::call( stack, i->second );
+            stack.raw_set( -3 );
         }
-    };
+    }
+};
 
-    template< typename t >
-        struct lua::push< t, typename enable_if< is_map< t > >::type >
+//--- traits: pair ---------------------------------------------------------------------------------
+template< typename t >
+    struct to< t, typename enable_if< is_pair< t > >::type >
+{
+    static void call( stack& stack, typename call_traits< t >::reference pair, s32 index )
     {
-        static void call( stack& stack, typename call_traits< t >::param_type map )
-        {
-            typedef typename no_ref< t >::type type;
-            stack.create_table( 0, map.size() );
+        typedef typename no_ref< t >::type type;
+        type_check( stack, index, lua::type::table );
+        up_t table_size = stack.objlen( index );
 
-            for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
-            {
-                push< typename type::key_type >::call( stack, i->first );
-                push< typename type::mapped_type >::call( stack, i->second );
-                stack.raw_set( -3 );
-            }
-        }
-    };
+        if ( table_size != 2 )
+            throw error::lua() << "Table is of size " << table_size << ", pair is of size 2";
 
-//--- lua::traits: pair --------------------------------------------------------
-    template< typename t >
-        struct lua::to< t, typename enable_if< is_pair< t > >::type >
+        stack.raw_geti( index, 1 );
+        to< typename type::first_type >::call( stack, pair.first, -1 );
+
+        stack.raw_geti( index, 2 );
+        to< typename type::second_type >::call( stack, pair.second, -1 );
+
+        stack.pop( 2 );
+    }
+};
+
+template< typename t >
+    struct push< t, typename enable_if< is_pair< t > >::type >
+{
+    static void call( stack& stack, typename call_traits< t >::param_type pair )
     {
-        static void call( stack& stack, typename call_traits< t >::reference pair, s32 index )
-        {
-            typedef typename no_ref< t >::type type;
-            type_check( stack, index, lua::type::table );
-            up_t table_size = stack.objlen( index );
+        typedef typename no_ref< t >::type type;
+        stack.create_table( 2 );
 
-            if ( table_size != 2 )
-                throw error::lua() << "Table is of size " << table_size << ", pair is of size 2";
+        push< typename type::first_type >::call( stack, pair.first );
+        stack.raw_seti( -2, 1 );
 
-            stack.raw_geti( index, 1 );
-            to< typename type::first_type >::call( stack, pair.first, -1 );
+        push< typename type::second_type >::call( stack, pair.second );
+        stack.raw_seti( -2, 2 );
+    }
+};
 
-            stack.raw_geti( index, 2 );
-            to< typename type::second_type >::call( stack, pair.second, -1 );
-
-            stack.pop( 2 );
-        }
-    };
-
-    template< typename t >
-        struct lua::push< t, typename enable_if< is_pair< t > >::type >
-    {
-        static void call( stack& stack, typename call_traits< t >::param_type pair )
-        {
-            typedef typename no_ref< t >::type type;
-            stack.create_table( 2 );
-
-            push< typename type::first_type >::call( stack, pair.first );
-            stack.raw_seti( -2, 1 );
-
-            push< typename type::second_type >::call( stack, pair.second );
-            stack.raw_seti( -2, 2 );
-        }
-    };
-}
+OOE_NAMESPACE_END( ( ooe )( lua ) )
 
     #define BOOST_PP_ITERATION_LIMITS ( 0, OOE_PP_LIMIT )
     #define BOOST_PP_FILENAME_1 "component/lua/traits.hpp"
@@ -227,47 +225,41 @@ namespace ooe
         push< typename tuple_element< n, t >::type >::call( stack, tuple._ ## n );\
         stack.raw_seti( -2, n + 1 );
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
+
+//--- traits: tuple --------------------------------------------------------------------------------
+template< typename t >
+    struct to< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-    namespace lua
+    static void call( stack& stack,
+        typename call_traits< t >::reference BOOST_PP_EXPR_IF( LIMIT, tuple ), s32 index )
     {
-        template< typename t >
-            struct to< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >;
+        typedef typename no_ref< t >::type type;
+        type_check( stack, index, lua::type::table );
 
-        template< typename t >
-            struct push< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >;
+        up_t table_size = stack.objlen( index );
+
+        if ( table_size != LIMIT )
+            throw error::lua() <<
+                "Table is of size " << table_size << ", tuple is of size " << LIMIT;
+
+        BOOST_PP_REPEAT( LIMIT, TUPLE_TO, ~ )
+        BOOST_PP_EXPR_IF( LIMIT, stack.pop( LIMIT ); )
     }
+};
 
-//--- lua::traits: tuple -------------------------------------------------------
-    template< typename t >
-        struct lua::to< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
+template< typename t >
+    struct push< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
+{
+    static void call( stack& stack,
+        typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, tuple ) )
     {
-        static void call( stack& stack, typename call_traits< t >::reference tuple, s32 index )
-        {
-            typedef typename no_ref< t >::type type;
-            type_check( stack, index, lua::type::table );
+        stack.create_table( LIMIT );
+        BOOST_PP_REPEAT( LIMIT, TUPLE_PUSH, ~ )
+    }
+};
 
-            up_t table_size = stack.objlen( index );
-
-            if ( table_size != LIMIT )
-                throw error::lua() <<
-                    "Table is of size " << table_size << ", tuple is of size " << LIMIT;
-
-            BOOST_PP_REPEAT( LIMIT, TUPLE_TO, ~ )
-            BOOST_PP_EXPR_IF( LIMIT, stack.pop( LIMIT ); )
-        }
-    };
-
-    template< typename t >
-        struct lua::push< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
-    {
-        static void call( stack& stack, typename call_traits< t >::param_type tuple )
-        {
-            stack.create_table( LIMIT );
-            BOOST_PP_REPEAT( LIMIT, TUPLE_PUSH, ~ )
-        }
-    };
-}
+OOE_NAMESPACE_END( ( ooe )( lua ) )
 
     #undef TUPLE_PUSH
     #undef TUPLE_TO

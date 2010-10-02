@@ -26,8 +26,8 @@ namespace ooe
     epoch_t timer::epoch( void )
     {
         initialise_timebase();
-        u64 time = mach_absolute_time() * timebase.numer / timebase.denom;
-        return epoch_t( time / 1000000000, time % 1000000000 );
+        u64 absolute = mach_absolute_time() * timebase.numer / timebase.denom;
+        return epoch_t( absolute / 1000000000, absolute % 1000000000 );
     }
 
     epoch_t timer::sleep( epoch_t value )

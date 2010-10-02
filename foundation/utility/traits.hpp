@@ -40,10 +40,10 @@ template< typename >
     class allocator;
 
 template< typename >
-    class less;
+    struct less;
 
 template< typename, typename >
-    class pair;
+    struct pair;
 
 template< typename, typename >
     class vector;

@@ -13,7 +13,7 @@ struct addrinfo;
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-struct address;
+class address;
 
 //--- socket ---------------------------------------------------------------------------------------
 struct OOE_VISIBLE socket

@@ -11,10 +11,12 @@
 #include <dlfcn.h>
 #include <execinfo.h>
 
+// forward declare string conversion functions
+#include "foundation/utility/string.hpp"
+
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/pointer.hpp"
-#include "foundation/utility/string.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
