@@ -19,7 +19,7 @@ template< typename type >
     class atom_base
 {
 public:
-    atom_base( type value = 0 )
+    explicit atom_base( type value = 0 )
         : atomic( value )
     {
     }
@@ -64,6 +64,11 @@ public:
         return exchange_add( -value ) - value;
     }
 
+    type swap( type value )
+    {
+        return exchange( value );
+    }
+
     bool cas( type compare, type value )
     {
         return compare_exchange( compare, value );
@@ -96,7 +101,9 @@ template< typename type >
     struct atom
     : public atom_base< type >
 {
-    atom( type value_ = 0 )
+    using atom_base< type >::operator =;
+
+    explicit atom( type value_ = 0 )
         : atom_base< type >( value_ )
     {
     }
@@ -106,7 +113,9 @@ template< typename type >
     struct atom< type* >
     : public atom_base< type* >
 {
-    atom( type* value_ = 0 )
+    using atom_base< type* >::operator =;
+
+    explicit atom( type* value_ = 0 )
         : atom_base< type* >( value_ )
     {
     }
