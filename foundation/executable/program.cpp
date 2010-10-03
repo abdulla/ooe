@@ -25,8 +25,8 @@ void signal_handler( s32 code, siginfo_t* info, void* )
     switch ( code )
     {
     case OOE_SIGFAULT:
-    case SIGFPE:
     case SIGABRT:
+    case SIGFPE:
         description = strsignal( code );
         trace = stack_trace();
         OOE_WARNING( "executable", "Caught signal " << code << " at " << info->si_addr << ": " <<
@@ -78,6 +78,7 @@ s32 launch( launch_type launch, s32 argc, c8** argv )
 
     struct sigaction action;
     signal( action, signal_handler, OOE_SIGFAULT );
+    signal( action, signal_handler, SIGABRT );
     signal( action, signal_handler, SIGFPE );
     signal( action, signal_handler, SIGTERM );
 
