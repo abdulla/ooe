@@ -75,7 +75,7 @@ public:
     }
 
 protected:
-    volatile type atomic;
+    type atomic;
 
 private:
 #if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
