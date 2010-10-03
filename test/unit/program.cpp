@@ -8,7 +8,7 @@
 #include "test/unit/program.hpp"
 #include "test/unit/runner.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** argv )
 {
@@ -23,8 +23,8 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
         case 'l':
             std::cout << "Available groups of tests:\n";
 
-            for ( unit::runner::iterator_type i = unit::global_runner.begin(),
-                end = unit::global_runner.end(); i != end; ++i )
+            for ( runner::iterator_type i = global_runner.begin(), end = global_runner.end();
+                i != end; ++i )
                 std::cout << "    " << i->first << '\n';
 
             return true;
@@ -53,20 +53,20 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
     }
 
     if ( optind == argc )
-        return unit::global_runner.run( timeout, no_stdout );
+        return global_runner.run( timeout, no_stdout );
 
     bool success = true;
 
     for ( s32 i = optind; i != argc; ++i )
     {
-        if ( !unit::global_runner.run( argv[ i ], timeout, no_stdout ) )
+        if ( !global_runner.run( argv[ i ], timeout, no_stdout ) )
             success = false;
     }
 
     return success;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( unit ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
