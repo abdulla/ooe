@@ -16,7 +16,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 template< typename, up_t >
     struct insert_test;
 
-//--- unit::fixture --------------------------------------------------------------------------------
+//--- fixture --------------------------------------------------------------------------------------
 template< typename setup, typename data >
     struct fixture
     : private data
@@ -29,7 +29,7 @@ template< typename setup, typename data >
     }
 };
 
-//--- unit::group_base -----------------------------------------------------------------------------
+//--- group_base -----------------------------------------------------------------------------------
 class group_base
 {
 public:
@@ -48,7 +48,7 @@ private:
     vector_type vector;
 };
 
-//--- unit::group ----------------------------------------------------------------------------------
+//--- group ----------------------------------------------------------------------------------------
 template< typename setup, typename data, up_t size >
     class group
     : public group_base
@@ -71,7 +71,7 @@ private:
     }
 };
 
-//--- unit::invoke_test ----------------------------------------------------------------------------
+//--- invoke_test ----------------------------------------------------------------------------------
 template< typename group, void ( group::fixture_type::* member )( typename group::setup_type& ) >
     void invoke_test( void* pointer )
 {
@@ -79,7 +79,7 @@ template< typename group, void ( group::fixture_type::* member )( typename group
     ( instance.*member )( *static_cast< typename group::setup_type* >( pointer ) );
 }
 
-//--- unit::insert_test ----------------------------------------------------------------------------
+//--- insert_test ----------------------------------------------------------------------------------
 template< typename group, up_t i >
     struct insert_test
 {
