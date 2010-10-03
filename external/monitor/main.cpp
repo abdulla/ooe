@@ -4,6 +4,8 @@
 
 #include <ctime>
 
+#include <paths.h>
+
 #include "foundation/executable/program.hpp"
 #include "foundation/image/jpeg.hpp"
 #include "foundation/utility/arithmetic.hpp"
@@ -75,7 +77,7 @@ namespace
 
     bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     {
-        std::string directory = ".";
+        std::string directory = _PATH_TMP;
         up_t percent = 5;
         u16 width = 640;
         u16 height = 480;
