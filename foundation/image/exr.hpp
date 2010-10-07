@@ -6,13 +6,11 @@
 #include "foundation/image/image.hpp"
 #include "foundation/io/descriptor.hpp"
 
-namespace ooe
-{
-    namespace exr
-    {
-        uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
-        uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
-    }
-}
+OOE_NAMESPACE_BEGIN( ( ooe )( exr ) )
+
+uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
+uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
+
+OOE_NAMESPACE_END( ( ooe )( exr ) )
 
 #endif  // OOE_FOUNDATION_IMAGE_EXR_HPP
