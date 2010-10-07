@@ -1,4 +1,4 @@
-replace maths with eigen2
+replace math with eigen2
     - uses expression templates like blitz++ but is sse optimised
     - other option is to roll my own, considering my limited needs, it is a possibility
 

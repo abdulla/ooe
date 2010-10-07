@@ -2,7 +2,7 @@
 
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/maths/maths.hpp"
+#include "foundation/math/math.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"

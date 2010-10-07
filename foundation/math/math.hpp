@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_FOUNDATION_MATHS_MATHS_HPP
-#define OOE_FOUNDATION_MATHS_MATHS_HPP
+#ifndef OOE_FOUNDATION_MATH_MATH_HPP
+#define OOE_FOUNDATION_MATH_MATH_HPP
 
 #include <limits>
 
@@ -265,4 +265,4 @@ template<>
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-#endif  // OOE_FOUNDATION_MATHS_MATHS_HPP
+#endif  // OOE_FOUNDATION_MATH_MATH_HPP

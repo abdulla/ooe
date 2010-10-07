@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "foundation/maths/maths.hpp"
+#include "foundation/math/math.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

@@ -1,6 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/maths/maths.hpp"
+#include "foundation/math/math.hpp"
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
@@ -8,7 +8,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 typedef unit::group< anonymous_t, anonymous_t, 7 > group_type;
 typedef group_type::fixture_type fixture_type;
-group_type group( "maths" );
+group_type group( "math" );
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 

@@ -5,7 +5,7 @@
 
 #include <map>
 
-#include "foundation/maths/maths.hpp"
+#include "foundation/math/math.hpp"
 #include "foundation/utility/tuple.hpp"
 #include "foundation/visual/graphics.hpp"
 

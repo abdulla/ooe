@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "foundation/maths/geometry.hpp"
+#include "foundation/math/geometry.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 

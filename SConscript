@@ -81,7 +81,7 @@ build.Linkable( 'image', 'foundation/image', 'io', include_path = ooe.exr.includ
     configure = ImageConfigure )
 build.Linkable( 'io', 'foundation/io', configure = IOConfigure )
 build.Linkable( 'ipc', 'foundation/ipc foundation/ipc/memory foundation/ipc/socket', 'io parallel' )
-build.Linkable( 'maths', 'foundation/maths' )
+build.Linkable( 'math', 'foundation/math' )
 build.Linkable( 'opengl', 'foundation/opengl', 'io', configure = OpenGLConfigure )
 build.Linkable( 'parallel', 'foundation/parallel', configure = ParallelConfigure )
 build.Linkable( 'visual', 'foundation/visual', 'image parallel', ooe.qtkit.framework,
@@ -94,7 +94,7 @@ build.Executable( 'lua_host', 'component/lua/host', 'executable lua registry' )
 build.Executable( 'python_host', 'component/python/host', 'executable python registry' )
 build.Executable( 'registry', 'component/registry/server', 'executable registry' )
 build.Executable( 'surrogate', 'component/registry/surrogate', 'executable registry' )
-build.Executable( 'ui', 'component/ui', 'executable maths visual' )
+build.Executable( 'ui', 'component/ui', 'executable math visual' )
 
 build.Linkable( 'javascript', 'component/javascript', 'io', configure = JavaScriptConfigure )
 build.Linkable( 'lua', 'component/lua', 'io', include_path = ooe.lua.include_path,
@@ -109,8 +109,8 @@ build.Executable( 'registry_test', 'test/component/registry',
 build.Executable( 'image_test', 'test/foundation/image', 'image unit' )
 build.Executable( 'io_test', 'test/foundation/io', 'parallel unit' )
 build.Executable( 'ipc_test', 'test/foundation/ipc', 'ipc unit' )
-build.Executable( 'maths_test', 'test/foundation/maths', 'maths unit' )
-build.Executable( 'opengl_test', 'test/foundation/opengl', 'maths unit visual' )
+build.Executable( 'math_test', 'test/foundation/math', 'math unit' )
+build.Executable( 'opengl_test', 'test/foundation/opengl', 'math unit visual' )
 build.Executable( 'parallel_test', 'test/foundation/parallel', 'parallel unit' )
 build.Executable( 'utility_test', 'test/foundation/utility', 'unit' )
 
