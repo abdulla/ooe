@@ -101,7 +101,7 @@ template<>
     std::cerr << "test texture array\n";
 
     std::string root = executable::path()._0;
-    library library( root + "../library/libopengl" + library::suffix, library::global_lazy );
+    library library( root + "../lib/libopengl.so", library::global_lazy );
 
     event_queue event_queue;
     view view( event_queue, width, height, false );

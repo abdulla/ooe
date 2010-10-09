@@ -176,7 +176,7 @@ shader_vector make_shaders( const device_type& device, const std::string& root )
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
     // graphics library must be preloaded for linux
-    library library( root + "../library/libopengl" + library::suffix, library::global_lazy );
+    library library( root + "../lib/libopengl.so", library::global_lazy );
 
     event_queue event_queue;
     view view( event_queue, width, height, false );

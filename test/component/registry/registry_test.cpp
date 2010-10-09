@@ -29,7 +29,7 @@ public:
         : path_( executable::path()._0 ), fork( 0 )
     {
         start_server();
-        std::string module_path = path_ + "../library/libhello" + library::suffix;
+        std::string module_path = path_ + "../lib/libhello.so";
         registry registry;
         registry.insert( registry::library, module_path );
     }
@@ -97,7 +97,7 @@ template<>
 {
     std::cerr << "load library in-process\n";
 
-    std::string path = setup.path() + "../library/libhello" + library::suffix;
+    std::string path = setup.path() + "../lib/libhello.so";
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
@@ -115,7 +115,7 @@ template<>
 {
     std::cerr << "insert and load library as surrogate\n";
 
-    std::string path = setup.path() + "../library/libhello" + library::suffix;
+    std::string path = setup.path() + "../lib/libhello.so";
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
