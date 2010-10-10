@@ -42,7 +42,7 @@ inline void send_name( socket& socket, const std::string& name )
 
     if ( socket.send( &size, sizeof( size ) ) != sizeof( size ) )
         throw error::runtime( "ipc::memory::transport: " ) << "Unable to send size";
-    else if ( socket.send( name.c_str(), size ) != size )
+    else if ( socket.send( name.data(), size ) != size )
         throw error::runtime( "ipc::memory::transport: " ) << "Unable to send name";
 }
 
