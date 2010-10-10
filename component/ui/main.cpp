@@ -5,6 +5,7 @@
 #include "component/ui/text_layout.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/io/vfs.hpp"
 #include "foundation/math/math.hpp"
 #include "foundation/parallel/thread_pool.hpp"
 #include "foundation/visual/event_queue.hpp"

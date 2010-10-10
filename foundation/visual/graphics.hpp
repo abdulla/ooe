@@ -5,12 +5,12 @@
 
 #include <vector>
 
-#include "foundation/io/memory.hpp"
-#include "foundation/io/vfs.hpp"
 #include "foundation/image/image.hpp"
+#include "foundation/utility/string.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+class vfs;
 class image_pyramid;
 
 template< u8 >
@@ -18,7 +18,6 @@ template< u8 >
 
 typedef matrix< 3 > mat3;
 typedef matrix< 4 > mat4;
-typedef std::vector< memory > memory_vector;
 
 //--- texture --------------------------------------------------------------------------------------
 struct texture
@@ -199,7 +198,7 @@ struct device
     virtual buffer_type buffer
         ( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
     virtual target_type target( u32, u32, image::type ) const = 0;
-    virtual shader_type shader( const memory_vector&, shader::type ) const = 0;
+    virtual shader_type shader( const std::string&, shader::type ) const = 0;
     virtual program_type program( const shader_vector& ) const = 0;
     virtual frame_type default_frame( u32, u32 ) const = 0;
 };
@@ -237,7 +236,7 @@ public:
 private:
     const device_type& device;
     const ooe::vfs& vfs;
-    memory_vector vector;
+    std::string header;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )

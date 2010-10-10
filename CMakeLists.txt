@@ -50,7 +50,7 @@ target_link_libraries( ipc io parallel )
 ooe_library( math foundation/math )
 
 ooe_module( opengl foundation/opengl )
-target_link_libraries( opengl io ${OPENGL_gl_LIBRARY} )
+target_link_libraries( opengl ${OPENGL_gl_LIBRARY} )
 
 ooe_library( parallel foundation/parallel )
 target_link_libraries( parallel ${CMAKE_THREAD_LIBS_INIT} )

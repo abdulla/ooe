@@ -15,10 +15,29 @@ const f32 height = 480;
 const u32 texture_size = 256;
 const image::type texture_format = image::rgb_u8;
 
-shader_type make_shader( const device_type& device, const std::string& path, shader::type type )
-{
-    return device->shader( memory_vector( 1, descriptor( path ) ), type );
-}
+const c8 vertex_shader[] =
+"uniform mat4 projection;\n\
+attribute vec2 vertex;\n\
+attribute vec2 coords;\n\
+varying vec2 texcoord;\n\
+\n\
+void main( void )\n\
+{\n\
+    gl_Position = projection * vec4( vertex, 0, 1 );\n\
+    texcoord = coords;\n\
+}";
+
+const c8 fragment_shader[] =
+"#extension GL_EXT_gpu_shader4 : enable\n\
+\n\
+uniform sampler2DArray sampler;\n\
+uniform int index;\n\
+varying vec2 texcoord;\n\
+\n\
+void main( void )\n\
+{\n\
+    gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );\n\
+}";
 
 buffer_type point_buffer( const device_type& device )
 {
@@ -109,8 +128,8 @@ template<>
         library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, false );
 
     shader_vector vector;
-    vector.push_back( make_shader( device, root + "../resource/glsl/unit.vs", shader::vertex ) );
-    vector.push_back( make_shader( device, root + "../resource/glsl/unit.fs", shader::fragment ) );
+    vector.push_back( device->shader( vertex_shader, shader::vertex ) );
+    vector.push_back( device->shader( fragment_shader, shader::fragment ) );
     program_type program = device->program( vector );
 
     const s32 array_size = device->limit( device::array_size );
