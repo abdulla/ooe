@@ -185,7 +185,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
         library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, true );
 
     font::library font_library;
-    font::face font_face( font_library, root + "../share/font/myriadpro-sans.otf" );
+    font::face font_face( font_library, root + "../share/font/ubuntu-regular.ttf" );
     font_source font_source( font_face, 512, root + "../cache" );
     thread_pool pool;
     page_cache cache( device, pool, font_source.format(), font_source.page_size() );
