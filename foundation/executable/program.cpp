@@ -87,7 +87,7 @@ s32 launch( launch_type launch, s32 argc, c8** argv )
     try
     {
         path_type path = executable::path();
-        std::string log = path._0 + path._1 + ".log";
+        std::string log = path._0 + "../log/" + path._1 + ".log";
 
         if ( close( STDERR_FILENO ) == -1 )
             throw error::runtime( "executable::launch: " ) <<

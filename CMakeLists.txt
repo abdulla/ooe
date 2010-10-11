@@ -36,6 +36,7 @@ include_directories( ${ZLIB_INCLUDE_DIRS} )
 ### data ###########################################################################################
 file( COPY share DESTINATION . )
 file( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/cache )
+file( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/log )
 
 ### foundation: library ############################################################################
 ooe_library( executable foundation/executable )
