@@ -97,10 +97,6 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
     case NSKeyUp:
         event.key.value = [ nsevent.charactersIgnoringModifiers characterAtIndex: 0 ];
         event.key.press = nsevent.type == NSKeyDown;
-
-        if ( nsevent.modifierFlags & NSShiftKeyMask )
-            event.key.value = tolower( event.key.value );
-
         return event::key_flag;
 
     case NSLeftMouseDown:

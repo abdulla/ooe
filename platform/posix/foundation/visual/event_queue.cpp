@@ -61,7 +61,7 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
 
     case KeyPress:
     case KeyRelease:
-        event.key.value = XLookupKeysym( &xevent.xkey, 0 );
+        event.key.value = XLookupKeysym( &xevent.xkey, 1 );
         event.key.press = xevent.type == KeyPress;
         return event::key_flag;
 
