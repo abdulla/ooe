@@ -204,19 +204,13 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     device->set( device::blend, true );
     block->input( "colour", 255, 255, 255 );
 
-    u32 source_size = font_source.size();
-    u16 page_size = font_source.page_size();
-    u32 font_size = font_source.font_size();
-    vt.load( 0, 0, source_size, font_size, log2( source_size / page_size ) - 1 );
-    cache.write();
-
     std::string string;
     text_layout layout( device, vt, font_source );
     block_type text;
 
     frame_type frame = device->default_frame( width, height );
     vec3 translate( width / 2, height / 2, 0 );
-    vec3 scale( page_size, page_size, 1 );
+    vec3 scale( font_source.page_size(), font_source.page_size(), 1 );
 
     while ( !executable::has_signal() )
     {
