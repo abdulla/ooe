@@ -24,7 +24,7 @@ template<>
     std::cerr << "iterate through an archive\n";
 
     std::string path = executable::path()._0;
-    archive archive( descriptor( path + "../resource/test/archive.zip" ) );
+    archive archive( descriptor( path + "../share/test/archive.zip" ) );
     archive::file stored = archive.open( "stored" );
     archive::file deflated = archive.open( "deflated" );
 

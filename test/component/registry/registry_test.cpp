@@ -160,7 +160,7 @@ template<>
     lua::vm vm;
     vm.setup( lua::component_setup );
 
-    std::string path = setup.path() + "../resource/hello/script.lua";
+    std::string path = setup.path() + "../share/hello/script.lua";
     vm.load( "hello/script.lua", path );
 
     std::cout <<
@@ -177,7 +177,7 @@ template<>
     javascript::vm vm;
     vm.setup( javascript::component_setup );
 
-    std::string path = setup.path() + "../resource/hello/script.js";
+    std::string path = setup.path() + "../share/hello/script.js";
     vm.load( "hello/script.js", path );
 
     std::cout <<
@@ -194,7 +194,7 @@ template<>
     python::vm vm;
     vm.setup( python::component_setup );
 
-    std::string path = setup.path() + "../resource/hello/script.py";
+    std::string path = setup.path() + "../share/hello/script.py";
     vm.load( "hello/script.py", path );
 
     std::cout << "Python version: " << vm.version() << '\n';

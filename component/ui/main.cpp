@@ -162,7 +162,7 @@ buffer_type make_index( const device_type& device )
 shader_vector make_shaders( const device_type& device, const std::string& root )
 {
     vfs vfs;
-    vfs.insert( root + "../resource/glsl", "/" );
+    vfs.insert( root + "../share/glsl", "/" );
     shader_include include( device, vfs );
     include.insert( "virtual_texture.hs" );
 
@@ -185,7 +185,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
         library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, true );
 
     font::library font_library;
-    font::face font_face( font_library, root + "../resource/font/myriadpro-sans.otf" );
+    font::face font_face( font_library, root + "../share/font/myriadpro-sans.otf" );
     font_source font_source( font_face, 512, root + "../cache" );
     thread_pool pool;
     page_cache cache( device, pool, font_source.format(), font_source.page_size() );

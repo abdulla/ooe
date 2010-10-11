@@ -1,4 +1,4 @@
-project( ooe )
+project( OOE )
 
 cmake_minimum_required( VERSION 2.8 )
 list( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/platform/module )
@@ -32,6 +32,10 @@ include_directories( ${PYTHON_INCLUDE_DIRS} )
 include_directories( ${SQUISH_INCLUDE_DIR} )
 include_directories( ${V8_INCLUDE_DIRS} )
 include_directories( ${ZLIB_INCLUDE_DIRS} )
+
+### data ###########################################################################################
+file( COPY share DESTINATION . )
+file( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/cache )
 
 ### foundation: library ############################################################################
 ooe_library( executable foundation/executable )

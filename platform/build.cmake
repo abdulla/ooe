@@ -1,6 +1,13 @@
 ### out-of-source ##################################################################################
-if( PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR )
+get_filename_component( PARENT_DIR ${PROJECT_BINARY_DIR} PATH )
+
+if( PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR OR PROJECT_SOURCE_DIR STREQUAL PARENT_DIR )
     message( FATAL_ERROR "CMake must be run outside of the source directory." )
+endif()
+
+if( EXISTS ${CMAKE_SOURCE_DIR}/CMakeCache.txt OR EXISTS ${CMAKE_SOURCE_DIR}/CMakeFiles )
+    message( FATAL_ERROR
+        "Source tree is polluted with build files, please remove CMakeCache.txt and CMakeFiles." )
 endif()
 
 ### flags ##########################################################################################
@@ -11,15 +18,22 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY bin )
 
 if( NOT CMAKE_BUILD_TYPE )
     set( CMAKE_BUILD_TYPE DEBUG )
+else()
+    string( TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE )
 endif()
 
-string( TOUPPER ${CMAKE_BUILD_TYPE} BUILD_TYPE )
-
-if( BUILD_TYPE STREQUAL "DEBUG" )
+if( CMAKE_BUILD_TYPE STREQUAL "DEBUG" )
+    unset( CMAKE_C_FLAGS_DEBUG CACHE )
+    unset( CMAKE_CXX_FLAGS_DEBUG CACHE )
     add_definitions( -O0 -g2 -fno-inline -fstack-protector-all -D_FORTIFY_SOURCE=2 )
-else()
+elseif( CMAKE_BUILD_TYPE STREQUAL "RELEASE" )
+    unset( CMAKE_C_FLAGS_RELEASE CACHE )
+    unset( CMAKE_CXX_FLAGS_RELEASE CACHE )
     add_definitions( -O3 -g0 -fomit-frame-pointer -ffast-math -ftracer -fweb -fvisibility=hidden
         -fvisibility-inlines-hidden )
+else()
+    message( FATAL_ERROR
+        "Project ${PROJECT_NAME} does not support build type ${CMAKE_BUILD_TYPE}." )
 endif()
 
 add_definitions( -pipe -ansi -pedantic-errors -fno-enforce-eh-specs -fuse-cxa-atexit
