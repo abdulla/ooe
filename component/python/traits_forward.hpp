@@ -271,7 +271,7 @@ template< typename t >
 template< typename INVALID_USAGE >
     struct as< INVALID_USAGE, typename enable_if< is_construct< INVALID_USAGE > >::type >
 {
-    static void call( PyObject* object, INVALID_USAGE )
+    static void call( PyObject*, INVALID_USAGE )
     {
         OOE_STATIC_ASSERT( !sizeof( INVALID_USAGE ) );
     }
@@ -347,7 +347,7 @@ template< typename t >
         python::object object = valid( PyList_New( array_size ) );
 
         for ( up_t i = 0; i != array_size; ++i )
-            PyList_SET_ITEM( object, i,
+            PyList_SET_ITEM( object.get(), i,
                 from< typename remove_extent< type >::type >::call( array[ i ] ) );
 
         return object.release();

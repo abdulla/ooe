@@ -238,7 +238,8 @@ OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 template< typename t >
     struct as< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-    static void call( PyObject* object, typename call_traits< t >::reference tuple )
+    static void call( PyObject* object,
+        typename call_traits< t >::reference BOOST_PP_EXPR_IF( LIMIT, tuple ) )
     {
         if ( !PyTuple_Check( object ) )
             throw error::python() << "Object is not a tuple";
@@ -255,7 +256,7 @@ template< typename t >
 template< typename t >
     struct from< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-    static PyObject* call( typename call_traits< t >::param_type tuple )
+    static PyObject* call( typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, tuple ) )
     {
         python::object object = valid( PyTuple_New( LIMIT ) );
         BOOST_PP_REPEAT( LIMIT, TUPLE_FROM, ~ )
