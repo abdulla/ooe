@@ -4,6 +4,7 @@
 
 #include "component/registry/local.hpp"
 #include "component/registry/module.hpp"
+#include "component/registry/registry.hpp"
 #include "component/registry/remote.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/nameservice.hpp"
@@ -30,18 +31,29 @@ void load_nameservice( ipc::nameservice& nameservice, const module& module )
             ( names[ i ]._0, names[ i ]._1, docs[ i ], remotes[ i ], locals[ i ] );
 }
 
+void* registry_insert( void* surrogate_path )
+{
+    registry().insert( registry::server, static_cast< const c8* >( surrogate_path ) );
+    return 0;
+}
+
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
+    bool public_server = false;
     const c8* library_path = 0;
     const c8* surrogate_path = 0;
 
-    for ( s32 option; ( option = getopt( argc, argv, "l:s:" ) ) != -1; )
+    for ( s32 option; ( option = getopt( argc, argv, "l:ps:" ) ) != -1; )
     {
         switch ( option )
         {
         case 'l':
             library_path = optarg;
+            break;
+
+        case 'p':
+            public_server = true;
             break;
 
         case 's':
@@ -50,6 +62,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 
         default:
             std::cout <<
+                "    -p         Create a public server from surrogate\n"
                 "    -l <path>  Path of library module to load in to surrogate\n"
                 "    -s <path>  Path to use for surrogate\n";
 
@@ -67,7 +80,10 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     ipc::memory::server server( surrogate_path, nameservice );
     ipc::barrier_notify( std::string( surrogate_path ) + ".b" );
 
-    while ( !executable::has_signal() && server.decode() ) {}
+    if ( public_server )
+        thread( registry_insert, const_cast< c8* >( surrogate_path ) );
+
+    while ( !executable::has_signal() && ( public_server || server.decode() ) ) {}
 
     return true;
 }

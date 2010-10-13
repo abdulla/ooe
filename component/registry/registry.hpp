@@ -6,30 +6,31 @@
 #include "component/registry/interface.hpp"
 #include "foundation/ipc/memory/client.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+class OOE_VISIBLE registry
 {
-//--- registry -----------------------------------------------------------------
-    class OOE_VISIBLE registry
+public:
+    enum type
     {
-    public:
-        enum type
-        {
-            server,
-            library
-        };
-
-        typedef tuple< type, std::string > info_tuple;
-        typedef std::vector< info_tuple > info_vector;
-
-        registry( void );
-
-        info_vector find( const interface& );
-        void insert( type, const std::string& );
-        std::string surrogate( const std::string& );
-
-    private:
-        ipc::memory::client client;
+        server,
+        library
     };
-}
+
+    typedef tuple< type, std::string > info_tuple;
+    typedef std::vector< info_tuple > info_vector;
+
+    registry( void );
+
+    info_vector find( const interface& );
+    void insert( type, const std::string& );
+    std::string surrogate( const std::string&, bool = false );
+    info_vector list_all( void );
+
+private:
+    ipc::memory::client client;
+};
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 #endif  // OOE_COMPONENT_REGISTRY_REGISTRY_HPP
