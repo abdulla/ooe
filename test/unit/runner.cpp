@@ -35,9 +35,6 @@ void run_test( const group_base::iterator_type& i, void* pointer, bool no_stdout
 
         test_status = true;
         ( *i )( pointer );
-
-        if ( test_status )
-            fork_io::exit( true );
     }
     catch ( error::runtime& error )
     {
@@ -52,7 +49,7 @@ void run_test( const group_base::iterator_type& i, void* pointer, bool no_stdout
         std::cerr << "An unknown exception was thrown\n";
     }
 
-    fork_io::exit( false );
+    return test_status;
 }
 
 std::string read( file& in )
@@ -112,7 +109,7 @@ vector_type run_group( group_base& group, time_t timeout, bool no_stdout )
         if ( !fork_io.is_child() )
             list.push_back( list_tuple( j++, fork_io, pair._0, timer() ) );
         else
-            run_test( i, pointer, no_stdout );
+            fork_io::exit( run_test( i, pointer, no_stdout ) );
     }
 
     vector_type vector( j );
