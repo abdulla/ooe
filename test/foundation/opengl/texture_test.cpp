@@ -6,6 +6,7 @@
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
+#include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
@@ -127,14 +128,15 @@ template<>
     device_type device =
         library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, false );
 
+    const s32 array_size = device->limit( device::array_size );
+    texture_array_type texture_array =
+        device->texture_array( texture_size, texture_size, array_size, texture_format );
+    OOE_CHECK( "texture array size " << array_size << " > 0 ", array_size );
+
     shader_vector vector;
     vector.push_back( device->shader( vertex_shader, shader::vertex ) );
     vector.push_back( device->shader( fragment_shader, shader::fragment ) );
     program_type program = device->program( vector );
-
-    const s32 array_size = device->limit( device::array_size );
-    texture_array_type texture_array =
-        device->texture_array( texture_size, texture_size, array_size, texture_format );
 
     buffer_type point = point_buffer( device );
     block_type block = program->block( index_buffer( device ) );
