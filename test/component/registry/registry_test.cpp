@@ -81,7 +81,7 @@ template<>
 template<>
     void fixture_type::test< 0 >( setup& )
 {
-    std::cerr << "search registry for an interface\n";
+    std::cerr << "search registry for an interface and list all modules\n";
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
@@ -89,13 +89,15 @@ template<>
     registry registry;
     registry::info_vector vector = registry.find( interface );
     OOE_CHECK( "vector.size()", vector.size() );
+    vector = registry.list_all();
+    OOE_CHECK( "vector.size()", vector.size() );
 }
 
 template<>
 template<>
     void fixture_type::test< 1 >( setup& setup )
 {
-    std::cerr << "load library in-process\n";
+    std::cerr << "load module in-process\n";
 
     std::string path = setup.path() + "../lib/libhello.so";
 
@@ -113,7 +115,7 @@ template<>
 template<>
     void fixture_type::test< 2 >( setup& setup )
 {
-    std::cerr << "insert and load library as surrogate\n";
+    std::cerr << "load module as surrogate\n";
 
     std::string path = setup.path() + "../lib/libhello.so";
 
@@ -132,7 +134,7 @@ template<>
 template<>
     void fixture_type::test< 3 >( setup& setup )
 {
-    std::cerr << "insert and load module from server\n";
+    std::cerr << "insert and load module as server\n";
 
     fork_ptr fork( 0 );
 
@@ -155,7 +157,7 @@ template<>
 template<>
     void fixture_type::test< 4 >( setup& setup )
 {
-    std::cerr << "load module in to lua\n";
+    std::cerr << "load module in lua\n";
 
     lua::vm vm;
     vm.setup( lua::component_setup );
@@ -172,7 +174,7 @@ template<>
 template<>
     void fixture_type::test< 5 >( setup& setup )
 {
-    std::cerr << "load module in to javascript\n";
+    std::cerr << "load module in javascript\n";
 
     javascript::vm vm;
     vm.setup( javascript::component_setup );
@@ -189,7 +191,7 @@ template<>
 template<>
     void fixture_type::test< 6 >( setup& setup )
 {
-    std::cerr << "load module in to python\n";
+    std::cerr << "load module in python\n";
 
     python::vm vm;
     vm.setup( python::component_setup );
