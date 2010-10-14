@@ -26,7 +26,7 @@ typedef tuple< bool, std::string > vector_tuple;
 typedef std::vector< vector_tuple > vector_type;
 bool test_status;
 
-void run_test( const group_base::iterator_type& i, void* pointer, bool no_stdout )
+bool run_test( const group_base::iterator_type& i, void* pointer, bool no_stdout )
 {
     try
     {
