@@ -27,7 +27,7 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- fork_id ------------------------------------------------------------------
+//--- fork_id --------------------------------------------------------------------------------------
 fork_id::fork_id( void )
     : pid( fork() )
 {
@@ -53,7 +53,7 @@ fork_id::fork_id( const io_triplet& io )
         replace( STDERR_FILENO, io._2 );
 }
 
-//--- fork_io ------------------------------------------------------------------
+//--- fork_io --------------------------------------------------------------------------------------
 fork_io::fork_io( void )
     : id( new fork_id )
 {
@@ -74,13 +74,20 @@ fork_io::wait_type fork_io::wait( bool block ) const
     s32 status;
     s32 pid = waitpid( id->pid, &status, block ? 0 : WNOHANG );
 
-    if ( pid == id->pid )
-        return WEXITSTATUS( status ) ? failure : success;
-    else if ( !pid )
+    if ( !pid )
         return waiting;
-    else
-        throw error::runtime( "fork_io: " ) <<
-            "Unable to wait for process " << id->pid << ": " << error::number( errno );
+    else if ( pid == id->pid )
+    {
+        if ( WIFEXITED( status ) )
+            return WEXITSTATUS( status ) ? failure : success;
+        else if ( WIFSIGNALED( status ) )
+            return failure;
+        else if ( WIFSTOPPED( status ) || WIFCONTINUED( status ) )
+            return waiting;
+    }
+
+    throw error::runtime( "fork_io: " ) << "Unable to wait for process " << id->pid <<
+        " with status " << status << ": " << error::number( errno );
 }
 
 void fork_io::signal( s32 number ) const
@@ -131,7 +138,7 @@ void fork_io::exit( bool success )
     _exit( success ? EXIT_SUCCESS : EXIT_FAILURE );
 }
 
-//--- scoped_fork --------------------------------------------------------------
+//--- scoped_fork ----------------------------------------------------------------------------------
 scoped_fork::scoped_fork( void )
     : fork_io()
 {
