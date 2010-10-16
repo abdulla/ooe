@@ -111,6 +111,9 @@ ooe_executable( mock test/mock )
 ooe_executable( registry_test test/component/registry )
 target_link_libraries( registry_test javascript lua python registry unit )
 
+ooe_executable( ui_test component/ui test/component/ui )
+target_link_libraries( ui_test math unit visual )
+
 # foundation
 ooe_executable( image_test test/foundation/image )
 target_link_libraries( image_test image unit )
