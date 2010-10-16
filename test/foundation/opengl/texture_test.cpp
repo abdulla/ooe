@@ -17,30 +17,30 @@ const u32 texture_size = 256;
 const image::type texture_format = image::rgb_u8;
 
 const c8 vertex_shader[] =
-"uniform mat4 projection;\n\
-attribute vec2 vertex;\n\
-attribute vec2 coords;\n\
-varying vec2 texcoord;\n\
-\n\
-void main( void )\n\
-{\n\
-    gl_Position = projection * vec4( vertex, 0, 1 );\n\
-    texcoord = coords;\n\
-}";
+    "uniform mat4 projection;\n\
+    attribute vec2 vertex;\n\
+    attribute vec2 coords;\n\
+    varying vec2 texcoord;\n\
+    \n\
+    void main( void )\n\
+    {\n\
+        gl_Position = projection * vec4( vertex, 0, 1 );\n\
+        texcoord = coords;\n\
+    }";
 
 const c8 fragment_shader[] =
-"#extension GL_EXT_gpu_shader4 : enable\n\
-\n\
-uniform sampler2DArray sampler;\n\
-uniform int index;\n\
-varying vec2 texcoord;\n\
-\n\
-void main( void )\n\
-{\n\
-    gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );\n\
-}";
+    "#extension GL_EXT_gpu_shader4 : enable\n\
+    \n\
+    uniform sampler2DArray sampler;\n\
+    uniform int index;\n\
+    varying vec2 texcoord;\n\
+    \n\
+    void main( void )\n\
+    {\n\
+        gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );\n\
+    }";
 
-buffer_type point_buffer( const device_type& device )
+buffer_type make_point( const device_type& device )
 {
     buffer_type point = device->buffer( sizeof( f32 ) * 4 * 4, buffer::point );
     {
@@ -74,7 +74,7 @@ buffer_type point_buffer( const device_type& device )
     return point;
 }
 
-buffer_type index_buffer( const device_type& device )
+buffer_type make_index( const device_type& device )
 {
     buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
     {
@@ -138,8 +138,8 @@ template<>
     vector.push_back( device->shader( fragment_shader, shader::fragment ) );
     program_type program = device->program( vector );
 
-    buffer_type point = point_buffer( device );
-    block_type block = program->block( index_buffer( device ) );
+    buffer_type point = make_point( device );
+    block_type block = program->block( make_index( device ) );
     block->input( "vertex", 2, point );
     block->input( "coords", 2, point );
     block->input( "sampler", texture_array );
