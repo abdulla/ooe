@@ -27,7 +27,7 @@ namespace
 
     void png_warning_( png_struct*, const c8* string )
     {
-        OOE_WARNING( "png", "Warning: " << string );
+        OOE_CONSOLE( "png: " << "Warning: " << string );
     }
 
     void png_read( png_struct* read_struct, u8* buffer, up_t size )

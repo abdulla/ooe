@@ -73,7 +73,7 @@ namespace ooe
     library::~library( void )
     {
         if ( dlclose( id ) )
-            OOE_WARNING( "library", "Unable to close: " << dlerror() );
+            OOE_CONSOLE( "library: " << "Unable to close: " << dlerror() );
     }
 
     void* library::find( const std::string& name ) const

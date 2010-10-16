@@ -29,8 +29,8 @@ void signal_handler( s32 code, siginfo_t* info, void* )
     case SIGFPE:
         description = strsignal( code );
         trace = stack_trace();
-        OOE_WARNING( "executable", "Caught signal " << code << " at " << info->si_addr << ": " <<
-            description << "\n\nStack trace:\n" << trace );
+        OOE_CONSOLE( "executable: " << "Caught signal " << code << " at " << info->si_addr <<
+            ": " << description << "\n\nStack trace:\n" << trace );
         std::exit( EXIT_FAILURE );
 
     default:
@@ -54,7 +54,7 @@ signal_handler_type signal( struct sigaction& action, signal_handler_type handle
     std::memset( &prior, 0, sizeof( prior ) );
 
     if ( sigaction( code, &action, &prior ) )
-        OOE_WARNING( "executable", "Handler for signal " << code << " was not registered" );
+        OOE_CONSOLE( "executable: " << "Handler for signal " << code << " was not registered" );
     else if ( prior.sa_flags & SA_SIGINFO )
         return prior.sa_sigaction;
 
@@ -103,16 +103,16 @@ s32 launch( launch_type launch, s32 argc, c8** argv )
     }
     catch ( error::runtime& error )
     {
-        OOE_WARNING( "executable",
+        OOE_CONSOLE( "executable: " <<
             "Uncaught exception:\n" << error.what() << "\n\nStack trace:" << error.where() );
     }
     catch ( std::exception& error )
     {
-        OOE_WARNING( "executable", "Uncaught exception:\n" << error.what() );
+        OOE_CONSOLE( "executable: " << "Uncaught exception:\n" << error.what() );
     }
     catch ( ... )
     {
-        OOE_WARNING( "executable", "Uncaught exception:\nUnknown\n" );
+        OOE_CONSOLE( "executable: " << "Uncaught exception:\nUnknown\n" );
     }
 
     return status;
@@ -129,7 +129,8 @@ void null_fd( s32 fd )
     s32 result = dup2( null, fd );
 
     if ( close( null ) )
-        OOE_WARNING( "executable::null_fd", "Unable to close /dev/null" << error::number( errno ) );
+        OOE_CONSOLE( "executable::null_fd: " <<
+            "Unable to close /dev/null" << error::number( errno ) );
     else if ( result == -1 )
         throw error::runtime( "executable::null_fd: " ) <<
             "Unable to duplicate fd: " << error::number( errno );

@@ -78,7 +78,7 @@ map::map( void* data_, up_t size_, u32 target_ )
 map::~map( void )
 {
     if ( !UnmapBuffer( target ) )
-        OOE_WARNING( "opengl::map", "Data corruption occurred" );
+        OOE_CONSOLE( "opengl::map: " << "Data corruption occurred" );
 }
 
 //--- buffer ---------------------------------------------------------------------------------------

@@ -39,11 +39,11 @@ sem_t* sem_create( const std::string& name, bool create, u32 value )
 void sem_destroy( const std::string& name, bool unlinkable, sem_t* sem )
 {
     if ( sem_close( sem ) )
-        OOE_WARNING( "ipc::semaphore",
+        OOE_CONSOLE( "ipc::semaphore: " <<
             "Unable to close semaphore \"" << name << "\": " << error::number( errno ) );
 
     if ( unlinkable && sem_unlink( name.c_str() ) && errno != OOE_NOEXIST )
-        OOE_WARNING( "ipc::semaphore",
+        OOE_CONSOLE( "ipc::semaphore: " <<
             "Unable to unlink semaphore \"" << name << "\": " << error::number( errno ) );
 }
 

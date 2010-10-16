@@ -53,7 +53,7 @@ namespace ooe
         s32 status = pthread_detach( pthread );
 
         if ( status && status != ESRCH )
-            OOE_WARNING( "thread", "Unable to destroy thread: " << error::number( status ) );
+            OOE_CONSOLE( "thread: " << "Unable to destroy thread: " << error::number( status ) );
     }
 
     bool thread::operator ==( const thread& compare ) const
@@ -97,7 +97,7 @@ namespace ooe
         s32 status = pthread_key_delete( pthread_key );
 
         if ( status )
-            OOE_WARNING( "tls", "Unable to destroy key: " << error::number( status ) );
+            OOE_CONSOLE( "tls: " << "Unable to destroy key: " << error::number( status ) );
     }
 
     void* tls_base::get( void ) const

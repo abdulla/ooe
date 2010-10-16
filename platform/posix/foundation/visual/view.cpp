@@ -119,7 +119,7 @@ view::~view( void )
     up_t root = DefaultRootWindow( queue.display );
 
     if ( XRRSetScreenConfig( queue.display, config, root, resize, rotate, CurrentTime ) )
-        OOE_WARNING( "view", "Unable to set screen configuration" );
+        OOE_CONSOLE( "view: " << "Unable to set screen configuration" );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

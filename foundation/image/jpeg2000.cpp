@@ -16,7 +16,7 @@ namespace
 
     void jpeg2000_warning( const c8* message, void* )
     {
-        OOE_WARNING( "jpeg2000", "Warning: " << message );
+        OOE_CONSOLE( "jpeg2000: " << "Warning: " << message );
     }
 
     image::type jpeg2000_image_type( OPJ_COLOR_SPACE colour_space, u8 channels )

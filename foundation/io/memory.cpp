@@ -22,7 +22,7 @@ memory_id::memory_id( s32 fd, u8 flags, up_t offset, up_t size_ )
 memory_id::~memory_id( void )
 {
     if ( munmap( area, size ) )
-        OOE_WARNING( "memory", "Unable to unmap memory: " << error::number( errno ) );
+        OOE_CONSOLE( "memory: " << "Unable to unmap memory: " << error::number( errno ) );
 }
 
 //--- memory -------------------------------------------------------------------

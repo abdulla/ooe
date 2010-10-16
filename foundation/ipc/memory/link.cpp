@@ -19,7 +19,7 @@ link_listen::link_listen( const std::string& name )
 link_listen::~link_listen( void )
 {
     if ( unlink( path.c_str() ) )
-        OOE_WARNING( "ipc::link_listen",
+        OOE_CONSOLE( "ipc::link_listen: " <<
             "Unable to unlink \"" << path << "\": " << error::number( errno ) );
 }
 

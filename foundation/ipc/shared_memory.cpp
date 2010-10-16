@@ -39,7 +39,7 @@ descriptor shm_create( const std::string& name, bool create, up_t size )
 void shm_destroy( const std::string& name, bool unlinkable )
 {
     if ( unlinkable && shm_unlink( name.c_str() ) && errno != OOE_NOEXIST )
-        OOE_WARNING( "ipc::shared_memory",
+        OOE_CONSOLE( "ipc::shared_memory: " <<
             "Unable to unlink shared memory \"" << name << "\": " << error::number( errno ) );
 }
 
@@ -101,7 +101,7 @@ locked_memory::locked_memory( const std::string& shm_name, type mode, up_t size_
 locked_memory::~locked_memory( void )
 {
     if ( munlock( get(), size() ) )
-        OOE_WARNING( "ipc::locked_memory",
+        OOE_CONSOLE( "ipc::locked_memory: " <<
             "Unable to unlock shared memory \"" << name() << "\": " << error::number( errno ) );
 }
 
@@ -117,7 +117,7 @@ memory_lock::memory_lock( shared_memory& memory_ )
 memory_lock::~memory_lock( void )
 {
     if ( munlock( memory.get(), memory.size() ) )
-        OOE_WARNING( "ipc::memory_lock", "Unable to unlock shared memory \"" <<
+        OOE_CONSOLE( "ipc::memory_lock: " << "Unable to unlock shared memory \"" <<
             memory.name() << "\": " << error::number( errno ) );
 }
 

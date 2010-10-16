@@ -48,8 +48,6 @@ do\
 }\
 while ( false )
 
-#define OOE_WARNING( id, statement ) OOE_CONSOLE( id ": " << statement )
-
 #define OOE_IGNORE( statement )\
 do\
 {\
@@ -72,16 +70,16 @@ do\
     }\
     catch ( error::runtime& error )\
     {\
-        OOE_WARNING( id,\
+        OOE_CONSOLE( id ": " <<\
                 "Uncaught exception:\n" << error.what() << "\n\nStack trace:" << error.where() );\
     }\
     catch ( std::exception& error )\
     {\
-        OOE_WARNING( id, "Uncaught exception:\n" << error.what() );\
+        OOE_CONSOLE( id ": " << "Uncaught exception:\n" << error.what() );\
     }\
     catch ( ... )\
     {\
-        OOE_WARNING( "executable", "Uncaught exception:\nAn unknown exception was thrown\n" );\
+        OOE_CONSOLE( id ": " << "Uncaught exception:\nAn unknown exception was thrown\n" );\
     }\
 }\
 while ( false )

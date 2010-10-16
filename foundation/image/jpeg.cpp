@@ -38,7 +38,7 @@ namespace
     {
         c8 string[ JMSG_LENGTH_MAX ];
         common->err->format_message( common, string );
-        OOE_WARNING( "jpeg", "Warning: " << string );
+        OOE_CONSOLE( "jpeg: " << "Warning: " << string );
     }
 
     //--- source manager functions ---------------------------------------------

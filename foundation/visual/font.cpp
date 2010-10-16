@@ -21,7 +21,7 @@ library::library( void )
 library::~library( void )
 {
     if ( FT_Done_FreeType( freetype ) )
-        OOE_WARNING( "font::library", "Unable to destroy library" );
+        OOE_CONSOLE( "font::library: " << "Unable to destroy library" );
 }
 
 //--- metric ---------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ face::face( const library& library, const descriptor& desc )
 face::~face( void )
 {
     if ( FT_Done_Face( face_ ) )
-        OOE_WARNING( "font::face", "Unable to close font face" );
+        OOE_CONSOLE( "font::face: " << "Unable to close font face" );
 }
 
 std::string face::string( string_type type ) const

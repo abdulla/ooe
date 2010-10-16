@@ -57,7 +57,7 @@ directory::directory( const descriptor& desc )
 directory::~directory( void )
 {
     if ( closedir( dir ) )
-        OOE_WARNING( "directory", "Unable to close directory: " << error::number( errno ) );
+        OOE_CONSOLE( "directory: " << "Unable to close directory: " << error::number( errno ) );
 }
 
 directory::iterator directory::begin( void ) const

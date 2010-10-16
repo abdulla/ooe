@@ -143,7 +143,7 @@ void servlet::check( const void* pointer )
         buffer.is_internal() ? transport.in_canary( pointer ) : allocator.in_canary( pointer );
 
     if ( inside )
-        OOE_WARNING( "servlet", "Data violation at " << pointer );
+        OOE_CONSOLE( "servlet: " << "Data violation at " << pointer );
 }
 
 void* servlet::main( void* pointer )

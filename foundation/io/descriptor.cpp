@@ -72,7 +72,7 @@ descriptor_id::descriptor_id( const std::string& path, s32 flags )
 descriptor_id::~descriptor_id( void )
 {
     if ( close( fd ) )
-        OOE_WARNING( "descriptor", "Unable to close: " << error::number( errno ) );
+        OOE_CONSOLE( "descriptor: " << "Unable to close: " << error::number( errno ) );
 }
 
 //--- descriptor -----------------------------------------------------------------------------------

@@ -21,7 +21,7 @@ bool socket_write( ooe::socket& socket, u8* data, up_t size )
     if ( socket.send( data, size ) == size )
         return true;
 
-    OOE_WARNING( "servlet", "Unable to write " << size << " bytes" );
+    OOE_CONSOLE( "servlet: " << "Unable to write " << size << " bytes" );
     return false;
 }
 
@@ -71,7 +71,7 @@ void* servlet::main( void* pointer )
 
         if ( length && OOE_UNLIKELY( !socket_read( socket, buffer, length ) ) )
         {
-            OOE_WARNING( "servlet", "Unable to read " << length << " bytes" );
+            OOE_CONSOLE( "servlet: " << "Unable to read " << length << " bytes" );
             break;
         }
 
