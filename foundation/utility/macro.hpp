@@ -40,13 +40,15 @@
 
 #define OOE_FOURCC( a, b, c, d ) ( a + ( b << 8 ) + ( c << 16 ) + ( d << 24 ) )
 
-#define OOE_WARNING( id, statement )\
+#define OOE_CONSOLE( statement )\
 do\
 {\
-    std::cerr << id ": " << statement << '\n';\
-    std::cout << id ": " << statement << '\n';\
+    std::cerr << statement << '\n';\
+    std::cout << statement << '\n';\
 }\
 while ( false )
+
+#define OOE_WARNING( id, statement ) OOE_CONSOLE( id ": " << statement )
 
 #define OOE_IGNORE( statement )\
 do\

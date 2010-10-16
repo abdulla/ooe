@@ -35,6 +35,7 @@ bool run_test( const group_base::iterator_type& i, void* pointer, bool no_stdout
 
         test_status = true;
         ( *i )( pointer );
+        return test_status;
     }
     catch ( error::runtime& error )
     {
@@ -49,7 +50,7 @@ bool run_test( const group_base::iterator_type& i, void* pointer, bool no_stdout
         std::cerr << "An unknown exception was thrown\n";
     }
 
-    return test_status;
+    return false;
 }
 
 std::string read( file& in )
@@ -122,7 +123,7 @@ vector_type run_group( group_base& group, time_t timeout, bool no_stdout )
 
 void print_tests( const std::string& name, const vector_type& vector )
 {
-    std::cout << "Group: " << name << '\n';
+    OOE_CONSOLE( "Group: " << name );
     up_t j = 0;
 
     for ( vector_type::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
@@ -131,7 +132,8 @@ void print_tests( const std::string& name, const vector_type& vector )
             ++j;
 
         up_t x = std::distance( vector.begin(), i );
-        std::cout << std::setw( 5 ) << x << ": " << ( i->_0 ? "Passed" : "Failed" ) << '\n';
+        OOE_CONSOLE( std::setw( 5 ) << x << ": " << ( i->_0 ? "Passed" : "Failed" ) );
+        std::cerr << i->_1 << '\n';
     }
 
     up_t k = 0;
