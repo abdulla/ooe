@@ -144,7 +144,7 @@ void print_tests( const std::string& name, const vector_type& vector )
             continue;
 
         up_t x = std::distance( vector.begin(), i );
-        std::cout << "\n(" << ++k << " of " << j << ") Test " << x << ":\n" << i->_1;
+        std::cout << "\n(" << ++k << " of " << j << ") Test " << x << ":\n" << i->_1 << '\n';
     }
 }
 
