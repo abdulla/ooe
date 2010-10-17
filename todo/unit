@@ -1,2 +1,6 @@
 modify runner to have flexible output
     - can make output in formats that are compatible with other test systems
+
+add the ability to benchmark as well as test
+    - use gotest as an example of testing and benchmarking
+    - http://www.youtube.com/watch?v=3brH0zOqm0w
