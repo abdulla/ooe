@@ -55,10 +55,10 @@ aabb::aabb( const vec3& min_, const vec3& max_ )
 
 aabb bounds( const f32* array, up_t length, up_t size )
 {
-    typedef const f32* f32_ptr;
-    aabb aabb( column( array ), column( array ) );
+    vec3 v = column( array );
+    aabb aabb( v, v );
 
-    for ( f32_ptr i = array, end = array + length * size; i != end; i += size )
+    for ( const f32* i = array + size, * end = array + size * length; i != end; i += size )
     {
         aabb.min.x = std::min( aabb.min.x, i[ 0 ] );
         aabb.max.x = std::max( aabb.max.x, i[ 0 ] );
