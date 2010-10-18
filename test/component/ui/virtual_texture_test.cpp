@@ -23,7 +23,7 @@ shader_vector make_shaders( const device_type& device, const std::string& root )
     include.insert( "virtual_texture.hs" );
 
     shader_vector vector;
-    vector.push_back( include.compile( "null.vs", shader::vertex ) );
+    vector.push_back( include.compile( "font.vs", shader::vertex ) );
     vector.push_back( include.compile( "font.fs", shader::fragment ) );
     vector.push_back( include.compile( "virtual_texture.fs", shader::fragment ) );
     return vector;
@@ -69,7 +69,6 @@ template<>
     {
         block_type block = layout.block( program, std::string( string.begin(), i ), 4 );
         block->input( "projection", orthographic( 0, width, height, 0 ) );
-        block->input( "model_view", mat4::identity );
         block->input( "colour", 255, 255, 255 );
         vt.input( "vt", block );
 
@@ -77,7 +76,7 @@ template<>
             cache.write();
 
         frame->clear();
-        device->draw( block, frame );
+        device->draw( block, frame, 1 );
         device->swap();
 
         event event;

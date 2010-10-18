@@ -160,7 +160,7 @@ template<>
         block->input( "index", i );
 
         frame->clear();
-        device->draw( block, frame );
+        device->draw( block, frame, 1 );
         device->swap();
 
         event event;

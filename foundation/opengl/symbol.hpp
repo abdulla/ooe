@@ -205,7 +205,7 @@ typedef void ( EnableVertexAttribArray_t )( u32 );
 typedef void ( DisableVertexAttribArray_t )( u32 );
 typedef void ( VertexAttribPointer_t )( u32, s32, u32, u8, s32, const void* );
 typedef void ( DrawBuffers_t )( s32, const u32* );
-typedef void ( DrawElements_t )( u32, s32, u32, const void* );
+typedef void ( DrawElementsInstanced_t )( u32, s32, u32, const void*, s32 );
 
 //--- functions ------------------------------------------------------------------------------------
 extern GetString_t* GetString;
@@ -285,7 +285,7 @@ extern EnableVertexAttribArray_t* EnableVertexAttribArray;
 extern DisableVertexAttribArray_t* DisableVertexAttribArray;
 extern VertexAttribPointer_t* VertexAttribPointer;
 extern DrawBuffers_t* DrawBuffers;
-extern DrawElements_t* DrawElements;
+extern DrawElementsInstanced_t* DrawElementsInstanced;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 

@@ -102,7 +102,7 @@ public:
     device( const ooe::view_data&, bool );
     virtual ~device( void );
 
-    virtual void draw( const block_type&, const frame_type& );
+    virtual void draw( const block_type&, const frame_type&, u32 );
     virtual void swap( void );
 
     virtual void set( set_type, bool );
@@ -156,8 +156,11 @@ device::~device( void )
     context_destruct( view, context );
 }
 
-void device::draw( const block_type& generic_block, const frame_type& frame )
+void device::draw( const block_type& generic_block, const frame_type& frame, u32 instances )
 {
+    if ( !instances )
+        throw error::runtime( "opengl::device: " ) << "Number of instances must be > 0";
+
     opengl::block& block = dynamic_cast< opengl::block& >( *generic_block );
     UseProgram( block.id );
 
@@ -213,7 +216,7 @@ void device::draw( const block_type& generic_block, const frame_type& frame )
     opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
     BindBuffer( index.target, index.id );
     block.check();
-    DrawElements( TRIANGLES, index.size / sizeof( u16 ), UNSIGNED_SHORT, 0 );
+    DrawElementsInstanced( TRIANGLES, index.size / sizeof( u16 ), UNSIGNED_SHORT, 0, instances );
 }
 
 void device::swap( void )

@@ -2,13 +2,12 @@
 
 #include <cmath>
 
-#include "component/ui/text_layout.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/io/vfs.hpp"
 #include "foundation/math/math.hpp"
-#include "foundation/parallel/thread_pool.hpp"
 #include "foundation/visual/event_queue.hpp"
+#include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
@@ -18,7 +17,7 @@ const f32 height = 640;
 u32 acceleration = 4;
 
 //--- process_key ----------------------------------------------------------------------------------
-void process_key( u32 value, bool press, vec3& translate, vec3& scale, std::string& string )
+void process_key( u32 value, bool press, vec3& translate, vec3& scale )
 {
     if ( !press )
         return;
@@ -68,16 +67,13 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale, std::stri
         break;
 
     default:
-        string += value;
         break;
     }
 }
 
 //--- process_events -------------------------------------------------------------------------------
-std::string process_events
-    ( event_queue& event_queue, vec3& translate, vec3& scale, epoch_t timeout )
+void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epoch_t timeout )
 {
-    std::string string;
     event event;
 
     for ( event::type type; ( type = event_queue.next_event( event, timeout ) );
@@ -90,7 +86,7 @@ std::string process_events
             break;
 
         case event::key_flag:
-            process_key( event.key.value, event.key.press, translate, scale, string );
+            process_key( event.key.value, event.key.press, translate, scale );
             break;
 
         case event::exit:
@@ -101,8 +97,6 @@ std::string process_events
             break;
         }
     }
-
-    return string;
 }
 
 //--- make_point -----------------------------------------------------------------------------------
@@ -158,18 +152,27 @@ buffer_type make_index( const device_type& device )
     return index;
 }
 
+//--- make_block -----------------------------------------------------------------------------------
+block_type make_block( const device_type& device, const program_type& program )
+{
+    buffer_type point = make_point( device );
+    block_type block = program->block( make_index( device ) );
+    block->input( "vertex", 2, point );
+    block->input( "coords", 2, point );
+    block->input( "projection", orthographic( 0, width, height, 0 ) );
+    return block;
+}
+
 //--- make_shaders ---------------------------------------------------------------------------------
 shader_vector make_shaders( const device_type& device, const std::string& root )
 {
     vfs vfs;
     vfs.insert( root + "../share/glsl", "/" );
     shader_include include( device, vfs );
-    include.insert( "virtual_texture.hs" );
 
     shader_vector vector;
-    vector.push_back( include.compile( "null.vs", shader::vertex ) );
-    vector.push_back( include.compile( "font.fs", shader::fragment ) );
-    vector.push_back( include.compile( "virtual_texture.fs", shader::fragment ) );
+    vector.push_back( include.compile( "box.vs", shader::vertex ) );
+    vector.push_back( include.compile( "box.fs", shader::fragment ) );
     return vector;
 }
 
@@ -184,33 +187,13 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     device_type device =
         library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, true );
 
-    font::library font_library;
-    font::face font_face( font_library, root + "../share/font/ubuntu-regular.ttf" );
-    font_source font_source( font_face, 512, root + "../cache" );
-    thread_pool pool;
-    page_cache cache( device, pool, font_source.format(), font_source.page_size() );
-    virtual_texture vt( device, cache, font_source );
-
     shader_vector vector = make_shaders( device, root );
     program_type program = device->program( vector );
 
-    buffer_type point = make_point( device );
-    block_type block = program->block( make_index( device ) );
-    vt.input( "vt", block );
-    block->input( "vertex", 2, point );
-    block->input( "coords", 2, point );
-    block->input( "projection", orthographic( 0, width, height, 0 ) );
-
-    device->set( device::blend, true );
-    block->input( "colour", 255, 255, 255 );
-
-    std::string string;
-    text_layout layout( device, vt, font_source );
-    block_type text;
-
+    block_type block = make_block( device, program );
     frame_type frame = device->default_frame( width, height );
     vec3 translate( width / 2, height / 2, 0 );
-    vec3 scale( font_source.page_size(), font_source.page_size(), 1 );
+    vec3 scale( 1, 1, 1 );
 
     while ( !executable::has_signal() )
     {
@@ -218,28 +201,10 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
             ooe::translate( mat4::identity, translate ) * ooe::scale( mat4::identity, scale ) );
 
         frame->clear();
-        device->draw( block, frame );
-
-        if ( text )
-            device->draw( text, frame );
-
+        device->draw( block, frame, 1 );
         device->swap();
 
-        up_t pending = cache.pending();
-        std::string suffix =
-            process_events( event_queue, translate, scale, epoch_t( pending ? 0 : 3600, 0 ) );
-
-        if ( !suffix.empty() )
-        {
-            string += suffix;
-            text = layout.block( program, string, 4 );
-            vt.input( "vt", text );
-            text->input( "projection", orthographic( 0, width, height, 0 ) );
-            text->input( "model_view", mat4::identity );
-        }
-
-        if ( pending )
-            cache.write();
+        process_events( event_queue, translate, scale, epoch_t( 3600, 0 ) );
     }
 
     return true;

@@ -95,7 +95,7 @@ void load_symbols( void )
     DisableVertexAttribArray = find< DisableVertexAttribArray_t >( "glDisableVertexAttribArray" );
     VertexAttribPointer = find< VertexAttribPointer_t >( "glVertexAttribPointer" );
     DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
-    DrawElements = find< DrawElements_t >( "glDrawElements" );
+    DrawElementsInstanced = find< DrawElementsInstanced_t >( "glDrawElementsInstancedARB" );
 
     /*const c8* extensions = */GetString( EXTENSIONS );
 }
@@ -178,6 +178,6 @@ EnableVertexAttribArray_t* EnableVertexAttribArray;
 DisableVertexAttribArray_t* DisableVertexAttribArray;
 VertexAttribPointer_t* VertexAttribPointer;
 DrawBuffers_t* DrawBuffers;
-DrawElements_t* DrawElements;
+DrawElementsInstanced_t* DrawElementsInstanced;
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
