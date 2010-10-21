@@ -106,6 +106,7 @@ target_link_libraries( unit executable io )
 ### test: executable ###############################################################################
 # mock
 ooe_executable( mock test/mock )
+target_link_libraries( mock executable )
 
 # component
 ooe_executable( registry_test test/component/registry )
