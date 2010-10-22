@@ -125,8 +125,7 @@ template<>
 
     event_queue event_queue;
     view view( event_queue, width, height, false );
-    device_type device =
-        library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, false );
+    device_type device = library.find< device_open_type >( "device_open" )( view, false );
 
     const s32 array_size = device->limit( device::array_size );
     texture_array_type texture_array =

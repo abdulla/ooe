@@ -48,8 +48,7 @@ template<>
 
     event_queue event_queue;
     view view( event_queue, width, height, false );
-    device_type device = opengl_library.
-        find< device_type ( const view_data&, bool ) >( "device_open" )( view, true );
+    device_type device = opengl_library.find< device_open_type >( "device_open" )( view, true );
 
     font::library font_library;
     font::face font_face( font_library, root + "../share/font/ubuntu-regular.ttf" );

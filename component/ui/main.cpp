@@ -184,14 +184,13 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
     event_queue event_queue;
     view view( event_queue, width, height, false );
-    device_type device =
-        library.find< device_type ( const view_data&, bool ) >( "device_open" )( view, true );
+    device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
     shader_vector vector = make_shaders( device, root );
     program_type program = device->program( vector );
-
     block_type block = make_block( device, program );
     frame_type frame = device->default_frame( width, height );
+
     vec3 translate( width / 2, height / 2, 0 );
     vec3 scale( 1, 1, 1 );
 

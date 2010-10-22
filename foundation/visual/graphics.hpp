@@ -11,6 +11,7 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 class vfs;
+class view_data;
 class image_pyramid;
 
 template< u8 >
@@ -204,6 +205,7 @@ struct device
 };
 
 typedef shared_ptr< device > device_type;
+typedef device_type ( device_open_type )( const view_data&, bool );
 
 //--- image_pyramid --------------------------------------------------------------------------------
 class OOE_VISIBLE image_pyramid
