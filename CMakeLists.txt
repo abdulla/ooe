@@ -34,7 +34,7 @@ include_directories( ${V8_INCLUDE_DIRS} )
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 
 ### data ###########################################################################################
-file( COPY share DESTINATION . )
+ooe_files( ${PROJECT_SOURCE_DIR}/share ${PROJECT_BINARY_DIR}/share )
 file( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/cache )
 file( MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/log )
 

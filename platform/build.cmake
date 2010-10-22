@@ -101,3 +101,11 @@ function( ooe_module NAME )
     add_library( ${NAME} MODULE ${SOURCES} )
     ooe_properties( ${NAME} )
 endfunction()
+
+function( ooe_files SOURCE TARGET )
+    file( GLOB_RECURSE FILES RELATIVE ${SOURCE} ${SOURCE}/* )
+
+    foreach( FILE ${FILES} )
+        configure_file( ${SOURCE}/${FILE} ${TARGET}/${FILE} COPY_ONLY )
+    endforeach()
+endfunction()
