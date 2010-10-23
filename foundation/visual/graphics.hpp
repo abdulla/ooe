@@ -114,36 +114,71 @@ typedef std::vector< shader_type > shader_vector;
 struct block
 {
     virtual ~block( void ) {}
-    virtual void input( const std::string&, s32 ) = 0;
-    virtual void input( const std::string&, s32, s32 ) = 0;
-    virtual void input( const std::string&, s32, s32, s32 ) = 0;
-    virtual void input( const std::string&, f32 ) = 0;
-    virtual void input( const std::string&, f32, f32 ) = 0;
-    virtual void input( const std::string&, f32, f32, f32 ) = 0;
-    virtual void input( const std::string&, const mat3& ) = 0;
-    virtual void input( const std::string&, const mat4& ) = 0;
+    virtual void input( const std::string&, s32[][ 1 ], u32 ) = 0;
+    virtual void input( const std::string&, s32[][ 2 ], u32 ) = 0;
+    virtual void input( const std::string&, s32[][ 3 ], u32 ) = 0;
+    virtual void input( const std::string&, f32[][ 1 ], u32 ) = 0;
+    virtual void input( const std::string&, f32[][ 2 ], u32 ) = 0;
+    virtual void input( const std::string&, f32[][ 3 ], u32 ) = 0;
+    virtual void input( const std::string&, const mat3*, u32 ) = 0;
+    virtual void input( const std::string&, const mat4*, u32 ) = 0;
 
     virtual void input( const std::string&, const texture_type& ) = 0;
     virtual void input( const std::string&, const texture_array_type& ) = 0;
-    virtual void input( const std::string&, u8, const buffer_type& ) = 0;
+    virtual void input( const std::string&, u8, const buffer_type&, bool = false ) = 0;
 
-    void input( const std::string& name, f64 x )
+    void input( const std::string& name, s32 x )
     {
-        input( name, f32( x ) );
+        s32 data[] = { x };
+        input( name, &data, 1 );
     }
 
-    void input( const std::string& name, f64 x, f64 y )
+    void input( const std::string& name, s32 x, s32 y )
     {
-        input( name, f32( x ), f32( y ) );
+        s32 data[] = { x, y };
+        input( name, &data, 1 );
     }
 
-    void input( const std::string& name, f64 x, f64 y, f64 z )
+    void input( const std::string& name, s32 x, s32 y, s32 z )
     {
-        input( name, f32( x ), f32( y ), f32( z ) );
+        s32 data[] = { x, y, z };
+        input( name, &data, 1 );
+    }
+
+    void input( const std::string& name, f32 x )
+    {
+        f32 data[] = { x };
+        input( name, &data, 1 );
+    }
+
+    void input( const std::string& name, f32 x, f32 y )
+    {
+        f32 data[] = { x, y };
+        input( name, &data, 1 );
+    }
+
+    void input( const std::string& name, f32 x, f32 y, f32 z )
+    {
+        f32 data[] = { x, y, z };
+        input( name, &data, 1 );
+    }
+
+    template< u8 size >
+        void input( const std::string& name, const matrix< size >& m )
+    {
+        input( name, &m, 1 );
+    }
+
+    template< u8 size >
+        void input( const std::string& name, const std::vector< matrix< size > >& m )
+    {
+        input( name, &m[ 0 ], m.size() );
     }
 };
 
 typedef shared_ptr< block > block_type;
+typedef std::vector< mat3 > mat3_vector;
+typedef std::vector< mat4 > mat4_vector;
 
 //--- frame ----------------------------------------------------------------------------------------
 typedef shared_ptr< struct frame > frame_type;

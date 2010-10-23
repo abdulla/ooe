@@ -166,7 +166,6 @@ typedef void ( UseProgram_t )( u32 );
 typedef void ( GetProgramiv_t )( u32, u32, s32* );
 typedef void ( GetProgramInfoLog_t )( u32, s32, s32*, c8* );
 
-typedef s32 ( GetUniformLocation_t )( u32, const c8* );
 typedef void ( Uniform1iv_t )( s32, s32, const s32* );
 typedef void ( Uniform2iv_t )( s32, s32, const s32* );
 typedef void ( Uniform3iv_t )( s32, s32, const s32* );
@@ -175,6 +174,7 @@ typedef void ( Uniform2fv_t )( s32, s32, const f32* );
 typedef void ( Uniform3fv_t )( s32, s32, const f32* );
 typedef void ( UniformMatrix3fv_t )( s32, s32, u8, const f32* );
 typedef void ( UniformMatrix4fv_t )( s32, s32, u8, const f32* );
+typedef s32 ( GetUniformLocation_t )( u32, const c8* );
 typedef s32 ( GetAttribLocation_t )( u32, const c8* );
 typedef s32 ( GetFragDataLocation_t )( u32, const c8* );
 
@@ -204,6 +204,7 @@ typedef void ( Clear_t )( u32 );
 typedef void ( EnableVertexAttribArray_t )( u32 );
 typedef void ( DisableVertexAttribArray_t )( u32 );
 typedef void ( VertexAttribPointer_t )( u32, s32, u32, u8, s32, const void* );
+typedef void ( VertexAttribDivisor_t )( u32, u32 );
 typedef void ( DrawBuffers_t )( s32, const u32* );
 typedef void ( DrawElementsInstanced_t )( u32, s32, u32, const void*, s32 );
 
@@ -246,7 +247,6 @@ extern UseProgram_t* UseProgram;
 extern GetProgramiv_t* GetProgramiv;
 extern GetProgramInfoLog_t* GetProgramInfoLog;
 
-extern GetUniformLocation_t* GetUniformLocation;
 extern Uniform1iv_t* Uniform1iv;
 extern Uniform2iv_t* Uniform2iv;
 extern Uniform3iv_t* Uniform3iv;
@@ -255,6 +255,7 @@ extern Uniform2fv_t* Uniform2fv;
 extern Uniform3fv_t* Uniform3fv;
 extern UniformMatrix3fv_t* UniformMatrix3fv;
 extern UniformMatrix4fv_t* UniformMatrix4fv;
+extern GetUniformLocation_t* GetUniformLocation;
 extern GetAttribLocation_t* GetAttribLocation;
 extern GetFragDataLocation_t* GetFragDataLocation;
 
@@ -284,6 +285,7 @@ extern Clear_t* Clear;
 extern EnableVertexAttribArray_t* EnableVertexAttribArray;
 extern DisableVertexAttribArray_t* DisableVertexAttribArray;
 extern VertexAttribPointer_t* VertexAttribPointer;
+extern VertexAttribDivisor_t* VertexAttribDivisor;
 extern DrawBuffers_t* DrawBuffers;
 extern DrawElementsInstanced_t* DrawElementsInstanced;
 

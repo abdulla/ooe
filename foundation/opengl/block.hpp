@@ -15,9 +15,9 @@ class block
     : public ooe::block
 {
 public:
-    typedef u8 uniform_data[ sizeof( mat4 ) ];
-    typedef void ( * uniform_function )( s32, const uniform_data );
-    typedef tuple< uniform_data, uniform_function > uniform_tuple;
+    typedef void ( * uniform_function )( s32, u32, const void* );
+    typedef shared_array< u8 > uniform_array;
+    typedef tuple< uniform_function, u32, uniform_array > uniform_tuple;
     typedef std::map< s32, uniform_tuple > uniform_map;
     typedef std::map< s32, texture_type > texture_map;
     typedef std::map< s32, texture_array_type > texture_array_map;
@@ -37,18 +37,18 @@ public:
     block( u32, const buffer_type& );
     virtual ~block( void );
 
-    virtual void input( const std::string&, s32 );
-    virtual void input( const std::string&, s32, s32 );
-    virtual void input( const std::string&, s32, s32, s32 );
-    virtual void input( const std::string&, f32 );
-    virtual void input( const std::string&, f32, f32 );
-    virtual void input( const std::string&, f32, f32, f32 );
-    virtual void input( const std::string&, const mat3& );
-    virtual void input( const std::string&, const mat4& );
+    virtual void input( const std::string&, s32[][ 1 ], u32 );
+    virtual void input( const std::string&, s32[][ 2 ], u32 );
+    virtual void input( const std::string&, s32[][ 3 ], u32 );
+    virtual void input( const std::string&, f32[][ 1 ], u32 );
+    virtual void input( const std::string&, f32[][ 2 ], u32 );
+    virtual void input( const std::string&, f32[][ 3 ], u32 );
+    virtual void input( const std::string&, const mat3*, u32 );
+    virtual void input( const std::string&, const mat4*, u32 );
 
     virtual void input( const std::string&, const texture_type& );
     virtual void input( const std::string&, const texture_array_type& );
-    virtual void input( const std::string&, u8, const buffer_type& );
+    virtual void input( const std::string&, u8, const buffer_type&, bool );
 
     void check( void );
 

@@ -166,7 +166,7 @@ void device::draw( const block_type& generic_block, const frame_type& frame, u32
 
     for ( block::uniform_map::const_iterator i = block.uniforms.begin(),
         end = block.uniforms.end(); i != end; ++i )
-        i->second._1( i->first, i->second._0 );
+        i->second._0( i->first, i->second._1, i->second._2 );
 
     s32 j = 0;
     s32 size = block.textures.size() + block.texture_arrays.size();

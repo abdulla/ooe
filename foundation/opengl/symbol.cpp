@@ -56,7 +56,6 @@ void load_symbols( void )
     GetProgramiv = find< GetProgramiv_t >( "glGetProgramiv" );
     GetProgramInfoLog = find< GetProgramInfoLog_t >( "glGetProgramInfoLog" );
 
-    GetUniformLocation = find< GetUniformLocation_t >( "glGetUniformLocation" );
     Uniform1iv = find< Uniform1iv_t >( "glUniform1iv" );
     Uniform2iv = find< Uniform2iv_t >( "glUniform2iv" );
     Uniform3iv = find< Uniform3iv_t >( "glUniform3iv" );
@@ -65,6 +64,7 @@ void load_symbols( void )
     Uniform3fv = find< Uniform3fv_t >( "glUniform3fv" );
     UniformMatrix3fv = find< UniformMatrix3fv_t >( "glUniformMatrix3fv" );
     UniformMatrix4fv = find< UniformMatrix4fv_t >( "glUniformMatrix4fv" );
+    GetUniformLocation = find< GetUniformLocation_t >( "glGetUniformLocation" );
     GetAttribLocation = find< GetAttribLocation_t >( "glGetAttribLocation" );
     GetFragDataLocation = find< GetFragDataLocation_t >( "glGetFragDataLocationEXT" );
 
@@ -94,6 +94,7 @@ void load_symbols( void )
     EnableVertexAttribArray = find< EnableVertexAttribArray_t >( "glEnableVertexAttribArray" );
     DisableVertexAttribArray = find< DisableVertexAttribArray_t >( "glDisableVertexAttribArray" );
     VertexAttribPointer = find< VertexAttribPointer_t >( "glVertexAttribPointer" );
+    VertexAttribDivisor = find< VertexAttribDivisor_t >( "glVertexAttribDivisorARB" );
     DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
     DrawElementsInstanced = find< DrawElementsInstanced_t >( "glDrawElementsInstancedARB" );
 
@@ -139,7 +140,6 @@ UseProgram_t* UseProgram;
 GetProgramiv_t* GetProgramiv;
 GetProgramInfoLog_t* GetProgramInfoLog;
 
-GetUniformLocation_t* GetUniformLocation;
 Uniform1iv_t* Uniform1iv;
 Uniform2iv_t* Uniform2iv;
 Uniform3iv_t* Uniform3iv;
@@ -148,6 +148,7 @@ Uniform2fv_t* Uniform2fv;
 Uniform3fv_t* Uniform3fv;
 UniformMatrix3fv_t* UniformMatrix3fv;
 UniformMatrix4fv_t* UniformMatrix4fv;
+GetUniformLocation_t* GetUniformLocation;
 GetAttribLocation_t* GetAttribLocation;
 GetFragDataLocation_t* GetFragDataLocation;
 
@@ -177,6 +178,7 @@ Clear_t* Clear;
 EnableVertexAttribArray_t* EnableVertexAttribArray;
 DisableVertexAttribArray_t* DisableVertexAttribArray;
 VertexAttribPointer_t* VertexAttribPointer;
+VertexAttribDivisor_t* VertexAttribDivisor;
 DrawBuffers_t* DrawBuffers;
 DrawElementsInstanced_t* DrawElementsInstanced;
 
