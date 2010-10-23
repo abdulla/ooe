@@ -291,7 +291,7 @@ virtual_texture::~virtual_texture( void )
 
 void virtual_texture::input( const std::string& name, block_type& block ) const
 {
-    block->input( name + ".bias_range", log2( source.page_size() ), log2( source.size() ) );
+    block->input( name + ".bias_range", log2f( source.page_size() ), log2f( source.size() ) );
     block->input( name + ".page_cache", cache.array );
     block->input( name + ".page_table", table );
 }
