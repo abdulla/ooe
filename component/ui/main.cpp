@@ -1,7 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include <cmath>
+#include <cstring>
 
+#include "component/ui/box_tree.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/io/vfs.hpp"
@@ -104,34 +106,26 @@ void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epo
 //--- make_point -----------------------------------------------------------------------------------
 buffer_type make_point( const device_type& device )
 {
-    buffer_type point = device->buffer( sizeof( f32 ) * 4 * 4, buffer::point );
+    buffer_type point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
     {
         map_type map = point->map( buffer::write );
         f32* value = static_cast< f32* >( map->data );
 
         // top left
-        value[ 0 ] = -.5;
-        value[ 1 ] = .5;
-        value[ 2 ] = 0;
-        value[ 3 ] = 1;
+        value[ 0 ] = 0;
+        value[ 1 ] = 1;
 
         // bottom left
-        value[ 4 ] = -.5;
-        value[ 5 ] = -.5;
-        value[ 6 ] = 0;
-        value[ 7 ] = 0;
+        value[ 2 ] = 0;
+        value[ 3 ] = 0;
 
         // top right
-        value[ 8 ] = .5;
-        value[ 9 ] = .5;
-        value[ 10 ] = 1;
-        value[ 11 ] = 1;
+        value[ 4 ] = 1;
+        value[ 5 ] = 1;
 
         // bottom right
-        value[ 12 ] = .5;
-        value[ 13 ] = -.5;
-        value[ 14 ] = 1;
-        value[ 15 ] = 0;
+        value[ 6 ] = 1;
+        value[ 7 ] = 0;
     }
     return point;
 }
@@ -155,40 +149,28 @@ buffer_type make_index( const device_type& device )
 }
 
 //--- make_attribute -------------------------------------------------------------------------------
-buffer_type make_attribute( const device_type& device )
+buffer_type make_attribute( const device_type& device, const box_tree::box_vector& boxes )
 {
-    buffer_type attribute = device->buffer( sizeof( f32 ) * 5 * 2, buffer::point );
+    buffer_type attribute = device->buffer( sizeof( f32 ) * 5 * boxes.size(), buffer::point );
     {
         map_type map = attribute->map( buffer::write );
-        f32* value = static_cast< f32* >( map->data );
-
-        value[ 0 ] = 100;
-        value[ 1 ] = 100;
-        value[ 2 ] = 100;
-        value[ 3 ] = 200;
-        value[ 4 ] = 0;
-
-        value[ 5 ] = 200;
-        value[ 6 ] = 200;
-        value[ 7 ] = 200;
-        value[ 8 ] = 100;
-        value[ 9 ] = 0;
+        std::memcpy( map->data, &boxes[ 0 ], map->size );
     }
     return attribute;
 }
 
 //--- make_block -----------------------------------------------------------------------------------
-block_type make_block( const device_type& device, const program_type& program )
+block_type make_block( const device_type& device, const program_type& program,
+    const box_tree::box_vector& boxes )
 {
     buffer_type point = make_point( device );
-    buffer_type attribute = make_attribute( device );
+    buffer_type attribute = make_attribute( device, boxes );
     block_type block = program->block( make_index( device ) );
     block->input( "vertex", 2, point );
-    block->input( "coords", 2, point );
-    block->input( "translate", 2, attribute, true );
     block->input( "scale", 2, attribute, true );
-    block->input( "z_index", 1, attribute, true );
-    block->input( "projection", orthographic( 0, width, height, 0, 0, 64 ) );
+    block->input( "translate", 2, attribute, true );
+    block->input( "depth", 1, attribute, true );
+    block->input( "projection", orthographic( 0, width, height, 0, -64, 0 ) );
     return block;
 }
 
@@ -201,6 +183,7 @@ shader_vector make_shaders( const device_type& device, const std::string& root )
 
     shader_vector vector;
     vector.push_back( include.compile( "box.vs", shader::vertex ) );
+    vector.push_back( include.compile( "box.gs", shader::geometry ) );
     vector.push_back( include.compile( "box.fs", shader::fragment ) );
     return vector;
 }
@@ -215,21 +198,28 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     view view( event_queue, width, height, false );
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
+    device->set( device::blend, true );
+    box_tree tree( box( 400, 400, 0, 0 ) );
+    tree.insert( box_tree::point_vector(), box( 200, 200, 100, 100 ) );
+    tree.insert( box_tree::point_vector(), box( 100, 100, 300, 300 ) );
+    tree.insert( box_tree::point_vector(), box( 100, 100, 300, 100 ) );
+    tree.insert( box_tree::point_vector(), box( 100, 100, 100, 300 ) );
+    box_tree::box_vector boxes = tree.view( box_tree::point_vector(), tree.box(), 8 );
+
     shader_vector shaders = make_shaders( device, root );
-    program_type program = device->program( shaders );
-    block_type block = make_block( device, program );
+    program_type program = device->program( shaders, 6 );
+    block_type block = make_block( device, program, boxes );
     frame_type frame = device->default_frame( width, height );
 
-    vec3 t( width / 2, height / 2, 0 );
+    vec3 t( 0, 0, 0 );
     vec3 s( 1, 1, 1 );
-    device->set( device::blend, true );
 
     while ( !executable::has_signal() )
     {
         frame->clear();
         block->input( "model_view", translate( mat4::identity, t ) * scale( mat4::identity, s ) );
 
-        device->draw( block, frame, 2 );
+        device->draw( block, frame, boxes.size() );
         device->swap();
 
         process_events( event_queue, t, s, epoch_t( 3600, 0 ) );

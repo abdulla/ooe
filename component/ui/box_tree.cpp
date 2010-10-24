@@ -11,8 +11,8 @@ typedef box_tree::point_vector::const_iterator point_iterator;
 
 geometry::intersection includes( const box& a, const box& b )
 {
-    if ( a.x > b.x + b.width || a.x + a.width < b.x ||
-        a.y > b.y + b.height || a.y + a.height < b.y )
+    if ( a.x > b.x + b.width || a.x + a.width <= b.x ||
+        a.y > b.y + b.height || a.y + a.height <= b.y )
         return geometry::outside;
     else if ( a.x < b.x && a.x + a.width > b.x + b.width &&
         a.y < b.y && a.y + a.height > b.y + b.height )
@@ -54,18 +54,24 @@ const box_tree& find_root( const box_tree& tree, point_iterator i, point_iterato
     return *root;
 }
 
-void find_view( const box_tree& tree, box_tree::view_vector& vector, u8 level, u8 level_limit )
+void find_view( const box_tree& tree, box_tree::box_vector& vector, f32 x, f32 y, u8 level,
+    u8 level_limit )
 {
+    ooe::box box = tree.box();
+    x += box.x / exp2f( level );
+    y += box.y / exp2f( level );
+
     if ( level != level_limit )
     {
         for ( box_tree::iterator i = tree.begin(), end = tree.end(); i != end; ++i )
-            find_view( tree, vector, level + 1, level_limit );
+            find_view( tree, vector, x, y, level + 1, level_limit );
     }
 
-    ooe::box box = tree.box();
+    u16 width = box.width >> level;
+    u16 height = box.height >> level;
 
-    if ( ( box.width >> level ) && ( box.height >> level ) )
-        vector.push_back( make_tuple( level, box ) );
+    if ( width && height )
+        vector.push_back( make_tuple( width, height, x, y, level + 1 ) );
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -79,19 +85,19 @@ point::point( u16 x_, u16 y_ )
 }
 
 //--- box ------------------------------------------------------------------------------------------
-box::box( u16 x_, u16 y_, u16 width_, u16 height_ )
-    : x( x_ ), y( y_ ), width( width_ ), height( height_ )
+box::box( u16 width_, u16 height_, u16 x_, u16 y_ )
+    : width( width_ ), height( height_ ), x( x_ ), y( y_ )
 {
 }
 
 box scale_up( const box& in, u16 value )
 {
-    return box( in.x << value, in.y << value, in.width << value, in.height << value );
+    return box( in.width << value, in.height << value, in.x << value, in.y << value );
 }
 
 box scale_down( const box& in, u16 value )
 {
-    return box( in.x >> value, in.y >> value, in.width >> value, in.height >> value );
+    return box( in.width >> value, in.height >> value, in.x >> value, in.y >> value );
 }
 
 //--- box_tree -------------------------------------------------------------------------------------
@@ -122,7 +128,7 @@ bool box_tree::insert( const point_vector& points, const ooe::box& in )
     if ( ::includes( scale_up( root.bound, 1 ), in ) != geometry::inside )
         return false;
 
-    for ( iterator i = begin(), i_end = end(); i != i_end; ++i )
+    for ( iterator i = root.begin(), i_end = root.end(); i != i_end; ++i )
     {
         if ( ::includes( i->bound, in ) != geometry::outside )
             return false;
@@ -132,16 +138,17 @@ bool box_tree::insert( const point_vector& points, const ooe::box& in )
     return true;
 }
 
-box_tree::view_vector box_tree::
+box_tree::box_vector box_tree::
     view( const point_vector& points, const ooe::box& in, u8 level_limit ) const
 {
     const box_tree& root = find_root( *this, points.begin(), points.end() );
-    view_vector vector( 1, make_tuple( 0, root.bound ) );
+    const ooe::box& rb = root.bound;
+    box_vector vector( 1, make_tuple( rb.width, rb.height, rb.x, rb.y, 1 ) );
 
-    for ( box_tree::iterator i = begin(), i_end = end(); i != i_end; ++i )
+    for ( box_tree::iterator i = root.begin(), i_end = root.end(); i != i_end; ++i )
     {
         if ( ::includes( i->bound, in ) != geometry::outside )
-            find_view( *i, vector, 1, level_limit );
+            find_view( *i, vector, 0, 0, 1, level_limit );
     }
 
     return vector;

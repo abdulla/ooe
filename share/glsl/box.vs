@@ -1,15 +1,19 @@
-uniform mat4 projection;
-uniform mat4 model_view;
+#extension GL_EXT_gpu_shader4 : enable
+
 attribute vec2 vertex;
-attribute vec2 coords;
-attribute vec2 translate;
 attribute vec2 scale;
-attribute float z_index;
-varying vec2 texcoord;
+attribute vec2 translate;
+attribute float depth;
+varying vec2 in_scale;
+varying vec2 in_translate;
+varying float in_depth;
+varying float in_instance;
 
 void main( void )
 {
-    vec2 transform = vertex * scale + translate;
-    gl_Position = projection * model_view * vec4( transform, z_index, 1 );
-    texcoord = coords;
+    gl_Position.xy = vertex;
+    in_scale = scale;
+    in_translate = translate;
+    in_depth = depth;
+    in_instance = float( gl_VertexID + 10 );
 }

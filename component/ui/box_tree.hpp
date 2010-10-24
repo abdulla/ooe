@@ -21,10 +21,10 @@ struct point
 //--- box ------------------------------------------------------------------------------------------
 struct box
 {
-    u16 x;
-    u16 y;
     u16 width;
     u16 height;
+    u16 x;
+    u16 y;
 
     box( u16, u16, u16, u16 );
 };
@@ -38,8 +38,8 @@ class box_tree
 public:
     typedef std::vector< box_tree > node_vector;
     typedef node_vector::const_iterator iterator;
-    typedef tuple< u8, ooe::box > view_tuple;
-    typedef std::vector< view_tuple > view_vector;
+    typedef tuple< f32, f32, f32, f32, f32 > box_tuple; // width, height, x, y, z
+    typedef std::vector< box_tuple > box_vector;
     typedef std::vector< point > point_vector;
 
     box_tree( const ooe::box& );
@@ -49,7 +49,7 @@ public:
     ooe::box box( void ) const;
 
     bool insert( const point_vector&, const ooe::box& );
-    view_vector view( const point_vector&, const ooe::box&, u8 ) const;
+    box_vector view( const point_vector&, const ooe::box&, u8 ) const;
 
 private:
     ooe::box bound;
