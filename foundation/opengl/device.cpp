@@ -113,7 +113,7 @@ public:
     virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
     virtual target_type target( u32, u32, image::type ) const;
     virtual shader_type shader( const std::string&, shader::type ) const;
-    virtual program_type program( const shader_vector& ) const;
+    virtual program_type program( const shader_vector&, u32 ) const;
     virtual frame_type default_frame( u32, u32 ) const;
 
 private:
@@ -310,9 +310,9 @@ shader_type device::shader( const std::string& source, shader::type type ) const
     return new opengl::shader( source, type );
 }
 
-program_type device::program( const shader_vector& vector ) const
+program_type device::program( const shader_vector& vector, u32 vertices ) const
 {
-    return new opengl::program( vector );
+    return new opengl::program( vector, vertices );
 }
 
 frame_type device::default_frame( u32 width, u32 height ) const

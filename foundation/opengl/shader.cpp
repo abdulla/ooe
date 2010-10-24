@@ -11,6 +11,9 @@ u32 get_stage( shader::type stage )
 {
     switch ( stage )
     {
+    case shader::geometry:
+        return GEOMETRY_SHADER;
+
     case shader::vertex:
         return VERTEX_SHADER;
 
@@ -26,6 +29,9 @@ const c8* stage_name( shader::type stage )
 {
     switch ( stage )
     {
+    case shader::geometry:
+        return "Geometry";
+
     case shader::vertex:
         return "Vertex";
 

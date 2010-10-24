@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <iostream>
+
 #include "foundation/opengl/block.hpp"
 #include "foundation/opengl/frame.hpp"
 #include "foundation/opengl/program.hpp"
@@ -14,14 +16,19 @@ void check_status( s32 id, s32 parameter, const c8* type )
     s32 status;
     GetProgramiv( id, parameter, &status );
 
-    if ( status )
-        return;
-
     s32 size;
     GetProgramiv( id, INFO_LOG_LENGTH, &size );
+
+    if ( status && !size )
+        return;
+
     scoped_array< c8 > array( new c8[ size ] );
     GetProgramInfoLog( id, size, 0, array );
-    throw error::runtime( "opengl::program: " ) << type << " failed:\n" << array;
+
+    if ( status )
+        OOE_CONSOLE( "opengl::program: " << type << " warning:\n" << array );
+    else
+        throw error::runtime( "opengl::program: " ) << type << " error:\n" << array;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -29,12 +36,19 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- program --------------------------------------------------------------------------------------
-program::program( const shader_vector& vector )
+program::program( const shader_vector& vector, u32 vertices )
 try
     : id ( CreateProgram() )
 {
     for ( shader_vector::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
         AttachShader( id, dynamic_cast< opengl::shader& >( **i ).id );
+
+    if ( vertices )
+    {
+        ProgramParameteri( id, GEOMETRY_INPUT_TYPE, TRIANGLES );
+        ProgramParameteri( id, GEOMETRY_OUTPUT_TYPE, TRIANGLES );
+        ProgramParameteri( id, GEOMETRY_VERTICES_OUT, vertices );
+    }
 
     LinkProgram( id );
     check_status( id, LINK_STATUS, "Link" );

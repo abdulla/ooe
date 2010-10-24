@@ -12,7 +12,7 @@ struct program
 {
     const u32 id;
 
-    program( const shader_vector& );
+    program( const shader_vector&, u32 );
     virtual ~program( void );
 
     virtual block_type block( const buffer_type& ) const;
