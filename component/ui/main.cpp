@@ -199,6 +199,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
     device->set( device::blend, true );
+    device->set( device::depth_test, true );
     box_tree tree( box( 400, 400, 0, 0 ) );
     tree.insert( box_tree::point_vector(), box( 200, 200, 100, 100 ) );
     tree.insert( box_tree::point_vector(), box( 100, 100, 300, 300 ) );

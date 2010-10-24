@@ -15,5 +15,5 @@ void main( void )
     in_scale = scale;
     in_translate = translate;
     in_depth = depth;
-    in_instance = float( gl_VertexID + 10 );
+    in_instance = float( gl_VertexID );
 }
