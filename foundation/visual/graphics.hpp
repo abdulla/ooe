@@ -219,7 +219,8 @@ struct device
         draw_buffers,
         texture_size,
         texture_units,
-        array_size
+        array_size,
+        geometry_output
     };
 
     virtual ~device( void ) {}

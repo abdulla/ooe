@@ -125,12 +125,13 @@ private:
     s32 texture_size_limit;
     s32 texture_units_limit;
     s32 array_size_limit;
+    s32 geometry_output_limit;
 };
 
 device::device( const ooe::view_data& view_, bool sync )
 try
     : view( view_ ), context( context_construct( view ) ), attributes(), draw_buffers_limit(),
-    texture_size_limit(), texture_units_limit(), array_size_limit()
+    texture_size_limit(), texture_units_limit(), array_size_limit(), geometry_output_limit()
 {
     context_current( view, context );
     context_sync( view, context, sync );
@@ -140,6 +141,7 @@ try
     GetIntegerv( MAX_TEXTURE_SIZE, &texture_size_limit );
     GetIntegerv( MAX_TEXTURE_IMAGE_UNITS, &texture_units_limit );
     GetIntegerv( MAX_ARRAY_TEXTURE_LAYERS, &array_size_limit );
+    GetIntegerv( MAX_GEOMETRY_OUTPUT_VERTICES, &geometry_output_limit );
 
     BlendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
     PixelStorei( PACK_ALIGNMENT, 1 );
@@ -264,6 +266,9 @@ u32 device::limit( limit_type type ) const
     case array_size:
         return array_size_limit;
 
+    case geometry_output:
+        return geometry_output_limit;
+
     default:
         throw error::runtime( "opengl::device: " ) << "Unknown limit type: " << type;
     }
@@ -287,7 +292,7 @@ texture_array_type device::
 
     if ( depth > u32( array_size_limit ) )
         throw error::runtime( "opengl::device: " ) <<
-            "Array size " << depth << " > device array size " << array_size_limit;
+            "Array size " << depth << " > array size limit " << array_size_limit;
 
     if ( is_compressed( format ) )
         return new compressed_texture_array( width, height, depth, format );
@@ -312,6 +317,10 @@ shader_type device::shader( const std::string& source, shader::type type ) const
 
 program_type device::program( const shader_vector& vector, u32 vertices ) const
 {
+    if ( vertices > u32( geometry_output_limit ) )
+        throw error::runtime( "opengl::device: " ) <<
+            "Geometry output " << vertices << " > geometry output limit " << geometry_output_limit;
+
     return new opengl::program( vector, vertices );
 }
 
