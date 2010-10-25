@@ -19,7 +19,8 @@ void check_status( s32 id, s32 parameter, const c8* type )
     s32 size;
     GetProgramiv( id, INFO_LOG_LENGTH, &size );
 
-    if ( status && !size )
+    // size < 2 to fix issue with nvidia drivers on linux
+    if ( status && size < 2 )
         return;
 
     scoped_array< c8 > array( new c8[ size ] );

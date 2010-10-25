@@ -1,15 +1,21 @@
+uniform bool shadow;
 varying vec2 coord;
-varying float shadow;
+varying vec2 pixel;
 
 void main( void )
 {
-    if ( shadow < .5 )
+    vec4 colour;
+
+    if ( !shadow )
+        colour = vec4( 1, 1, 1, 1 );
+    else
     {
-        gl_FragColor = vec4( 1, 1, 1, 1 );
-        return;
+        vec2 ten = pixel * 10.;
+        float x = smoothstep( ten.x, 0., coord.x ) + smoothstep( ten.x, 0., 1. - coord.x );
+        float y = smoothstep( ten.y, 0., coord.y ) + smoothstep( ten.y, 0., 1. - coord.y );
+        float a = .25 - length( vec2( x, y ) );
+        colour = vec4( 0, 0, 0, a );
     }
 
-    vec2 c = smoothstep( .2, 0., coord ) + smoothstep( .2, 0., vec2( 1, 1 ) - coord );
-    float a = .75 - length( c );
-    gl_FragColor = vec4( 0, 0, 0, a );
+    gl_FragColor = colour;
 }

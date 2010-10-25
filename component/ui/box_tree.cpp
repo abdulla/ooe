@@ -11,11 +11,13 @@ typedef box_tree::point_vector::const_iterator point_iterator;
 
 geometry::intersection includes( const box& a, const box& b )
 {
-    if ( a.x > b.x + b.width || a.x + a.width <= b.x ||
-        a.y > b.y + b.height || a.y + a.height <= b.y )
+    if ( a.x > b.x + b.width || a.x + a.width < b.x ||
+        a.y > b.y + b.height || a.y + a.height < b.y )
         return geometry::outside;
-    else if ( a.x < b.x && a.x + a.width > b.x + b.width &&
-        a.y < b.y && a.y + a.height > b.y + b.height )
+    else if ( ( a.x <= b.x && a.x + a.width >= b.x + b.width &&
+        a.y <= b.y && a.y + a.height >= b.y + b.height ) ||
+        ( b.x <= a.x && b.x + b.width >= a.x + a.width &&
+        b.y <= a.y && b.y + b.height >= a.y + a.height ) )
         return geometry::inside;
     else
         return geometry::intersect;
@@ -23,7 +25,7 @@ geometry::intersection includes( const box& a, const box& b )
 
 geometry::intersection includes( const box& a, const point& b )
 {
-    if ( a.x > b.x || a.y > b.y || a.x + a.width <= b.x || a.y + a.height <= b.y )
+    if ( a.x > b.x || a.y > b.y || a.x + a.width < b.x || a.y + a.height < b.y )
         return geometry::outside;
     else
         return geometry::inside;
@@ -130,7 +132,7 @@ bool box_tree::insert( const point_vector& points, const ooe::box& in )
 
     for ( iterator i = root.begin(), i_end = root.end(); i != i_end; ++i )
     {
-        if ( ::includes( i->bound, in ) != geometry::outside )
+        if ( ::includes( i->bound, in ) == geometry::inside )
             return false;
     }
 
@@ -142,15 +144,16 @@ box_tree::box_vector box_tree::
     view( const point_vector& points, const ooe::box& in, u8 level_limit ) const
 {
     const box_tree& root = find_root( *this, points.begin(), points.end() );
-    const ooe::box& rb = root.bound;
-    box_vector vector( 1, make_tuple( rb.width, rb.height, rb.x, rb.y, 1 ) );
+    box_vector vector;
 
-    for ( box_tree::iterator i = root.begin(), i_end = root.end(); i != i_end; ++i )
+    for ( iterator i = root.begin(), i_end = root.end(); i != i_end; ++i )
     {
         if ( ::includes( i->bound, in ) != geometry::outside )
             find_view( *i, vector, 0, 0, 1, level_limit );
     }
 
+    const ooe::box& rb = root.bound;
+    vector.push_back( make_tuple( rb.width, rb.height, rb.x, rb.y, 1 ) );
     return vector;
 }
 

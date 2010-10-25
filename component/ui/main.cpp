@@ -183,9 +183,28 @@ shader_vector make_shaders( const device_type& device, const std::string& root )
 
     shader_vector vector;
     vector.push_back( include.compile( "box.vs", shader::vertex ) );
-    vector.push_back( include.compile( "box.gs", shader::geometry ) );
     vector.push_back( include.compile( "box.fs", shader::fragment ) );
     return vector;
+}
+
+//--- make_shadow ----------------------------------------------------------------------------------
+box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
+{
+    box_tree::box_vector shadows;
+    f32 z = 4. / 64.;
+
+    for ( box_tree::box_vector::const_reverse_iterator i = boxes.rbegin(), end = boxes.rend();
+        i != end; ++i )
+    {
+        f32 w = i->_0 + 20;
+        f32 h = i->_1 + 20;
+        f32 x = i->_2 - 10;
+        f32 y = i->_3 - 10;
+        shadows.push_back( make_tuple( w, h, x, y, i->_4 - z ) );
+        z -= 1. / 64.;
+    }
+
+    return shadows;
 }
 
 //--- launch ---------------------------------------------------------------------------------------
@@ -198,19 +217,23 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     view view( event_queue, width, height, false );
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
-    device->set( device::blend, true );
-    device->set( device::depth_test, true );
     box_tree tree( box( 400, 400, 0, 0 ) );
     tree.insert( box_tree::point_vector(), box( 200, 200, 100, 100 ) );
     tree.insert( box_tree::point_vector(), box( 100, 100, 300, 300 ) );
-    tree.insert( box_tree::point_vector(), box( 100, 100, 300, 100 ) );
-    tree.insert( box_tree::point_vector(), box( 100, 100, 100, 300 ) );
+    tree.insert( box_tree::point_vector(), box( 100, 200, 300, 100 ) );
+    tree.insert( box_tree::point_vector(), box( 300, 100, 100, 300 ) );
     box_tree::box_vector boxes = tree.view( box_tree::point_vector(), tree.box(), 8 );
+    box_tree::box_vector shadows = make_shadow( boxes );
 
     shader_vector shaders = make_shaders( device, root );
     program_type program = device->program( shaders, 6 );
-    block_type block = make_block( device, program, boxes );
+    block_type block_boxes = make_block( device, program, boxes );
+    block_type block_shadows = make_block( device, program, shadows );
     frame_type frame = device->default_frame( width, height );
+
+    device->set( device::depth_test, true );
+    block_boxes->input( "shadow", false );
+    block_shadows->input( "shadow", true );
 
     vec3 t( 0, 0, 0 );
     vec3 s( 1, 1, 1 );
@@ -218,9 +241,15 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     while ( !executable::has_signal() )
     {
         frame->clear();
-        block->input( "model_view", translate( mat4::identity, t ) * scale( mat4::identity, s ) );
+        mat4 matrix = translate( mat4::identity, t ) * scale( mat4::identity, s );
 
-        device->draw( block, frame, boxes.size() );
+        device->set( device::blend, false );
+        block_boxes->input( "model_view", matrix );
+        device->set( device::blend, true );
+        block_shadows->input( "model_view", matrix );
+
+        device->draw( block_boxes, frame, boxes.size() );
+        device->draw( block_shadows, frame, shadows.size() );
         device->swap();
 
         process_events( event_queue, t, s, epoch_t( 3600, 0 ) );
