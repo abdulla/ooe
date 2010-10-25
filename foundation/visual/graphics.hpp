@@ -237,7 +237,7 @@ struct device
         ( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
     virtual target_type target( u32, u32, image::type ) const = 0;
     virtual shader_type shader( const std::string&, shader::type ) const = 0;
-    virtual program_type program( const shader_vector&, u32 = 0 ) const = 0;
+    virtual program_type program( const shader_vector& ) const = 0;
     virtual frame_type default_frame( u32, u32 ) const = 0;
 };
 

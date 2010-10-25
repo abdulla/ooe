@@ -226,7 +226,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     box_tree::box_vector shadows = make_shadow( boxes );
 
     shader_vector shaders = make_shaders( device, root );
-    program_type program = device->program( shaders, 6 );
+    program_type program = device->program( shaders );
     block_type block_boxes = make_block( device, program, boxes );
     block_type block_shadows = make_block( device, program, shadows );
     frame_type frame = device->default_frame( width, height );

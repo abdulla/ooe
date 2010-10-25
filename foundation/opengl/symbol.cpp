@@ -50,7 +50,6 @@ void load_symbols( void )
     CreateProgram = find< CreateProgram_t >( "glCreateProgram" );
     DeleteProgram = find< DeleteProgram_t >( "glDeleteProgram" );
     AttachShader = find< AttachShader_t >( "glAttachShader" );
-    ProgramParameteri = find< ProgramParameteri_t >( "glProgramParameteriEXT" );
     LinkProgram = find< LinkProgram_t >( "glLinkProgram" );
     ValidateProgram = find< ValidateProgram_t >( "glValidateProgram" );
     UseProgram = find< UseProgram_t >( "glUseProgram" );
@@ -135,7 +134,6 @@ GetShaderInfoLog_t* GetShaderInfoLog;
 CreateProgram_t* CreateProgram;
 DeleteProgram_t* DeleteProgram;
 AttachShader_t* AttachShader;
-ProgramParameteri_t* ProgramParameteri;
 LinkProgram_t* LinkProgram;
 ValidateProgram_t* ValidateProgram;
 UseProgram_t* UseProgram;

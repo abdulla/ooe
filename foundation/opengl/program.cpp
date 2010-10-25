@@ -37,19 +37,12 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- program --------------------------------------------------------------------------------------
-program::program( const shader_vector& vector, u32 vertices )
+program::program( const shader_vector& vector )
 try
     : id ( CreateProgram() )
 {
     for ( shader_vector::const_iterator i = vector.begin(), end = vector.end(); i != end; ++i )
         AttachShader( id, dynamic_cast< opengl::shader& >( **i ).id );
-
-    if ( vertices )
-    {
-        ProgramParameteri( id, GEOMETRY_INPUT_TYPE, TRIANGLES );
-        ProgramParameteri( id, GEOMETRY_OUTPUT_TYPE, TRIANGLES );
-        ProgramParameteri( id, GEOMETRY_VERTICES_OUT, vertices );
-    }
 
     LinkProgram( id );
     check_status( id, LINK_STATUS, "Link" );

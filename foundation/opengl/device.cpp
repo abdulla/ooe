@@ -113,7 +113,7 @@ public:
     virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
     virtual target_type target( u32, u32, image::type ) const;
     virtual shader_type shader( const std::string&, shader::type ) const;
-    virtual program_type program( const shader_vector&, u32 ) const;
+    virtual program_type program( const shader_vector& ) const;
     virtual frame_type default_frame( u32, u32 ) const;
 
 private:
@@ -125,13 +125,12 @@ private:
     s32 texture_size_limit;
     s32 texture_units_limit;
     s32 array_size_limit;
-    s32 geometry_output_limit;
 };
 
 device::device( const ooe::view_data& view_, bool sync )
 try
     : view( view_ ), context( context_construct( view ) ), attributes(), draw_buffers_limit(),
-    texture_size_limit(), texture_units_limit(), array_size_limit(), geometry_output_limit()
+    texture_size_limit(), texture_units_limit(), array_size_limit()
 {
     context_current( view, context );
     context_sync( view, context, sync );
@@ -141,7 +140,6 @@ try
     GetIntegerv( MAX_TEXTURE_SIZE, &texture_size_limit );
     GetIntegerv( MAX_TEXTURE_IMAGE_UNITS, &texture_units_limit );
     GetIntegerv( MAX_ARRAY_TEXTURE_LAYERS, &array_size_limit );
-    GetIntegerv( MAX_GEOMETRY_OUTPUT_VERTICES, &geometry_output_limit );
 
     BlendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
     PixelStorei( PACK_ALIGNMENT, 1 );
@@ -266,9 +264,6 @@ u32 device::limit( limit_type type ) const
     case array_size:
         return array_size_limit;
 
-    case geometry_output:
-        return geometry_output_limit;
-
     default:
         throw error::runtime( "opengl::device: " ) << "Unknown limit type: " << type;
     }
@@ -315,13 +310,9 @@ shader_type device::shader( const std::string& source, shader::type type ) const
     return new opengl::shader( source, type );
 }
 
-program_type device::program( const shader_vector& vector, u32 vertices ) const
+program_type device::program( const shader_vector& vector ) const
 {
-    if ( vertices > u32( geometry_output_limit ) )
-        throw error::runtime( "opengl::device: " ) <<
-            "Geometry output " << vertices << " > geometry output limit " << geometry_output_limit;
-
-    return new opengl::program( vector, vertices );
+    return new opengl::program( vector );
 }
 
 frame_type device::default_frame( u32 width, u32 height ) const
