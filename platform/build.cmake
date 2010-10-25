@@ -106,6 +106,6 @@ function( ooe_files SOURCE TARGET )
     file( GLOB_RECURSE FILES RELATIVE ${SOURCE} ${SOURCE}/* )
 
     foreach( FILE ${FILES} )
-        configure_file( ${SOURCE}/${FILE} ${TARGET}/${FILE} COPY_ONLY )
+        configure_file( ${SOURCE}/${FILE} ${TARGET}/${FILE} COPYONLY )
     endforeach()
 endfunction()
