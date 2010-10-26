@@ -10,9 +10,9 @@ void main( void )
         colour = vec4( 1, 1, 1, 1 );
     else
     {
-        vec2 ten = pixel * 10.;
-        float x = smoothstep( ten.x, 0., coord.x ) + smoothstep( ten.x, 0., 1. - coord.x );
-        float y = smoothstep( ten.y, 0., coord.y ) + smoothstep( ten.y, 0., 1. - coord.y );
+        vec2 border = pixel * 10.;
+        float x = smoothstep( border.x, -border.x, coord.x ) + smoothstep( border.x, -border.x, 1. - coord.x );
+        float y = smoothstep( border.y, -border.y, coord.y ) + smoothstep( border.y, -border.y, 1. - coord.y );
         float a = .25 - length( vec2( x, y ) );
         colour = vec4( 0, 0, 0, a );
     }
