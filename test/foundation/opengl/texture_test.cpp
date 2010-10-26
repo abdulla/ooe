@@ -19,13 +19,12 @@ const image::type texture_format = image::rgb_u8;
 const c8 vertex_shader[] =
     "uniform mat4 projection;\n\
     attribute vec2 vertex;\n\
-    attribute vec2 coords;\n\
     varying vec2 texcoord;\n\
     \n\
     void main( void )\n\
     {\n\
         gl_Position = projection * vec4( vertex, 0, 1 );\n\
-        texcoord = coords;\n\
+        texcoord = vertex;\n\
     }";
 
 const c8 fragment_shader[] =
@@ -42,34 +41,26 @@ const c8 fragment_shader[] =
 
 buffer_type make_point( const device_type& device )
 {
-    buffer_type point = device->buffer( sizeof( f32 ) * 4 * 4, buffer::point );
+    buffer_type point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
     {
         map_type map = point->map( buffer::write );
         f32* value = static_cast< f32* >( map->data );
 
         // top left
-        value[ 0 ] = -1;
+        value[ 0 ] = 0;
         value[ 1 ] = 1;
-        value[ 2 ] = 0;
-        value[ 3 ] = 1;
 
         // bottom left
-        value[ 4 ] = -1;
-        value[ 5 ] = -1;
-        value[ 6 ] = 0;
-        value[ 7 ] = 0;
+        value[ 2 ] = 0;
+        value[ 3 ] = 0;
 
         // top right
-        value[ 8 ] = 1;
-        value[ 9 ] = 1;
-        value[ 10 ] = 1;
-        value[ 11 ] = 1;
+        value[ 4 ] = 1;
+        value[ 5 ] = 1;
 
         // bottom right
-        value[ 12 ] = 1;
-        value[ 13 ] = -1;
-        value[ 14 ] = 1;
-        value[ 15 ] = 0;
+        value[ 6 ] = 1;
+        value[ 7 ] = 0;
     }
     return point;
 }
@@ -137,10 +128,8 @@ template<>
     vector.push_back( device->shader( fragment_shader, shader::fragment ) );
     program_type program = device->program( vector );
 
-    buffer_type point = make_point( device );
     block_type block = program->block( make_index( device ) );
-    block->input( "vertex", 2, point );
-    block->input( "coords", 2, point );
+    block->input( "vertex", 2, make_point( device ) );
     block->input( "sampler", texture_array );
     block->input( "projection", orthographic( 0, width / height, 1, 0 ) );
 
