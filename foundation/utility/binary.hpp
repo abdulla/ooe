@@ -55,6 +55,14 @@ inline u32 parity( u32 value )
     return ( 0x6996 >> value ) & 0x01;
 }
 
+//--- saturated_shift ------------------------------------------------------------------------------
+template< typename t >
+    t saturated_shift( t value )
+{
+    t mask = 1 << ( sizeof( t ) * 8 - 1 );
+    return value & mask ? ~t( 0 ) : value << 1;
+}
+
 //--- endian_swap ----------------------------------------------------------------------------------
 inline u8 endian_swap( u8 value )
 {
