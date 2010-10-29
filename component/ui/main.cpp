@@ -19,7 +19,7 @@ const f32 height = 640;
 u32 acceleration = 4;
 
 //--- process_key ----------------------------------------------------------------------------------
-void process_key( u32 value, bool press, vec3& translate, vec3& scale )
+void process_key( u32 value, bool press, vec3& translate )
 {
     if ( !press )
         return;
@@ -33,29 +33,27 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale )
         break;
 
     case key_left:
-        translate.x += acceleration;
-        break;
-
-    case key_right:
         translate.x -= acceleration;
         break;
 
-    case key_up:
-        translate.y += acceleration;
+    case key_right:
+        translate.x += acceleration;
         break;
 
-    case key_down:
+    case key_up:
         translate.y -= acceleration;
         break;
 
-    case '=':
-        scale.x *= 2;
-        scale.y *= 2;
+    case key_down:
+        translate.y += acceleration;
         break;
 
     case '-':
-        scale.x /= 2;
-        scale.y /= 2;
+        translate.z -= 1;
+        break;
+
+    case '=':
+        translate.z += 1;
         break;
 
     case '.':
@@ -76,7 +74,7 @@ void process_key( u32 value, bool press, vec3& translate, vec3& scale )
 }
 
 //--- process_events -------------------------------------------------------------------------------
-void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epoch_t timeout )
+void process_events( event_queue& event_queue, vec3& translate, epoch_t timeout )
 {
     event event;
 
@@ -90,7 +88,7 @@ void process_events( event_queue& event_queue, vec3& translate, vec3& scale, epo
             break;
 
         case event::key_flag:
-            process_key( event.key.value, event.key.press, translate, scale );
+            process_key( event.key.value, event.key.press, translate );
             break;
 
         case event::exit:
@@ -170,7 +168,7 @@ block_type make_block( const device_type& device, const program_type& program,
     block->input( "scale", 2, attribute, true );
     block->input( "translate", 2, attribute, true );
     block->input( "depth", 1, attribute, true );
-    block->input( "projection", orthographic( 0, width, height, 0, -64, 0 ) );
+    block->input( "projection", orthographic( 0, width, height, 0, -64, 64 ) );
     return block;
 }
 
@@ -191,7 +189,7 @@ shader_vector make_shaders( const device_type& device, const std::string& root )
 box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
 {
     box_tree::box_vector shadows;
-    f32 level = -1;
+    f32 level = -1024;
     f32 z;
 
     for ( box_tree::box_vector::const_reverse_iterator i = boxes.rbegin(), end = boxes.rend();
@@ -200,7 +198,7 @@ box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
         if ( !is_equal( level, i->_4 ) )
         {
             level = i->_4;
-            z = 1. / 16;
+            z = 1. / 8;
         }
 
         f32 w = i->_0 + 12;
@@ -224,42 +222,48 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     view view( event_queue, width, height, false );
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
-    box_tree tree( box( 400, 400, 0, 0 ) );
-    tree.insert( box_tree::point_vector(), box( 200, 200, 100, 100 ) );
-    tree.insert( box_tree::point_vector(), box( 100, 100, 300, 300 ) );
-    tree.insert( box_tree::point_vector(), box( 100, 200, 300, 100 ) );
-    tree.insert( box_tree::point_vector(), box( 300, 100, 100, 300 ) );
-    box_tree::box_vector boxes = tree.view( box_tree::point_vector(), tree.box(), 8 );
-    box_tree::box_vector shadows = make_shadow( boxes );
+    box_tree tree( box( 800, 800, 0, 0 ) );
+    tree.insert( box( 400, 400, 200, 200 ), 0, 0, 0 );
+    tree.insert( box( 200, 200, 600, 600 ), 0, 0, 0 );
+    tree.insert( box( 200, 400, 600, 200 ), 0, 0, 0 );
+    tree.insert( box( 400, 200, 200, 600 ), 0, 0, 0 );
+    tree.insert( box( 400, 400, 202, 202 ), 0.5, 0.5, 1 );
 
     shader_vector shaders = make_shaders( device, root );
     program_type program = device->program( shaders );
-    block_type block_boxes = make_block( device, program, boxes );
-    block_type block_shadows = make_block( device, program, shadows );
     frame_type frame = device->default_frame( width, height );
 
     device->set( device::depth_test, true );
-    block_boxes->input( "shadow", false );
-    block_shadows->input( "shadow", true );
-
-    vec3 t( 0, 0, 0 );
-    vec3 s( 1, 1, 1 );
+    vec3 v( 0, 0, 0 );
 
     while ( !executable::has_signal() )
     {
-        frame->clear();
-        mat4 matrix = translate( mat4::identity, t ) * scale( mat4::identity, s );
+        box box( width, height, std::max( 0.f, v.x ), std::max( 0.f, v.y ) );
+        box_tree::box_vector boxes = tree.view( box, 0, 0, v.z );
 
-        device->set( device::blend, false );
-        block_boxes->input( "model_view", matrix );
-        device->set( device::blend, true );
-        block_shadows->input( "model_view", matrix );
+        if ( boxes.size() )
+        {
+            box_tree::box_vector shadows = make_shadow( boxes );
+            block_type block_boxes = make_block( device, program, boxes );
+            block_type block_shadows = make_block( device, program, shadows );
+            mat4 m = translate( mat4::identity,
+                vec3( std::max( 0.f, -v.x ), std::max( 0.f, -v.y ), 0 ) );
 
-        device->draw( block_boxes, frame, boxes.size() );
-        device->draw( block_shadows, frame, shadows.size() );
-        device->swap();
+            device->set( device::blend, false );
+            block_boxes->input( "model_view", m );
+            block_boxes->input( "shadow", false );
+            device->set( device::blend, true );
+            block_shadows->input( "model_view", m );
+            block_shadows->input( "shadow", true );
 
-        process_events( event_queue, t, s, epoch_t( 3600, 0 ) );
+            frame->clear();
+            device->draw( block_boxes, frame, boxes.size() );
+            device->draw( block_shadows, frame, shadows.size() );
+            device->swap();
+        }
+
+        process_events( event_queue, v, epoch_t( 3600, 0 ) );
+        v.z = std::max( 0.f, v.z );
     }
 
     return true;

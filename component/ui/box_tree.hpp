@@ -9,15 +9,6 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- point ----------------------------------------------------------------------------------------
-struct point
-{
-    u16 x;
-    u16 y;
-
-    point( u16, u16 );
-};
-
 //--- box ------------------------------------------------------------------------------------------
 struct box
 {
@@ -29,9 +20,6 @@ struct box
     box( u16, u16, u16, u16 );
 };
 
-box scale_up( const box&, u16 );
-box scale_down( const box&, u16 );
-
 //--- box_tree -------------------------------------------------------------------------------------
 class box_tree
 {
@@ -40,7 +28,6 @@ public:
     typedef node_vector::const_iterator iterator;
     typedef tuple< f32, f32, f32, f32, f32 > box_tuple; // width, height, x, y, z
     typedef std::vector< box_tuple > box_vector;
-    typedef std::vector< point > point_vector;
 
     box_tree( const ooe::box& );
 
@@ -48,8 +35,8 @@ public:
     iterator end( void ) const;
     ooe::box box( void ) const;
 
-    bool insert( const point_vector&, const ooe::box& );
-    box_vector view( const point_vector&, const ooe::box&, u8 ) const;
+    bool insert( const ooe::box&, f32, f32, u16 );
+    box_vector view( const ooe::box&, f32, f32, u16 ) const;
 
 private:
     ooe::box bound;
@@ -57,6 +44,5 @@ private:
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
-
 
 #endif  // OOE_COMPONENT_UI_BOX_TREE_HPP
