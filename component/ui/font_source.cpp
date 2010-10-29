@@ -114,7 +114,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 font_source::font_source( font::face& face_, u32 face_size_, const std::string& root_ )
     : face( face_ ), face_size( face_size_ ), root( get_root( root_, face ) ),
     source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
-    first( face.number( font::face::first ) ), level_limit( log2( source_size / page_wide ) ),
+    first( face.number( font::face::first ) ), level_limit( log2f( source_size / page_wide ) ),
     mutex(), memory( open_memory( root, glyphs, level_limit + 1 ) )
 {
     if ( !is_bit_round( face_size ) )
