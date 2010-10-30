@@ -23,32 +23,27 @@ geometry::intersection includes( const box& a, const box& b )
 
 const box_tree* find_root( const box_tree* root, unit& x, unit& y, u16 z )
 {
-    for ( u16 i = 0; i != z; ++i )
+    box box = root->box();
+
+    if ( box.x > x.integer || box.y > y.integer ||
+        box.x + box.width < x.integer || box.y + box.height < y.integer )
+        return 0;
+
+    x.fraction *= 2;
+    y.fraction *= 2;
+    x.integer = ( x.integer - box.x ) * 2 + x.fraction;
+    y.integer = ( y.integer - box.y ) * 2 + y.fraction;
+
+    if ( !z )
+        return root;
+
+    for ( box_tree::iterator i = root->begin(), end = root->end(); i != end; ++i )
     {
-        box_tree::iterator j = root->begin();
-        box_tree::iterator end = root->end();
-
-        for ( ; j != end; ++j )
-        {
-            box box = j->box();
-
-            if ( box.x > x.integer || box.y > y.integer ||
-                box.x + box.width < x.integer || box.y + box.height < y.integer )
-                continue;
-
-            x.integer = ( x.integer - box.x + x.fraction ) * 2;
-            y.integer = ( y.integer - box.y + y.fraction ) * 2;
-            x.fraction *= 2;
-            y.fraction *= 2;
-            root = &*j;
-            break;
-        }
-
-        if ( j == end )
-            return 0;
+        if ( ( root = find_root( &*i, x, y, z - 1 ) ) )
+            return root;
     }
 
-    return root;
+    return 0;
 }
 
 bool find_view( const box_tree& tree, box_tree::box_vector& vector, u16 width, u16 height,
