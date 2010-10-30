@@ -1,11 +1,12 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <cmath>
-#include <cstring>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "component/ui/box_tree.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/io/directory.hpp"
 #include "foundation/io/vfs.hpp"
 #include "foundation/math/math.hpp"
 #include "foundation/visual/event_queue.hpp"
@@ -212,6 +213,47 @@ box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
     return shadows;
 }
 
+//--- make_box -------------------------------------------------------------------------------------
+box make_box( const boost::property_tree::ptree& pt )
+{
+    u16 w = pt.get< u16 >( "width" );
+    u16 h = pt.get< u16 >( "height" );
+    u16 x = pt.get< u16 >( "x" );
+    u16 y = pt.get< u16 >( "y" );
+    return box( w, h, x, y );
+}
+
+//--- make_tree ------------------------------------------------------------------------------------
+void make_tree( const boost::property_tree::ptree& pt, box_tree& bt, unit x, unit y, u16 z )
+{
+    for ( boost::property_tree::ptree::const_iterator i = pt.begin(), end = pt.end();
+        i != end; ++i )
+    {
+        box box = make_box( i->second );
+        u16 c = z + 1;
+        unit b( y.integer + ( box.y >> c ), fmodf( box.y, 1 << c ) );
+        unit a( x.integer + ( box.x >> c ), fmodf( box.x, 1 << c ) );
+        bt.insert( box.width, box.height, a, b, z );
+
+        boost::optional< const boost::property_tree::ptree& > optional =
+            i->second.get_child_optional( "children" );
+
+        if ( optional )
+            make_tree( *optional, bt, a, b, c );
+    }
+}
+
+//--- read_tree ------------------------------------------------------------------------------------
+box_tree read_tree( const std::string& path )
+{
+    boost::property_tree::ptree pt;
+    read_json( canonical_path( path ), pt );
+
+    box_tree bt( make_box( pt ) );
+    make_tree( pt.get_child( "children" ), bt, unit( 0, 0 ), unit( 0, 0 ), 0 );
+    return bt;
+}
+
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
@@ -222,13 +264,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     view view( event_queue, width, height, false );
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
-    box_tree tree( box( 800, 800, 0, 0 ) );
-    tree.insert( 600, 600, unit( 200, 0 ), unit( 200, 0 ), 0 );
-    tree.insert( 200, 200, unit( 500, 0 ), unit( 500, 0 ), 0 );
-    tree.insert( 200, 600, unit( 500, 0 ), unit( 200, 0 ), 0 );
-    tree.insert( 600, 200, unit( 200, 0 ), unit( 500, 0 ), 0 );
-    tree.insert( 800, 800, unit( 300, 0 ), unit( 300, 0 ), 1 );
-
+    box_tree tree = read_tree( root + "../share/json/box_tree.json" );
     shader_vector shaders = make_shaders( device, root );
     program_type program = device->program( shaders );
     frame_type frame = device->default_frame( width, height );
