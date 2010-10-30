@@ -223,11 +223,11 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
     box_tree tree( box( 800, 800, 0, 0 ) );
-    tree.insert( box( 400, 400, 200, 200 ), 0, 0, 0 );
-    tree.insert( box( 200, 200, 600, 600 ), 0, 0, 0 );
-    tree.insert( box( 200, 400, 600, 200 ), 0, 0, 0 );
-    tree.insert( box( 400, 200, 200, 600 ), 0, 0, 0 );
-    tree.insert( box( 400, 400, 202, 202 ), 0.5, 0.5, 1 );
+    tree.insert( 600, 600, unit(  400, 0 ), unit(  400, 0 ), 0 );
+    tree.insert( 200, 200, unit( 1000, 0 ), unit( 1000, 0 ), 0 );
+    tree.insert( 200, 600, unit( 1000, 0 ), unit(  400, 0 ), 0 );
+    tree.insert( 600, 200, unit(  400, 0 ), unit( 1000, 0 ), 0 );
+    tree.insert( 800, 800, unit(  600, 0 ), unit(  600, 0 ), 1 );
 
     shader_vector shaders = make_shaders( device, root );
     program_type program = device->program( shaders );
@@ -238,8 +238,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
     while ( !executable::has_signal() )
     {
-        box box( width, height, std::max( 0.f, v.x ), std::max( 0.f, v.y ) );
-        box_tree::box_vector boxes = tree.view( box, 0, 0, v.z );
+        unit x( std::max( 0.f, v.x ), 0 );
+        unit y( std::max( 0.f, v.y ), 0 );
+        box_tree::box_vector boxes = tree.view( width, height, x, y, v.z );
 
         if ( boxes.size() )
         {
