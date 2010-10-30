@@ -9,6 +9,7 @@
 #include "foundation/io/directory.hpp"
 #include "foundation/io/vfs.hpp"
 #include "foundation/math/math.hpp"
+#include "foundation/utility/error.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
@@ -233,7 +234,12 @@ void make_tree( const boost::property_tree::ptree& pt, box_tree& bt, unit x, uni
         u16 c = z + 1;
         unit b( y.integer + ( box.y >> c ), fmodf( box.y, 1 << c ) );
         unit a( x.integer + ( box.x >> c ), fmodf( box.x, 1 << c ) );
-        bt.insert( box.width, box.height, a, b, z );
+
+        if ( !bt.insert( box.width, box.height, a, b, z ) )
+            throw error::runtime( "read_tree: " ) <<
+                "Unable to insert: " << box.width << ' ' << box.height <<
+                " ( " << a.integer << ", " << a.fraction << " )"
+                " ( " << b.integer << ", " << b.fraction << " ) " << c << '\n';
 
         boost::optional< const boost::property_tree::ptree& > optional =
             i->second.get_child_optional( "children" );
