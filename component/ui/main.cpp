@@ -223,11 +223,11 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
     box_tree tree( box( 800, 800, 0, 0 ) );
-    tree.insert( 600, 600, unit(  400, 0 ), unit(  400, 0 ), 0 );
-    tree.insert( 200, 200, unit( 1000, 0 ), unit( 1000, 0 ), 0 );
-    tree.insert( 200, 600, unit( 1000, 0 ), unit(  400, 0 ), 0 );
-    tree.insert( 600, 200, unit(  400, 0 ), unit( 1000, 0 ), 0 );
-    tree.insert( 800, 800, unit(  600, 0 ), unit(  600, 0 ), 1 );
+    tree.insert( 600, 600, unit( 200, 0 ), unit( 200, 0 ), 0 );
+    tree.insert( 200, 200, unit( 500, 0 ), unit( 500, 0 ), 0 );
+    tree.insert( 200, 600, unit( 500, 0 ), unit( 200, 0 ), 0 );
+    tree.insert( 600, 200, unit( 200, 0 ), unit( 500, 0 ), 0 );
+    tree.insert( 800, 800, unit( 300, 0 ), unit( 300, 0 ), 1 );
 
     shader_vector shaders = make_shaders( device, root );
     program_type program = device->program( shaders );
