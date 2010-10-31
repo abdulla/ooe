@@ -23,6 +23,9 @@ u32 acceleration = 4;
 //--- zoom_out -------------------------------------------------------------------------------------
 void zoom_out( vec3& translate )
 {
+    if ( translate.z < 0 )
+        return;
+
     translate.x -= u16( width ) >> u16( translate.z + 2 );
     translate.y -= u16( height ) >> u16( translate.z + 2 );
 }
