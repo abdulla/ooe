@@ -111,8 +111,8 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
         return event::button_flag;
 
     case NSScrollWheel:
-        event.scroll.x = nsevent.deltaX;
-        event.scroll.y = nsevent.deltaY;
+        event.scroll.x = -nsevent.deltaX;
+        event.scroll.y = -nsevent.deltaY;
         return event::scroll_flag;
 
     case NSEventTypeSwipe:

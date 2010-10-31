@@ -31,8 +31,8 @@ namespace ooe
         {
             struct
             {
-                s32 x;
-                s32 y;
+                f32 x;
+                f32 y;
             } motion, scroll, swipe;
 
             struct
