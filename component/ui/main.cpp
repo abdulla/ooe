@@ -20,6 +20,20 @@ const f32 width = 1024;
 const f32 height = 640;
 u32 acceleration = 4;
 
+//--- zoom_out -------------------------------------------------------------------------------------
+void zoom_out( vec3& translate )
+{
+    translate.x -= u16( width ) >> u16( translate.z + 2 );
+    translate.y -= u16( height ) >> u16( translate.z + 2 );
+}
+
+//--- zoom_in --------------------------------------------------------------------------------------
+void zoom_in( vec3& translate )
+{
+    translate.x += u16( width ) >> u16( translate.z + 1 );
+    translate.y += u16( height ) >> u16( translate.z + 1 );
+}
+
 //--- process_key ----------------------------------------------------------------------------------
 void process_key( u32 value, bool press, vec3& translate )
 {
@@ -52,10 +66,12 @@ void process_key( u32 value, bool press, vec3& translate )
 
     case '-':
         translate.z -= 1;
+        zoom_out( translate );
         break;
 
     case '=':
         translate.z += 1;
+        zoom_in( translate );
         break;
 
     case '.':
@@ -78,6 +94,7 @@ void process_key( u32 value, bool press, vec3& translate )
 //--- process_events -------------------------------------------------------------------------------
 void process_events( event_queue& event_queue, vec3& translate, epoch_t timeout )
 {
+    int direction;
     event event;
 
     for ( event::type type; ( type = event_queue.next_event( event, timeout ) );
@@ -102,7 +119,14 @@ void process_events( event_queue& event_queue, vec3& translate, epoch_t timeout 
             break;
 
         case event::magnify_flag:
+            direction = s16( translate.z + event.magnify.value ) - s16( translate.z );
             translate.z += event.magnify.value;
+
+            if ( direction < 0 )
+                zoom_out( translate );
+            else if ( direction > 0 )
+                zoom_in( translate );
+
             break;
 
         case event::rotate_flag:
