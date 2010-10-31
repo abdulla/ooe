@@ -128,6 +128,12 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
         event.rotate.value = nsevent.rotation;
         return event::rotate_flag;
 
+    case NSEventTypeBeginGesture:
+        return event::gesture_begin;
+
+    case NSEventTypeEndGesture:
+        return event::gesture_end;
+
     default:
         [ NSApp sendEvent: nsevent ];
         return event::ignore;

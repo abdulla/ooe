@@ -24,7 +24,10 @@ namespace ooe
             scroll_flag,
             swipe_flag,
             magnify_flag,
-            rotate_flag
+            rotate_flag,
+
+            gesture_begin,
+            gesture_end
         };
 
         union
