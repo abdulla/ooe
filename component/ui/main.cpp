@@ -93,6 +93,21 @@ void process_events( event_queue& event_queue, vec3& translate, epoch_t timeout 
             process_key( event.key.value, event.key.press, translate );
             break;
 
+        case event::scroll_flag:
+            translate.x += event.scroll.x;
+            translate.y += event.scroll.y;
+            break;
+
+        case event::swipe_flag:
+            break;
+
+        case event::magnify_flag:
+            translate.z += event.magnify.value;
+            break;
+
+        case event::rotate_flag:
+            break;
+
         case event::exit:
             executable::quit();
             break;
