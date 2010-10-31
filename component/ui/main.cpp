@@ -130,6 +130,8 @@ void process_events( event_queue& event_queue, vec3& translate, epoch_t timeout 
             break;
 
         case event::rotate_flag:
+        case event::gesture_begin:
+        case event::gesture_end:
             break;
 
         case event::exit:
