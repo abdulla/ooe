@@ -110,6 +110,24 @@ event::type event_queue::next_event( event& event, epoch_t timeout ) const
             nsevent.type == NSOtherMouseDown;
         return event::button_flag;
 
+    case NSScrollWheel:
+        event.scroll.x = nsevent.deltaX;
+        event.scroll.y = nsevent.deltaY;
+        return event::scroll_flag;
+
+    case NSEventTypeSwipe:
+        event.swipe.x = nsevent.deltaX;
+        event.swipe.y = nsevent.deltaY;
+        return event::swipe_flag;
+
+    case NSEventTypeMagnify:
+        event.magnify.value = nsevent.magnification;
+        return event::magnify_flag;
+
+    case NSEventTypeRotate:
+        event.rotate.value = nsevent.rotation;
+        return event::rotate_flag;
+
     default:
         [ NSApp sendEvent: nsevent ];
         return event::ignore;

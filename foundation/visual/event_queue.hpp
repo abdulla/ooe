@@ -19,7 +19,12 @@ namespace ooe
 
             motion_flag,
             button_flag,
-            key_flag
+            key_flag,
+
+            scroll_flag,
+            swipe_flag,
+            magnify_flag,
+            rotate_flag
         };
 
         union
@@ -28,13 +33,18 @@ namespace ooe
             {
                 s32 x;
                 s32 y;
-            } motion;
+            } motion, scroll, swipe;
 
             struct
             {
                 u32 value;
                 bool press;
             } button, key;
+
+            struct
+            {
+                f32 value;
+            } magnify, rotate;
         };
     };
 
