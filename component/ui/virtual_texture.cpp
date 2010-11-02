@@ -289,7 +289,7 @@ virtual_texture::~virtual_texture( void )
     cache.evict( *this );
 }
 
-void virtual_texture::input( const std::string& name, block_type& block ) const
+void virtual_texture::input( block_type& block, const std::string& name ) const
 {
     block->input( name + ".bias_range", log2f( source.page_size() ), log2f( source.size() ) );
     block->input( name + ".page_cache", cache.array );

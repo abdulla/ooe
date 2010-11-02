@@ -5,49 +5,24 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const up_t index_size = 6;
-const up_t point_size = 4 * 4;
+const up_t point_size = 8;
 
 u32 add_glyph
     ( const font_source::glyph_type& glyph, f32* value, u32 size, s32 x, s32 y, u32 max, u8 level )
 {
-    const font::metric& m = glyph._2;
+    const font::metric& metric = glyph._2;
 
-    f32 x_min = x + m.left;
-    f32 x_max = x + m.width + m.left;
-    f32 y_min = y + ( max - m.top );
-    f32 y_max = y + m.height + ( max - m.top );
+    value[ 0 ] = metric.width;
+    value[ 1 ] = metric.height;
+    value[ 2 ] = x;
+    value[ 3 ] = y + ( max - metric.top );
 
-    f32 u_min = divide( glyph._0, size );
-    f32 u_max = divide( glyph._0 + ( m.width << level ), size );
-    f32 v_min = divide( glyph._1, size );
-    f32 v_max = divide( glyph._1 + ( m.height << level ), size );
+    value[ 4 ] = divide( metric.width << level, size );
+    value[ 5 ] = divide( metric.height << level, size );
+    value[ 6 ] = divide( glyph._0, size );
+    value[ 7 ] = divide( glyph._1, size );
 
-    // top left
-    value[ 0 ] = x_min;
-    value[ 1 ] = y_max;
-    value[ 2 ] = u_min;
-    value[ 3 ] = v_max;
-
-    // bottom left
-    value[ 4 ] = x_min;
-    value[ 5 ] = y_min;
-    value[ 6 ] = u_min;
-    value[ 7 ] = v_min;
-
-    // top right
-    value[ 8 ] = x_max;
-    value[ 9 ] = y_max;
-    value[ 10 ] = u_max;
-    value[ 11 ] = v_max;
-
-    // bottom right
-    value[ 12 ] = x_max;
-    value[ 13 ] = y_min;
-    value[ 14 ] = u_max;
-    value[ 15 ] = v_min;
-
-    return m.width + m.left;
+    return metric.width + metric.left;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -61,26 +36,8 @@ text_layout::
 {
 }
 
-block_type text_layout::block( const program_type& program, const std::string& text, u8 level )
+u32 text_layout::input( const block_type& block, const std::string& text, u8 level )
 {
-    buffer_type index = device->buffer( sizeof( u16 ) * index_size * text.size(), buffer::index );
-
-    if ( !text.empty() )
-    {
-        map_type map = index->map( buffer::write );
-        u16* value = static_cast< u16* >( map->data );
-
-        for ( up_t i = 0, end = text.size() * 4; i != end; i += 4, value += index_size )
-        {
-            value[ 0 ] = 0 + i;
-            value[ 1 ] = 1 + i;
-            value[ 2 ] = 2 + i;
-            value[ 3 ] = 2 + i;
-            value[ 4 ] = 1 + i;
-            value[ 5 ] = 3 + i;
-        }
-    }
-
     buffer_type point = device->buffer( sizeof( f32 ) * point_size * text.size(), buffer::point );
 
     if ( !text.empty() )
@@ -101,10 +58,11 @@ block_type text_layout::block( const program_type& program, const std::string& t
         }
     }
 
-    block_type b = program->block( index );
-    b->input( "vertex", 2, point );
-    b->input( "coords", 2, point );
-    return b;
+    block->input( "vertex_scale", 2, point, true );
+    block->input( "vertex_translate", 2, point, true );
+    block->input( "coords_scale", 2, point, true );
+    block->input( "coords_translate", 2, point, true );
+    return text.size();
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

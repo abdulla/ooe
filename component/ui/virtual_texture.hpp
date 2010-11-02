@@ -91,7 +91,7 @@ public:
     virtual_texture( const device_type&, page_cache&, physical_source& );
     ~virtual_texture( void );
 
-    void input( const std::string&, block_type& ) const;
+    void input( block_type&, const std::string& ) const;
     void load( u32, u32, u32, u32, u8, bool = false );
     void unlock( u32, u32, u32, u32, u8 );
 

@@ -15,6 +15,49 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 const f32 width = 640;
 const f32 height = 480;
 
+buffer_type make_point( const device_type& device )
+{
+    buffer_type point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
+    {
+        map_type map = point->map( buffer::write );
+        f32* value = static_cast< f32* >( map->data );
+
+        // top left
+        value[ 0 ] = 0;
+        value[ 1 ] = 1;
+
+        // bottom left
+        value[ 2 ] = 0;
+        value[ 3 ] = 0;
+
+        // top right
+        value[ 4 ] = 1;
+        value[ 5 ] = 1;
+
+        // bottom right
+        value[ 6 ] = 1;
+        value[ 7 ] = 0;
+    }
+    return point;
+}
+
+buffer_type make_index( const device_type& device )
+{
+    buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
+    {
+        map_type map = index->map( buffer::write );
+        u16* value = static_cast< u16* >( map->data );
+
+        value[ 0 ] = 0;
+        value[ 1 ] = 1;
+        value[ 2 ] = 2;
+        value[ 3 ] = 2;
+        value[ 4 ] = 1;
+        value[ 5 ] = 3;
+    }
+    return index;
+}
+
 shader_vector make_shaders( const device_type& device, const std::string& root )
 {
     vfs vfs;
@@ -59,23 +102,27 @@ template<>
     virtual_texture vt( device, cache, font_source );
     text_layout layout( device, vt, font_source );
 
-    device->set( device::blend, true );
     program_type program = device->program( make_shaders( device, root ) );
     frame_type frame = device->default_frame( width, height );
     std::string string = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
 
-    for ( std::string::iterator i = string.begin(), end = string.end(); i != end; ++i )
+    device->set( device::blend, true );
+    block_type block = program->block( make_index( device ) );
+    block->input( "vertex", 2, make_point( device ) );
+    block->input( "projection", orthographic( 0, width, height, 0 ) );
+    block->input( "depth", 0.f );
+    block->input( "colour", 255, 255, 255 );
+    vt.input( block, "vt" );
+
+    for ( std::string::iterator i = string.begin() + 1, end = string.end(); i != end; ++i )
     {
-        block_type block = layout.block( program, std::string( string.begin(), i ), 4 );
-        block->input( "projection", orthographic( 0, width, height, 0 ) );
-        block->input( "colour", 255, 255, 255 );
-        vt.input( "vt", block );
+        u32 instances = layout.input( block, std::string( string.begin(), i ), 4 );
 
         while ( cache.pending() )
             cache.write();
 
         frame->clear();
-        device->draw( block, frame, 1 );
+        device->draw( block, frame, instances );
         device->swap();
 
         event event;
