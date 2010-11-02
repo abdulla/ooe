@@ -104,7 +104,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 //--- block ----------------------------------------------------------------------------------------
 block::block( u32 id_, const buffer_type& index_ )
     : id( id_ ), do_check( true ), index( index_ ), uniforms(), textures(), texture_arrays(),
-    buffers(), locations()
+    buffers(), iterators(), locations()
 {
     if ( dynamic_cast< opengl::buffer& >( *index ).target != ELEMENT_ARRAY_BUFFER )
         throw error::runtime( "opengl::block: " ) << "Index buffer expected";
@@ -193,7 +193,19 @@ void block::input( const std::string& name, u8 size, const buffer_type& buffer, 
     input_tuple in = buffer_input( name, size );
 
     for ( u8 i = 0; i != in._0; ++i )
-        buffers.insert( buffer_map::value_type( buffer, buffer_tuple( location + i, in._1 ) ) );
+    {
+        buffer_map::iterator j =
+            buffers.insert( buffer_map::value_type( buffer, buffer_tuple( location + i, in._1 ) ) );
+        iterator_map::iterator k = iterators.find( location + i );
+
+        if ( k == iterators.end() )
+            iterators[ location + i ] = j;
+        else
+        {
+            buffers.erase( k->second );
+            k->second = j;
+        }
+    }
 
     VertexAttribDivisor( location, instanced );
     do_check = true;

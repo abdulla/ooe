@@ -23,6 +23,7 @@ public:
     typedef std::map< s32, texture_array_type > texture_array_map;
     typedef tuple< s32, u8 > buffer_tuple;
     typedef std::multimap< buffer_type, buffer_tuple > buffer_map;
+    typedef std::map< s32, buffer_map::iterator > iterator_map;
     typedef std::map< std::string, s32 > location_map;
 
     const u32 id;
@@ -53,6 +54,7 @@ public:
     void check( void );
 
 private:
+    iterator_map iterators;
     location_map locations;
 };
 
