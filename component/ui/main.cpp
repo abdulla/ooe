@@ -330,9 +330,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
             f32 t_y = std::max( 0.f, -v.y );
             box_tree::box_vector shadows = make_shadow( boxes );
 
-            block_boxes->input( "view_translate", t_x, t_y );
+            block_boxes->input( "view", t_x, t_y );
             make_input( device, block_boxes, boxes );
-            block_shadows->input( "view_translate", t_x, t_y );
+            block_shadows->input( "view", t_x, t_y );
             make_input( device, block_shadows, shadows );
 
             frame->clear();

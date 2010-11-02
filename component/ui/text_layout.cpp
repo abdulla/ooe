@@ -60,8 +60,8 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
 
     block->input( "vertex_scale", 2, point, true );
     block->input( "vertex_translate", 2, point, true );
-    block->input( "coords_scale", 2, point, true );
-    block->input( "coords_translate", 2, point, true );
+    block->input( "coord_scale", 2, point, true );
+    block->input( "coord_translate", 2, point, true );
     return text.size();
 }
 

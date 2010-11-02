@@ -110,7 +110,7 @@ template<>
     block_type block = program->block( make_index( device ) );
     block->input( "vertex", 2, make_point( device ) );
     block->input( "projection", orthographic( 0, width, height, 0 ) );
-    block->input( "depth", 0.f );
+    block->input( "view", 0.f, 0.f, 0.f );
     block->input( "colour", 255, 255, 255 );
     vt.input( block, "vt" );
 
