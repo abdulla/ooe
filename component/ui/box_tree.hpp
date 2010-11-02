@@ -34,17 +34,21 @@ class box_tree
 {
 public:
     typedef std::vector< box_tree > node_vector;
-    typedef node_vector::const_iterator iterator;
+    typedef node_vector::iterator iterator;
+    typedef node_vector::const_iterator const_iterator;
     typedef tuple< f32, f32, f32, f32, f32 > box_tuple; // width, height, x, y, z
     typedef std::vector< box_tuple > box_vector;
 
     box_tree( const ooe::box& );
-
-    iterator begin( void ) const;
-    iterator end( void ) const;
     ooe::box box( void ) const;
 
-    bool insert( u16, u16, unit, unit, u16 );
+    iterator begin( void );
+    iterator end( void );
+    const_iterator begin( void ) const;
+    const_iterator end( void ) const;
+
+    iterator insert( u16, u16, u16, u16 );
+    iterator insert( u16, u16, unit, unit, u16 );
     box_vector view( u16, u16, unit, unit, u16 ) const;
 
 private:

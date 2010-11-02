@@ -21,7 +21,7 @@ geometry::intersection includes( const box& a, const box& b )
         return geometry::intersect;
 }
 
-const box_tree* find_root( const box_tree* root, unit& x, unit& y, u16 z )
+box_tree* find_root( box_tree* root, unit& x, unit& y, u16 z )
 {
     box box = root->box();
 
@@ -72,7 +72,7 @@ bool find_view( const box_tree& tree, box_tree::box_vector& vector, u16 width, u
         x.fraction += box.x * exp2f( z );
         y.fraction += box.y * exp2f( z );
 
-        for ( box_tree::iterator j = tree.begin(), end = tree.end(); j != end; ++j )
+        for ( box_tree::const_iterator j = tree.begin(), end = tree.end(); j != end; ++j )
         {
             if ( find_view( *j, vector, width, height, x, y, z - 1, level, level_limit ) )
                 return true;
@@ -91,7 +91,7 @@ bool find_view( const box_tree& tree, box_tree::box_vector& vector, u16 width, u
         width = saturated_shift( width );
         height = saturated_shift( width );
 
-        for ( box_tree::iterator j = tree.begin(), end = tree.end(); j != end; ++j )
+        for ( box_tree::const_iterator j = tree.begin(), end = tree.end(); j != end; ++j )
         {
             if ( find_view( *j, vector, width, height, x, y, 0, level + 1, level_limit ) )
                 return true;
@@ -126,45 +126,60 @@ box_tree::box_tree( const ooe::box& bound_ )
 {
 }
 
-box_tree::iterator box_tree::begin( void ) const
-{
-    return children.begin();
-}
-
-box_tree::iterator box_tree::end( void ) const
-{
-    return children.end();
-}
-
 box box_tree::box( void ) const
 {
     return bound;
 }
 
-bool box_tree::insert( u16 width, u16 height, unit x, unit y, u16 z )
+box_tree::iterator box_tree::begin( void )
 {
+    return children.begin();
+}
+
+box_tree::iterator box_tree::end( void )
+{
+    return children.end();
+}
+
+box_tree::const_iterator box_tree::begin( void ) const
+{
+    return children.begin();
+}
+
+box_tree::const_iterator box_tree::end( void ) const
+{
+    return children.end();
+}
+
+box_tree::iterator box_tree::insert( u16 width, u16 height, u16 x, u16 y )
+{
+    iterator back = end();
+
     if ( !width || !height )
-        return false;
+        return back;
 
-    const box_tree* root = find_root( this, x, y, z );
-
-    if ( !root )
-        return false;
-
-    ooe::box b( width, height, x.integer, y.integer );
-    ooe::box c( root->bound.width * 2, root->bound.height * 2, 0, 0 );
+    ooe::box b( width, height, x, y );
+    ooe::box c( bound.width * 2, bound.height * 2, 0, 0 );
 
     if ( ::includes( c, b ) != geometry::inside )
-        return false;
+        return back;
 
-    for ( iterator i = root->begin(), i_end = root->end(); i != i_end; ++i )
+    for ( iterator i = begin(); i != back; ++i )
     {
         if ( ::includes( i->bound, b ) != geometry::outside )
-            return false;
+            return back;
     }
 
-    const_cast< node_vector& >( root->children ).push_back( b );
-    return true;
+    children.push_back( b );
+    return --end();
+}
+
+box_tree::iterator box_tree::insert( u16 width, u16 height, unit x, unit y, u16 z )
+{
+    x.integer += bound.x;
+    y.integer += bound.y;
+    box_tree* root = find_root( this, x, y, z );
+    return root ? root->insert( width, height, x.integer, y.integer ) : end();
 }
 
 box_tree::box_vector box_tree::view( u16 width, u16 height, unit x, unit y, u16 z ) const
