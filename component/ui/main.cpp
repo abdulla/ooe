@@ -192,29 +192,27 @@ buffer_type make_index( const device_type& device )
     return index;
 }
 
-//--- make_attribute -------------------------------------------------------------------------------
-buffer_type make_attribute( const device_type& device, const box_tree::box_vector& boxes )
+//--- make_input -----------------------------------------------------------------------------------
+void make_input( const device_type& device, block_type& block, const box_tree::box_vector& boxes )
 {
     buffer_type attribute = device->buffer( sizeof( f32 ) * 5 * boxes.size(), buffer::point );
     {
         map_type map = attribute->map( buffer::write );
         std::memcpy( map->data, &boxes[ 0 ], map->size );
     }
-    return attribute;
-}
 
-//--- make_block -----------------------------------------------------------------------------------
-block_type make_block( const device_type& device, const program_type& program,
-    const box_tree::box_vector& boxes )
-{
-    buffer_type point = make_point( device );
-    buffer_type attribute = make_attribute( device, boxes );
-    block_type block = program->block( make_index( device ) );
-    block->input( "vertex", 2, point );
     block->input( "scale", 2, attribute, true );
     block->input( "translate", 2, attribute, true );
     block->input( "depth", 1, attribute, true );
+}
+
+//--- make_block -----------------------------------------------------------------------------------
+block_type make_block( const device_type& device, const program_type& program, bool shadow )
+{
+    block_type block = program->block( make_index( device ) );
+    block->input( "vertex", 2, make_point( device ) );
     block->input( "projection", orthographic( 0, width, height, 0, -64, 64 ) );
+    block->input( "shadow", shadow );
     return block;
 }
 
@@ -269,27 +267,23 @@ box make_box( const boost::property_tree::ptree& pt )
 }
 
 //--- make_tree ------------------------------------------------------------------------------------
-void make_tree( const boost::property_tree::ptree& pt, box_tree& bt, unit x, unit y, u16 z )
+void make_tree( const boost::property_tree::ptree& pt, box_tree& bt )
 {
     for ( boost::property_tree::ptree::const_iterator i = pt.begin(), end = pt.end();
         i != end; ++i )
     {
         box box = make_box( i->second );
-        u16 c = z + 1;
-        unit b( y.integer + ( box.y >> c ), fmodf( box.y, 1 << c ) );
-        unit a( x.integer + ( box.x >> c ), fmodf( box.x, 1 << c ) );
+        box_tree::iterator j = bt.insert( box.width, box.height, box.x, box.y );
 
-        if ( !bt.insert( box.width, box.height, a, b, z ) )
-            throw error::runtime( "read_tree: " ) <<
-                "Unable to insert: " << box.width << ' ' << box.height <<
-                " ( " << a.integer << ", " << a.fraction << " )"
-                " ( " << b.integer << ", " << b.fraction << " ) " << c << '\n';
+        if ( j == bt.end() )
+            throw error::runtime( "read_tree: " ) << "Unable to insert box ( " << box.width <<
+                ' ' << box.height << ' ' << box.x << ' ' << box.y << " )";
 
         boost::optional< const boost::property_tree::ptree& > optional =
             i->second.get_child_optional( "children" );
 
         if ( optional )
-            make_tree( *optional, bt, a, b, c );
+            make_tree( *optional, *j );
     }
 }
 
@@ -300,7 +294,7 @@ box_tree read_tree( const std::string& path )
     read_json( canonical_path( path ), pt );
 
     box_tree bt( make_box( pt ) );
-    make_tree( pt.get_child( "children" ), bt, unit( 0, 0 ), unit( 0, 0 ), 0 );
+    make_tree( pt.get_child( "children" ), bt );
     return bt;
 }
 
@@ -319,6 +313,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     program_type program = device->program( shaders );
     frame_type frame = device->default_frame( width, height );
 
+    block_type block_boxes = make_block( device, program, false );
+    block_type block_shadows = make_block( device, program, true );
     device->set( device::depth_test, true );
     vec3 v( 0, 0, 0 );
 
@@ -330,21 +326,19 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
         if ( boxes.size() )
         {
+            f32 t_x = std::max( 0.f, -v.x );
+            f32 t_y = std::max( 0.f, -v.y );
             box_tree::box_vector shadows = make_shadow( boxes );
-            block_type block_boxes = make_block( device, program, boxes );
-            block_type block_shadows = make_block( device, program, shadows );
-            mat4 m = translate( mat4::identity,
-                vec3( std::max( 0.f, -v.x ), std::max( 0.f, -v.y ), 0 ) );
 
-            device->set( device::blend, false );
-            block_boxes->input( "model_view", m );
-            block_boxes->input( "shadow", false );
-            device->set( device::blend, true );
-            block_shadows->input( "model_view", m );
-            block_shadows->input( "shadow", true );
+            block_boxes->input( "view_translate", t_x, t_y );
+            make_input( device, block_boxes, boxes );
+            block_shadows->input( "view_translate", t_x, t_y );
+            make_input( device, block_shadows, shadows );
 
             frame->clear();
+            device->set( device::blend, false );
             device->draw( block_boxes, frame, boxes.size() );
+            device->set( device::blend, true );
             device->draw( block_shadows, frame, shadows.size() );
             device->swap();
         }
