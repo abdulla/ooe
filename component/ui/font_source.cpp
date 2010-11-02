@@ -94,14 +94,14 @@ const uncompressed_image& write_image( const uncompressed_image& image, const st
     return image;
 }
 
-void write_metric( const memory& memory, up_t char_code, u32 glyphs, u8 level_inverse,
+void write_metric( const memory& memory, u32 char_code, u32 glyphs, u8 level_inverse,
     const font::metric& metric )
 {
     source_metric* metrics = memory.as< source_metric >() + char_code + glyphs * level_inverse;
     *metrics = source_metric( metric, true );
 }
 
-source_metric& read_metric( const memory& memory, up_t char_code, u32 glyphs, u8 level_inverse )
+source_metric& read_metric( const memory& memory, u32 char_code, u32 glyphs, u8 level_inverse )
 {
     return memory.as< source_metric >()[ char_code + glyphs * level_inverse ];
 }
@@ -146,7 +146,7 @@ u32 font_source::font_size( void ) const
     return face_size;
 }
 
-font_source::glyph_type font_source::glyph( up_t char_code, u8 level ) const
+font_source::glyph_type font_source::glyph( u32 char_code, u8 level ) const
 {
     if ( level > level_limit )
         throw error::runtime( "font_source: " ) <<
@@ -190,7 +190,7 @@ image font_source::read( const pyramid_index& index )
     std::memset( image.get(), 0, image.byte_size() );
     u32 level_size = face_size >> index.level;
     u32 glyphs_per_row = source_size / face_size;
-    up_t char_code =
+    u32 char_code =
         index.x * page_wide / level_size + ( index.y * page_wide / level_size ) * glyphs_per_row;
 
     if ( char_code >= glyphs )

@@ -24,7 +24,7 @@ public:
     virtual u16 page_size( void ) const;
 
     u32 font_size( void ) const;
-    glyph_type glyph( up_t, u8 ) const;
+    glyph_type glyph( u32, u8 ) const;
 
 private:
     font::face& face;

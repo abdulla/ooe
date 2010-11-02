@@ -12,8 +12,8 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const f32 width = 640;
-const f32 height = 480;
+const f32 width = 1024;
+const f32 height = 64;
 
 buffer_type make_point( const device_type& device )
 {

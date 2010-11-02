@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <utf8.h>
+
 #include "component/ui/text_layout.hpp"
 #include "foundation/utility/arithmetic.hpp"
 
@@ -38,6 +40,7 @@ text_layout::
 
 u32 text_layout::input( const block_type& block, const std::string& text, u8 level )
 {
+    u32 points = 0;
     buffer_type point = device->buffer( sizeof( f32 ) * point_size * text.size(), buffer::point );
 
     if ( !text.empty() )
@@ -50,9 +53,10 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
         u32 max = source.font_size() >> level;
 
         for ( std::string::const_iterator i = text.begin(), end = text.end(); i != end;
-            ++i, value += point_size )
+            ++points, value += point_size )
         {
-            font_source::glyph_type glyph = source.glyph( u8( *i ), level );
+            u32 char_code = utf8::next( i, end );
+            font_source::glyph_type glyph = source.glyph( char_code, level );
             x += add_glyph( glyph, value, size, x, y, max, level );
             vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
         }
@@ -62,7 +66,7 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
     block->input( "vertex_translate", 2, point, true );
     block->input( "coord_scale", 2, point, true );
     block->input( "coord_translate", 2, point, true );
-    return text.size();
+    return points;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
