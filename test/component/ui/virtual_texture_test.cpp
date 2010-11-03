@@ -104,7 +104,7 @@ template<>
 
     program_type program = device->program( make_shaders( device, root ) );
     frame_type frame = device->default_frame( width, height );
-    std::string string = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
+    std::string string = "AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
     device->set( device::blend, true );
     block_type block = program->block( make_index( device ) );

@@ -13,7 +13,7 @@ class text_layout
 public:
     text_layout( const device_type&, virtual_texture&, const font_source& );
 
-    u32 input( const block_type&, const std::string&, u8, u32 = ~u32( 0 ) );
+    u32 input( const block_type&, const std::string&, u8, u32 );
 
 private:
     const device_type& device;

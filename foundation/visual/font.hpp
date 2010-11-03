@@ -25,17 +25,26 @@ private:
     friend class face;
 };
 
+//--- kerning --------------------------------------------------------------------------------------
+struct kerning
+{
+    s32 x;
+    s32 y;
+
+    kerning( s32, s32 );
+};
+
 //--- metric ---------------------------------------------------------------------------------------
 struct metric
 {
     s32 left;
     s32 top;
-    u32 x;
-    u32 y;
+    s32 x;
+    s32 y;
     u32 width;
     u32 height;
 
-    metric( s32, s32, u32, u32, u32, u32 );
+    metric( s32, s32, s32, s32, u32, u32 );
 };
 
 //--- bitmap ---------------------------------------------------------------------------------------
@@ -70,7 +79,9 @@ public:
 
     std::string string( string_type ) const;
     u32 number( number_type ) const;
-    bitmap character( up_t, u32 );
+
+    font::kerning kerning( u32, u32, u32 ) const;
+    font::bitmap bitmap( u32, u32 ) const;
 
 private:
     ooe::memory memory;

@@ -32,7 +32,7 @@ c8 transform( c8 c )
     return std::isspace( c ) ? '-' : std::tolower( c );
 }
 
-std::string get_root( const std::string& root, font::face& face )
+std::string get_root( const std::string& root, const font::face& face )
 {
     std::string suffix = face.string( font::face::family ) + '-' + face.string( font::face::style );
     std::transform( suffix.begin(), suffix.end(), suffix.begin(), transform );
@@ -111,7 +111,7 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
-font_source::font_source( font::face& face_, u32 face_size_, const std::string& root_ )
+font_source::font_source( const font::face& face_, u32 face_size_, const std::string& root_ )
     : face( face_ ), face_size( face_size_ ), root( get_root( root_, face ) ),
     source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
     first( face.number( font::face::first ) ), level_limit( log2f( source_size / page_wide ) ),
@@ -146,6 +146,12 @@ u32 font_source::font_size( void ) const
     return face_size;
 }
 
+font::kerning font_source::kerning( u32 left, u32 right, u8 level ) const
+{
+    lock lock( mutex );
+    return face.kerning( left, right, face_size >> level );
+}
+
 font_source::glyph_type font_source::glyph( u32 code_point, u8 level ) const
 {
     if ( level > level_limit )
@@ -159,7 +165,7 @@ font_source::glyph_type font_source::glyph( u32 code_point, u8 level ) const
     if ( !metric.valid )
     {
         lock lock( mutex );
-        font::bitmap bitmap = face.character( code_point, face_size >> level );
+        font::bitmap bitmap = face.bitmap( code_point, face_size >> level );
         metric = source_metric( bitmap.metric, true );
     }
 
@@ -203,7 +209,7 @@ image font_source::read( const pyramid_index& index )
         u32 y_offset = ( index.y % pages_per_glyph ) * page_wide;
 
         lock lock( mutex );
-        font::bitmap bitmap = face.character( code_point + first, level_size );
+        font::bitmap bitmap = face.bitmap( code_point + first, level_size );
         copy_partial( image, bitmap, x_offset, y_offset );
         write_metric( memory, code_point, glyphs, level_inverse, bitmap.metric );
         return write_image( image, path );
@@ -219,7 +225,7 @@ image font_source::read( const pyramid_index& index )
                 return write_image( image, path );
 
             lock lock( mutex );
-            font::bitmap bitmap = face.character( code + first, level_size );
+            font::bitmap bitmap = face.bitmap( code + first, level_size );
             copy_square( image, bitmap, i * level_size, j * level_size );
             write_metric( memory, code, glyphs, level_inverse, bitmap.metric );
         }

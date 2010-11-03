@@ -8,6 +8,20 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/font.hpp"
 
+OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( font ) )
+
+u32 glyph_index( FT_Face face, u32 code_point )
+{
+    u32 index = FT_Get_Char_Index( face, code_point );
+
+    if ( !index )
+        throw error::runtime( "font::face: " ) << "Unable to get index of " << code_point;
+
+    return index;
+}
+
+OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( font ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( font ) )
 
 //--- library --------------------------------------------------------------------------------------
@@ -24,8 +38,14 @@ library::~library( void )
         OOE_CONSOLE( "font::library: " << "Unable to destroy library" );
 }
 
+//--- kerning --------------------------------------------------------------------------------------
+kerning::kerning( s32 x_, s32 y_ )
+    : x( x_ ), y( y_ )
+{
+}
+
 //--- metric ---------------------------------------------------------------------------------------
-metric::metric( s32 left_, s32 top_, u32 x_, u32 y_, u32 width_, u32 height_ )
+metric::metric( s32 left_, s32 top_, s32 x_, s32 y_, u32 width_, u32 height_ )
     : left( left_ ), top( top_ ), x( x_ ), y( y_ ), width( width_ ), height( height_ )
 {
 }
@@ -83,17 +103,33 @@ u32 face::number( number_type type ) const
     }
 }
 
-bitmap face::character( up_t char_code, u32 size )
+kerning face::kerning( u32 left, u32 right, u32 size ) const
 {
     if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
         throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
-    else if ( FT_Load_Char( face_, char_code, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
-        return bitmap( metric( 0, 0, 0, 0, 0, 0 ), 0 );
+
+    u32 i = glyph_index( face_, left );
+    u32 j = glyph_index( face_, right );
+    FT_Vector delta;
+
+    if ( FT_Get_Kerning( face_, i, j, FT_KERNING_DEFAULT, &delta ) )
+        throw error::runtime( "font::face: " ) <<
+            "Unable to get kerning for " << left << " and " << right;
+
+    return font::kerning( delta.x >> 6, delta.y >> 6 );
+}
+
+bitmap face::bitmap( u32 code_point, u32 size ) const
+{
+    if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
+        throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
+    else if ( FT_Load_Char( face_, code_point, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
+        throw error::runtime( "font::face: " ) << "Unable to load " << code_point;
 
     FT_GlyphSlot glyph = face_->glyph;
     font::metric metric( glyph->bitmap_left, glyph->bitmap_top, glyph->advance.x >> 6,
         glyph->advance.y >> 6, glyph->bitmap.width, glyph->bitmap.rows );
-    return bitmap( metric, glyph->bitmap.buffer );
+    return font::bitmap( metric, glyph->bitmap.buffer );
 }
 
 OOE_NAMESPACE_END( ( ooe )( font ) )

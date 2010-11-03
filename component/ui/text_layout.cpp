@@ -23,7 +23,7 @@ struct marker
 };
 
 void add_glyph
-    ( const font_source::glyph_type& glyph, f32* data, u32 size, u32 x, u32 y, u32 max, u8 level )
+    ( const font_source::glyph_type& glyph, f32* data, u32 size, s32 x, s32 y, u32 max, u8 level )
 {
     const font::metric& metric = glyph._2;
 
@@ -51,7 +51,7 @@ u32 glyph_size( iterator_type i, iterator_type end )
     return glyphs;
 }
 
-bool handle_space( u32 code_point, u32& x, u32& y, u32 max )
+bool handle_space( u32 code_point, s32& x, s32& y, u32 max )
 {
     switch ( code_point )
     {
@@ -91,23 +91,31 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
     map_type map = point->map( buffer::write );
     f32* data = static_cast< f32* >( map->data );
     u32 size = source.size();
-    u32 x = 0;
-    u32 y = 0;
+    s32 x = 0;
+    s32 y = 0;
     u32 max = source.font_size() >> level;
     marker m( text.begin(), data, 0 );
+    u32 code_point = 0;
+    u32 last_point;
 
     for ( iterator_type i = m.i, end = text.end(); i != end; )
     {
-        u32 code_point = utf8::next( i, end );
+        last_point = code_point;
+        code_point = utf8::next( i, end );
 
         if ( handle_space( code_point, x, y, max ) )
         {
             m = marker( i, data, 0 );
             continue;
         }
+        else if ( m.width )
+        {
+            font::kerning kerning = source.kerning( last_point, code_point, level );
+            x += kerning.x;
+        }
 
         font_source::glyph_type glyph = source.glyph( code_point, level );
-        u32 x_offset = glyph._2.width + glyph._2.left;
+        u32 x_offset = glyph._2.x;
 
         if ( x + x_offset > width )
         {
@@ -115,16 +123,14 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
             y += max;
 
             if ( m.width + x_offset > width )
-            {
                 utf8::prior( i, text.begin() );
-                m.width = 0;
-            }
             else
             {
                 i = m.i;
                 data = m.data;
             }
 
+            m.width = 0;
             continue;
         }
 
