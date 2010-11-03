@@ -94,16 +94,16 @@ const uncompressed_image& write_image( const uncompressed_image& image, const st
     return image;
 }
 
-void write_metric( const memory& memory, u32 char_code, u32 glyphs, u8 level_inverse,
+void write_metric( const memory& memory, u32 code_point, u32 glyphs, u8 level_inverse,
     const font::metric& metric )
 {
-    source_metric* metrics = memory.as< source_metric >() + char_code + glyphs * level_inverse;
+    source_metric* metrics = memory.as< source_metric >() + code_point + glyphs * level_inverse;
     *metrics = source_metric( metric, true );
 }
 
-source_metric& read_metric( const memory& memory, u32 char_code, u32 glyphs, u8 level_inverse )
+source_metric& read_metric( const memory& memory, u32 code_point, u32 glyphs, u8 level_inverse )
 {
-    return memory.as< source_metric >()[ char_code + glyphs * level_inverse ];
+    return memory.as< source_metric >()[ code_point + glyphs * level_inverse ];
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -146,20 +146,20 @@ u32 font_source::font_size( void ) const
     return face_size;
 }
 
-font_source::glyph_type font_source::glyph( u32 char_code, u8 level ) const
+font_source::glyph_type font_source::glyph( u32 code_point, u8 level ) const
 {
     if ( level > level_limit )
         throw error::runtime( "font_source: " ) <<
             "Mipmap level " << level << " > maximum level " << level_limit;
 
-    u32 code = first >= char_code ? 0 : char_code - first;
+    u32 code = first >= code_point ? 0 : code_point - first;
     u8 level_inverse = level_limit - level;
     source_metric& metric = read_metric( memory, code, glyphs, level_inverse );
 
     if ( !metric.valid )
     {
         lock lock( mutex );
-        font::bitmap bitmap = face.character( char_code, face_size >> level );
+        font::bitmap bitmap = face.character( code_point, face_size >> level );
         metric = source_metric( bitmap.metric, true );
     }
 
@@ -190,10 +190,10 @@ image font_source::read( const pyramid_index& index )
     std::memset( image.get(), 0, image.byte_size() );
     u32 level_size = face_size >> index.level;
     u32 glyphs_per_row = source_size / face_size;
-    u32 char_code =
+    u32 code_point =
         index.x * page_wide / level_size + ( index.y * page_wide / level_size ) * glyphs_per_row;
 
-    if ( char_code >= glyphs )
+    if ( code_point >= glyphs )
         return write_image( image, path );
 
     if ( level_size >= page_wide )
@@ -203,9 +203,9 @@ image font_source::read( const pyramid_index& index )
         u32 y_offset = ( index.y % pages_per_glyph ) * page_wide;
 
         lock lock( mutex );
-        font::bitmap bitmap = face.character( char_code + first, level_size );
+        font::bitmap bitmap = face.character( code_point + first, level_size );
         copy_partial( image, bitmap, x_offset, y_offset );
-        write_metric( memory, char_code, glyphs, level_inverse, bitmap.metric );
+        write_metric( memory, code_point, glyphs, level_inverse, bitmap.metric );
         return write_image( image, path );
     }
 
@@ -213,7 +213,7 @@ image font_source::read( const pyramid_index& index )
     {
         for ( u32 i = 0; i != glyphs_per_page; ++i )
         {
-            u32 code = char_code + i + j * glyphs_per_row;
+            u32 code = code_point + i + j * glyphs_per_row;
 
             if ( code >= glyphs )
                 return write_image( image, path );

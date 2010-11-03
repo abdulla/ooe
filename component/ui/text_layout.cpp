@@ -7,24 +7,66 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
+typedef std::string::const_iterator iterator_type;
 const up_t point_size = 8;
 
-u32 add_glyph
-    ( const font_source::glyph_type& glyph, f32* value, u32 size, s32 x, s32 y, u32 max, u8 level )
+struct marker
+{
+    iterator_type i;
+    f32* data;
+    u32 width;
+
+    marker( iterator_type i_, f32* data_, u32 width_ )
+        : i( i_ ), data( data_ ), width( width_ )
+    {
+    }
+};
+
+void add_glyph
+    ( const font_source::glyph_type& glyph, f32* data, u32 size, u32 x, u32 y, u32 max, u8 level )
 {
     const font::metric& metric = glyph._2;
 
-    value[ 0 ] = metric.width;
-    value[ 1 ] = metric.height;
-    value[ 2 ] = x;
-    value[ 3 ] = y + ( max - metric.top );
+    data[ 0 ] = metric.width;
+    data[ 1 ] = metric.height;
+    data[ 2 ] = x;
+    data[ 3 ] = y + ( max - metric.top );
 
-    value[ 4 ] = divide( metric.width << level, size );
-    value[ 5 ] = divide( metric.height << level, size );
-    value[ 6 ] = divide( glyph._0, size );
-    value[ 7 ] = divide( glyph._1, size );
+    data[ 4 ] = divide( metric.width << level, size );
+    data[ 5 ] = divide( metric.height << level, size );
+    data[ 6 ] = divide( glyph._0, size );
+    data[ 7 ] = divide( glyph._1, size );
+}
 
-    return metric.width + metric.left;
+u32 glyph_size( iterator_type i, iterator_type end )
+{
+    u32 glyphs = 0;
+
+    while ( i != end )
+    {
+        if ( !std::iswspace( utf8::next( i, end ) ) )
+            ++glyphs;
+    }
+
+    return glyphs;
+}
+
+bool handle_space( u32 code_point, u32& x, u32& y, u32 max )
+{
+    switch ( code_point )
+    {
+    case ' ':
+        x += max >> 1;
+        return true;
+
+    case '\n':
+        x = 0;
+        y += max;
+        return true;
+
+    default:
+        return std::iswspace( code_point );
+    }
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
@@ -38,35 +80,67 @@ text_layout::
 {
 }
 
-u32 text_layout::input( const block_type& block, const std::string& text, u8 level )
+u32 text_layout::input( const block_type& block, const std::string& text, u8 level, u32 width )
 {
-    u32 points = 0;
-    buffer_type point = device->buffer( sizeof( f32 ) * point_size * text.size(), buffer::point );
+    u32 glyphs = glyph_size( text.begin(), text.end() );
 
-    if ( !text.empty() )
+    if ( !glyphs )
+        return 0;
+
+    buffer_type point = device->buffer( sizeof( f32 ) * point_size * glyphs, buffer::point );
+    map_type map = point->map( buffer::write );
+    f32* data = static_cast< f32* >( map->data );
+    u32 size = source.size();
+    u32 x = 0;
+    u32 y = 0;
+    u32 max = source.font_size() >> level;
+    marker m( text.begin(), data, 0 );
+
+    for ( iterator_type i = m.i, end = text.end(); i != end; )
     {
-        map_type map = point->map( buffer::write );
-        f32* value = static_cast< f32* >( map->data );
-        u32 size = source.size();
-        s32 x = 0;
-        s32 y = 0;
-        u32 max = source.font_size() >> level;
+        u32 code_point = utf8::next( i, end );
 
-        for ( std::string::const_iterator i = text.begin(), end = text.end(); i != end;
-            ++points, value += point_size )
+        if ( handle_space( code_point, x, y, max ) )
         {
-            u32 char_code = utf8::next( i, end );
-            font_source::glyph_type glyph = source.glyph( char_code, level );
-            x += add_glyph( glyph, value, size, x, y, max, level );
-            vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
+            m = marker( i, data, 0 );
+            continue;
         }
+
+        font_source::glyph_type glyph = source.glyph( code_point, level );
+        u32 x_offset = glyph._2.width + glyph._2.left;
+
+        if ( x + x_offset > width )
+        {
+            x = 0;
+            y += max;
+
+            if ( m.width + x_offset > width )
+            {
+                utf8::prior( i, text.begin() );
+                m.width = 0;
+            }
+            else
+            {
+                i = m.i;
+                data = m.data;
+            }
+
+            continue;
+        }
+
+        vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
+        add_glyph( glyph, data, size, x, y, max, level );
+
+        data += point_size;
+        x += x_offset;
+        m.width += x_offset;
     }
 
     block->input( "vertex_scale", 2, point, true );
     block->input( "vertex_translate", 2, point, true );
     block->input( "coord_scale", 2, point, true );
     block->input( "coord_translate", 2, point, true );
-    return points;
+    return glyphs;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

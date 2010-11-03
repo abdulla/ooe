@@ -12,8 +12,8 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const f32 width = 1024;
-const f32 height = 64;
+const f32 width = 640;
+const f32 height = 480;
 
 buffer_type make_point( const device_type& device )
 {
@@ -104,7 +104,7 @@ template<>
 
     program_type program = device->program( make_shaders( device, root ) );
     frame_type frame = device->default_frame( width, height );
-    std::string string = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789";
+    std::string string = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
     device->set( device::blend, true );
     block_type block = program->block( make_index( device ) );
@@ -114,9 +114,10 @@ template<>
     block->input( "colour", 255, 255, 255 );
     vt.input( block, "vt" );
 
-    for ( std::string::iterator i = string.begin() + 1, end = string.end(); i != end; ++i )
+    for ( std::string::iterator i = string.begin(), end = string.end(); i != end; ++i )
     {
-        u32 instances = layout.input( block, std::string( string.begin(), i ), 4 );
+        std::string substring( string.begin(), i + 1 );
+        u32 instances = layout.input( block, substring, 4, 640 );
 
         while ( cache.pending() )
             cache.write();
