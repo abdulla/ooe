@@ -17,12 +17,12 @@ class runner
 {
 public:
     typedef std::map< std::string, group_base* > map_type;
-    typedef map_type::const_iterator iterator_type;
+    typedef map_type::const_iterator const_iterator;
 
     runner( void );
 
-    iterator_type begin( void ) const;
-    iterator_type end( void ) const;
+    const_iterator begin( void ) const;
+    const_iterator end( void ) const;
     void insert( const std::string&, group_base& ) OOE_VISIBLE;
     bool run( time_t = 60, bool = true ) const;
     bool run( const std::string&, time_t = 60, bool = true ) const;

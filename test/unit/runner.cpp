@@ -26,7 +26,7 @@ typedef tuple< bool, std::string > vector_tuple;
 typedef std::vector< vector_tuple > vector_type;
 bool test_status;
 
-bool run_test( const group_base::iterator_type& i, void* pointer, bool no_stdout )
+bool run_test( const group_base::const_iterator& i, void* pointer, bool no_stdout )
 {
     try
     {
@@ -102,7 +102,7 @@ vector_type run_group( group_base& group, time_t timeout, bool no_stdout )
     list_type list;
     up_t j = 0;
 
-    for ( group_base::iterator_type i = group.begin(), end = group.end(); i != end; ++i )
+    for ( group_base::const_iterator i = group.begin(), end = group.end(); i != end; ++i )
     {
         file_pair pair = make_pipe();
         fork_io fork_io( io_triplet( -1, -1, pair._1.get() ) );
@@ -205,12 +205,12 @@ runner::runner( void )
 {
 }
 
-runner::iterator_type runner::begin( void ) const
+runner::const_iterator runner::begin( void ) const
 {
     return map.begin();
 }
 
-runner::iterator_type runner::end( void ) const
+runner::const_iterator runner::end( void ) const
 {
     return map.end();
 }

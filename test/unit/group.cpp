@@ -2,21 +2,22 @@
 
 #include "test/unit/group.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
+
+//--- group_base -----------------------------------------------------------------------------------
+group_base::const_iterator group_base::begin( void ) const
 {
-//--- unit::group_base ---------------------------------------------------------
-    unit::group_base::iterator_type unit::group_base::begin( void ) const
-    {
-        return vector.begin();
-    }
-
-    unit::group_base::iterator_type unit::group_base::end( void ) const
-    {
-        return vector.end();
-    }
-
-    void unit::group_base::insert( function_type function )
-    {
-        vector.push_back( function );
-    }
+    return vector.begin();
 }
+
+group_base::const_iterator group_base::end( void ) const
+{
+    return vector.end();
+}
+
+void group_base::insert( function_type function )
+{
+    vector.push_back( function );
+}
+
+OOE_NAMESPACE_END( ( ooe )( unit ) )

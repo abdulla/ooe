@@ -23,7 +23,7 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
         case 'l':
             std::cout << "Available groups of tests:\n";
 
-            for ( runner::iterator_type i = global_runner.begin(), end = global_runner.end();
+            for ( runner::const_iterator i = global_runner.begin(), end = global_runner.end();
                 i != end; ++i )
                 std::cout << "    " << i->first << '\n';
 

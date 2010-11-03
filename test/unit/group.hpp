@@ -35,13 +35,13 @@ class group_base
 public:
     typedef void ( * function_type )( void* );
     typedef std::vector< function_type > vector_type;
-    typedef vector_type::const_iterator iterator_type;
+    typedef vector_type::const_iterator const_iterator;
 
     virtual ~group_base( void ) {}
     virtual opaque_ptr create_setup( void ) = 0;
 
-    iterator_type begin( void ) const;
-    iterator_type end( void ) const;
+    const_iterator begin( void ) const;
+    const_iterator end( void ) const;
     void insert( function_type ) OOE_VISIBLE;
 
 private:
