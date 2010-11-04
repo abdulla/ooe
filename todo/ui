@@ -1,0 +1,2 @@
+modify box_tree to use binary search
+    - insert boxes in order, and use binary search for all operations
