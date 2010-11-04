@@ -100,7 +100,6 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
 
     for ( iterator_type i = m.i, end = text.end(); i != end; )
     {
-        last_point = code_point;
         code_point = utf8::next( i, end );
 
         if ( handle_space( code_point, x, y, max ) )
@@ -108,7 +107,7 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
             m = marker( i, data, 0 );
             continue;
         }
-        else if ( m.width )
+        else if ( x )
         {
             font::kerning kerning = source.kerning( last_point, code_point, level );
             x += kerning.x;
@@ -140,6 +139,7 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
         data += point_size;
         x += x_offset;
         m.width += x_offset;
+        last_point = code_point;
     }
 
     block->input( "vertex_scale", 2, point, true );
