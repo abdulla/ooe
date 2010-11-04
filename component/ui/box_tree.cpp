@@ -170,8 +170,7 @@ box_tree::iterator box_tree::insert( u16 width, u16 height, u16 x, u16 y )
             return back;
     }
 
-    children.push_back( b );
-    return --end();
+    return children.insert( back, b );
 }
 
 box_tree::iterator box_tree::insert( u16 width, u16 height, unit x, unit y, u16 z )
