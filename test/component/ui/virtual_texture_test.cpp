@@ -51,13 +51,13 @@ template<>
     std::string string =
         "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
-    device->set( device::blend, true );
     block_type block = program->block( make_index( device ) );
     block->input( "vertex", 2, make_point( device ) );
     block->input( "projection", orthographic( 0, width, height, 0 ) );
     block->input( "view", 0.f, 0.f, 0.f );
     block->input( "colour", 255, 255, 255 );
     vt.input( block, "vt" );
+    device->set( device::blend, true );
 
     for ( std::string::iterator i = string.begin(), end = string.end(); i != end; ++i )
     {

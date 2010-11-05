@@ -14,7 +14,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 const f32 width = 1024;
 const f32 height = 640;
-u32 acceleration = 4;
+u32 velocity = 4;
 
 //--- zoom_out -------------------------------------------------------------------------------------
 void zoom_out( vec3& translate )
@@ -48,19 +48,19 @@ void process_key( u32 value, bool press, vec3& translate )
         break;
 
     case key_left:
-        translate.x -= acceleration;
+        translate.x -= velocity;
         break;
 
     case key_right:
-        translate.x += acceleration;
+        translate.x += velocity;
         break;
 
     case key_up:
-        translate.y -= acceleration;
+        translate.y -= velocity;
         break;
 
     case key_down:
-        translate.y += acceleration;
+        translate.y += velocity;
         break;
 
     case '-':
@@ -74,11 +74,11 @@ void process_key( u32 value, bool press, vec3& translate )
         break;
 
     case '.':
-        acceleration = acceleration ? acceleration << 1 : 1;
+        velocity = velocity ? velocity << 1 : 1;
         break;
 
     case ',':
-        acceleration = acceleration ? acceleration >> 1 : 1;
+        velocity = velocity ? velocity >> 1 : 1;
         break;
 
     case key_escape:
