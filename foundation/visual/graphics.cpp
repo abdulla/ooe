@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/io/memory.hpp"
-#include "foundation/io/vfs.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/graphics.hpp"
 
@@ -53,35 +51,6 @@ u8 image_pyramid::size( void ) const
 image::data_type image_pyramid::operator []( u8 level ) const
 {
     return vector[ level ];
-}
-
-//--- shader_include -------------------------------------------------------------------------------
-shader_include::shader_include( const device_type& device_, const ooe::vfs& vfs_ )
-    : device( device_ ), vfs( vfs_ ), header()
-{
-}
-
-void shader_include::insert( const std::string& path )
-{
-    memory memory( vfs[ path ] );
-    header << std::string( memory.as< c8 >(), memory.size() ) << '\n';
-}
-
-shader_type shader_include::compile( const std::string& path, shader::type type ) const
-{
-    memory memory( vfs[ path ] );
-    std::string source( header );
-    source << std::string( memory.as< c8 >(), memory.size() );
-
-    try
-    {
-        return device->shader( source, type );
-    }
-    catch ( error::runtime& error )
-    {
-        throw error::runtime( "shader_include: " ) <<
-            "Unable to compile \"" << path << "\": " << error.what();
-    }
 }
 
 OOE_NAMESPACE_END( ( ooe ) )

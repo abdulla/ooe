@@ -9,13 +9,13 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- unit -----------------------------------------------------------------------------------------
-struct unit
+//--- box_unit -------------------------------------------------------------------------------------
+struct box_unit
 {
     u16 integer;
     f32 fraction;
 
-    unit( u16, f32 );
+    box_unit( u16, f32 );
 };
 
 //--- box ------------------------------------------------------------------------------------------
@@ -48,8 +48,8 @@ public:
     const_iterator end( void ) const;
 
     iterator insert( u16, u16, u16, u16 );
-    iterator insert( u16, u16, unit, unit, u16 );
-    box_vector view( u16, u16, unit, unit, u16 ) const;
+    iterator insert( u16, u16, box_unit, box_unit, u16 );
+    box_vector view( u16, u16, box_unit, box_unit, u16 ) const;
 
 private:
     ooe::box bound;

@@ -1,15 +1,11 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <cstring>
 
-#include "component/ui/box_tree.hpp"
+#include "component/ui/make.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/io/directory.hpp"
-#include "foundation/io/vfs.hpp"
 #include "foundation/math/math.hpp"
-#include "foundation/utility/error.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
@@ -147,51 +143,6 @@ void process_events( event_queue& event_queue, vec3& translate, epoch_t timeout 
     }
 }
 
-//--- make_point -----------------------------------------------------------------------------------
-buffer_type make_point( const device_type& device )
-{
-    buffer_type point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
-    {
-        map_type map = point->map( buffer::write );
-        f32* value = static_cast< f32* >( map->data );
-
-        // top left
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-
-        // bottom left
-        value[ 2 ] = 0;
-        value[ 3 ] = 0;
-
-        // top right
-        value[ 4 ] = 1;
-        value[ 5 ] = 1;
-
-        // bottom right
-        value[ 6 ] = 1;
-        value[ 7 ] = 0;
-    }
-    return point;
-}
-
-//--- make_index -----------------------------------------------------------------------------------
-buffer_type make_index( const device_type& device )
-{
-    buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
-    {
-        map_type map = index->map( buffer::write );
-        u16* value = static_cast< u16* >( map->data );
-
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-        value[ 2 ] = 2;
-        value[ 3 ] = 2;
-        value[ 4 ] = 1;
-        value[ 5 ] = 3;
-    }
-    return index;
-}
-
 //--- make_input -----------------------------------------------------------------------------------
 void make_input( const device_type& device, block_type& block, const box_tree::box_vector& boxes )
 {
@@ -216,19 +167,6 @@ block_type make_block( const device_type& device, const program_type& program, b
     return block;
 }
 
-//--- make_shaders ---------------------------------------------------------------------------------
-shader_vector make_shaders( const device_type& device, const std::string& root )
-{
-    vfs vfs;
-    vfs.insert( root + "../share/glsl", "/" );
-    shader_include include( device, vfs );
-
-    shader_vector vector;
-    vector.push_back( include.compile( "box.vs", shader::vertex ) );
-    vector.push_back( include.compile( "box.fs", shader::fragment ) );
-    return vector;
-}
-
 //--- make_shadow ----------------------------------------------------------------------------------
 box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
 {
@@ -247,48 +185,6 @@ box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
     return shadows;
 }
 
-//--- make_box -------------------------------------------------------------------------------------
-box make_box( const boost::property_tree::ptree& pt )
-{
-    u16 w = pt.get< u16 >( "width" );
-    u16 h = pt.get< u16 >( "height" );
-    u16 x = pt.get< u16 >( "x" );
-    u16 y = pt.get< u16 >( "y" );
-    return box( w, h, x, y );
-}
-
-//--- make_tree ------------------------------------------------------------------------------------
-void make_tree( const boost::property_tree::ptree& pt, box_tree& bt )
-{
-    for ( boost::property_tree::ptree::const_iterator i = pt.begin(), end = pt.end();
-        i != end; ++i )
-    {
-        box box = make_box( i->second );
-        box_tree::iterator j = bt.insert( box.width, box.height, box.x, box.y );
-
-        if ( j == bt.end() )
-            throw error::runtime( "read_tree: " ) << "Unable to insert box ( " << box.width <<
-                ' ' << box.height << ' ' << box.x << ' ' << box.y << " )";
-
-        boost::optional< const boost::property_tree::ptree& > optional =
-            i->second.get_child_optional( "children" );
-
-        if ( optional )
-            make_tree( *optional, *j );
-    }
-}
-
-//--- read_tree ------------------------------------------------------------------------------------
-box_tree read_tree( const std::string& path )
-{
-    boost::property_tree::ptree pt;
-    read_json( canonical_path( path ), pt );
-
-    box_tree bt( make_box( pt ) );
-    make_tree( pt.get_child( "children" ), bt );
-    return bt;
-}
-
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
@@ -299,9 +195,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     view view( event_queue, width, height, false );
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
-    box_tree tree = read_tree( root + "../share/json/box_tree.json" );
-    shader_vector shaders = make_shaders( device, root );
-    program_type program = device->program( shaders );
+    box_tree tree = make_tree( root + "../share/json/box_tree.json" );
+    program_type program =
+        make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
     frame_type frame = device->default_frame( width, height );
 
     block_type block_boxes = make_block( device, program, false );
@@ -311,8 +207,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
     while ( !executable::has_signal() )
     {
-        unit x( std::max( 0.f, v.x ), 0 );
-        unit y( std::max( 0.f, v.y ), 0 );
+        box_unit x( std::max( 0.f, v.x ), 0 );
+        box_unit y( std::max( 0.f, v.y ), 0 );
         box_tree::box_vector boxes = tree.view( width, height, x, y, v.z );
 
         if ( boxes.size() )

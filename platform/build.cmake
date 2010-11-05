@@ -102,6 +102,12 @@ function( ooe_module NAME )
     ooe_properties( ${NAME} )
 endfunction()
 
+function( ooe_static NAME )
+    ooe_glob( SOURCES ${ARGN} )
+    add_library( ${NAME} STATIC ${SOURCES} )
+    ooe_properties( ${NAME} )
+endfunction()
+
 function( ooe_files SOURCE TARGET )
     file( GLOB_RECURSE FILES RELATIVE ${SOURCE} ${SOURCE}/* )
 

@@ -1,0 +1,4 @@
+{
+    "vertex": [ "box.vs" ],
+    "fragment": [ "box.fs" ]
+}

@@ -1,9 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include "component/ui/make.hpp"
 #include "component/ui/text_layout.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/io/vfs.hpp"
 #include "foundation/math/math.hpp"
 #include "foundation/parallel/thread_pool.hpp"
 #include "foundation/visual/event_queue.hpp"
@@ -14,63 +14,6 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 const f32 width = 640;
 const f32 height = 480;
-
-buffer_type make_point( const device_type& device )
-{
-    buffer_type point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
-    {
-        map_type map = point->map( buffer::write );
-        f32* value = static_cast< f32* >( map->data );
-
-        // top left
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-
-        // bottom left
-        value[ 2 ] = 0;
-        value[ 3 ] = 0;
-
-        // top right
-        value[ 4 ] = 1;
-        value[ 5 ] = 1;
-
-        // bottom right
-        value[ 6 ] = 1;
-        value[ 7 ] = 0;
-    }
-    return point;
-}
-
-buffer_type make_index( const device_type& device )
-{
-    buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
-    {
-        map_type map = index->map( buffer::write );
-        u16* value = static_cast< u16* >( map->data );
-
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-        value[ 2 ] = 2;
-        value[ 3 ] = 2;
-        value[ 4 ] = 1;
-        value[ 5 ] = 3;
-    }
-    return index;
-}
-
-shader_vector make_shaders( const device_type& device, const std::string& root )
-{
-    vfs vfs;
-    vfs.insert( root + "../share/glsl", "/" );
-    shader_include include( device, vfs );
-    include.insert( "virtual_texture.hs" );
-
-    shader_vector vector;
-    vector.push_back( include.compile( "font.vs", shader::vertex ) );
-    vector.push_back( include.compile( "font.fs", shader::fragment ) );
-    vector.push_back( include.compile( "virtual_texture.fs", shader::fragment ) );
-    return vector;
-}
 
 typedef unit::group< anonymous_t, anonymous_t, 1 > group_type;
 typedef group_type::fixture_type fixture_type;
@@ -102,7 +45,8 @@ template<>
     virtual_texture vt( device, cache, font_source );
     text_layout layout( device, vt, font_source );
 
-    program_type program = device->program( make_shaders( device, root ) );
+    program_type program =
+        make_program( device, root + "../share/glsl", root + "../share/json/font.effect" );
     frame_type frame = device->default_frame( width, height );
     std::string string =
         "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";

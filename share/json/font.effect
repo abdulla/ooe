@@ -1,0 +1,5 @@
+{
+    "header": [ "virtual_texture.hs" ],
+    "vertex": [ "font.vs" ],
+    "fragment": [ "font.fs", "virtual_texture.fs" ]
+}

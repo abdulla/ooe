@@ -78,6 +78,9 @@ target_link_libraries( python io ${PYTHON_LIBRARIES} )
 ooe_library( registry component/registry )
 target_link_libraries( registry ipc )
 
+ooe_static( ui component/ui )
+target_link_libraries( ui visual )
+
 ### component: executable ##########################################################################
 ooe_executable( doc component/registry/doc )
 target_link_libraries( doc executable registry )
@@ -98,8 +101,9 @@ set_target_properties( registry_server PROPERTIES OUTPUT_NAME registry )
 ooe_executable( surrogate component/registry/surrogate )
 target_link_libraries( surrogate executable registry )
 
-ooe_executable( ui component/ui )
-target_link_libraries( ui executable math visual )
+ooe_executable( ui_server component/ui/server )
+target_link_libraries( ui_server executable math ui )
+set_target_properties( ui_server PROPERTIES OUTPUT_NAME ui )
 
 ### test: library ##################################################################################
 ooe_library( unit test/unit )
@@ -114,8 +118,8 @@ target_link_libraries( mock executable )
 ooe_executable( registry_test test/component/registry )
 target_link_libraries( registry_test javascript lua python registry unit )
 
-ooe_executable( ui_test component/ui test/component/ui )
-target_link_libraries( ui_test math unit visual )
+ooe_executable( ui_test test/component/ui )
+target_link_libraries( ui_test math ui unit )
 
 # foundation
 ooe_executable( image_test test/foundation/image )

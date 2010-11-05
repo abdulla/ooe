@@ -10,15 +10,12 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-class vfs;
-class view_data;
-class image_pyramid;
-
 template< u8 >
     class matrix;
 
 typedef matrix< 3 > mat3;
 typedef matrix< 4 > mat4;
+class view_data;
 
 //--- texture --------------------------------------------------------------------------------------
 struct texture
@@ -205,6 +202,26 @@ struct program
 
 typedef shared_ptr< program > program_type;
 
+//--- image_pyramid --------------------------------------------------------------------------------
+class OOE_VISIBLE image_pyramid
+{
+public:
+    const u32 width;
+    const u32 height;
+    const ooe::image::type format;
+
+    image_pyramid( const ooe::image& );
+    image_pyramid( u32, u32, ooe::image::type );
+
+    void insert( const ooe::image& );
+    ooe::image image( u8 ) const;
+    u8 size( void ) const;
+    ooe::image::data_type operator []( u8 ) const;
+
+private:
+    std::vector< ooe::image::data_type > vector;
+};
+
 //--- device ---------------------------------------------------------------------------------------
 struct device
 {
@@ -243,40 +260,6 @@ struct device
 
 typedef shared_ptr< device > device_type;
 typedef device_type ( device_open_type )( const view_data&, bool );
-
-//--- image_pyramid --------------------------------------------------------------------------------
-class OOE_VISIBLE image_pyramid
-{
-public:
-    const u32 width;
-    const u32 height;
-    const ooe::image::type format;
-
-    image_pyramid( const ooe::image& );
-    image_pyramid( u32, u32, ooe::image::type );
-
-    void insert( const ooe::image& );
-    ooe::image image( u8 ) const;
-    u8 size( void ) const;
-    ooe::image::data_type operator []( u8 ) const;
-
-private:
-    std::vector< ooe::image::data_type > vector;
-};
-
-//--- shader_include -------------------------------------------------------------------------------
-class OOE_VISIBLE shader_include
-{
-public:
-    shader_include( const device_type&, const ooe::vfs& );
-    void insert( const std::string& );
-    shader_type compile( const std::string&, shader::type ) const;
-
-private:
-    const device_type& device;
-    const ooe::vfs& vfs;
-    std::string header;
-};
 
 OOE_NAMESPACE_END( ( ooe ) )
 

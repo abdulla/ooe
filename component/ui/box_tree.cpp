@@ -21,7 +21,7 @@ geometry::intersection includes( const box& a, const box& b )
         return geometry::intersect;
 }
 
-box_tree* find_root( box_tree* root, unit& x, unit& y, u16 z )
+box_tree* find_root( box_tree* root, box_unit& x, box_unit& y, u16 z )
 {
     box box = root->box();
 
@@ -47,7 +47,7 @@ box_tree* find_root( box_tree* root, unit& x, unit& y, u16 z )
 }
 
 bool find_view( const box_tree& tree, box_tree::box_vector& vector, u16 width, u16 height,
-    unit x, unit y, u16 z, u8 level, u8 level_limit )
+    box_unit x, box_unit y, u16 z, u8 level, u8 level_limit )
 {
     if ( level == level_limit )
         return false;
@@ -106,12 +106,12 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- unit -----------------------------------------------------------------------------------------
-unit::unit( u16 integer_, f32 fraction_ )
+//--- box_unit -------------------------------------------------------------------------------------
+box_unit::box_unit( u16 integer_, f32 fraction_ )
     : integer( integer_ ), fraction( fraction_ )
 {
     if ( fraction >= 1 )
-        throw error::runtime( "unit: " ) << "Fraction " << fraction << " >= 1";
+        throw error::runtime( "box_unit: " ) << "Fraction " << fraction << " >= 1";
 }
 
 //--- box ------------------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ box_tree::iterator box_tree::insert( u16 width, u16 height, u16 x, u16 y )
     return children.insert( back, b );
 }
 
-box_tree::iterator box_tree::insert( u16 width, u16 height, unit x, unit y, u16 z )
+box_tree::iterator box_tree::insert( u16 width, u16 height, box_unit x, box_unit y, u16 z )
 {
     x.integer += bound.x;
     y.integer += bound.y;
@@ -181,7 +181,7 @@ box_tree::iterator box_tree::insert( u16 width, u16 height, unit x, unit y, u16 
     return root ? root->insert( width, height, x.integer, y.integer ) : end();
 }
 
-box_tree::box_vector box_tree::view( u16 width, u16 height, unit x, unit y, u16 z ) const
+box_tree::box_vector box_tree::view( u16 width, u16 height, box_unit x, box_unit y, u16 z ) const
 {
     u16 level_limit = std::min( log2f( width ), log2f( height ) );
     f32 multiplier = -( 1 << z );
