@@ -16,6 +16,7 @@ find_package( PNG REQUIRED )
 find_package( Python REQUIRED )
 find_package( Squish REQUIRED )
 find_package( Threads REQUIRED )
+find_package( UTF8CPP REQUIRED )
 find_package( V8 REQUIRED )
 find_package( ZLIB REQUIRED )
 
@@ -31,6 +32,7 @@ include_directories( ${SQUISH_INCLUDE_DIRS} )
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 ooe_directories( ${Boost_INCLUDE_DIRS} )
 ooe_directories( ${OPENEXR_INCLUDE_DIRS} )
+ooe_directories( ${UTF8CPP_INCLUDE_DIRS} )
 ooe_directories( ${V8_INCLUDE_DIRS} )
 
 ### data ###########################################################################################
