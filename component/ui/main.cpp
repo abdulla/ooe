@@ -233,24 +233,15 @@ shader_vector make_shaders( const device_type& device, const std::string& root )
 box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
 {
     box_tree::box_vector shadows;
-    f32 level = -1024;
-    f32 z;
 
     for ( box_tree::box_vector::const_reverse_iterator i = boxes.rbegin(), end = boxes.rend();
         i != end; ++i )
     {
-        if ( !is_equal( level, i->_4 ) )
-        {
-            level = i->_4;
-            z = 1. / 8;
-        }
-
         f32 w = i->_0 + 12;
         f32 h = i->_1 + 16;
         f32 x = i->_2 - 6;
         f32 y = i->_3 - 6;
-        shadows.push_back( make_tuple( w, h, x, y, i->_4 - z ) );
-        z -= 1. / 256;
+        shadows.push_back( make_tuple( w, h, x, y, i->_4 - .5 ) );
     }
 
     return shadows;

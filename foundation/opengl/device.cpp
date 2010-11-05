@@ -142,6 +142,7 @@ try
     GetIntegerv( MAX_ARRAY_TEXTURE_LAYERS, &array_size_limit );
 
     BlendFunc( SRC_ALPHA, ONE_MINUS_SRC_ALPHA );
+    DepthFunc( LEQUAL );
     PixelStorei( PACK_ALIGNMENT, 1 );
     PixelStorei( UNPACK_ALIGNMENT, 1 );
 }

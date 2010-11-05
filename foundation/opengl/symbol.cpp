@@ -23,6 +23,7 @@ void load_symbols( void )
     Enable = find< Enable_t >( "glEnable" );
     Disable = find< Disable_t >( "glDisable" );
     BlendFunc = find< BlendFunc_t >( "glBlendFunc" );
+    DepthFunc = find< DepthFunc_t >( "glDepthFunc" );
     PixelStorei = find< PixelStorei_t >( "glPixelStorei" );
 
     GenTextures = find< GenTextures_t >( "glGenTextures" );
@@ -107,6 +108,7 @@ GetIntegerv_t* GetIntegerv;
 Enable_t* Enable;
 Disable_t* Disable;
 BlendFunc_t* BlendFunc;
+DepthFunc_t* DepthFunc;
 PixelStorei_t* PixelStorei;
 
 GenTextures_t* GenTextures;

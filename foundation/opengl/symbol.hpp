@@ -15,6 +15,8 @@ enum
 {
     TRIANGLES                   = 0x0004,
 
+    LEQUAL                      = 0x0203,
+
     SRC_ALPHA                   = 0x0302,
     ONE_MINUS_SRC_ALPHA         = 0x0303,
 
@@ -134,6 +136,7 @@ typedef void ( GetIntegerv_t )( u32, s32* );
 typedef void ( Enable_t )( u32 );
 typedef void ( Disable_t )( u32 );
 typedef void ( BlendFunc_t )( u32, u32 );
+typedef void ( DepthFunc_t )( u32 );
 typedef void ( PixelStorei_t )( u32, s32 );
 
 typedef void ( GenTextures_t )( s32, u32* );
@@ -216,6 +219,7 @@ extern GetIntegerv_t* GetIntegerv;
 extern Enable_t* Enable;
 extern Disable_t* Disable;
 extern BlendFunc_t* BlendFunc;
+extern DepthFunc_t* DepthFunc;
 extern PixelStorei_t* PixelStorei;
 
 extern GenTextures_t* GenTextures;
