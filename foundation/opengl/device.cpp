@@ -78,7 +78,6 @@ void enable_frame( const frame_type& generic_frame, u32 program, s32 draw_buffer
         throw error::runtime( "opengl::device: " ) <<
             "Frame has " << size << " colour attachments, device supports " << draw_buffers_limit;
 
-    BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
     frame.check();
     DrawBuffers( size, &frame.colours[ 0 ] );
 }
@@ -216,7 +215,6 @@ void device::draw( const block_type& generic_block, const frame_type& frame, u32
 
     opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
     BindBuffer( index.target, index.id );
-    block.check();
     DrawElementsInstanced( TRIANGLES, index.size / sizeof( u16 ), UNSIGNED_SHORT, 0, instances );
 }
 

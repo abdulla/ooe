@@ -27,7 +27,6 @@ public:
     typedef std::map< std::string, s32 > location_map;
 
     const u32 id;
-    bool do_check;
     const buffer_type index;
 
     uniform_map uniforms;
@@ -50,8 +49,6 @@ public:
     virtual void input( const std::string&, const texture_type& );
     virtual void input( const std::string&, const texture_array_type& );
     virtual void input( const std::string&, u8, const buffer_type&, bool );
-
-    void check( void );
 
 private:
     iterator_map iterators;

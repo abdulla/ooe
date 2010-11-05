@@ -11,10 +11,10 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
-void check_status( s32 id, s32 parameter, const c8* type )
+void check( s32 id )
 {
     s32 status;
-    GetProgramiv( id, parameter, &status );
+    GetProgramiv( id, LINK_STATUS, &status );
 
     s32 size;
     GetProgramiv( id, INFO_LOG_LENGTH, &size );
@@ -27,9 +27,9 @@ void check_status( s32 id, s32 parameter, const c8* type )
     GetProgramInfoLog( id, size, 0, array );
 
     if ( status )
-        OOE_CONSOLE( "opengl::program: " << type << " warning:\n" << array );
+        OOE_CONSOLE( "opengl::program: " << "Link warning:\n" << array );
     else
-        throw error::runtime( "opengl::program: " ) << type << " error:\n" << array;
+        throw error::runtime( "opengl::program: " ) << "Link error:\n" << array;
 }
 
 OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
@@ -45,7 +45,7 @@ try
         AttachShader( id, dynamic_cast< opengl::shader& >( **i ).id );
 
     LinkProgram( id );
-    check_status( id, LINK_STATUS, "Link" );
+    check( id );
 }
 catch ( ... )
 {
@@ -65,12 +65,6 @@ block_type program::block( const buffer_type& buffer ) const
 frame_type program::frame( u32 width, u32 height ) const
 {
     return new opengl::frame( id, width, height );
-}
-
-void check_program( u32 id )
-{
-    ValidateProgram( id );
-    check_status( id, VALIDATE_STATUS, "Validate" );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

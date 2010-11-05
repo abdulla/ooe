@@ -19,8 +19,6 @@ struct program
     virtual frame_type frame( u32, u32 ) const;
 };
 
-void check_program( u32 );
-
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
 #endif  // OOE_FOUNDATION_OPENGL_PROGRAM_HPP

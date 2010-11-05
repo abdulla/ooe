@@ -74,18 +74,6 @@ format_tuple frame_format( image::type format )
     }
 }
 
-template< typename target, typename source >
-    const target& check( const source& in, u32 width, u32 height )
-{
-    const target& out = dynamic_cast< const target& >( in );
-
-    if ( out.width != width || out.height != height )
-        throw error::runtime( "opengl::frame: " ) << "Attachment size " << out.width << 'x' <<
-            out.height << " != frame size " << width << 'x' << height;
-
-    return out;
-}
-
 void frame_check( bool& do_check, u32 target )
 {
     if ( !do_check )
@@ -226,7 +214,7 @@ void frame::clear( void )
 
 void frame::output( const std::string& name, const texture_type& generic_texture )
 {
-    const opengl::texture& texture = ::check< opengl::texture >( *generic_texture, width, height );
+    const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
     s32 location = find( program, locations, name );
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
@@ -238,7 +226,7 @@ void frame::output( const std::string& name, const texture_type& generic_texture
 
 void frame::output( const std::string& name, const target_type& generic_target )
 {
-    const opengl::target& target = ::check< opengl::target >( *generic_target, width, height );
+    const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
     s32 location = find( program, locations, name );
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
@@ -250,6 +238,7 @@ void frame::output( const std::string& name, const target_type& generic_target )
 
 void frame::check( void )
 {
+    BindFramebuffer( DRAW_FRAMEBUFFER, id );
     frame_check( do_check, DRAW_FRAMEBUFFER );
 }
 
