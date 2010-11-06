@@ -27,7 +27,7 @@ void load_tree( const boost::property_tree::ptree& pt, box_tree& bt )
         i != end; ++i )
     {
         box box = make_box( i->second );
-        box_tree::iterator j = bt.insert( box.width, box.height, box.x, box.y );
+        box_tree::iterator j = bt.insert( box.width, box.height, box.x, box.y, 0 );
 
         if ( j == bt.end() )
             throw error::runtime( "read_tree: " ) << "Unable to insert box ( " << box.width <<
@@ -143,7 +143,7 @@ box_tree make_tree( const std::string& path )
     boost::property_tree::ptree pt;
     read_json( canonical_path( path ), pt );
 
-    box_tree bt( make_box( pt ) );
+    box_tree bt( make_box( pt ), 0 );
     load_tree( pt.get_child( "children" ), bt );
     return bt;
 }

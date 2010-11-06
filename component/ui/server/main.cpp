@@ -209,7 +209,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     {
         box_unit x( std::max( 0.f, v.x ), 0 );
         box_unit y( std::max( 0.f, v.y ), 0 );
-        box_tree::box_vector boxes = tree.view( width, height, x, y, v.z );
+
+        box_tree::aux_vector auxes;
+        box_tree::box_vector boxes = tree.view( width, height, x, y, v.z, auxes );
 
         if ( boxes.size() )
         {

@@ -38,21 +38,24 @@ public:
     typedef node_vector::const_iterator const_iterator;
     typedef tuple< f32, f32, f32, f32, f32 > box_tuple; // width, height, x, y, z
     typedef std::vector< box_tuple > box_vector;
+    typedef std::vector< const void* > aux_vector;
 
-    box_tree( const ooe::box& );
+    box_tree( const ooe::box&, const void* );
     ooe::box box( void ) const;
+    const void* get( void ) const;
 
     iterator begin( void );
     iterator end( void );
     const_iterator begin( void ) const;
     const_iterator end( void ) const;
 
-    iterator insert( u16, u16, u16, u16 );
-    iterator insert( u16, u16, box_unit, box_unit, u16 );
-    box_vector view( u16, u16, box_unit, box_unit, u16 ) const;
+    iterator insert( u16, u16, u16, u16, const void* );
+    iterator insert( u16, u16, box_unit, box_unit, u16, const void* );
+    box_vector view( u16, u16, box_unit, box_unit, u16, aux_vector& ) const;
 
 private:
     ooe::box bound;
+    const void* aux;
     node_vector children;
 };
 
