@@ -62,7 +62,7 @@ template<>
     for ( std::string::iterator i = string.begin(), end = string.end(); i != end; ++i )
     {
         std::string substring( string.begin(), i + 1 );
-        u32 instances = layout.input( block, substring, 4, 640 );
+        u32 instances = layout.input( block, substring, 4, width );
 
         while ( cache.pending() )
             cache.write();
