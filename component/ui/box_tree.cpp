@@ -4,6 +4,7 @@
 
 #include "component/ui/box_tree.hpp"
 #include "foundation/math/geometry.hpp"
+#include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
 
@@ -21,7 +22,16 @@ geometry::intersection includes( const box& a, const box& b )
         return geometry::intersect;
 }
 
-box_tree* find_root( box_tree* root, box_unit& x, box_unit& y, u16 z )
+box intersection( const box& a, const box& b )
+{
+    u16 x = std::max( a.x, b.x );
+    u16 y = std::max( a.y, b.y );
+    u16 w = std::min( a.width + a.x, b.width + b.x ) - x;
+    u16 h = std::min( a.height + a.y, b.height + b.y ) - y;
+    return box( w, h, x, y );
+}
+
+box_tree* find_root( box_tree* root, box_unit& x, box_unit& y )
 {
     box box = root->box();
 
@@ -34,16 +44,13 @@ box_tree* find_root( box_tree* root, box_unit& x, box_unit& y, u16 z )
     x.integer = ( x.integer - box.x ) * 2 + x.fraction;
     y.integer = ( y.integer - box.y ) * 2 + y.fraction;
 
-    if ( !z )
-        return root;
-
     for ( box_tree::iterator i = root->begin(), end = root->end(); i != end; ++i )
     {
-        if ( ( root = find_root( &*i, x, y, z - 1 ) ) )
+        if ( ( root = find_root( &*i, x, y ) ) )
             return root;
     }
 
-    return 0;
+    return root;
 }
 
 bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux_vector& auxes,
@@ -98,8 +105,14 @@ bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux
         }
     }
 
+    ooe::box intersect = intersection( view, box );
+    f32 i_w = divide( intersect.width, box.width );
+    f32 i_h = divide( intersect.height, box.height );
+    f32 i_x = divide( intersect.x, box.width );
+    f32 i_y = divide( intersect.y, box.height );
+
     boxes.push_back( make_tuple( w, h, x.fraction, y.fraction, -z + level ) );
-    auxes.push_back( tree.get() );
+    auxes.push_back( make_tuple( i_w, i_h, i_x, i_y, tree.get() ) );
     return includes( box, view ) == geometry::inside;
 }
 
@@ -122,7 +135,7 @@ box::box( u16 width_, u16 height_, u16 x_, u16 y_ )
 }
 
 //--- box_tree -------------------------------------------------------------------------------------
-box_tree::box_tree( const ooe::box& bound_, const void* aux_ )
+box_tree::box_tree( const ooe::box& bound_, void* aux_ )
     : bound( bound_ ), aux( aux_ ), children()
 {
 }
@@ -132,7 +145,7 @@ box box_tree::box( void ) const
     return bound;
 }
 
-const void* box_tree::get( void ) const
+void* box_tree::get( void ) const
 {
     return aux;
 }
@@ -157,39 +170,36 @@ box_tree::const_iterator box_tree::end( void ) const
     return children.end();
 }
 
-box_tree::iterator box_tree::insert( u16 width, u16 height, u16 x, u16 y, const void* aux_ )
+box_tree::iterator box_tree::insert( const ooe::box& box_, void* aux_ )
 {
     iterator back = end();
 
-    if ( !width || !height )
+    if ( !box_.width || !box_.height )
         return back;
 
-    ooe::box b( width, height, x, y );
-    ooe::box c( bound.width * 2, bound.height * 2, 0, 0 );
+    ooe::box container( bound.width * 2, bound.height * 2, 0, 0 );
 
-    if ( ::includes( c, b ) != geometry::inside )
+    if ( ::includes( container, box_ ) != geometry::inside )
         return back;
 
     for ( iterator i = begin(); i != back; ++i )
     {
-        if ( ::includes( i->bound, b ) != geometry::outside )
+        if ( ::includes( i->bound, box_ ) != geometry::outside )
             return back;
     }
 
-    return children.insert( back, box_tree( b, aux_ ) );
+    return children.insert( back, box_tree( box_, aux_ ) );
 }
 
-box_tree::iterator box_tree::
-    insert( u16 width, u16 height, box_unit x, box_unit y, u16 z, const void* aux_ )
+box_tree::find_tuple box_tree::find( box_unit x, box_unit y )
 {
     x.integer += bound.x;
     y.integer += bound.y;
-    box_tree* root = find_root( this, x, y, z );
-    return root ? root->insert( width, height, x.integer, y.integer, aux_ ) : end();
+    box_tree* root = find_root( this, x, y );
+    return find_tuple( root ? *root : *this, x.integer, y.integer );
 }
 
-box_tree::box_vector box_tree::
-    view( u16 width, u16 height, box_unit x, box_unit y, u16 z, aux_vector& auxes ) const
+box_tree::view_tuple box_tree::view( u16 width, u16 height, box_unit x, box_unit y, u16 z ) const
 {
     u16 level_limit = std::min( log2f( width ), log2f( height ) );
     f32 multiplier = -( 1 << z );
@@ -197,8 +207,9 @@ box_tree::box_vector box_tree::
     y.fraction = ( y.integer + y.fraction ) * multiplier;
 
     box_vector boxes;
+    aux_vector auxes;
     find_view( *this, boxes, auxes, width, height, x, y, z, 0, level_limit );
-    return boxes;
+    return view_tuple( boxes, auxes );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
