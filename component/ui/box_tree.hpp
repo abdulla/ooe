@@ -33,9 +33,9 @@ struct box
 class box_tree
 {
 public:
-    typedef std::vector< box_tree > node_vector;
-    typedef node_vector::iterator iterator;
-    typedef node_vector::const_iterator const_iterator;
+    typedef std::vector< box_tree > tree_vector;
+    typedef tree_vector::iterator iterator;
+    typedef tree_vector::const_iterator const_iterator;
     typedef tuple< f32, f32, f32, f32, f32 > box_tuple; // width, height, x, y, z
     typedef std::vector< box_tuple > box_vector;
     typedef tuple< f32, f32, f32, f32, void* > aux_tuple;  // width, height, x, y, aux
@@ -59,7 +59,7 @@ public:
 private:
     ooe::box bound;
     void* aux;
-    node_vector children;
+    tree_vector children;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
