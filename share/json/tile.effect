@@ -1,0 +1,5 @@
+{
+    "header": [ "virtual_texture.hs" ],
+    "vertex": [ "tile.vs" ],
+    "fragment": [ "tile.fs", "virtual_texture.fs" ]
+}
