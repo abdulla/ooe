@@ -42,8 +42,7 @@ template<>
 
     thread_pool pool;
     page_cache cache( device, pool, font_source.format(), font_source.page_size() );
-    virtual_texture vt( device, cache, font_source );
-    text_layout layout( device, vt, font_source );
+    text_layout layout( device, cache, font_source );
 
     program_type program =
         make_program( device, root + "../share/glsl", root + "../share/json/font.effect" );
@@ -56,7 +55,6 @@ template<>
     block->input( "projection", orthographic( 0, width, height, 0 ) );
     block->input( "view", 0.f, 0.f, 0.f );
     block->input( "colour", 255, 255, 255 );
-    vt.input( block, "vt" );
     device->set( device::blend, true );
 
     for ( std::string::iterator i = string.begin(), end = string.end(); i != end; ++i )

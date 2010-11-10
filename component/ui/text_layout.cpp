@@ -75,12 +75,12 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- text_layout ----------------------------------------------------------------------------------
 text_layout::
-    text_layout( const device_type& device_, virtual_texture& vt_, const font_source& source_ )
-    : device( device_ ), vt( vt_ ), source( source_ )
+    text_layout( const device_type& device_, page_cache& cache, font_source& source_ )
+    : device( device_ ), source( source_ ), texture( device_, cache, source_ )
 {
 }
 
-u32 text_layout::input( const block_type& block, const std::string& text, u8 level, u32 width )
+u32 text_layout::input( block_type& block, const std::string& text, u8 level, u32 width )
 {
     u32 glyphs = glyph_size( text.begin(), text.end() );
 
@@ -133,7 +133,7 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
             continue;
         }
 
-        vt.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
+        texture.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
         add_glyph( glyph, data, size, x, y, max, level );
 
         data += point_size;
@@ -146,6 +146,7 @@ u32 text_layout::input( const block_type& block, const std::string& text, u8 lev
     block->input( "vertex_translate", 2, point, true );
     block->input( "coord_scale", 2, point, true );
     block->input( "coord_translate", 2, point, true );
+    texture.input( block, "texture" );
     return glyphs;
 }
 

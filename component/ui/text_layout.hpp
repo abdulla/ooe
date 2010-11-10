@@ -11,14 +11,14 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 class text_layout
 {
 public:
-    text_layout( const device_type&, virtual_texture&, const font_source& );
+    text_layout( const device_type&, page_cache&, font_source& );
 
-    u32 input( const block_type&, const std::string&, u8, u32 );
+    u32 input( block_type&, const std::string&, u8, u32 );
 
 private:
     const device_type& device;
-    virtual_texture& vt;
     const font_source& source;
+    virtual_texture texture;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
