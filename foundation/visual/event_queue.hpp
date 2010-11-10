@@ -55,7 +55,7 @@ namespace ooe
     struct OOE_VISIBLE event_queue
         : private noncopyable, public platform::event_queue
     {
-        event::type next_event( event&, epoch_t = epoch_t( 0, 0 ) ) const;
+        event::type dequeue( event&, epoch_t = epoch_t( 0, 0 ) ) const;
     };
 }
 

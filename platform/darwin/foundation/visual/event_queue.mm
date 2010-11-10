@@ -56,7 +56,7 @@ OOE_NAMESPACE_END( ( ooe )( platform ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- event_queue ----------------------------------------------------------------------------------
-event::type event_queue::next_event( event& event, epoch_t timeout ) const
+event::type event_queue::dequeue( event& event, epoch_t timeout ) const
 {
     NSDate* date = [ NSDate dateWithTimeIntervalSinceNow: timeout._0 + timeout._1 * 1e-9 ];
     NSEvent* nsevent = [ NSApp nextEventMatchingMask: NSAnyEventMask untilDate: date
