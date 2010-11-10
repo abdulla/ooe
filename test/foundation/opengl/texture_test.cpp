@@ -114,8 +114,8 @@ template<>
     std::string root = executable::path()._0;
     library library( root + "../lib/libopengl.so", library::global_lazy );
 
-    event_queue event_queue;
-    view view( event_queue, width, height, false );
+    event_queue queue;
+    view view( queue, width, height, false );
     device_type device = library.find< device_open_type >( "device_open" )( view, false );
 
     const s32 array_size = device->limit( device::array_size );
@@ -152,7 +152,7 @@ template<>
         device->swap();
 
         event event;
-        while ( event_queue.next_event( event, epoch_t( 0, 0 ) ) ) {}
+        while ( queue.dequeue( event, epoch_t( 0, 0 ) ) ) {}
     }
 }
 

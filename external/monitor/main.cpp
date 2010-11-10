@@ -124,7 +124,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 #ifdef __APPLE__
     event_queue queue;
     event event;
-    while ( queue.next_event( event, timeout ) ) {}
+    while ( queue.dequeue( event, timeout ) ) {}
 #else
     while ( true ) timer::sleep( timeout );
 #endif
