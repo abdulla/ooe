@@ -12,7 +12,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 typedef tuple< u32, u32, u32, u32 > region_type;
 typedef std::pair< page_cache::page_map::iterator, page_cache::page_map::iterator > pair_type;
-const image::type table_format = image::rg_f32;
+const image::type table_format = image::rg_s16;
 const u8 table_channels = 2;
 
 u32 check_page_size( u16 page_size )
@@ -45,7 +45,7 @@ image make_image( u32 size )
 {
     uncompressed_image image( size, size, table_format );
 
-    for ( f32* i = image.as< f32 >(), * end = i + image.width * image.height * table_channels;
+    for ( s16* i = image.as< s16 >(), * end = i + image.width * image.height * table_channels;
         i != end; ++i )
         *i = -1;
 
@@ -74,12 +74,12 @@ texture_array_type make_array( const device_type& device, image::type format, u1
     return device->texture_array( page_size, page_size, size, format );
 }
 
-void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, f32 i, f32 pow_level )
+void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, s16 i, s16 exponent )
 {
     u32 width = pyramid.width >> index.level;
-    f32* rg = pyramid[ index.level ].as< f32 >() + ( index.x + index.y * width ) * table_channels;
+    s16* rg = pyramid[ index.level ].as< s16 >() + ( index.x + index.y * width ) * table_channels;
     rg[ 0 ] = i;
-    rg[ 1 ] = pow_level;
+    rg[ 1 ] = exponent;
 }
 
 region_type get_region( const physical_source& source, u8 level_limit,
@@ -245,9 +245,9 @@ void page_cache::write( void )
 
         virtual_texture& texture = *page->_1._0;
         const pyramid_index& index = page->_1._1;
-        f32 pow_level = exp2( texture.pyramid.size() - index.level - 1 );
+        s16 exponent = texture.pyramid.size() - index.level - 1;
 
-        write_pyramid( texture.pyramid, index, page->_0, pow_level );
+        write_pyramid( texture.pyramid, index, page->_0, exponent );
         texture.bitset.set( index.level );
         dirty.push_back( &texture );
 
@@ -291,7 +291,9 @@ virtual_texture::~virtual_texture( void )
 
 void virtual_texture::input( block_type& block, const std::string& name ) const
 {
-    block->input( name + ".bias_range", log2f( source.page_size() ), log2f( source.size() ) );
+    s32 begin = log2f( source.page_size() );
+    s32 end = log2f( source.size() );
+    block->input( name + ".bias_range", begin, end );
     block->input( name + ".page_cache", cache.array );
     block->input( name + ".page_table", table );
 }
