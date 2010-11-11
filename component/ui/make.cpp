@@ -20,24 +20,57 @@ box make_box( const boost::property_tree::ptree& pt )
     return box( w, h, x, y );
 }
 
+//--- make_aux -------------------------------------------------------------------------------------
+void* make_aux( const boost::property_tree::ptree& pt, const node_map& map )
+{
+    boost::optional< std::string > node = pt.get_optional< std::string >( "node" );
+    boost::optional< std::string > data = pt.get_optional< std::string >( "data" );
+
+    if ( !node || !data )
+        return 0;
+
+    std::cout << "node: " << *node << '\n';
+    std::cout << "data: " << *data << "\n\n";
+    node_map::const_iterator i = map.find( *node );
+
+    if ( i == map.end() )
+        throw error::runtime( "make_tree: " ) << "Unknown node \"" << *node << '\"';
+
+    return i->second( *data );
+}
+
 //--- load_tree ------------------------------------------------------------------------------------
-void load_tree( const boost::property_tree::ptree& pt, box_tree& bt )
+void load_tree( const boost::property_tree::ptree& pt, const node_map& node, box_tree& bt )
 {
     for ( boost::property_tree::ptree::const_iterator i = pt.begin(), end = pt.end();
         i != end; ++i )
     {
         box box = make_box( i->second );
-        box_tree::iterator j = bt.insert( box.width, box.height, box.x, box.y, 0 );
+        box_tree::iterator j = bt.insert( box, make_aux( i->second, node ) );
 
         if ( j == bt.end() )
             throw error::runtime( "read_tree: " ) << "Unable to insert box ( " << box.width <<
                 ' ' << box.height << ' ' << box.x << ' ' << box.y << " )";
 
-        boost::optional< const boost::property_tree::ptree& > optional =
+        boost::optional< const boost::property_tree::ptree& > children =
             i->second.get_child_optional( "children" );
 
-        if ( optional )
-            load_tree( *optional, *j );
+        if ( children )
+            load_tree( *children, node, *j );
+    }
+}
+
+//--- make_shader ----------------------------------------------------------------------------------
+shader_type make_shader( const std::string& name, const device_type& device,
+    const std::string& source, shader::type type )
+{
+    try
+    {
+        return device->shader( source, type );
+    }
+    catch ( error::runtime& error )
+    {
+        throw error::runtime( "make_shader: " ) << '\"' << name << "\": " << error.what();
     }
 }
 
@@ -76,15 +109,15 @@ program_type make_program
         for ( boost::property_tree::ptree::iterator j = child->begin(), j_end = child->end();
             j != j_end; ++j )
         {
-            memory memory( root + '/' + j->second.data() );
+            std::string name = j->second.data();
+            memory memory( root + '/' + name );
             std::string source( memory.as< c8 >(), memory.size() );
 
             if ( i == id )
                 header << source << '\n';
             else
             {
-                shader_type shader = device->shader( header + source, i->type );
-                vector.push_back( shader );
+                vector.push_back( make_shader( name, device, header + source, i->type ) );
             }
         }
     }
@@ -138,13 +171,13 @@ buffer_type make_point( const device_type& device )
 }
 
 //--- make_tree ------------------------------------------------------------------------------------
-box_tree make_tree( const std::string& path )
+box_tree make_tree( const std::string& path, const node_map& node )
 {
     boost::property_tree::ptree pt;
     read_json( canonical_path( path ), pt );
 
-    box_tree bt( make_box( pt ), 0 );
-    load_tree( pt.get_child( "children" ), bt );
+    box_tree bt( make_box( pt ), make_aux( pt, node ) );
+    load_tree( pt.get_child( "children" ), node, bt );
     return bt;
 }
 
