@@ -45,7 +45,7 @@ template<>
     text_layout layout( device, cache, font_source );
 
     program_type program =
-        make_program( device, root + "../share/glsl", root + "../share/json/font.effect" );
+        make_program( device, root + "../share/glsl", root + "../share/json/tile.effect" );
     frame_type frame = device->default_frame( width, height );
     std::string string =
         "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
