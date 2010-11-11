@@ -115,9 +115,11 @@ struct block
     virtual void input( const std::string&, s32[][ 1 ], u32 ) = 0;
     virtual void input( const std::string&, s32[][ 2 ], u32 ) = 0;
     virtual void input( const std::string&, s32[][ 3 ], u32 ) = 0;
+    virtual void input( const std::string&, s32[][ 4 ], u32 ) = 0;
     virtual void input( const std::string&, f32[][ 1 ], u32 ) = 0;
     virtual void input( const std::string&, f32[][ 2 ], u32 ) = 0;
     virtual void input( const std::string&, f32[][ 3 ], u32 ) = 0;
+    virtual void input( const std::string&, f32[][ 4 ], u32 ) = 0;
     virtual void input( const std::string&, const mat3*, u32 ) = 0;
     virtual void input( const std::string&, const mat4*, u32 ) = 0;
 
@@ -125,39 +127,51 @@ struct block
     virtual void input( const std::string&, const texture_array_type& ) = 0;
     virtual void input( const std::string&, u8, const buffer_type&, bool = false ) = 0;
 
-    void input( const std::string& name, s32 x )
+    void input( const std::string& name, s32 a )
     {
-        s32 data[] = { x };
+        s32 data[] = { a };
         input( name, &data, 1 );
     }
 
-    void input( const std::string& name, s32 x, s32 y )
+    void input( const std::string& name, s32 a, s32 b )
     {
-        s32 data[] = { x, y };
+        s32 data[] = { a, b };
         input( name, &data, 1 );
     }
 
-    void input( const std::string& name, s32 x, s32 y, s32 z )
+    void input( const std::string& name, s32 a, s32 b, s32 c )
     {
-        s32 data[] = { x, y, z };
+        s32 data[] = { a, b, c };
         input( name, &data, 1 );
     }
 
-    void input( const std::string& name, f32 x )
+    void input( const std::string& name, s32 a, s32 b, s32 c, s32 d )
     {
-        f32 data[] = { x };
+        s32 data[] = { a, b, c, d };
         input( name, &data, 1 );
     }
 
-    void input( const std::string& name, f32 x, f32 y )
+    void input( const std::string& name, f32 a )
     {
-        f32 data[] = { x, y };
+        f32 data[] = { a };
         input( name, &data, 1 );
     }
 
-    void input( const std::string& name, f32 x, f32 y, f32 z )
+    void input( const std::string& name, f32 a, f32 b )
     {
-        f32 data[] = { x, y, z };
+        f32 data[] = { a, b };
+        input( name, &data, 1 );
+    }
+
+    void input( const std::string& name, f32 a, f32 b, f32 c )
+    {
+        f32 data[] = { a, b, c };
+        input( name, &data, 1 );
+    }
+
+    void input( const std::string& name, f32 a, f32 b, f32 c, f32 d )
+    {
+        f32 data[] = { a, b, c, d };
         input( name, &data, 1 );
     }
 

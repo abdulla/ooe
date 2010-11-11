@@ -40,6 +40,14 @@ public:
         r_u8,
         rg_u8,
 
+        rgb_s16,
+        rgba_s16,
+        y_s16,
+        ya_s16,
+        a_s16,
+        r_s16,
+        rg_s16,
+
         rgb_f16,
         rgba_f16,
         y_f16,

@@ -69,12 +69,15 @@ enum
     TEXTURE_MAX_LEVEL           = 0x813D,
 
     RG                          = 0x8227,
+    RG_INTEGER                  = 0x8228,
     R8                          = 0x8229,
     RG8                         = 0x822B,
     R16F                        = 0x822D,
     R32F                        = 0x822E,
     RG16F                       = 0x822F,
     RG32F                       = 0x8230,
+    R16I                        = 0x8233,
+    RG16I                       = 0x8239,
 
     COMPRESSED_RGBA_S3TC_DXT1   = 0x83F1,
     COMPRESSED_RGBA_S3TC_DXT3   = 0x83F2,
@@ -123,6 +126,18 @@ enum
     FRAMEBUFFER_COMPLETE        = 0x8CD5,
     COLOR_ATTACHMENT0           = 0x8CE0,
     RENDERBUFFER                = 0x8D41,
+
+    RGBA16I                     = 0x8D88,
+    RGB16I                      = 0x8D89,
+    ALPHA16I                    = 0x8D8A,
+    LUMINANCE16I                = 0x8D8C,
+    LUMINANCE_ALPHA16I          = 0x8D8D,
+    RED_INTEGER                 = 0x8D94,
+    ALPHA_INTEGER               = 0x8D97,
+    RGB_INTEGER                 = 0x8D98,
+    RGBA_INTEGER                = 0x8D99,
+    LUMINANCE_INTEGER           = 0x8D9C,
+    LUMINANCE_ALPHA_INTEGER     = 0x8D9D,
 
     GEOMETRY_SHADER             = 0x8DD9,
 
@@ -174,9 +189,11 @@ typedef void ( GetProgramInfoLog_t )( u32, s32, s32*, c8* );
 typedef void ( Uniform1iv_t )( s32, s32, const s32* );
 typedef void ( Uniform2iv_t )( s32, s32, const s32* );
 typedef void ( Uniform3iv_t )( s32, s32, const s32* );
+typedef void ( Uniform4iv_t )( s32, s32, const s32* );
 typedef void ( Uniform1fv_t )( s32, s32, const f32* );
 typedef void ( Uniform2fv_t )( s32, s32, const f32* );
 typedef void ( Uniform3fv_t )( s32, s32, const f32* );
+typedef void ( Uniform4fv_t )( s32, s32, const f32* );
 typedef void ( UniformMatrix3fv_t )( s32, s32, u8, const f32* );
 typedef void ( UniformMatrix4fv_t )( s32, s32, u8, const f32* );
 typedef s32 ( GetUniformLocation_t )( u32, const c8* );
@@ -256,9 +273,11 @@ extern GetProgramInfoLog_t* GetProgramInfoLog;
 extern Uniform1iv_t* Uniform1iv;
 extern Uniform2iv_t* Uniform2iv;
 extern Uniform3iv_t* Uniform3iv;
+extern Uniform4iv_t* Uniform4iv;
 extern Uniform1fv_t* Uniform1fv;
 extern Uniform2fv_t* Uniform2fv;
 extern Uniform3fv_t* Uniform3fv;
+extern Uniform4fv_t* Uniform4fv;
 extern UniformMatrix3fv_t* UniformMatrix3fv;
 extern UniformMatrix4fv_t* UniformMatrix4fv;
 extern GetUniformLocation_t* GetUniformLocation;

@@ -50,32 +50,39 @@ u8 uncompressed_image::channels( void ) const
     switch ( format )
     {
     case y_u8:
+    case y_s16:
     case y_f16:
     case y_f32:
     case a_u8:
+    case a_s16:
     case a_f16:
     case a_f32:
     case r_u8:
+    case r_s16:
     case r_f16:
     case r_f32:
         return 1;
 
     case ya_u8:
+    case ya_s16:
     case ya_f16:
     case ya_f32:
     case rg_u8:
+    case rg_s16:
     case rg_f16:
     case rg_f32:
         return 2;
 
     case bgr_u8:
     case rgb_u8:
+    case rgb_s16:
     case rgb_f16:
     case rgb_f32:
         return 3;
 
     case bgra_u8:
     case rgba_u8:
+    case rgba_s16:
     case rgba_f16:
     case rgba_f32:
         return 4;
@@ -100,6 +107,13 @@ u8 uncompressed_image::channel_size( void ) const
     case rg_u8:
         return 1;
 
+    case rgb_s16:
+    case rgba_s16:
+    case y_s16:
+    case ya_s16:
+    case a_s16:
+    case r_s16:
+    case rg_s16:
     case rgb_f16:
     case rgba_f16:
     case y_f16:

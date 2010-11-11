@@ -68,6 +68,28 @@ uncompressed_tuple uncompressed_format( image::type format )
     case image::rg_u8:
         return uncompressed_tuple( RG8, RG, UNSIGNED_BYTE );
 
+    //--- s16 ------------------------------------------------------------------
+    case image::rgb_s16:
+        return uncompressed_tuple( RGB16I, RGB_INTEGER, UNSIGNED_SHORT );
+
+    case image::rgba_s16:
+        return uncompressed_tuple( RGBA16I, RGBA_INTEGER, UNSIGNED_SHORT );
+
+    case image::y_s16:
+        return uncompressed_tuple( LUMINANCE16I, LUMINANCE_INTEGER, UNSIGNED_SHORT );
+
+    case image::ya_s16:
+        return uncompressed_tuple( LUMINANCE_ALPHA16I, LUMINANCE_ALPHA_INTEGER, UNSIGNED_SHORT );
+
+    case image::a_s16:
+        return uncompressed_tuple( ALPHA16I, ALPHA_INTEGER, UNSIGNED_SHORT );
+
+    case image::r_s16:
+        return uncompressed_tuple( R16I, RED_INTEGER, UNSIGNED_SHORT );
+
+    case image::rg_s16:
+        return uncompressed_tuple( RG16I, RG_INTEGER, UNSIGNED_SHORT );
+
     //--- f16 ------------------------------------------------------------------
     case image::rgb_f16:
         return uncompressed_tuple( RGB16F, RGB, HALF_FLOAT );

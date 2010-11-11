@@ -43,6 +43,11 @@ void uniform_3i( s32 location, u32 size, const void* data )
     Uniform3iv( location, size, reinterpret_cast< const s32* >( data ) );
 }
 
+void uniform_4i( s32 location, u32 size, const void* data )
+{
+    Uniform4iv( location, size, reinterpret_cast< const s32* >( data ) );
+}
+
 void uniform_1f( s32 location, u32 size, const void* data )
 {
     Uniform1fv( location, size, reinterpret_cast< const f32* >( data ) );
@@ -56,6 +61,11 @@ void uniform_2f( s32 location, u32 size, const void* data )
 void uniform_3f( s32 location, u32 size, const void* data )
 {
     Uniform3fv( location, size, reinterpret_cast< const f32* >( data ) );
+}
+
+void uniform_4f( s32 location, u32 size, const void* data )
+{
+    Uniform4fv( location, size, reinterpret_cast< const f32* >( data ) );
 }
 
 void uniform_3m( s32 location, u32 size, const void* data )
@@ -135,6 +145,13 @@ void block::input( const std::string& name, s32 data[][ 3 ], u32 size )
     uniforms[ location ] = make_tuple( uniform_3i, size, array );
 }
 
+void block::input( const std::string& name, s32 data[][ 4 ], u32 size )
+{
+    s32 location = find( id, locations, name, GetUniformLocation );
+    uniform_array array = make_array( data, sizeof( *data ) * size );
+    uniforms[ location ] = make_tuple( uniform_4i, size, array );
+}
+
 void block::input( const std::string& name, f32 data[][ 1 ], u32 size )
 {
     s32 location = find( id, locations, name, GetUniformLocation );
@@ -154,6 +171,13 @@ void block::input( const std::string& name, f32 data[][ 3 ], u32 size )
     s32 location = find( id, locations, name, GetUniformLocation );
     uniform_array array = make_array( data, sizeof( *data ) );
     uniforms[ location ] = make_tuple( uniform_3f, size, array );
+}
+
+void block::input( const std::string& name, f32 data[][ 4 ], u32 size )
+{
+    s32 location = find( id, locations, name, GetUniformLocation );
+    uniform_array array = make_array( data, sizeof( *data ) );
+    uniforms[ location ] = make_tuple( uniform_4f, size, array );
 }
 
 void block::input( const std::string& name, const mat3* data, u32 size )

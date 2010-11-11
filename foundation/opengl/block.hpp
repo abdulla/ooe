@@ -40,9 +40,11 @@ public:
     virtual void input( const std::string&, s32[][ 1 ], u32 );
     virtual void input( const std::string&, s32[][ 2 ], u32 );
     virtual void input( const std::string&, s32[][ 3 ], u32 );
+    virtual void input( const std::string&, s32[][ 4 ], u32 );
     virtual void input( const std::string&, f32[][ 1 ], u32 );
     virtual void input( const std::string&, f32[][ 2 ], u32 );
     virtual void input( const std::string&, f32[][ 3 ], u32 );
+    virtual void input( const std::string&, f32[][ 4 ], u32 );
     virtual void input( const std::string&, const mat3*, u32 );
     virtual void input( const std::string&, const mat4*, u32 );
 
