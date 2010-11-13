@@ -71,7 +71,7 @@ texture_type make_table( const device_type& device, const image_pyramid& pyramid
 texture_array_type make_array( const device_type& device, image::type format, u16 page_size )
 {
     u32 size = device->limit( device::array_size );
-    return device->texture_array( page_size, page_size, size, format, texture::nearest );
+    return device->texture_array( page_size, page_size, size, format );
 }
 
 void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, s16 i, s16 exponent )

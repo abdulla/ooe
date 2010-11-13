@@ -8,3 +8,4 @@ struct vsampler2D
 };
 
 vec4 vtexture2D( vsampler2D, vec2 );
+vec4 vtexel2D( vsampler2D, vec2 );

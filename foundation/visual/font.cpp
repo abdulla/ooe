@@ -10,6 +10,8 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( font ) )
 
+const u32 load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_PEDANTIC;
+
 u32 glyph_index( FT_Face face, u32 code_point )
 {
     u32 index = FT_Get_Char_Index( face, code_point );
@@ -123,7 +125,7 @@ bitmap face::bitmap( u32 code_point, u32 size ) const
 {
     if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
         throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
-    else if ( FT_Load_Char( face_, code_point, FT_LOAD_RENDER | FT_LOAD_PEDANTIC ) )
+    else if ( FT_Load_Char( face_, code_point, load_flags ) )
         throw error::runtime( "font::face: " ) << "Unable to load " << code_point;
 
     FT_GlyphSlot glyph = face_->glyph;
