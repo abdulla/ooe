@@ -22,6 +22,18 @@ template< typename type >
     return std::max( min, std::min( value, max ) );
 }
 
+//--- inverse_clamp --------------------------------------------------------------------------------
+template< typename type >
+    type inverse_clamp( type value, type min, type max )
+{
+    if ( value > max )
+        return value - max;
+    else if ( value < min )
+        return value - min;
+    else
+        return 0;
+}
+
 //--- ceiling --------------------------------------------------------------------------------------
 template< typename type >
     type ceiling( type dividend, type divisor )
@@ -52,7 +64,7 @@ template< typename type >
 
 //--- isqrt ----------------------------------------------------------------------------------------
 template< typename type >
-    typename enable_if< is_unsigned< type > >::type isqrt( type value )
+    type isqrt( type value )
 {
     type remainder = 0;
     type root = 0;

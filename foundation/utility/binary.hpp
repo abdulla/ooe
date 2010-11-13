@@ -45,14 +45,11 @@ inline u32 bit_count( u32 value )
     return value * 0x01010101 >> 24;
 }
 
-//--- parity ---------------------------------------------------------------------------------------
-inline u32 parity( u32 value )
+//--- bit_shift ------------------------------------------------------------------------------------
+template< typename t >
+    t bit_shift( t value, s8 slide )
 {
-    value ^= value >> 16;
-    value ^= value >> 8;
-    value ^= value >> 4;
-    value &= 0x0f;
-    return ( 0x6996 >> value ) & 0x01;
+    return slide < 0 ? value >> -slide : value << slide;
 }
 
 //--- saturated_shift ------------------------------------------------------------------------------
@@ -61,6 +58,16 @@ template< typename t >
 {
     t mask = 1 << ( sizeof( t ) * 8 - 1 );
     return value & mask ? ~t( 0 ) : value << 1;
+}
+
+//--- parity ---------------------------------------------------------------------------------------
+inline u32 parity( u32 value )
+{
+    value ^= value >> 16;
+    value ^= value >> 8;
+    value ^= value >> 4;
+    value &= 0x0f;
+    return ( 0x6996 >> value ) & 0x01;
 }
 
 //--- endian_swap ----------------------------------------------------------------------------------
