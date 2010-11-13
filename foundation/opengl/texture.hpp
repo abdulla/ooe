@@ -79,21 +79,21 @@ protected:
     const u32 depth;
     const image::type format;
 
-    texture_array( u32, u32, u32, image::type );
+    texture_array( u32, u32, u32, image::type, texture::type );
     void check( const image&, u32, u32, u32 ) const;
 };
 
 struct compressed_texture_array
     : public texture_array, private compressed_id
 {
-    compressed_texture_array( u32, u32, u32, image::type );
+    compressed_texture_array( u32, u32, u32, image::type, texture::type );
     virtual void write( const image&, u32, u32, u32 );
 };
 
 struct uncompressed_texture_array
     : public texture_array, private uncompressed_id
 {
-    uncompressed_texture_array( u32, u32, u32, image::type );
+    uncompressed_texture_array( u32, u32, u32, image::type, texture::type );
     virtual void write( const image&, u32, u32, u32 );
 };
 
