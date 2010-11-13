@@ -293,12 +293,11 @@ void uncompressed_texture::write( const image& image, u32 x, u32 y, u8 level )
 }
 
 //--- texture_array --------------------------------------------------------------------------------
-texture_array::
-    texture_array( u32 width_, u32 height_, u32 depth_, image::type format_, texture::type filter )
+texture_array::texture_array( u32 width_, u32 height_, u32 depth_, image::type format_ )
     : texture_id(), width( width_ ), height( height_ ), depth( depth_ ), format( format_ )
 {
     BindTexture( TEXTURE_2D_ARRAY, id );
-    set_filter( TEXTURE_2D_ARRAY, filter );
+    set_filter( TEXTURE_2D_ARRAY, texture::nearest );
     set_levels( TEXTURE_2D_ARRAY, false, 1 );
 }
 
@@ -317,10 +316,9 @@ void texture_array::check( const image& image, u32 x, u32 y, u32 index ) const
 }
 
 //--- compressed_texture_array ---------------------------------------------------------------------
-compressed_texture_array::compressed_texture_array
-    ( u32 width_, u32 height_, u32 depth_, image::type format_, texture::type filter )
-    : texture_array( width_, height_, depth_, format_, filter ),
-    compressed_id( width, height, format )
+compressed_texture_array::
+    compressed_texture_array( u32 width_, u32 height_, u32 depth_, image::type format_ )
+    : texture_array( width_, height_, depth_, format_ ), compressed_id( width, height, format )
 {
     CompressedTexImage3D( TEXTURE_2D_ARRAY, 0, internal, width, height, depth, 0, size, 0 );
 }
@@ -334,9 +332,9 @@ void compressed_texture_array::write( const image& image, u32 x, u32 y, u32 inde
 }
 
 //--- uncompressed_texture_array -------------------------------------------------------------------
-uncompressed_texture_array::uncompressed_texture_array
-    ( u32 width_, u32 height_, u32 depth_, image::type format_, texture::type filter )
-    : texture_array( width_, height_, depth_, format_, filter ), uncompressed_id( format )
+uncompressed_texture_array::
+    uncompressed_texture_array( u32 width_, u32 height_, u32 depth_, image::type format_ )
+    : texture_array( width_, height_, depth_, format_ ), uncompressed_id( format )
 {
     u32 internal = uncompressed_format( format )._0;
     TexImage3D( TEXTURE_2D_ARRAY, 0, internal, width, height, depth, 0, external, data_type, 0 );

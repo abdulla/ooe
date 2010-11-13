@@ -108,7 +108,7 @@ public:
     virtual u32 limit( limit_type ) const;
 
     virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
-    virtual texture_array_type texture_array( u32, u32, u32, image::type, texture::type ) const;
+    virtual texture_array_type texture_array( u32, u32, u32, image::type ) const;
     virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
     virtual target_type target( u32, u32, image::type ) const;
     virtual shader_type shader( const std::string&, shader::type ) const;
@@ -279,8 +279,8 @@ texture_type device::
         return new uncompressed_texture( pyramid, filter, generate_mipmap );
 }
 
-texture_array_type device::texture_array
-    ( u32 width, u32 height, u32 depth, image::type format, texture::type filter ) const
+texture_array_type device::
+    texture_array( u32 width, u32 height, u32 depth, image::type format ) const
 {
     verify_texture( width, height, texture_size_limit );
 
@@ -289,9 +289,9 @@ texture_array_type device::texture_array
             "Array size " << depth << " > array size limit " << array_size_limit;
 
     if ( is_compressed( format ) )
-        return new compressed_texture_array( width, height, depth, format, filter );
+        return new compressed_texture_array( width, height, depth, format );
     else
-        return new uncompressed_texture_array( width, height, depth, format, filter );
+        return new uncompressed_texture_array( width, height, depth, format );
 }
 
 buffer_type device::buffer( up_t size, buffer::type format, buffer::usage_type usage ) const
