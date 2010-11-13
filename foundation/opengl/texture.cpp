@@ -70,25 +70,25 @@ uncompressed_tuple uncompressed_format( image::type format )
 
     //--- s16 ------------------------------------------------------------------
     case image::rgb_s16:
-        return uncompressed_tuple( RGB16I, RGB_INTEGER, UNSIGNED_SHORT );
+        return uncompressed_tuple( RGB16I, RGB_INTEGER, SHORT );
 
     case image::rgba_s16:
-        return uncompressed_tuple( RGBA16I, RGBA_INTEGER, UNSIGNED_SHORT );
+        return uncompressed_tuple( RGBA16I, RGBA_INTEGER, SHORT );
 
     case image::y_s16:
-        return uncompressed_tuple( LUMINANCE16I, LUMINANCE_INTEGER, UNSIGNED_SHORT );
+        return uncompressed_tuple( LUMINANCE16I, LUMINANCE_INTEGER, SHORT );
 
     case image::ya_s16:
-        return uncompressed_tuple( LUMINANCE_ALPHA16I, LUMINANCE_ALPHA_INTEGER, UNSIGNED_SHORT );
+        return uncompressed_tuple( LUMINANCE_ALPHA16I, LUMINANCE_ALPHA_INTEGER, SHORT );
 
     case image::a_s16:
-        return uncompressed_tuple( ALPHA16I, ALPHA_INTEGER, UNSIGNED_SHORT );
+        return uncompressed_tuple( ALPHA16I, ALPHA_INTEGER, SHORT );
 
     case image::r_s16:
-        return uncompressed_tuple( R16I, RED_INTEGER, UNSIGNED_SHORT );
+        return uncompressed_tuple( R16I, RED_INTEGER, SHORT );
 
     case image::rg_s16:
-        return uncompressed_tuple( RG16I, RG_INTEGER, UNSIGNED_SHORT );
+        return uncompressed_tuple( RG16I, RG_INTEGER, SHORT );
 
     //--- f16 ------------------------------------------------------------------
     case image::rgb_f16:
