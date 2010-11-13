@@ -7,13 +7,29 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+//--- text -----------------------------------------------------------------------------------------
+struct text
+{
+    std::string data;
+
+    u16 x;
+    u16 y;
+    u8 level;
+
+    u8 red;
+    u8 green;
+    u8 blue;
+
+    text( void );
+};
+
 //--- text_layout ----------------------------------------------------------------------------------
 class text_layout
 {
 public:
     text_layout( const device_type&, page_cache&, font_source& );
 
-    u32 input( block_type&, const std::string&, u8, u32 );
+    u32 input( block_type&, const text&, u32 );
 
 private:
     const device_type& device;
