@@ -297,7 +297,7 @@ texture_array::texture_array( u32 width_, u32 height_, u32 depth_, image::type f
     : texture_id(), width( width_ ), height( height_ ), depth( depth_ ), format( format_ )
 {
     BindTexture( TEXTURE_2D_ARRAY, id );
-    set_filter( TEXTURE_2D_ARRAY, texture::linear );
+    set_filter( TEXTURE_2D_ARRAY, texture::nearest );
     set_levels( TEXTURE_2D_ARRAY, false, 1 );
 }
 
