@@ -5,10 +5,19 @@
 
 #include <map>
 
-#include "component/ui/node.hpp"
+#include "component/ui/box_tree.hpp"
 #include "foundation/utility/function.hpp"
+#include "foundation/visual/graphics.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+struct node
+{
+    typedef tuple< block_type, u32 > block_tuple;
+
+    virtual ~node( void ) {}
+    virtual block_tuple block( const box_tree::box_tuple&, const box_tree::aux_tuple& ) = 0;
+};
 
 typedef std::map< std::string, function< node* ( const std::string& ) > > node_map;
 
