@@ -22,7 +22,58 @@
         "node": "tile",
         "data":
         {
+            "tile": "cache/blue-marble-c1"
+        }
+    },
+    {
+        "width": 400,
+        "height": 400,
+        "x": 200,
+        "y": 600,
+        "node": "tile",
+        "data":
+        {
+            "tile": "cache/blue-marble-c2"
+        }
+    },
+    {
+        "width": 400,
+        "height": 400,
+        "x": 600,
+        "y": 200,
+        "node": "tile",
+        "data":
+        {
+            "tile": "cache/blue-marble-d1"
+        }
+    },
+    {
+        "width": 400,
+        "height": 400,
+        "x": 600,
+        "y": 600,
+        "node": "tile",
+        "data":
+        {
             "tile": "cache/blue-marble-d2"
+        }
+    },
+    {
+        "width": 400,
+        "height": 400,
+        "x": 1000,
+        "y": 200,
+        "node": "text",
+        "data":
+        {
+            "text":
+"My long essay
+
+Today, I ate cheese. It was quite delicious, but I'm still ambivalent about cheese.
+
+Tomorrow, I'm going horse back riding. I may also eat some cheese.",
+            "x": 8,
+            "y": 8
         }
     } ]
 }
