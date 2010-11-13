@@ -32,6 +32,14 @@ c8 transform( c8 c )
     return std::isspace( c ) ? '-' : std::tolower( c );
 }
 
+u32 check_size( u32 face_size )
+{
+    if ( is_bit_round( face_size ) )
+        return face_size;
+
+    throw error::runtime( "font_source: " ) << "Font size " << face_size << " is not a power of 2";
+}
+
 std::string get_root( const std::string& root, const font::face& face )
 {
     std::string suffix = face.string( font::face::family ) + '-' + face.string( font::face::style );
@@ -112,14 +120,11 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
 font_source::font_source( const font::face& face_, u32 face_size_, const std::string& root_ )
-    : face( face_ ), face_size( face_size_ ), root( get_root( root_, face ) ),
+    : face( face_ ), face_size( check_size( face_size_ ) ), root( get_root( root_, face ) ),
     source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
     first( face.number( font::face::first ) ), level_limit( log2f( source_size / page_wide ) ),
     mutex(), memory( open_memory( root, glyphs, level_limit + 1 ) )
 {
-    if ( !is_bit_round( face_size ) )
-        throw error::runtime( "font_source: " ) <<
-            "Font size " << face_size << " is not a power of 2";
 }
 
 font_source::~font_source( void )

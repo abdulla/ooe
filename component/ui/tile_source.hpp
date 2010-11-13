@@ -7,14 +7,12 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-typedef std::map< std::string, decoder_type > decoder_map;
-
 //--- tile_source ----------------------------------------------------------------------------------
 class tile_source
     : public physical_source
 {
 public:
-    tile_source( const std::string&, const decoder_map& );
+    tile_source( const std::string& );
     virtual ~tile_source( void );
 
     virtual u32 size( void ) const;

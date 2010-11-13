@@ -1,12 +1,14 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <cmath>
 #include <cstring>
 
+#include "component/ui/box_tree.hpp"
 #include "component/ui/make.hpp"
+#include "component/ui/text_layout.hpp"
 #include "component/ui/tile_source.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
-#include "foundation/image/png.hpp"
 #include "foundation/math/math.hpp"
 #include "foundation/parallel/thread_pool.hpp"
 #include "foundation/visual/event_queue.hpp"
@@ -194,34 +196,136 @@ box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
     return shadows;
 }
 
+//--- text_node ------------------------------------------------------------------------------------
+class text_node
+    : public node
+{
+public:
+    text_node( const block_type& in_, text_layout& layout_, const std::string& data )
+        : in( in_ ), layout( layout_ ), text()
+    {
+        text.data = data;
+        text.x = 16;
+        text.y = 16;
+    }
+
+    virtual ~text_node( void )
+    {
+    }
+
+    virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& )
+    {
+        // TODO: do not layout text if depth hasn't changed
+        in->input( "translate", box._2, box._3 );
+        in->input( "depth", box._4 );
+        text.level = std::max( 0.f, 5 - box._4 );
+        return make_tuple( in, layout.input( in, text, box._0 ) );
+    }
+
+private:
+    block_type in;
+    text_layout& layout;
+    ooe::text text;
+};
+
 //--- make_text ------------------------------------------------------------------------------------
 class make_text
 {
 public:
-    make_text( const program_type& program_, const buffer_type& index_, const buffer_type& point_,
-        text_layout& layout_ )
-        : program( program_ ), index( index_ ), point( point_ ), layout( layout_ ), vector()
+    make_text( const device_type& device, const std::string& root, const buffer_type& index_,
+        const buffer_type& point_, page_cache& cache )
+        : program( make_program( device, root + "../share/glsl",
+        root + "../share/json/text.effect" ) ), index( index_ ), point( point_ ), library(),
+        face( library, root + "../share/font/ubuntu-regular.ttf" ),
+        source( face, 512, root + "../cache" ), layout( device, cache, source ), vector()
     {
     }
 
     node* operator ()( const std::string& string )
     {
         block_type block = make_block( program, index, point );
-        vector.push_back( new text_node( layout, block, string ) );
+        vector.push_back( new text_node( block, layout, string ) );
         return vector.back();
     }
 
 private:
-    const program_type& program;
+    const program_type program;
     const buffer_type& index;
     const buffer_type& point;
-    text_layout& layout;
+    font::library library;
+    font::face face;
+    font_source source;
+    text_layout layout;
+    node_vector vector;
+};
+
+//--- tile_node ------------------------------------------------------------------------------------
+class tile_node
+    : public node
+{
+public:
+    tile_node( const block_type& data_, const device_type& device, page_cache& cache,
+        tile_source& source_ )
+        : data( data_ ), source( source_ ), texture( device, cache, source )
+    {
+        texture.input( data, "texture" );
+    }
+
+    virtual ~tile_node( void )
+    {
+    }
+
+    virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& aux )
+    {
+        u32 size = source.size();
+        u8 level = std::max( 0.f, log2f( size / box._0 ) );
+        texture.load( aux._2 * size, aux._3 * size, aux._0 * size, aux._1 * size, level );
+
+        data->input( "scale", box._0, box._1 );
+        data->input( "translate", box._2, box._3 );
+        data->input( "depth", box._4 );
+        return make_tuple( data, 1 );
+    }
+
+private:
+    block_type data;
+    tile_source source;
+    virtual_texture texture;
+};
+
+//--- make_tile ------------------------------------------------------------------------------------
+class make_tile
+{
+public:
+    make_tile( const device_type& device_, const std::string& root_, const buffer_type& index_,
+        const buffer_type& point_, page_cache& cache_ )
+        : device( device_ ), root( root_ ), program( make_program( device, root + "../share/glsl",
+        root + "../share/json/tile.effect" ) ), index( index_ ), point( point_ ), cache( cache_ ),
+        vector()
+    {
+    }
+
+    node* operator ()( const std::string& path )
+    {
+        block_type block = make_block( program, index, point );
+        tile_source source( root + "../" + path );
+        vector.push_back( new tile_node( block, device, cache, source ) );
+        return vector.back();
+    }
+
+private:
+    const device_type& device;
+    const std::string& root;
+    const program_type program;
+    const buffer_type& index;
+    const buffer_type& point;
+    page_cache& cache;
     node_vector vector;
 };
 
 //--- draw_aux -------------------------------------------------------------------------------------
 void draw_aux( device_type& device, const frame_type& frame, const box_tree::box_vector& box,
-    const box_tree::aux_vector& aux )
+    const box_tree::aux_vector& aux, f32 x, f32 y )
 {
     for ( up_t i = 0, end = box.size(); i != end; ++i )
     {
@@ -231,6 +335,7 @@ void draw_aux( device_type& device, const frame_type& frame, const box_tree::box
             continue;
 
         node::block_tuple bt = node->block( box[ i ], aux[ i ] );
+        bt._0->input( "view", x, y );
         device->draw( bt._0, frame, bt._1 );
     }
 }
@@ -251,34 +356,21 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     buffer_type index = make_index( device );
     buffer_type point = make_point( device );
 
-    // font rendering
-    font::library font_library;
-    font::face font_face( font_library, root + "../share/font/ubuntu-regular.ttf" );
-    font_source font_source( font_face, 512, root + "../cache" );
-
-    program_type program_font =
-        make_program( device, root + "../share/glsl", root + "../share/json/tile.effect" );
-    text_layout layout( device, cache, font_source );
-
-    // tile rendering
-    decoder_map decoder;
-    decoder[ "png" ] = uncompressed_decode< png::decode >;
-    /*tile_source tile_source( root + "../cache/blue-marble-d2", decoder );
-    virtual_texture tile_texture( device, cache, tile_source );*/
-
     // box rendering
-    make_text text( program_font, index, point, layout );
+    make_text text( device, root, index, point, cache );
+    make_tile tile( device, root, index, point, cache );
     node_map map;
     map[ "text" ] = make_function( text, &make_text::operator () );
+    map[ "tile" ] = make_function( tile, &make_tile::operator () );
 
     box_tree tree = make_tree( root + "../share/json/ui_tree.json", map );
     program_type program_box =
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
 
     block_type block_boxes = make_block( program_box, index, point );
-    block_boxes->input( "shadow", false );
+    block_boxes->input( "do_shadow", false );
     block_type block_shadows = make_block( program_box, index, point );
-    block_shadows->input( "shadow", true );
+    block_shadows->input( "do_shadow", true );
     device->set( device::depth_test, true );
     vec3 translate( 0, 0, 0 );
 
@@ -304,7 +396,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
             device->set( device::blend, false );
             device->draw( block_boxes, frame, vt._0.size() );
             device->set( device::blend, true );
-            draw_aux( device, frame, vt._0, vt._1 );
+            draw_aux( device, frame, vt._0, vt._1, v_x, v_y );
             device->draw( block_shadows, frame, shadows.size() );
             device->swap();
         }

@@ -1,9 +1,12 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <cmath>
+
 #include <utf8.h>
 
 #include "component/ui/text_layout.hpp"
 #include "foundation/utility/arithmetic.hpp"
+#include "foundation/utility/binary.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -22,15 +25,15 @@ struct marker
     }
 };
 
-void add_glyph
-    ( const font_source::glyph_type& glyph, f32* data, u32 size, s32 x, s32 y, u32 max, u8 level )
+void add_glyph( const font_source::glyph_type& glyph, f32* data, u32 size, s32 x, s32 y, u32 max,
+    u8 level, s8 shift )
 {
     const font::metric& metric = glyph._2;
 
-    data[ 0 ] = metric.width;
-    data[ 1 ] = metric.height;
+    data[ 0 ] = bit_shift( metric.width, shift );
+    data[ 1 ] = bit_shift( metric.height, shift );
     data[ 2 ] = x;
-    data[ 3 ] = y + ( max - metric.top );
+    data[ 3 ] = y + max - bit_shift( metric.top, shift );
 
     data[ 4 ] = divide( metric.width << level, size );
     data[ 5 ] = divide( metric.height << level, size );
@@ -73,6 +76,12 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+//--- text -----------------------------------------------------------------------------------------
+text::text( void )
+    : data(), x( 0 ), y( 0 ), level( 4 ), red( 0 ), green( 0 ), blue( 0 )
+{
+}
+
 //--- text_layout ----------------------------------------------------------------------------------
 text_layout::
     text_layout( const device_type& device_, page_cache& cache, font_source& source_ )
@@ -80,25 +89,33 @@ text_layout::
 {
 }
 
-u32 text_layout::input( block_type& block, const std::string& text, u8 level, u32 width )
+u32 text_layout::input( block_type& block, const text& text, u32 width )
 {
-    u32 glyphs = glyph_size( text.begin(), text.end() );
+    u32 glyphs = glyph_size( text.data.begin(), text.data.end() );
+    u32 max = 1 << text.level;
 
-    if ( !glyphs )
+    if ( !glyphs || text.x + max > width )
         return 0;
+
+    u32 size = source.size();
+    u16 font_size = source.font_size();
+    u8 level_limit = log2f( size / source.page_size() );
+    u8 level_max = log2f( font_size );
+    u8 level_min = log2f( font_size >> level_limit );
+    u8 level = level_max - clamp( text.level, level_min, level_max );
+    s8 shift = inverse_clamp< s8 >( text.level, level_min, level_max );
+    width -= text.x;
+    s32 x = 0;
+    s32 y = text.y;
+    u32 code_point = 0;
+    u32 last_point;
 
     buffer_type point = device->buffer( sizeof( f32 ) * point_size * glyphs, buffer::point );
     map_type map = point->map( buffer::write );
     f32* data = static_cast< f32* >( map->data );
-    u32 size = source.size();
-    s32 x = 0;
-    s32 y = 0;
-    u32 max = source.font_size() >> level;
-    marker m( text.begin(), data, 0 );
-    u32 code_point = 0;
-    u32 last_point;
+    marker m( text.data.begin(), data, 0 );
 
-    for ( iterator_type i = m.i, end = text.end(); i != end; )
+    for ( iterator_type i = m.i, end = text.data.end(); i != end; )
     {
         code_point = utf8::next( i, end );
 
@@ -110,11 +127,11 @@ u32 text_layout::input( block_type& block, const std::string& text, u8 level, u3
         else if ( x )
         {
             font::kerning kerning = source.kerning( last_point, code_point, level );
-            x += kerning.x;
+            x += bit_shift( kerning.x, shift );
         }
 
         font_source::glyph_type glyph = source.glyph( code_point, level );
-        u32 x_offset = glyph._2.x;
+        u32 x_offset = bit_shift( glyph._2.x, shift );
 
         if ( x + x_offset > width )
         {
@@ -122,7 +139,7 @@ u32 text_layout::input( block_type& block, const std::string& text, u8 level, u3
             y += max;
 
             if ( m.width + x_offset > width )
-                utf8::prior( i, text.begin() );
+                utf8::prior( i, text.data.begin() );
             else
             {
                 i = m.i;
@@ -134,7 +151,7 @@ u32 text_layout::input( block_type& block, const std::string& text, u8 level, u3
         }
 
         texture.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
-        add_glyph( glyph, data, size, x, y, max, level );
+        add_glyph( glyph, data, size, x + text.x, y, max, level, shift );
 
         data += point_size;
         x += x_offset;
@@ -146,6 +163,7 @@ u32 text_layout::input( block_type& block, const std::string& text, u8 level, u3
     block->input( "vertex_translate", 2, point, true );
     block->input( "coord_scale", 2, point, true );
     block->input( "coord_translate", 2, point, true );
+    block->input( "colour", text.red, text.blue, text.green, 255 );
     texture.input( block, "texture" );
     return glyphs;
 }
