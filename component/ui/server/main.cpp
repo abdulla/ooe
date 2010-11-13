@@ -368,9 +368,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
 
     block_type block_boxes = make_block( program_box, index, point );
-    block_boxes->input( "shadow", false );
+    block_boxes->input( "do_shadow", false );
     block_type block_shadows = make_block( program_box, index, point );
-    block_shadows->input( "shadow", true );
+    block_shadows->input( "do_shadow", true );
     device->set( device::depth_test, true );
     vec3 translate( 0, 0, 0 );
 
