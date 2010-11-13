@@ -77,7 +77,7 @@ std::string canonical_path( const std::string& path )
     c8 buffer[ PATH_MAX ];
 
     if ( !realpath( path.c_str(), buffer ) )
-        throw error::io( "make_directory: " ) <<
+        throw error::io( "canonical_path: " ) <<
             "Unable to canonicalize \"" << path << "\": " << error::number( errno );
 
     return buffer;
