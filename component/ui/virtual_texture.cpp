@@ -193,10 +193,7 @@ void page_cache::load( virtual_texture& texture, const pyramid_index& index, boo
         ++loads;
     }
     else if ( pair.first->second != null )
-    {
-        pair.first->second->_2 = locked;
         list.splice( list.end(), list, pair.first->second );
-    }
 }
 
 void page_cache::unlock( virtual_texture& texture, const pyramid_index& index )
@@ -292,7 +289,7 @@ virtual_texture::~virtual_texture( void )
 void virtual_texture::input( block_type& block, const std::string& name ) const
 {
     s32 begin = log2f( source.page_size() );
-    s32 end = log2f( source.size() );
+    s32 end = log2f( source.size() ) + 1;
     block->input( name + ".bias_range", begin, end );
     block->input( name + ".page_cache", cache.array );
     block->input( name + ".page_table", table );

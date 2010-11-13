@@ -43,6 +43,7 @@ struct physical_source
 
 //--- page_cache -----------------------------------------------------------------------------------
 class page_cache
+    : private noncopyable
 {
 public:
     typedef tuple< virtual_texture*, pyramid_index > key_type;
@@ -86,6 +87,7 @@ private:
 
 //--- virtual_texture ------------------------------------------------------------------------------
 class virtual_texture
+    : private noncopyable
 {
 public:
     virtual_texture( const device_type&, page_cache&, physical_source& );
