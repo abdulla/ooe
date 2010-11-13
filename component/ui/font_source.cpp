@@ -13,8 +13,8 @@
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
-const image::type image_type = image::rgba_u8;
 const u16 page_wide = 256;
+const image::type image_type = image::rgba_u8;
 
 struct source_metric
     : public font::metric
@@ -136,14 +136,14 @@ u32 font_source::size( void ) const
     return source_size;
 }
 
-image::type font_source::format( void ) const
-{
-    return image_type;
-}
-
 u16 font_source::page_size( void ) const
 {
     return page_wide;
+}
+
+image::type font_source::format( void ) const
+{
+    return image_type;
 }
 
 u32 font_source::font_size( void ) const

@@ -41,7 +41,7 @@ template<>
     font_source font_source( font_face, 512, root + "../cache" );
 
     thread_pool pool;
-    page_cache cache( device, pool, font_source.format(), font_source.page_size() );
+    page_cache cache( device, pool, font_source.page_size(), font_source.format() );
     text_layout layout( device, cache, font_source );
 
     program_type program =

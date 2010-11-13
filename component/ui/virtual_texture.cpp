@@ -71,7 +71,7 @@ texture_type make_table( const device_type& device, const image_pyramid& pyramid
 texture_array_type make_array( const device_type& device, image::type format, u16 page_size )
 {
     u32 size = device->limit( device::array_size );
-    return device->texture_array( page_size, page_size, size, format );
+    return device->texture_array( page_size, page_size, size, format, texture::nearest );
 }
 
 void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, s16 i, s16 exponent )
@@ -152,22 +152,22 @@ bool operator <( const pyramid_index& i, const pyramid_index& j )
 
 //--- page_cache -----------------------------------------------------------------------------------
 page_cache::page_cache
-    ( const device_type& device, thread_pool& pool_, image::type cache_format, u16 size )
-    : pool( pool_ ), format_( cache_format ), page_size_( check_page_size( size ) ),
+    ( const device_type& device, thread_pool& pool_, u16 size, image::type cache_format )
+    : pool( pool_ ), page_size_( check_page_size( size ) ), format_( cache_format ),
     array( make_array( device, format_, page_size_ ) ), list(), map(), pages(), loads( 0 ), queue()
 {
     for ( u16 i = 0, end = device->limit( device::array_size ); i != end; ++i )
         list.push_back( cache_type( i, key_type( 0, pyramid_index() ), false ) );
 }
 
-image::type page_cache::format( void ) const
-{
-    return format_;
-}
-
 u16 page_cache::page_size( void ) const
 {
     return page_size_;
+}
+
+image::type page_cache::format( void ) const
+{
+    return format_;
 }
 
 up_t page_cache::pending( void ) const

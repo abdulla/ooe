@@ -16,8 +16,8 @@ public:
     virtual ~null_source( void );
 
     virtual u32 size( void ) const;
-    virtual image::type format( void ) const;
     virtual u16 page_size( void ) const;
+    virtual image::type format( void ) const;
 
 private:
     const u32 size_;

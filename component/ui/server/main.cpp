@@ -21,8 +21,8 @@ typedef std::vector< shared_ptr< node > > node_vector;
 
 const f32 width = 1024;
 const f32 height = 640;
-image::type format = image::rgba_u8;
-u16 page_size = 256;
+const u16 page_size = 256;
+const image::type format = image::rgba_u8;
 u32 velocity = 4;
 
 //--- zoom_out -------------------------------------------------------------------------------------
@@ -351,7 +351,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     device_type device = library.find< device_open_type >( "device_open" )( view, true );
 
     thread_pool pool;
-    page_cache cache( device, pool, format, page_size );
+    page_cache cache( device, pool, page_size, format );
     frame_type frame = device->default_frame( width, height );
     buffer_type index = make_index( device );
     buffer_type point = make_point( device );

@@ -21,14 +21,14 @@ u32 null_source::size( void ) const
     return size_;
 }
 
-image::type null_source::format( void ) const
-{
-    return image::rgba_u8;
-}
-
 u16 null_source::page_size( void ) const
 {
     return 256;
+}
+
+image::type null_source::format( void ) const
+{
+    return image::rgba_u8;
 }
 
 image null_source::read( const pyramid_index& index )

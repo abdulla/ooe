@@ -16,8 +16,8 @@ public:
     virtual ~tile_source( void );
 
     virtual u32 size( void ) const;
-    virtual image::type format( void ) const;
     virtual u16 page_size( void ) const;
+    virtual image::type format( void ) const;
 
 private:
     const std::string root;
@@ -25,8 +25,8 @@ private:
     decoder_type decoder;
 
     u32 size_;
-    image::type format_;
     u16 page_size_;
+    image::type format_;
     u8 level_limit;
 
     virtual image read( const pyramid_index& );

@@ -52,7 +52,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- tile_source ----------------------------------------------------------------------------------
 tile_source::tile_source( const std::string& root_ )
-    : root( root_ ), type(), decoder(), size_(), format_(), page_size_(), level_limit()
+    : root( root_ ), type(), decoder(), size_(), page_size_(), format_(), level_limit()
 {
     boost::property_tree::ptree pt;
     read_json( canonical_path( root + "/metadata" ), pt );
@@ -63,8 +63,8 @@ tile_source::tile_source( const std::string& root_ )
     decoder = find( type );
     image image = decoder( root + "/0_0_0." + type );
     size_ = image.width << level_limit;
-    format_ = image.format;
     page_size_ = image.width;
+    format_ = image.format;
 }
 
 tile_source::~tile_source( void )
@@ -76,14 +76,14 @@ u32 tile_source::size( void ) const
     return size_;
 }
 
-image::type tile_source::format( void ) const
-{
-    return format_;
-}
-
 u16 tile_source::page_size( void ) const
 {
     return page_size_;
+}
+
+image::type tile_source::format( void ) const
+{
+    return format_;
 }
 
 image tile_source::read( const pyramid_index& index )

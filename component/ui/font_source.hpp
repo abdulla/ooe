@@ -20,8 +20,8 @@ public:
     virtual ~font_source( void );
 
     virtual u32 size( void ) const;
-    virtual image::type format( void ) const;
     virtual u16 page_size( void ) const;
+    virtual image::type format( void ) const;
 
     u32 font_size( void ) const;
     font::kerning kerning( u32, u32, u8 ) const;
