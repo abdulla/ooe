@@ -28,24 +28,24 @@ const image::type format = image::rgba_u8;
 u32 velocity = 4;
 
 //--- zoom_out -------------------------------------------------------------------------------------
-void zoom_out( vec3& translate )
+void zoom_out( vec3& move )
 {
-    if ( translate.z < 0 )
+    if ( move.z < 0 )
         return;
 
-    translate.x -= u16( width ) >> u16( translate.z + 2 );
-    translate.y -= u16( height ) >> u16( translate.z + 2 );
+    move.x -= u16( width ) >> u16( move.z + 2 );
+    move.y -= u16( height ) >> u16( move.z + 2 );
 }
 
 //--- zoom_in --------------------------------------------------------------------------------------
-void zoom_in( vec3& translate )
+void zoom_in( vec3& move )
 {
-    translate.x += u16( width ) >> u16( translate.z + 1 );
-    translate.y += u16( height ) >> u16( translate.z + 1 );
+    move.x += u16( width ) >> u16( move.z + 1 );
+    move.y += u16( height ) >> u16( move.z + 1 );
 }
 
 //--- process_key ----------------------------------------------------------------------------------
-void process_key( u32 value, bool press, vec3& translate )
+void process_key( u32 value, bool press, vec3& move )
 {
     if ( !press )
         return;
@@ -59,29 +59,29 @@ void process_key( u32 value, bool press, vec3& translate )
         break;
 
     case key_left:
-        translate.x -= velocity;
+        move.x -= velocity / exp2f( move.z );
         break;
 
     case key_right:
-        translate.x += velocity;
+        move.x += velocity / exp2f( move.z );
         break;
 
     case key_up:
-        translate.y -= velocity;
+        move.y -= velocity / exp2f( move.z );
         break;
 
     case key_down:
-        translate.y += velocity;
+        move.y += velocity / exp2f( move.z );
         break;
 
     case '-':
-        translate.z -= 1;
-        zoom_out( translate );
+        move.z -= 1;
+        zoom_out( move );
         break;
 
     case '=':
-        translate.z += 1;
-        zoom_in( translate );
+        move.z += 1;
+        zoom_in( move );
         break;
 
     case '.':
@@ -102,7 +102,7 @@ void process_key( u32 value, bool press, vec3& translate )
 }
 
 //--- process_events -------------------------------------------------------------------------------
-void process_events( event_queue& queue, vec3& translate, epoch_t timeout )
+void process_events( event_queue& queue, vec3& move, epoch_t timeout )
 {
     int direction;
     event event;
@@ -117,25 +117,25 @@ void process_events( event_queue& queue, vec3& translate, epoch_t timeout )
             break;
 
         case event::key_flag:
-            process_key( event.key.value, event.key.press, translate );
+            process_key( event.key.value, event.key.press, move );
             break;
 
         case event::scroll_flag:
-            translate.x += event.scroll.x;
-            translate.y += event.scroll.y;
+            move.x += event.scroll.x / exp2f( move.z );
+            move.y += event.scroll.y / exp2f( move.z );
             break;
 
         case event::swipe_flag:
             break;
 
         case event::magnify_flag:
-            direction = s16( translate.z + event.magnify.value ) - s16( translate.z );
-            translate.z += event.magnify.value;
+            direction = s16( move.z + event.magnify.value ) - s16( move.z );
+            move.z += event.magnify.value;
 
             if ( direction < 0 )
-                zoom_out( translate );
+                zoom_out( move );
             else if ( direction > 0 )
-                zoom_in( translate );
+                zoom_in( move );
 
             break;
 
@@ -152,6 +152,13 @@ void process_events( event_queue& queue, vec3& translate, epoch_t timeout )
             break;
         }
     }
+}
+
+//--- make_unit ------------------------------------------------------------------------------------
+box_unit make_unit( f32 value )
+{
+    value = std::max( 0.f, value );
+    return box_unit( value, std::fmod( value, 1 ) );
 }
 
 //--- make_input -----------------------------------------------------------------------------------
@@ -203,8 +210,8 @@ class text_node
     : public node
 {
 public:
-    text_node( const block_type& in_, text_layout& layout_, const property_tree& tree )
-        : in( in_ ), layout( layout_ ), text()
+    text_node( const block_type& in, text_layout& layout_, const property_tree& tree )
+        : tuple( in, 0 ), layout( layout_ ), text()
     {
         text.data = tree.get< std::string >( "text" );
         text.x = tree.get( "x", 0 );
@@ -212,6 +219,7 @@ public:
         text.red = tree.get( "red", 0 );
         text.green = tree.get( "green", 0 );
         text.blue = tree.get( "blue", 0 );
+        text.level = 255;
     }
 
     virtual ~text_node( void )
@@ -220,15 +228,20 @@ public:
 
     virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& )
     {
-        // TODO: do not layout text if depth hasn't changed
-        in->input( "translate", box._2, box._3 );
-        in->input( "depth", box._4 );
-        text.level = std::max( 0.f, 5 - box._4 );
-        return make_tuple( in, layout.input( in, text, box._0 ) );
+        tuple._0->input( "translate", box._2, box._3 );
+        u8 level = std::max( 0.f, 5 - box._4 );
+
+        if ( level == text.level )
+            return tuple;
+
+        text.level = level;
+        tuple._0->input( "depth", box._4 );
+        tuple._1 = layout.input( tuple._0, text, box._0 );
+        return tuple;
     }
 
 private:
-    block_type in;
+    block_tuple tuple;
     text_layout& layout;
     ooe::text text;
 };
@@ -340,6 +353,10 @@ void draw_aux( device_type& device, const frame_type& frame, const box_tree::box
             continue;
 
         node::block_tuple bt = node->block( box[ i ], aux[ i ] );
+
+        if ( !bt._1 )
+            continue;
+
         bt._0->input( "view", x, y );
         device->draw( bt._0, frame, bt._1 );
     }
@@ -361,13 +378,13 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     buffer_type index = make_index( device );
     buffer_type point = make_point( device );
 
-    // box rendering
     make_text text( device, root, index, point, cache );
     make_tile tile( device, root, index, point, cache );
     node_map map;
     map[ "text" ] = make_function( text, &make_text::operator () );
     map[ "tile" ] = make_function( tile, &make_tile::operator () );
 
+    // box rendering
     box_tree tree = make_tree( root + "../share/json/ui_tree.json", map );
     program_type program_box =
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
@@ -377,19 +394,18 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     block_type block_shadows = make_block( program_box, index, point );
     block_shadows->input( "shadow", true );
     device->set( device::depth_test, true );
-    vec3 translate( 0, 0, 0 );
+    vec3 move( 0, 0, 0 );
 
     while ( !executable::has_signal() )
     {
-        box_unit x( std::max( 0.f, translate.x ), 0 );
-        box_unit y( std::max( 0.f, translate.y ), 0 );
-        box_tree::view_tuple vt = tree.view( width, height, x, y, translate.z );
+        box_tree::view_tuple vt =
+            tree.view( width, height, make_unit( move.x ), make_unit( move.y ), move.z );
 
         if ( vt._0.size() )
         {
             box_tree::box_vector shadows = make_shadow( vt._0 );
-            f32 v_x = std::max( 0.f, -translate.x );
-            f32 v_y = std::max( 0.f, -translate.y );
+            f32 v_x = std::max( 0.f, -move.x * exp2f( move.z ) );
+            f32 v_y = std::max( 0.f, -move.y * exp2f( move.z ) );
 
             make_input( device, block_boxes, vt._0, v_x, v_y );
             make_input( device, block_shadows, shadows, v_x, v_y );
@@ -406,8 +422,8 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
             device->swap();
         }
 
-        process_events( queue, translate, epoch_t( 3600, 0 ) );
-        translate.z = std::max( 0.f, translate.z );
+        process_events( queue, move, epoch_t( 3600, 0 ) );
+        move.z = std::max( 0.f, move.z );
     }
 
     return true;
