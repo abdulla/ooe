@@ -5,6 +5,8 @@
 
 #include <map>
 
+#include <boost/property_tree/ptree.hpp>
+
 #include "component/ui/box_tree.hpp"
 #include "foundation/utility/function.hpp"
 #include "foundation/visual/graphics.hpp"
@@ -19,7 +21,8 @@ struct node
     virtual block_tuple block( const box_tree::box_tuple&, const box_tree::aux_tuple& ) = 0;
 };
 
-typedef std::map< std::string, function< node* ( const std::string& ) > > node_map;
+typedef boost::property_tree::ptree property_tree;
+typedef std::map< std::string, function< node* ( const property_tree& ) > > node_map;
 
 program_type make_program( const device_type&, const std::string&, const std::string& );
 buffer_type make_index( const device_type& );

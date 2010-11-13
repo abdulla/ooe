@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstring>
 
+#include <boost/property_tree/ptree.hpp>
+
 #include "component/ui/box_tree.hpp"
 #include "component/ui/make.hpp"
 #include "component/ui/text_layout.hpp"
@@ -201,12 +203,15 @@ class text_node
     : public node
 {
 public:
-    text_node( const block_type& in_, text_layout& layout_, const std::string& data )
+    text_node( const block_type& in_, text_layout& layout_, const property_tree& tree )
         : in( in_ ), layout( layout_ ), text()
     {
-        text.data = data;
-        text.x = 16;
-        text.y = 16;
+        text.data = tree.get< std::string >( "text" );
+        text.x = tree.get( "x", 0 );
+        text.y = tree.get( "y", 0 );
+        text.red = tree.get( "red", 0 );
+        text.green = tree.get( "green", 0 );
+        text.blue = tree.get( "blue", 0 );
     }
 
     virtual ~text_node( void )
@@ -241,10 +246,10 @@ public:
     {
     }
 
-    node* operator ()( const std::string& string )
+    node* operator ()( const property_tree& tree )
     {
         block_type block = make_block( program, index, point );
-        vector.push_back( new text_node( block, layout, string ) );
+        vector.push_back( new text_node( block, layout, tree ) );
         return vector.back();
     }
 
@@ -305,10 +310,10 @@ public:
     {
     }
 
-    node* operator ()( const std::string& path )
+    node* operator ()( const property_tree& tree )
     {
         block_type block = make_block( program, index, point );
-        tile_source source( root + "../" + path );
+        tile_source source( root + "../" + tree.get< std::string >( "tile" ) );
         vector.push_back( new tile_node( block, device, cache, source ) );
         return vector.back();
     }
@@ -368,9 +373,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
 
     block_type block_boxes = make_block( program_box, index, point );
-    block_boxes->input( "do_shadow", false );
+    block_boxes->input( "shadow", false );
     block_type block_shadows = make_block( program_box, index, point );
-    block_shadows->input( "do_shadow", true );
+    block_shadows->input( "shadow", true );
     device->set( device::depth_test, true );
     vec3 translate( 0, 0, 0 );
 

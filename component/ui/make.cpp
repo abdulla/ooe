@@ -11,7 +11,7 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- make_box -------------------------------------------------------------------------------------
-box make_box( const boost::property_tree::ptree& pt )
+box make_box( const property_tree& pt )
 {
     u16 w = pt.get< u16 >( "width" );
     u16 h = pt.get< u16 >( "height" );
@@ -21,16 +21,14 @@ box make_box( const boost::property_tree::ptree& pt )
 }
 
 //--- make_aux -------------------------------------------------------------------------------------
-void* make_aux( const boost::property_tree::ptree& pt, const node_map& map )
+void* make_aux( const property_tree& pt, const node_map& map )
 {
     boost::optional< std::string > node = pt.get_optional< std::string >( "node" );
-    boost::optional< std::string > data = pt.get_optional< std::string >( "data" );
+    boost::optional< const property_tree& > data = pt.get_child_optional( "data" );
 
     if ( !node || !data )
         return 0;
 
-    std::cout << "node: " << *node << '\n';
-    std::cout << "data: " << *data << "\n\n";
     node_map::const_iterator i = map.find( *node );
 
     if ( i == map.end() )
@@ -40,10 +38,9 @@ void* make_aux( const boost::property_tree::ptree& pt, const node_map& map )
 }
 
 //--- load_tree ------------------------------------------------------------------------------------
-void load_tree( const boost::property_tree::ptree& pt, const node_map& node, box_tree& bt )
+void load_tree( const property_tree& pt, const node_map& node, box_tree& bt )
 {
-    for ( boost::property_tree::ptree::const_iterator i = pt.begin(), end = pt.end();
-        i != end; ++i )
+    for ( property_tree::const_iterator i = pt.begin(), end = pt.end(); i != end; ++i )
     {
         box box = make_box( i->second );
         box_tree::iterator j = bt.insert( box, make_aux( i->second, node ) );
@@ -52,7 +49,7 @@ void load_tree( const boost::property_tree::ptree& pt, const node_map& node, box
             throw error::runtime( "read_tree: " ) << "Unable to insert box ( " << box.width <<
                 ' ' << box.height << ' ' << box.x << ' ' << box.y << " )";
 
-        boost::optional< const boost::property_tree::ptree& > children =
+        boost::optional< const property_tree& > children =
             i->second.get_child_optional( "children" );
 
         if ( children )
@@ -82,7 +79,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 program_type make_program
     ( const device_type& device, const std::string& root, const std::string& path )
 {
-    boost::property_tree::ptree pt;
+    property_tree pt;
     read_json( canonical_path( path ), pt );
     std::string header;
     shader_vector vector;
@@ -101,13 +98,12 @@ program_type make_program
 
     for ( id_type* i = id, * i_end = i + ( sizeof( id ) / sizeof( *id ) ); i != i_end; ++i )
     {
-        boost::optional< boost::property_tree::ptree& > child = pt.get_child_optional( i->name );
+        boost::optional< property_tree& > child = pt.get_child_optional( i->name );
 
         if ( !child )
             continue;
 
-        for ( boost::property_tree::ptree::iterator j = child->begin(), j_end = child->end();
-            j != j_end; ++j )
+        for ( property_tree::iterator j = child->begin(), j_end = child->end(); j != j_end; ++j )
         {
             std::string name = j->second.data();
             memory memory( root + '/' + name );
@@ -173,7 +169,7 @@ buffer_type make_point( const device_type& device )
 //--- make_tree ------------------------------------------------------------------------------------
 box_tree make_tree( const std::string& path, const node_map& node )
 {
-    boost::property_tree::ptree pt;
+    property_tree pt;
     read_json( canonical_path( path ), pt );
 
     box_tree bt( make_box( pt ), make_aux( pt, node ) );

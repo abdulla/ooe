@@ -4,7 +4,15 @@
     "x": 0,
     "y": 0,
     "node": "text",
-    "data": "Earth from Blue Marble",
+    "data":
+    {
+        "text": "Earth from Blue Marble",
+        "x": 16,
+        "y": 16,
+        "red": 255,
+        "green": 127,
+        "blue": 127
+    },
     "children": [
     {
         "width": 400,
@@ -12,6 +20,9 @@
         "x": 200,
         "y": 200,
         "node": "tile",
-        "data": "cache/blue-marble-d2"
+        "data":
+        {
+            "tile": "cache/blue-marble-d2"
+        }
     } ]
 }
