@@ -38,7 +38,7 @@ public:
     typedef tree_vector::const_iterator const_iterator;
     typedef tuple< f32, f32, f32, f32, f32 > box_tuple; // width, height, x, y, z
     typedef std::vector< box_tuple > box_vector;
-    typedef tuple< f32, f32, f32, f32, void* > aux_tuple;  // width, height, x, y, aux
+    typedef tuple< f32, f32, f32, f32, void* > aux_tuple;  // width, height, x, y, pointer
     typedef std::vector< aux_tuple > aux_vector;
     typedef tuple< box_tree&, u16, u16 > find_tuple;
     typedef tuple< box_vector, aux_vector > view_tuple;
@@ -58,7 +58,7 @@ public:
 
 private:
     ooe::box bound;
-    void* aux;
+    void* pointer;
     tree_vector children;
 };
 
