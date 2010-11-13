@@ -45,21 +45,25 @@ template<>
     text_layout layout( device, cache, font_source );
 
     program_type program =
-        make_program( device, root + "../share/glsl", root + "../share/json/tile.effect" );
+        make_program( device, root + "../share/glsl", root + "../share/json/text.effect" );
     frame_type frame = device->default_frame( width, height );
-    std::string string =
-        "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
+    const c8 data[] = "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
+
+    text text;
+    text.level = 9;
+    text.red = 255;
+    text.green = 255;
+    text.blue = 255;
 
     block_type block = program->block( make_index( device ) );
     block->input( "vertex", 2, make_point( device ) );
     block->input( "projection", orthographic( 0, width, height, 0 ) );
-    block->input( "colour", 255, 255, 255 );
     device->set( device::blend, true );
 
-    for ( std::string::iterator i = string.begin(), end = string.end(); i != end; ++i )
+    for ( const c8* i = data, * end = i + sizeof( data ); i != end; ++i )
     {
-        std::string substring( string.begin(), i + 1 );
-        u32 instances = layout.input( block, substring, 4, width );
+        text.data = std::string( data, i + 1 );
+        u32 instances = layout.input( block, text, width );
 
         while ( cache.pending() )
             cache.write();
