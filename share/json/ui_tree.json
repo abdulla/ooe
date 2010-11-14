@@ -1,79 +1,177 @@
 {
-    "width": 800,
+    "width": 1600,
     "height": 800,
     "x": 0,
     "y": 0,
     "node": "text",
-    "data":
-    {
-        "text": "Earth from Blue Marble",
+    "data": {
+        "text": "Workspace Map",
         "x": 16,
-        "y": 16,
-        "red": 255,
-        "green": 127,
-        "blue": 127
+        "y": 16
     },
     "children": [
-    {
-        "width": 400,
-        "height": 400,
-        "x": 200,
-        "y": 200,
-        "node": "tile",
-        "data":
         {
-            "tile": "cache/blue-marble-c1"
-        }
-    },
-    {
-        "width": 400,
-        "height": 400,
-        "x": 200,
-        "y": 600,
-        "node": "tile",
-        "data":
+            "width": 1100,
+            "height": 500,
+            "x": 150,
+            "y": 150,
+            "children": [
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 100,
+                    "y": 100,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-a1"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 100,
+                    "y": 500,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-a2"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 500,
+                    "y": 100,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-b1"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 500,
+                    "y": 500,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-b2"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 900,
+                    "y": 100,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-c1"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 900,
+                    "y": 500,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-c2"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 1300,
+                    "y": 100,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-d1"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 400,
+                    "x": 1300,
+                    "y": 500,
+                    "node": "tile",
+                    "data": {
+                        "tile": "cache/blue-marble-d2"
+                    }
+                },
+                {
+                    "width": 400,
+                    "height": 350,
+                    "x": 1700,
+                    "y": 100,
+                    "node": "text",
+                    "data": {
+                        "text": "Blue Marble",
+                        "x": 16,
+                        "y": 16,
+                        "blue": 255
+                    },
+                    "children": [
+                        {
+                            "width": 800,
+                            "height": 550,
+                            "x": 0,
+                            "y": 150,
+                            "node": "text",
+                            "data": {
+                                "text": "In celebration of the deployment of its Earth Observing System, NASA is pleased to share the newest in its series of stunning Earth images, affectionately named the 'Blue Marble.' This new Earth imagery enhances the Blue Marble legacy by providing a detailed look at an entire year in the life of our planet. In sharing these Blue Marble images, NASA hopes the public will join with the agency in its continuing exploration of our world from the unique perspective of space.",
+                                "x": 16,
+                                "y": 16,
+                                "red": 127,
+                                "green": 127,
+                                "blue": 127
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
         {
-            "tile": "cache/blue-marble-c2"
-        }
-    },
-    {
-        "width": 400,
-        "height": 400,
-        "x": 600,
-        "y": 200,
-        "node": "tile",
-        "data":
-        {
-            "tile": "cache/blue-marble-d1"
-        }
-    },
-    {
-        "width": 400,
-        "height": 400,
-        "x": 600,
-        "y": 600,
-        "node": "tile",
-        "data":
-        {
-            "tile": "cache/blue-marble-d2"
-        }
-    },
-    {
-        "width": 400,
-        "height": 400,
-        "x": 1000,
-        "y": 200,
-        "node": "text",
-        "data":
-        {
-            "text":
-"My long essay
+            "width": 1100,
+            "height": 800,
+            "x": 150,
+            "y": 700,
+            "node": "text",
+            "data": {
+                "text": "Documents",
+                "x": 16,
+                "y": 16,
+                "red": 127,
+                "green": 127,
+                "blue": 255
+            },
+            "children": [
+                {
+                    "width": 1000,
+                    "height": 1400,
+                    "x": 50,
+                    "y": 150,
+                    "node": "text",
+                    "data": {
+                        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum vel velit quis magna ultrices ornare. Integer hendrerit mi sed nisi iaculis euismod. Fusce molestie facilisis varius. Nulla facilisi. Aenean ac massa et velit auctor venenatis. In dignissim lobortis commodo. Maecenas luctus augue nec ante tristique mollis. Praesent scelerisque faucibus felis lacinia volutpat. Donec condimentum auctor leo, ac vestibulum dolor accumsan non. Integer quam eros, sollicitudin vel accumsan vitae, cursus a ligula. Aliquam sodales dapibus mauris, gravida facilisis dui ultrices at. Maecenas vitae dui eget quam tempus mattis. Praesent tincidunt pulvinar turpis, non molestie massa consequat sit amet. Vestibulum risus metus, scelerisque placerat luctus aliquet, rhoncus a lacus. Curabitur varius tempor pulvinar.
 
-Today, I ate cheese. It was quite delicious, but I'm still ambivalent about cheese.
+Fusce arcu mi, dictum et faucibus id, venenatis sed risus. Donec auctor nulla vitae eros convallis sed pulvinar ipsum dapibus. Nullam nulla dolor, euismod in mattis nec, tincidunt at neque. Cras in ligula tellus, sit amet commodo mi. Sed egestas blandit feugiat. Curabitur aliquet augue sed urna viverra placerat. Aenean aliquet dictum quam vel vehicula. Sed dapibus viverra leo nec venenatis. Sed a nibh quam, et molestie ligula. Maecenas lectus nunc, pulvinar id rutrum quis, tristique quis nibh. Nam blandit, tortor a egestas iaculis, mauris lectus rhoncus turpis, et porttitor eros turpis eget felis. Nunc nec nisl est, eget blandit dui. Phasellus vehicula est id est adipiscing id auctor purus luctus. Nam tristique, metus sed pulvinar congue, nulla mauris pretium dui, et varius quam erat sed leo. Ut nec eleifend mauris.",
+                        "x": 16,
+                        "y": 16
+                    }
+                },
+                {
+                    "width": 1000,
+                    "height": 1400,
+                    "x": 1150,
+                    "y": 150,
+                    "node": "text",
+                    "data": {
+                        "text": "Quisque mollis posuere lobortis. In consectetur pretium elementum. Duis malesuada risus in erat pellentesque nec ultricies justo euismod. Morbi molestie ullamcorper leo, at adipiscing lacus laoreet et. Curabitur nisi sem, laoreet eget semper feugiat, dictum nec risus. Etiam in tellus eu libero eleifend vulputate. Aenean porta lectus ut mi posuere nec volutpat leo cursus. In eget tincidunt diam. Donec congue tempus dui, vitae ultrices mi blandit sed. Phasellus massa dui, feugiat in fringilla ut, dictum ut metus. Donec turpis turpis, aliquam sed sollicitudin non, sagittis sit amet lorem. Aenean malesuada, nisi at malesuada varius, nisl nisi molestie nibh, ac lacinia ante lectus a turpis. Aliquam aliquet orci eget nisi vulputate ut viverra eros hendrerit.
 
-Tomorrow, I'm going horse back riding. I may also eat some cheese.",
-            "x": 8,
-            "y": 8
+Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Cras at risus at quam volutpat imperdiet sit amet vitae risus. Morbi lacinia tristique urna, at varius nibh scelerisque sed. Nulla hendrerit felis vel sapien placerat eu semper lectus pharetra. Vestibulum vitae felis massa, a scelerisque nisi. Sed vel eleifend tortor. Nulla facilisi. Etiam mattis molestie lectus, nec euismod nibh varius id. Donec mollis tristique est accumsan pulvinar. Morbi ut sapien ut neque porta tempus. Nullam eget leo tellus. Praesent ac felis sit amet tortor elementum dapibus a convallis ipsum. Donec ante neque, volutpat ut varius et, cursus a mauris. Pellentesque non nibh urna. Mauris auctor ligula a nibh fringilla sed suscipit mauris fringilla. Praesent dictum urna vitae lectus pretium et lacinia dui accumsan.",
+                        "x": 16,
+                        "y": 16
+                    }
+                }
+            ]
         }
-    } ]
+    ]
 }
