@@ -66,8 +66,8 @@ bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux
     if ( result == geometry::outside )
         return false;
 
-    u16 w = box.width;
-    u16 h = box.height;
+    u32 w = box.width;
+    u32 h = box.height;
     x.integer = box.x < x.integer ? x.integer - box.x : 0;
     y.integer = box.y < y.integer ? y.integer - box.y : 0;
     x.integer = saturated_shift( x.integer );
