@@ -213,11 +213,10 @@ class text_node
 {
 public:
     text_node( const block_type& in, text_layout& layout_, const property_tree& tree )
-        : tuple( in, 0 ), layout( layout_ ), text(), x(), y()
+        : tuple( in, 0 ), layout( layout_ ), text(), x( tree.get( "x", 0 ) ),
+        y( tree.get( "y", 0 ) ), level( tree.get( "level", 5 ) )
     {
         text.data = tree.get< std::string >( "text" );
-        text.x = x = tree.get( "x", 0 );
-        text.y = y = tree.get( "y", 0 );
         text.red = tree.get( "red", 0 );
         text.green = tree.get( "green", 0 );
         text.blue = tree.get( "blue", 0 );
@@ -231,14 +230,14 @@ public:
     virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& )
     {
         tuple._0->input( "translate", box._2, box._3 );
-        u8 level = std::max( 0.f, 5 - box._4 );
+        u8 text_level = std::max( 0.f, level - box._4 );
 
-        if ( level == text.level )
+        if ( text_level == text.level )
             return tuple;
 
         text.x = bit_shift( x, -box._4 );
         text.y = bit_shift( y, -box._4 );
-        text.level = level;
+        text.level = text_level;
         tuple._0->input( "depth", box._4 );
         tuple._1 = layout.input( tuple._0, text, box._0 - text.x );
         return tuple;
@@ -250,6 +249,7 @@ private:
     ooe::text text;
     u16 x;
     u16 y;
+    u8 level;
 };
 
 //--- make_text ------------------------------------------------------------------------------------
@@ -305,7 +305,11 @@ public:
         u32 size = source.size();
         f32 level_limit = log2f( size / source.page_size() );
         u8 level = clamp( log2f( size / box._0 ), 0.f, level_limit );
-        texture.load( aux._0 * size, aux._1 * size, aux._2 * size, aux._3 * size, level );
+        u32 w = aux._0 * size;
+        u32 h = aux._1 * size;
+        u32 x = aux._2 * size;
+        u32 y = aux._3 * size;
+        texture.load( w, h, x, y, level );
 
         data->input( "scale", box._0, box._1 );
         data->input( "translate", box._2, box._3 );
