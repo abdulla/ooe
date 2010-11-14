@@ -14,7 +14,7 @@ class font_source
     : public physical_source
 {
 public:
-    typedef tuple< u32, u32, font::metric > glyph_type;
+    typedef tuple< font::metric, u32, u32 > glyph_type;
 
     font_source( const font::face&, u32, const std::string& );
     virtual ~font_source( void );

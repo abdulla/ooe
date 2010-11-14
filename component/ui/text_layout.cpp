@@ -28,7 +28,7 @@ struct marker
 void add_glyph( const font_source::glyph_type& glyph, f32* data, u32 size, s32 x, s32 y, u32 max,
     u8 level, s8 shift )
 {
-    const font::metric& metric = glyph._2;
+    const font::metric& metric = glyph._0;
 
     data[ 0 ] = bit_shift( metric.width, shift );
     data[ 1 ] = bit_shift( metric.height, shift );
@@ -37,8 +37,8 @@ void add_glyph( const font_source::glyph_type& glyph, f32* data, u32 size, s32 x
 
     data[ 4 ] = divide( metric.width << level, size );
     data[ 5 ] = divide( metric.height << level, size );
-    data[ 6 ] = divide( glyph._0, size );
-    data[ 7 ] = divide( glyph._1, size );
+    data[ 6 ] = divide( glyph._1, size );
+    data[ 7 ] = divide( glyph._2, size );
 }
 
 u32 glyph_size( iterator_type i, iterator_type end )
@@ -131,7 +131,7 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
         }
 
         font_source::glyph_type glyph = source.glyph( code_point, level );
-        u32 x_offset = bit_shift( glyph._2.x, shift );
+        u32 x_offset = bit_shift( glyph._0.x, shift );
 
         if ( x + x_offset > width )
         {
@@ -150,7 +150,7 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
             continue;
         }
 
-        texture.load( glyph._0, glyph._1, glyph._2.width, glyph._2.height, level );
+        texture.load( glyph._0.width, glyph._0.height, glyph._1, glyph._2, level );
         add_glyph( glyph, data, size, x + text.x, y, max, level, shift );
 
         data += point_size;

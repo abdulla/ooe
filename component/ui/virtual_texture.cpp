@@ -82,8 +82,8 @@ void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, s16 i, s
     rg[ 1 ] = exponent;
 }
 
-region_type get_region( const physical_source& source, u8 level_limit,
-    u32 x, u32 y, u32 width, u32 height, u8 level )
+region_type get_region
+    ( const physical_source& source, u32 width, u32 height, u32 x, u32 y, u8 level, u8 level_limit )
 {
     u32 size = source.size();
 
@@ -278,7 +278,7 @@ virtual_texture::
     table( make_table( device, pyramid ) ), bitset()
 {
     u32 size = source.size();
-    load( 0, 0, size, size, pyramid.size() - 1, true );
+    load( size, size, 0, 0, pyramid.size() - 1, true );
 }
 
 virtual_texture::~virtual_texture( void )
@@ -295,9 +295,9 @@ void virtual_texture::input( block_type& block, const std::string& name ) const
     block->input( name + ".page_table", table );
 }
 
-void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool locked )
+void virtual_texture::load( u32 width, u32 height, u32 x, u32 y, u8 level, bool locked )
 {
-    region_type region = get_region( source, pyramid.size() - 1, x, y, width, height, level );
+    region_type region = get_region( source, width, height, x, y, level, pyramid.size() - 1 );
 
     // TODO: limit the load by some number of texels
     for ( u32 j = region._2; j != region._3; ++j )
@@ -307,9 +307,9 @@ void virtual_texture::load( u32 x, u32 y, u32 width, u32 height, u8 level, bool 
     }
 }
 
-void virtual_texture::unlock( u32 x, u32 y, u32 width, u32 height, u8 level )
+void virtual_texture::unlock( u32 width, u32 height, u32 x, u32 y, u8 level )
 {
-    region_type region = get_region( source, pyramid.size() - 1, x, y, width, height, level );
+    region_type region = get_region( source, width, height, x, y, level, pyramid.size() - 1 );
 
     for ( u32 j = region._2; j != region._3; ++j )
     {

@@ -295,9 +295,14 @@ public:
 
     virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& aux )
     {
+        // TODO: expand load to a page boundary outside of view
         u32 size = source.size();
         u8 level = std::max( 0.f, log2f( size / box._0 ) );
-        texture.load( aux._2 * size, aux._3 * size, aux._0 * size, aux._1 * size, level );
+        u32 w = aux._0 * size;
+        u32 h = aux._1 * size;
+        u32 x = aux._2 * size;
+        u32 y = aux._3 * size;
+        texture.load( w, h, x, y, level );
 
         data->input( "scale", box._0, box._1 );
         data->input( "translate", box._2, box._3 );

@@ -177,9 +177,9 @@ font_source::glyph_type font_source::glyph( u32 code_point, u8 level ) const
     u32 glyphs_per_row = source_size / face_size;
     return glyph_type
     (
+        metric,
         ( code % glyphs_per_row ) * face_size,
-        ( code / glyphs_per_row ) * face_size,
-        metric
+        ( code / glyphs_per_row ) * face_size
     );
 }
 
