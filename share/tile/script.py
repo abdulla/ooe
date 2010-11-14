@@ -11,6 +11,7 @@ parser.add_option( '-c', '--convert', dest = 'convert', default = 'RGBA' )
 parser.add_option( '-d', '--directory', dest = 'directory' )
 parser.add_option( '-f', '--file', dest = 'file' )
 parser.add_option( '-p', '--page-size', dest = 'page_size', type = 'int', default = 256 )
+parser.add_option( '-t', '--type', dest = 'type' )
 options, arguments = parser.parse_args()
 
 if not options.file or not options.directory:
@@ -22,14 +23,16 @@ if __name__ == '__main__':
 
     os.makedirs( options.directory )
     image = PIL.Image.open( options.file )
-    type = image.format.lower()
+    type = options.type if options.type else image.format.lower()
     image_size = image.size[ 0 ]
     page_size = options.page_size
 
     if image_size != image.size[ 1 ]:
         image_size = min( image.size )
-        print 'Cropping image from size', image.size, 'to', ( image_size, image_size ), '...',
-        image = image.crop( ( 0, 0, image_size, image_size ) )
+        x = ( image.size[ 0 ] - image_size ) / 2
+        y = ( image.size[ 1 ] - image_size ) / 2
+        print 'Cropping image from size', image.size, 'to', ( image_size, image_size, x, y ), '...',
+        image = image.crop( ( x, y, image_size, image_size ) )
         print 'done.'
 
     if image_size % page_size:
