@@ -92,7 +92,7 @@ region_type get_region
             "Mipmap level " << level << " > maximum level " << level_limit;
     else if ( x + width > size || y + height > size )
         throw error::runtime( "virtual_texture: " ) <<
-            "Load of ( " << x << ", " << y << ", " << width << ", " << height <<
+            "Load of ( " << width << ", " << height << ", " << x << ", " << y <<
             " ) is outside of source size " << size << " at level " << level;
 
     u32 page_size = source.page_size();
