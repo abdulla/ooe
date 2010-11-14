@@ -298,11 +298,7 @@ public:
         // TODO: expand load to a page boundary outside of view
         u32 size = source.size();
         u8 level = std::max( 0.f, log2f( size / box._0 ) );
-        u32 w = aux._0 * size;
-        u32 h = aux._1 * size;
-        u32 x = aux._2 * size;
-        u32 y = aux._3 * size;
-        texture.load( w, h, x, y, level );
+        texture.load( aux._0 * size, aux._1 * size, aux._2 * size, aux._3 * size, level );
 
         data->input( "scale", box._0, box._1 );
         data->input( "translate", box._2, box._3 );
