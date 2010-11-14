@@ -12,6 +12,7 @@ OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 typedef std::string::const_iterator iterator_type;
 const up_t point_size = 8;
+const f32 line_spacing = 1.5;
 
 struct marker
 {
@@ -59,12 +60,12 @@ bool handle_space( u32 code_point, s32& x, s32& y, u32 max )
     switch ( code_point )
     {
     case ' ':
-        x += max >> 1;
+        x += max >> 2;
         return true;
 
     case '\n':
         x = 0;
-        y += max;
+        y += max * line_spacing;
         return true;
 
     default:
@@ -136,7 +137,7 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
         if ( x + x_offset > width )
         {
             x = 0;
-            y += max;
+            y += max * line_spacing;
 
             if ( m.width + x_offset > width )
                 utf8::prior( i, text.data.begin() );
@@ -163,7 +164,7 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
     block->input( "vertex_translate", 2, point, true );
     block->input( "coord_scale", 2, point, true );
     block->input( "coord_translate", 2, point, true );
-    block->input( "colour", text.red, text.blue, text.green, 255 );
+    block->input( "colour", text.red, text.green, text.blue, 255 );
     texture.input( block, "texture" );
     return glyphs;
 }

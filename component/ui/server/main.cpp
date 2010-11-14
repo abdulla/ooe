@@ -13,6 +13,8 @@
 #include "foundation/executable/program.hpp"
 #include "foundation/math/math.hpp"
 #include "foundation/parallel/thread_pool.hpp"
+#include "foundation/utility/arithmetic.hpp"
+#include "foundation/utility/binary.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
@@ -211,11 +213,11 @@ class text_node
 {
 public:
     text_node( const block_type& in, text_layout& layout_, const property_tree& tree )
-        : tuple( in, 0 ), layout( layout_ ), text()
+        : tuple( in, 0 ), layout( layout_ ), text(), x(), y()
     {
         text.data = tree.get< std::string >( "text" );
-        text.x = tree.get( "x", 0 );
-        text.y = tree.get( "y", 0 );
+        text.x = x = tree.get( "x", 0 );
+        text.y = y = tree.get( "y", 0 );
         text.red = tree.get( "red", 0 );
         text.green = tree.get( "green", 0 );
         text.blue = tree.get( "blue", 0 );
@@ -234,9 +236,11 @@ public:
         if ( level == text.level )
             return tuple;
 
+        text.x = bit_shift( x, -box._4 );
+        text.y = bit_shift( y, -box._4 );
         text.level = level;
         tuple._0->input( "depth", box._4 );
-        tuple._1 = layout.input( tuple._0, text, box._0 );
+        tuple._1 = layout.input( tuple._0, text, box._0 - text.x );
         return tuple;
     }
 
@@ -244,6 +248,8 @@ private:
     block_tuple tuple;
     text_layout& layout;
     ooe::text text;
+    u16 x;
+    u16 y;
 };
 
 //--- make_text ------------------------------------------------------------------------------------
@@ -297,7 +303,8 @@ public:
     {
         // TODO: expand load to a page boundary outside of view
         u32 size = source.size();
-        u8 level = std::max( 0.f, log2f( size / box._0 ) );
+        f32 level_limit = log2f( size / source.page_size() );
+        u8 level = clamp( log2f( size / box._0 ), 0.f, level_limit );
         texture.load( aux._0 * size, aux._1 * size, aux._2 * size, aux._3 * size, level );
 
         data->input( "scale", box._0, box._1 );
@@ -411,9 +418,6 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
             make_input( device, block_boxes, vt._0, v_x, v_y );
             make_input( device, block_shadows, shadows, v_x, v_y );
 
-            while ( cache.pending() )
-                cache.write();
-
             frame->clear();
             device->set( device::blend, false );
             device->draw( block_boxes, frame, vt._0.size() );
@@ -423,7 +427,15 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
             device->swap();
         }
 
-        process_events( queue, move, epoch_t( 3600, 0 ) );
+        epoch_t timeout( 3600, 0 );
+
+        if ( cache.pending() )
+        {
+            cache.write();
+            timeout = epoch_t( 0, 0 );
+        }
+
+        process_events( queue, move, timeout );
         move.z = std::max( 0.f, move.z );
     }
 
