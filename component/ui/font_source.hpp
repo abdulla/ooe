@@ -16,20 +16,20 @@ class font_source
 public:
     typedef tuple< font::metric, u32, u32 > glyph_type;
 
-    font_source( const font::face&, u32, const std::string& );
+    font_source( const font::face&, u16, const std::string& );
     virtual ~font_source( void );
 
     virtual u32 size( void ) const;
     virtual u16 page_size( void ) const;
     virtual image::type format( void ) const;
 
-    u32 font_size( void ) const;
+    u16 font_size( void ) const;
     font::kerning kerning( u32, u32, u8 ) const;
     glyph_type glyph( u32, u8 ) const;
 
 private:
     const font::face& face;
-    const u32 face_size;
+    const u16 face_size;
     const std::string root;
 
     const u32 source_size;

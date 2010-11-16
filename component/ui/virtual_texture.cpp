@@ -54,7 +54,7 @@ image make_image( u32 size )
 
 image_pyramid make_pyramid( const physical_source& source )
 {
-    u32 table_size = ceiling< u32 >( source.size(), source.page_size() );
+    u32 table_size = source.size() / source.page_size();
     image_pyramid pyramid( make_image( table_size ) );
 
     for ( u32 x = table_size >> 1; x; x >>= 1 )

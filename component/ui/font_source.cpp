@@ -32,7 +32,7 @@ c8 transform( c8 c )
     return std::isspace( c ) ? '-' : std::tolower( c );
 }
 
-u32 check_size( u32 face_size )
+u16 check_size( u16 face_size )
 {
     if ( is_bit_round( face_size ) )
         return face_size;
@@ -52,7 +52,7 @@ std::string get_root( const std::string& root, const font::face& face )
     return path;
 }
 
-u32 get_size( const font::face& face, u32 face_size )
+u32 get_size( const font::face& face, u16 face_size )
 {
     u32 root = std::sqrt( face.number( font::face::glyphs ) );
     return bit_round_up( root ) * face_size;
@@ -119,7 +119,7 @@ OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
-font_source::font_source( const font::face& face_, u32 face_size_, const std::string& root_ )
+font_source::font_source( const font::face& face_, u16 face_size_, const std::string& root_ )
     : face( face_ ), face_size( check_size( face_size_ ) ), root( get_root( root_, face ) ),
     source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
     first( face.number( font::face::first ) ), level_limit( log2f( source_size / page_wide ) ),
@@ -146,7 +146,7 @@ image::type font_source::format( void ) const
     return image_type;
 }
 
-u32 font_source::font_size( void ) const
+u16 font_source::font_size( void ) const
 {
     return face_size;
 }
@@ -199,7 +199,7 @@ image font_source::read( const pyramid_index& index )
     }
 
     std::memset( image.get(), 0, image.byte_size() );
-    u32 level_size = face_size >> index.level;
+    u16 level_size = face_size >> index.level;
     u32 glyphs_per_row = source_size / face_size;
     u32 code_point =
         index.x * page_wide / level_size + ( index.y * page_wide / level_size ) * glyphs_per_row;
