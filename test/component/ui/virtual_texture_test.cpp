@@ -50,7 +50,7 @@ template<>
     const c8 data[] = "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
     text text;
-    text.level = 9;
+    text.level = 5;
     text.red = 255;
     text.green = 255;
     text.blue = 255;
