@@ -6,15 +6,13 @@
 #include "foundation/image/image.hpp"
 #include "foundation/io/descriptor.hpp"
 
-namespace ooe
-{
-    namespace png
-    {
-        uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
-        uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
+OOE_NAMESPACE_BEGIN( ( ooe )( png ) )
 
-        void encode( const uncompressed_image&, const descriptor& ) OOE_VISIBLE;
-    }
-}
+uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
+uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
+
+void encode( const uncompressed_image&, const descriptor& ) OOE_VISIBLE;
+
+OOE_NAMESPACE_END( ( ooe )( png ) )
 
 #endif  // OOE_FOUNDATION_IMAGE_PNG_HPP
