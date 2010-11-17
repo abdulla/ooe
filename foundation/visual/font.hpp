@@ -28,8 +28,8 @@ private:
 //--- metric ---------------------------------------------------------------------------------------
 struct metric
 {
-    f32 left;
-    f32 top;
+    s32 left;
+    s32 top;
     f32 advance;
     u16 width;
     u16 height;
