@@ -8,7 +8,7 @@
 #include "foundation/io/error.hpp"
 #include "foundation/io/file.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 const descriptor& check( const descriptor& desc )
 {
@@ -20,7 +20,7 @@ const descriptor& check( const descriptor& desc )
     return desc;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

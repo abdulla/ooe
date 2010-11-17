@@ -8,7 +8,7 @@
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef interface::vector_type::const_iterator iterator_type;
 typedef function< std::string ( const std::string&, const std::string& ) > function_type;
@@ -88,7 +88,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     return false;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 //--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )

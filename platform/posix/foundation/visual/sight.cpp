@@ -13,7 +13,7 @@
 #include "foundation/utility/scoped.hpp"
 #include "foundation/visual/sight.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 void control( const descriptor& desc, up_t request, void* pointer )
 {
@@ -21,7 +21,7 @@ void control( const descriptor& desc, up_t request, void* pointer )
         throw error::runtime( "sight: " ) << "Unable control device: " << error::number( errno );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

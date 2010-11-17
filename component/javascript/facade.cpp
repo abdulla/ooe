@@ -6,7 +6,7 @@
 #include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( javascript ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( javascript ) )
 
 typedef std::vector< std::string > find_vector;
 typedef shared_ptr< ooe::source > source_ptr;
@@ -135,7 +135,7 @@ v8::Handle< v8::Value > print( const v8::Arguments& arguments )
     return v8::Undefined();
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( javascript ) )
+OOE_ANONYMOUS_END( ( ooe )( javascript ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 

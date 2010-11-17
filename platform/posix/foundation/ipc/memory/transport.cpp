@@ -5,7 +5,7 @@
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/utility/miscellany.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
 
 //--- cast -----------------------------------------------------------------------------------------
 inline shared_memory::type cast( bool create )
@@ -13,7 +13,7 @@ inline shared_memory::type cast( bool create )
     return create ? shared_memory::create : shared_memory::open;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 

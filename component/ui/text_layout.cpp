@@ -8,7 +8,7 @@
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef std::string::const_iterator iterator_type;
 const up_t point_size = 8;
@@ -73,7 +73,7 @@ bool handle_space( u32 code_point, f32& x, f32& y, u32 font_size )
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

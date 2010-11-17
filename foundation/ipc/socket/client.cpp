@@ -5,7 +5,7 @@
 #include "foundation/ipc/socket/rpc.hpp"
 #include "foundation/utility/scoped.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( socket ) )
 
 bool socket_read( ooe::socket& socket, io_buffer& buffer, up_t size )
 {
@@ -29,7 +29,7 @@ void error_check( u64 notify )
         throw error::connection();
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( socket ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc )( socket ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 

@@ -19,7 +19,7 @@
 #include "foundation/visual/graphics.hpp"
 #include "foundation/visual/view.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef std::vector< shared_ptr< node > > node_vector;
 typedef tuple< f32, f32 > pin_type;
@@ -451,7 +451,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     return true;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 //--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )

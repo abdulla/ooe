@@ -4,7 +4,7 @@
 
 #include "foundation/math/geometry.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 vec3 planar_max( const aabb& aabb, const vec3& normal )
 {
@@ -22,7 +22,7 @@ vec3 planar_min( const aabb& aabb, const vec3& normal )
         normal.z < 0 ? aabb.max.z : aabb.min.z );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

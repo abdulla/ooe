@@ -8,7 +8,7 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/tuple.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 typedef tuple< u32, u32, u8 > format_tuple;
 
@@ -135,7 +135,7 @@ void frame_clear( s32 id, bool& do_check )
     Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

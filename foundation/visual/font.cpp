@@ -9,7 +9,7 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/font.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( font ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( font ) )
 
 const u32 load_flags = FT_LOAD_RENDER | FT_LOAD_PEDANTIC | FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING |
     FT_LOAD_NO_AUTOHINT | FT_LOAD_TARGET_LCD;
@@ -24,7 +24,7 @@ u32 glyph_index( FT_Face face, u32 code_point )
     return index;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( font ) )
+OOE_ANONYMOUS_END( ( ooe )( font ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( font ) )
 

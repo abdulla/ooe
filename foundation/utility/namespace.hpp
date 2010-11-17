@@ -7,13 +7,13 @@
 
 #define OOE_NAMESPACE_BEGIN_MACRO( r, _, e ) namespace e {
 #define OOE_NAMESPACE_END_MACRO( r, _, e ) }
-#define OOE_ANONYMOUS_NAMESPACE_MACRO( r, _, e ) using namespace e;
+#define OOE_ANONYMOUS_MACRO( r, _, e ) using namespace e;
 
 #define OOE_NAMESPACE_BEGIN( s ) BOOST_PP_SEQ_FOR_EACH( OOE_NAMESPACE_BEGIN_MACRO, ~, s )
 #define OOE_NAMESPACE_END( s ) BOOST_PP_SEQ_FOR_EACH( OOE_NAMESPACE_END_MACRO, ~, s )
 
-#define OOE_ANONYMOUS_NAMESPACE_BEGIN( s )\
-    namespace { BOOST_PP_SEQ_FOR_EACH( OOE_ANONYMOUS_NAMESPACE_MACRO, ~, s )
-#define OOE_ANONYMOUS_NAMESPACE_END( s ) }
+#define OOE_ANONYMOUS_BEGIN( s )\
+    namespace { BOOST_PP_SEQ_FOR_EACH( OOE_ANONYMOUS_MACRO, ~, s )
+#define OOE_ANONYMOUS_END( s ) }
 
 #endif  // OOE_FOUNDATION_UTILITY_NAMESPACE_HPP

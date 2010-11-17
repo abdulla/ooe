@@ -2,7 +2,7 @@
 
 #include "foundation/ipc/switchboard.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
 
 //--- ipc_null -------------------------------------------------------------------------------------
 up_t ipc_null( const any&, io_buffer&, pool& )
@@ -19,7 +19,7 @@ up_t return_error( io_buffer& buffer, bool executed, const c8* what, const c8* w
     return size;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 

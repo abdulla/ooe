@@ -4,7 +4,7 @@
 #include "foundation/opengl/target.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 u32 target_format( image::type format )
 {
@@ -43,7 +43,7 @@ u32 target_format( image::type format )
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

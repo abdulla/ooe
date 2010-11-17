@@ -4,7 +4,7 @@
 #include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( lua ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( lua ) )
 
 typedef std::vector< std::string > find_vector;
 typedef shared_ptr< ooe::source > source_ptr;
@@ -121,7 +121,7 @@ s32 doc( state* state )
     return 1;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( lua ) )
+OOE_ANONYMOUS_END( ( ooe )( lua ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 

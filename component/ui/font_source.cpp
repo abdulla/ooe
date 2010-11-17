@@ -11,7 +11,7 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 const u16 page_wide = 256;
 const image::type image_type = image::rgba_u8;
@@ -125,7 +125,7 @@ source_metric& read_metric( const memory& memory, u32 code_point, u32 glyphs, u8
     return memory.as< source_metric >()[ code_point + glyphs * level_inverse ];
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

@@ -11,7 +11,7 @@
 #include "foundation/io/error.hpp"
 #include "foundation/utility/convert.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 void statistics( s32 fd, struct stat& status )
 {
@@ -43,7 +43,7 @@ s32 transform( u8 flags )
     return io_flags;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

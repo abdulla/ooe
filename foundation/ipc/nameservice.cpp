@@ -4,7 +4,7 @@
 
 #include "foundation/ipc/nameservice.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
 
 up_t ipc_find( const any& any, io_buffer& buffer, pool& pool )
 {
@@ -69,7 +69,7 @@ void load_switchboard( switchboard& switchboard, any any )
 
 const up_t index_adjust = 5;
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 

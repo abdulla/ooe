@@ -5,7 +5,7 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/event_queue.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 enum
 {
@@ -38,7 +38,7 @@ modifier_tuple modifier( NSEvent* nsevent )
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 

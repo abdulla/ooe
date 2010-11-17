@@ -56,11 +56,11 @@ struct void_t;
 
 OOE_NAMESPACE_END( ( ooe ) )
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 // must be anonymous so dependent types are unique
 struct anonymous_t {};
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 #endif  // OOE_FOUNDATION_UTILITY_FUNDAMENTAL_HPP

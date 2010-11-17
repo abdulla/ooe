@@ -8,7 +8,7 @@
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/rpc_forward.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- ipc_connect ----------------------------------------------------------------------------------
 link_t ipc_connect( const std::string& name, pid_t pid, time_t time )
@@ -32,7 +32,7 @@ void ipc_disconnect( const std::string& name, link_t link )
     unlink( link );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( memory ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 

@@ -7,7 +7,7 @@
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/scoped.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 enum method_type
 {
@@ -78,7 +78,7 @@ void check_crc( const u8* data, up_t size, u32 file_crc )
             "Cyclic redundancy check mismatch, " << hex( data_crc ) << " != " << hex( file_crc );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

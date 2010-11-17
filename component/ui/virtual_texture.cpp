@@ -8,7 +8,7 @@
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef tuple< u32, u32, u32, u32 > region_type;
 typedef std::pair< page_cache::page_map::iterator, page_cache::page_map::iterator > pair_type;
@@ -130,7 +130,7 @@ void erase_page( page_cache::page_map& pages, const page_cache::cache_list::iter
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

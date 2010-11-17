@@ -6,7 +6,7 @@
 #include "foundation/ipc/io_buffer.hpp"
 #include "foundation/ipc/socket/server.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( socket ) )
 
 OOE_TLS( ipc::socket::servlet* ) servlet_tls;
 
@@ -25,7 +25,7 @@ bool socket_write( ooe::socket& socket, u8* data, up_t size )
     return false;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( socket ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc )( socket ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 

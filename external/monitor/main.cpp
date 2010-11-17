@@ -19,7 +19,7 @@
     #include "foundation/executable/timer.hpp"
 #endif
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 //--- detect ---------------------------------------------------------------------------------------
 class detect
@@ -132,7 +132,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     return true;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 //--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )

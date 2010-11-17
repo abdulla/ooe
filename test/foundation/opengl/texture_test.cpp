@@ -9,7 +9,7 @@
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 const f32 width = 640;
 const f32 height = 480;
@@ -101,7 +101,7 @@ typedef unit::group< anonymous_t, anonymous_t, 1 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "texture" );
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 

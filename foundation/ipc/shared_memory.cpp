@@ -10,7 +10,7 @@
 #include "foundation/ipc/error.hpp"
 #include "foundation/ipc/shared_memory.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
 
 //--- shm_remove -----------------------------------------------------------------------------------
 void shm_remove( const std::string& name )
@@ -43,7 +43,7 @@ void shm_destroy( const std::string& name, bool unlinkable )
             "Unable to unlink shared memory \"" << name << "\": " << error::number( errno ) );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 

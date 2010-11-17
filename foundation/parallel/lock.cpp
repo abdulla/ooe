@@ -6,7 +6,7 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 #ifdef __OPTIMIZE__
 const ooe::s32 mutex_type = PTHREAD_MUTEX_NORMAL;
@@ -14,7 +14,7 @@ const ooe::s32 mutex_type = PTHREAD_MUTEX_NORMAL;
 const ooe::s32 mutex_type = PTHREAD_MUTEX_ERRORCHECK;
 #endif
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

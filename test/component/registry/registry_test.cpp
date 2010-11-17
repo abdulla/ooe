@@ -18,7 +18,7 @@
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef scoped_ptr< scoped_fork > fork_ptr;
 
@@ -73,7 +73,7 @@ typedef unit::group< setup, anonymous_t, 7 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "registry" );
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 

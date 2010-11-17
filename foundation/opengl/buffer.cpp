@@ -6,7 +6,7 @@
 #include "foundation/opengl/symbol.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 u32 buffer_target( ooe::buffer::type format )
 {
@@ -65,7 +65,7 @@ u32 buffer_access( ooe::buffer::access_type access )
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

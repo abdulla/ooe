@@ -16,7 +16,7 @@
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 typedef std::set< s32 > attribute_set;
 
@@ -89,7 +89,7 @@ void verify_texture( u32 width, u32 height, u32 limit )
             "Image size " << width << 'x' << height << " > device texture size " << limit;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

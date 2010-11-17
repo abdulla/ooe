@@ -8,7 +8,7 @@
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 geometry::intersection includes( const box& a, const box& b )
 {
@@ -122,7 +122,7 @@ bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux
     return includes( box, view ) == geometry::inside;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

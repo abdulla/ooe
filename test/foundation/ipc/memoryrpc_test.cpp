@@ -11,7 +11,7 @@
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef std::vector< c8 > std_vector;
 typedef ipc::vector< c8 > ipc_vector;
@@ -154,7 +154,7 @@ typedef unit::group< setup, data, 4 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "memory rpc" );
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 

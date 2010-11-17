@@ -13,7 +13,7 @@
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/scoped.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( png ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( png ) )
 
 typedef tuple< const u8*, up_t > tuple_type;
 
@@ -94,7 +94,7 @@ u8 png_colour_type( png_struct* write_struct, u8 type )
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( png ) )
+OOE_ANONYMOUS_END( ( ooe )( png ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( png ) )
 

@@ -4,7 +4,7 @@
 #include "component/javascript/vm.hpp"
 #include "foundation/io/memory.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 //--- mapped ---------------------------------------------------------------------------------------
 class mapped
@@ -43,7 +43,7 @@ up_t mapped::length( void ) const
 //--- object_template ------------------------------------------------------------------------------
 v8::Handle< v8::ObjectTemplate >* object_template;
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 

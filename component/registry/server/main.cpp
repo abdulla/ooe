@@ -13,7 +13,7 @@
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/parallel/lock.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef tuple< std::string, std::string > name_tuple;
 typedef tuple< registry::type, std::string > info_tuple;
@@ -218,7 +218,7 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
     return true;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 //--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )

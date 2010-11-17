@@ -6,7 +6,7 @@
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/tuple.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 typedef tuple< u32, u32 > compressed_tuple;
 typedef tuple< u32, u32, u32 > uncompressed_tuple;
@@ -178,7 +178,7 @@ void set_levels( u32 target, bool generate_mipmap, u8 levels )
         TexParameteri( target, TEXTURE_MAX_LEVEL, levels ? levels - 1 : 0 );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

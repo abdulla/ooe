@@ -5,7 +5,7 @@
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
 
 //--- cast_sem -------------------------------------------------------------------------------------
 inline semaphore::type cast_sem( bool create )
@@ -46,7 +46,7 @@ inline void send_name( socket& socket, const std::string& name )
         throw error::runtime( "ipc::memory::transport: " ) << "Unable to send name";
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 

@@ -6,7 +6,7 @@
 #include "foundation/opengl/symbol.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 typedef opengl::block::location_map location_map;
 typedef s32 ( function_type )( u32, const c8* );
@@ -107,7 +107,7 @@ input_tuple buffer_input( const std::string& name, u8 size )
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

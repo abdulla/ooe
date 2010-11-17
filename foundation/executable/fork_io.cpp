@@ -13,7 +13,7 @@
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 void replace( s32 index, s32 fd )
 {
@@ -23,7 +23,7 @@ void replace( s32 index, s32 fd )
         throw error::runtime( "fork_io: " ) << "Unable to close fd " << fd;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

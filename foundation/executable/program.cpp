@@ -13,7 +13,7 @@
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/scoped.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 s32 signal_code = 0;
 
@@ -39,7 +39,7 @@ void signal_handler( s32 code, siginfo_t* info, void* )
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
 

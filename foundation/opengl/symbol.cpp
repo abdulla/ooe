@@ -3,7 +3,7 @@
 #include "foundation/executable/library.hpp"
 #include "foundation/opengl/symbol.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 template< typename type >
     type* find( const c8* name )
@@ -11,7 +11,7 @@ template< typename type >
     return library::find< type >( name, library::all );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

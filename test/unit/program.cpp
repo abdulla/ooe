@@ -8,7 +8,7 @@
 #include "test/unit/program.hpp"
 #include "test/unit/runner.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( unit ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( unit ) )
 
 bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** argv )
 {
@@ -66,7 +66,7 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
     return success;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( unit ) )
+OOE_ANONYMOUS_END( ( ooe )( unit ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 

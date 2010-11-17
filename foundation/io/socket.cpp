@@ -10,7 +10,7 @@
 #include "foundation/io/error.hpp"
 #include "foundation/io/socket.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 struct control_message
     : public cmsghdr
@@ -44,7 +44,7 @@ const descriptor& check( const descriptor& desc )
     return desc;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

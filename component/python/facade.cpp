@@ -4,7 +4,7 @@
 #include "component/registry/local.hpp"
 #include "component/registry/registry.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( python ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( python ) )
 
 typedef std::vector< std::string > find_vector;
 typedef shared_ptr< ooe::source > source_ptr;
@@ -125,7 +125,7 @@ PyMethodDef methods[] =
     { "doc", embed< doc >::call, METH_VARARGS, 0 }
 };
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( python ) )
+OOE_ANONYMOUS_END( ( ooe )( python ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 

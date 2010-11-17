@@ -8,7 +8,7 @@
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/utility/scoped.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 
 typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool* > tuple_type;
 
@@ -89,7 +89,7 @@ up_t ipc_unlink( const any& any, io_buffer& buffer, pool& )
     return 0;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc )( memory ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 

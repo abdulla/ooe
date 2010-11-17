@@ -18,7 +18,7 @@
 #include "test/unit/group.hpp"
 #include "test/unit/runner.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( unit ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( unit ) )
 
 typedef tuple< up_t, fork_io, file, timer > list_tuple;
 typedef std::list< list_tuple > list_type;
@@ -189,7 +189,7 @@ bool safe_run( const runner::map_type::const_iterator i, time_t timeout, bool no
     return false;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( unit ) )
+OOE_ANONYMOUS_END( ( ooe )( unit ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 

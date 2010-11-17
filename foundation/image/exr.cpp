@@ -8,7 +8,7 @@
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( Imf ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( Imf ) )
 
 //--- mapped ---------------------------------------------------------------------------------------
 class mapped
@@ -106,7 +106,7 @@ image::type exr_image_type( const ChannelList& channels, PixelType type )
         throw error::runtime( "exr: " ) << "Unknown format: " << format;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( Imf ) )
+OOE_ANONYMOUS_END( ( ooe )( Imf ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( exr ) )
 

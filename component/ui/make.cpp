@@ -8,7 +8,7 @@
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 //--- make_box -------------------------------------------------------------------------------------
 box make_box( const property_tree& pt )
@@ -71,7 +71,7 @@ shader_type make_shader( const std::string& name, const device_type& device,
     }
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

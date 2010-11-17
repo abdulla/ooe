@@ -10,7 +10,7 @@
 #include "foundation/ipc/nameservice.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 //--- load_nameservice -----------------------------------------------------------------------------
 void load_nameservice( ipc::nameservice& nameservice, const module& module )
@@ -88,7 +88,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     return true;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 //--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )

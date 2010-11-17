@@ -9,7 +9,7 @@
 #include "foundation/ipc/error.hpp"
 #include "foundation/ipc/semaphore.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
 
 //--- sem_remove -----------------------------------------------------------------------------------
 void sem_remove( const std::string& name )
@@ -47,7 +47,7 @@ void sem_destroy( const std::string& name, bool unlinkable, sem_t* sem )
             "Unable to unlink semaphore \"" << name << "\": " << error::number( errno ) );
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( ipc ) )
+OOE_ANONYMOUS_END( ( ooe )( ipc ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 

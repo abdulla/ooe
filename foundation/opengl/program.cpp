@@ -9,7 +9,7 @@
 #include "foundation/opengl/symbol.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( opengl ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 void check( s32 id )
 {
@@ -32,7 +32,7 @@ void check( s32 id )
         throw error::runtime( "opengl::program: " ) << "Link error:\n" << array;
 }
 
-OOE_ANONYMOUS_NAMESPACE_END( ( ooe )( opengl ) )
+OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
