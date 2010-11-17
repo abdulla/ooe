@@ -131,14 +131,14 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
         }
 
         font_source::glyph_type glyph = source.glyph( code_point, level );
-        u32 x_offset = bit_shift( glyph._0.x, shift );
+        u32 advance = bit_shift( glyph._0.advance, shift );
 
-        if ( x + x_offset > width )
+        if ( x + advance > width )
         {
             x = 0;
             y += font_size * line_spacing;
 
-            if ( m.width + x_offset > width )
+            if ( m.width + advance > width )
                 utf8::prior( i, text.data.begin() );
             else
             {
@@ -154,8 +154,8 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
         add_glyph( glyph, data, size, x + text.x, y, font_size, level, shift );
 
         data += point_size;
-        x += x_offset;
-        m.width += x_offset;
+        x += advance;
+        m.width += advance;
         last_point = code_point;
     }
 

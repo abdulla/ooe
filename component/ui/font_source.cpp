@@ -93,7 +93,7 @@ void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u16 x,
 
     for ( u16 i = 0; i != height;
         ++i, target += image.row_size(), source += bitmap.pitch )
-        copy_row( source + ( x ? 0 : 3 ), target, width - ( x ? 1 : 0 ) );
+        copy_row( source + ( x ? 0 : 3 ), target, width );
 }
 
 void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u16 x, u16 y )
@@ -103,7 +103,7 @@ void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u16 x, 
 
     for ( u16 i = 0; i != bitmap.metric.height;
         ++i, target += image.row_size(), source += bitmap.pitch )
-        copy_row( source + 3, target, bitmap.metric.width - 1 );
+        copy_row( source + 3, target, bitmap.metric.width );
 }
 
 const uncompressed_image& write_image( const uncompressed_image& image, const std::string& path )

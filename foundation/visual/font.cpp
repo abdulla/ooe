@@ -46,13 +46,14 @@ library::~library( void )
 
 //--- kerning --------------------------------------------------------------------------------------
 kerning::kerning( s32 x_, s32 y_ )
-    : x( x_ ), y( y_ )
+    : x( x_ >> 6 ), y( y_ >> 6 )
 {
 }
 
 //--- metric ---------------------------------------------------------------------------------------
-metric::metric( s32 left_, s32 top_, s32 x_, s32 y_, u32 width_, u32 height_ )
-    : left( left_ ), top( top_ ), x( x_ ), y( y_ ), width( width_ ), height( height_ )
+metric::metric( s32 left_, s32 top_, s32 advance_, u32 width_, u32 height_ )
+    : left( left_ >> 6 ), top( top_ >> 6 ), advance( advance_ >> 6 ), width( ( width_ / 3 ) - 2 ),
+    height( height_ )
 {
 }
 
@@ -122,7 +123,7 @@ kerning face::kerning( u32 left, u32 right, u32 size ) const
         throw error::runtime( "font::face: " ) <<
             "Unable to get kerning for " << left << " and " << right;
 
-    return font::kerning( delta.x >> 6, delta.y >> 6 );
+    return font::kerning( delta.x, delta.y );
 }
 
 bitmap face::bitmap( u32 code_point, u32 size ) const
@@ -132,10 +133,10 @@ bitmap face::bitmap( u32 code_point, u32 size ) const
     else if ( FT_Load_Char( face_, code_point, load_flags ) )
         throw error::runtime( "font::face: " ) << "Unable to load " << code_point;
 
-    FT_GlyphSlot glyph = face_->glyph;
-    font::metric metric( glyph->bitmap_left, glyph->bitmap_top, glyph->advance.x >> 6,
-        glyph->advance.y >> 6, glyph->bitmap.width / 3, glyph->bitmap.rows );
-    return font::bitmap( metric, glyph->bitmap.pitch, glyph->bitmap.buffer );
+    FT_Glyph_Metrics& m = face_->glyph->metrics;
+    FT_Bitmap& b = face_->glyph->bitmap;
+    font::metric metric( m.horiBearingX, m.horiBearingY, m.horiAdvance, b.width, b.rows );
+    return font::bitmap( metric, b.pitch, b.buffer );
 }
 
 OOE_NAMESPACE_END( ( ooe )( font ) )
