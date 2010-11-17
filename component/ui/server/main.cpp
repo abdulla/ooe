@@ -22,6 +22,7 @@
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe ) )
 
 typedef std::vector< shared_ptr< node > > node_vector;
+typedef tuple< f32, f32 > pin_type;
 
 const f32 width = 1024;
 const f32 height = 640;
@@ -30,24 +31,24 @@ const image::type format = image::rgba_u8;
 u32 velocity = 4;
 
 //--- zoom_out -------------------------------------------------------------------------------------
-void zoom_out( vec3& move )
+void zoom_out( vec3& move, pin_type& pin )
 {
     if ( move.z < 0 )
         return;
 
-    move.x -= u16( width ) >> u16( move.z + 2 );
-    move.y -= u16( height ) >> u16( move.z + 2 );
+    move.x -= u16( pin._0 ) >> u16( move.z + 1 );
+    move.y -= u16( pin._1 ) >> u16( move.z + 1 );
 }
 
 //--- zoom_in --------------------------------------------------------------------------------------
-void zoom_in( vec3& move )
+void zoom_in( vec3& move, pin_type& pin )
 {
-    move.x += u16( width ) >> u16( move.z + 1 );
-    move.y += u16( height ) >> u16( move.z + 1 );
+    move.x += u16( pin._0 ) >> u16( move.z );
+    move.y += u16( pin._1 ) >> u16( move.z );
 }
 
 //--- process_key ----------------------------------------------------------------------------------
-void process_key( u32 value, bool press, vec3& move )
+void process_key( u32 value, bool press, vec3& move, pin_type& pin )
 {
     if ( !press )
         return;
@@ -78,12 +79,12 @@ void process_key( u32 value, bool press, vec3& move )
 
     case '-':
         move.z -= 1;
-        zoom_out( move );
+        zoom_out( move, pin );
         break;
 
     case '=':
         move.z += 1;
-        zoom_in( move );
+        zoom_in( move, pin );
         break;
 
     case '.':
@@ -104,7 +105,7 @@ void process_key( u32 value, bool press, vec3& move )
 }
 
 //--- process_events -------------------------------------------------------------------------------
-void process_events( event_queue& queue, vec3& move, epoch_t timeout )
+void process_events( event_queue& queue, vec3& move, pin_type& pin, epoch_t timeout )
 {
     int direction;
     event event;
@@ -115,11 +116,14 @@ void process_events( event_queue& queue, vec3& move, epoch_t timeout )
         switch ( type )
         {
         case event::motion_flag:
+            pin = pin_type( event.motion.x, event.motion.y );
+            break;
+
         case event::button_flag:
             break;
 
         case event::key_flag:
-            process_key( event.key.value, event.key.press, move );
+            process_key( event.key.value, event.key.press, move, pin );
             break;
 
         case event::scroll_flag:
@@ -135,9 +139,9 @@ void process_events( event_queue& queue, vec3& move, epoch_t timeout )
             move.z += event.magnify.value;
 
             if ( direction < 0 )
-                zoom_out( move );
+                zoom_out( move, pin );
             else if ( direction > 0 )
-                zoom_in( move );
+                zoom_in( move, pin );
 
             break;
 
@@ -407,6 +411,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     block_shadows->input( "shadow", true );
     device->set( device::depth_test, true );
     vec3 move( 0, 0, 0 );
+    pin_type pin( width / 2, height / 2 );
 
     while ( !executable::has_signal() )
     {
@@ -439,7 +444,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
             timeout = epoch_t( 0, 0 );
         }
 
-        process_events( queue, move, timeout );
+        process_events( queue, move, pin, timeout );
         move.z = std::max( 0.f, move.z );
     }
 
