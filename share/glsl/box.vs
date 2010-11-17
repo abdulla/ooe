@@ -10,8 +10,8 @@ attribute float depth;
 
 void main( void )
 {
-    vec4 point = vec4( vertex * scale + translate, depth, 1 );
-    gl_Position = projection * ( point + vec4( view, 0, 0 ) );
+    vec2 point = vertex * scale + translate;
+    gl_Position = projection * vec4( point + view, depth, 1 );
     coord = vertex;
     pixel = 1. / scale;
 }
