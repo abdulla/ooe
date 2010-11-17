@@ -69,30 +69,41 @@ memory open_memory( const std::string& root, u32 glyphs, u8 levels )
     return memory( desc, memory::read_write );
 }
 
-void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
+void copy_row( const u8* i, u8* j, u16 size )
+{
+    for ( const u8* end = i + size * 3; i != end; i += 3, j += 4 )
+    {
+        j[ 0 ] = i[ 0 ];
+        j[ 1 ] = i[ 1 ];
+        j[ 2 ] = i[ 2 ];
+        j[ 3 ] = ( u32( i[ 0 ] ) + i[ 1 ] + i[ 2 ] + 1 ) / 3;
+    }
+}
+
+void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u16 x, u16 y )
 {
     if ( x >= bitmap.metric.width || y >= bitmap.metric.height )
         return;
 
-    u8* target = image.as< u8 >() + 3 /* alpha */;
-    const u8* source = bitmap.data + x + y * bitmap.metric.width;
+    u8* target = image.as< u8 >();
+    const u8* source = bitmap.data + x * 3 + y * bitmap.pitch;
 
-    u32 width = std::min< u32 >( page_wide, bitmap.metric.width - x );
-    u32 height = std::min< u32 >( page_wide, bitmap.metric.height - y );
+    u16 width = std::min< u16 >( page_wide, bitmap.metric.width - x );
+    u16 height = std::min< u16 >( page_wide, bitmap.metric.height - y );
 
-    for ( u32 i = 0; i != height;
-        ++i, target += image.row_size(), source += bitmap.metric.width )
-        skip_out( source, source + width, target, image.channels() );
+    for ( u16 i = 0; i != height;
+        ++i, target += image.row_size(), source += bitmap.pitch )
+        copy_row( source + ( x ? 0 : 3 ), target, width - ( x ? 1 : 0 ) );
 }
 
-void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u32 x, u32 y )
+void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u16 x, u16 y )
 {
-    u8* target = image.as< u8 >() + ( x + y * image.width ) * image.pixel_size() + 3 /* alpha */;
+    u8* target = image.as< u8 >() + ( x + y * image.width ) * 4;
     const u8* source = bitmap.data;
 
-    for ( u32 i = 0; i != bitmap.metric.height;
-        ++i, target += image.row_size(), source += bitmap.metric.width )
-        skip_out( source, source + bitmap.metric.width, target, image.channels() );
+    for ( u16 i = 0; i != bitmap.metric.height;
+        ++i, target += image.row_size(), source += bitmap.pitch )
+        copy_row( source + 3, target, bitmap.metric.width - 1 );
 }
 
 const uncompressed_image& write_image( const uncompressed_image& image, const std::string& path )

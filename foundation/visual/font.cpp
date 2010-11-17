@@ -4,13 +4,15 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_LCD_FILTER_H
 
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/font.hpp"
 
 OOE_ANONYMOUS_NAMESPACE_BEGIN( ( ooe )( font ) )
 
-const u32 load_flags = FT_LOAD_RENDER | FT_LOAD_NO_BITMAP | FT_LOAD_PEDANTIC;
+const u32 load_flags = FT_LOAD_RENDER | FT_LOAD_PEDANTIC | FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING |
+    FT_LOAD_NO_AUTOHINT | FT_LOAD_TARGET_LCD;
 
 u32 glyph_index( FT_Face face, u32 code_point )
 {
@@ -32,6 +34,8 @@ library::library( void )
 {
     if ( FT_Init_FreeType( &freetype ) )
         throw error::runtime( "font::library: " ) << "Unable to initialise library";
+    else if ( FT_Library_SetLcdFilter( freetype, FT_LCD_FILTER_LIGHT ) )
+        throw error::runtime( "font::library: " ) << "Unable to set LCD filter";
 }
 
 library::~library( void )
@@ -53,8 +57,8 @@ metric::metric( s32 left_, s32 top_, s32 x_, s32 y_, u32 width_, u32 height_ )
 }
 
 //--- bitmap ---------------------------------------------------------------------------------------
-bitmap::bitmap( const font::metric& metric_, const u8* data_ )
-    : metric( metric_ ), data( data_ )
+bitmap::bitmap( const font::metric& metric_, s32 pitch_, const u8* data_ )
+    : metric( metric_ ), pitch( pitch_ ), data( data_ )
 {
 }
 
@@ -130,8 +134,8 @@ bitmap face::bitmap( u32 code_point, u32 size ) const
 
     FT_GlyphSlot glyph = face_->glyph;
     font::metric metric( glyph->bitmap_left, glyph->bitmap_top, glyph->advance.x >> 6,
-        glyph->advance.y >> 6, glyph->bitmap.width, glyph->bitmap.rows );
-    return font::bitmap( metric, glyph->bitmap.buffer );
+        glyph->advance.y >> 6, glyph->bitmap.width / 3, glyph->bitmap.rows );
+    return font::bitmap( metric, glyph->bitmap.pitch, glyph->bitmap.buffer );
 }
 
 OOE_NAMESPACE_END( ( ooe )( font ) )

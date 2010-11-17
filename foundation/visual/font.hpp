@@ -51,9 +51,10 @@ struct metric
 struct bitmap
 {
     font::metric metric;
+    s32 pitch;
     const u8* data;
 
-    bitmap( const font::metric&, const u8* );
+    bitmap( const font::metric&, s32, const u8* );
 };
 
 //--- face -----------------------------------------------------------------------------------------
