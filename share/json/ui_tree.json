@@ -96,34 +96,32 @@
                         "tile": "cache/blue-marble-d2"
                     }
                 },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 1700,
-                    "y": 100,
-                    "node": "text",
-                    "data": {
-                            "text": "In celebration of the deployment of its Earth Observing System, NASA is pleased to share the newest in its series of stunning Earth images, affectionately named the 'Blue Marble.' This new Earth imagery enhances the Blue Marble legacy by providing a detailed look at an entire year in the life of our planet. In sharing these Blue Marble images, NASA hopes the public will join with the agency in its continuing exploration of our world from the unique perspective of space.",
-                        "x": 16,
-                        "y": 125,
-                        "level": 4
-                    },
-                    "children": [
                         {
-                            "width": 800,
-                            "height": 200,
-                            "x": 0,
-                            "y": 0,
+                            "width": 400,
+                            "height": 100,
+                            "x": 1700,
+                            "y": 100,
                             "node": "text",
                             "data": {
                                 "text": "Blue Marble",
                                 "x": 16,
                                 "y": 16,
-                                "level": 7,
+                                "level": 6,
                                 "blue": 127
                             }
-                        }
-                    ]
+                        },
+                {
+                    "width": 400,
+                    "height": 300,
+                    "x": 1700,
+                    "y": 200,
+                    "node": "text",
+                    "data": {
+                            "text": "In celebration of the deployment of its Earth Observing System, NASA is pleased to share the newest in its series of stunning Earth images, affectionately named the 'Blue Marble.' This new Earth imagery enhances the Blue Marble legacy by providing a detailed look at an entire year in the life of our planet. In sharing these Blue Marble images, NASA hopes the public will join with the agency in its continuing exploration of our world from the unique perspective of space.",
+                        "x": 16,
+                        "y": 16,
+                        "level": 4
+                    }
                 }
             ]
         },
