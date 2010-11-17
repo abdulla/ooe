@@ -96,20 +96,20 @@
                         "tile": "cache/blue-marble-d2"
                     }
                 },
-                        {
-                            "width": 400,
-                            "height": 100,
-                            "x": 1700,
-                            "y": 100,
-                            "node": "text",
-                            "data": {
-                                "text": "Blue Marble",
-                                "x": 16,
-                                "y": 16,
-                                "level": 6,
-                                "blue": 127
-                            }
-                        },
+                {
+                    "width": 400,
+                    "height": 100,
+                    "x": 1700,
+                    "y": 100,
+                    "node": "text",
+                    "data": {
+                        "text": "Blue Marble",
+                        "x": 16,
+                        "y": 16,
+                        "level": 6,
+                        "blue": 127
+                    }
+                },
                 {
                     "width": 400,
                     "height": 300,
