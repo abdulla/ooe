@@ -24,7 +24,7 @@ public:
     virtual image::type format( void ) const;
 
     u16 font_size( void ) const;
-    font::kerning kerning( u32, u32, u8 ) const;
+    f32 kerning( u32, u32, u8 ) const;
     glyph_type glyph( u32, u8 ) const;
 
 private:

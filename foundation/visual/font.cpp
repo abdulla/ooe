@@ -44,16 +44,10 @@ library::~library( void )
         OOE_CONSOLE( "font::library: " << "Unable to destroy library" );
 }
 
-//--- kerning --------------------------------------------------------------------------------------
-kerning::kerning( s32 x_, s32 y_ )
-    : x( x_ >> 6 ), y( y_ >> 6 )
-{
-}
-
 //--- metric ---------------------------------------------------------------------------------------
-metric::metric( s32 left_, s32 top_, s32 advance_, u32 width_, u32 height_ )
-    : left( left_ >> 6 ), top( top_ >> 6 ), advance( advance_ >> 6 ), width( ( width_ / 3 ) - 2 ),
-    height( height_ )
+metric::metric( s32 left_, s32 top_, s32 advance_, u16 width_, u16 height_ )
+    : left( left_ >> 6 ), top( top_ >> 6 ), advance( advance_ / 64. ),
+    width( ( width_ / 3 ) - 2 ), height( height_ )
 {
 }
 
@@ -110,7 +104,7 @@ u32 face::number( number_type type ) const
     }
 }
 
-kerning face::kerning( u32 left, u32 right, u32 size ) const
+f32 face::kerning( u32 left, u32 right, u32 size ) const
 {
     if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
         throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
@@ -119,11 +113,11 @@ kerning face::kerning( u32 left, u32 right, u32 size ) const
     u32 j = glyph_index( face_, right );
     FT_Vector delta;
 
-    if ( FT_Get_Kerning( face_, i, j, FT_KERNING_DEFAULT, &delta ) )
+    if ( FT_Get_Kerning( face_, i, j, FT_KERNING_UNFITTED, &delta ) )
         throw error::runtime( "font::face: " ) <<
             "Unable to get kerning for " << left << " and " << right;
 
-    return font::kerning( delta.x, delta.y );
+    return delta.x / 64.;
 }
 
 bitmap face::bitmap( u32 code_point, u32 size ) const

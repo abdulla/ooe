@@ -18,23 +18,23 @@ struct marker
 {
     iterator_type i;
     f32* data;
-    u32 width;
+    f32 width;
 
-    marker( iterator_type i_, f32* data_, u32 width_ )
+    marker( iterator_type i_, f32* data_, f32 width_ )
         : i( i_ ), data( data_ ), width( width_ )
     {
     }
 };
 
-void add_glyph( const font_source::glyph_type& glyph, f32* data, u32 size, s32 x, s32 y,
+void add_glyph( const font_source::glyph_type& glyph, f32* data, u32 size, f32 x, f32 y,
     u32 font_size, u8 level, s8 shift )
 {
     const font::metric& metric = glyph._0;
 
     data[ 0 ] = bit_shift( metric.width, shift );
     data[ 1 ] = bit_shift( metric.height, shift );
-    data[ 2 ] = x + bit_shift( metric.left, shift );
-    data[ 3 ] = y + font_size - bit_shift( metric.top, shift );
+    data[ 2 ] = std::floor( x + metric.left * exp2f( shift ) );
+    data[ 3 ] = std::ceil( y + font_size - metric.top * exp2f( shift ) );
 
     data[ 4 ] = divide( metric.width << level, size );
     data[ 5 ] = divide( metric.height << level, size );
@@ -55,7 +55,7 @@ u32 glyph_size( iterator_type i, iterator_type end )
     return glyphs;
 }
 
-bool handle_space( u32 code_point, s32& x, s32& y, u32 font_size )
+bool handle_space( u32 code_point, f32& x, f32& y, u32 font_size )
 {
     switch ( code_point )
     {
@@ -90,7 +90,7 @@ text_layout::
 {
 }
 
-u32 text_layout::input( block_type& block, const text& text, u32 width )
+u32 text_layout::input( block_type& block, const text& text, f32 width )
 {
     u32 glyphs = glyph_size( text.data.begin(), text.data.end() );
     u32 font_size = 1 << text.level;
@@ -105,8 +105,8 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
     u8 level = level_max - clamp( text.level, level_min, level_max );
     s8 shift = inverse_clamp< s8 >( text.level, level_min, level_max );
     width -= text.x;
-    s32 x = 0;
-    s32 y = text.y;
+    f32 x = 0;
+    f32 y = text.y;
     u32 code_point = 0;
     u32 last_point;
 
@@ -124,14 +124,11 @@ u32 text_layout::input( block_type& block, const text& text, u32 width )
             m = marker( i, data, 0 );
             continue;
         }
-        else if ( x )
-        {
-            font::kerning kerning = source.kerning( last_point, code_point, level );
-            x += bit_shift( kerning.x, shift );
-        }
+        else if ( x > 0 )
+            x += source.kerning( last_point, code_point, level ) * exp2f( shift );
 
         font_source::glyph_type glyph = source.glyph( code_point, level );
-        u32 advance = bit_shift( glyph._0.advance, shift );
+        f32 advance = glyph._0.advance * exp2f( shift );
 
         if ( x + advance > width )
         {

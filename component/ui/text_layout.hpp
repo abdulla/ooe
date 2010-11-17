@@ -29,7 +29,7 @@ class text_layout
 public:
     text_layout( const device_type&, page_cache&, font_source& );
 
-    u32 input( block_type&, const text&, u32 );
+    u32 input( block_type&, const text&, f32 );
 
 private:
     const device_type& device;
