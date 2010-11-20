@@ -117,7 +117,7 @@ protected:
     image_reader( const image_metadata& );
 };
 
-typedef shared_ptr< image_reader > reader_type;
+typedef shared_ptr< image_reader > reader_ptr;
 
 //--------------------------------------------------------------------------------------------------
 bool is_compressed( image_format::type ) OOE_VISIBLE;

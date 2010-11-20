@@ -13,15 +13,15 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-typedef atom_ptr< task_base > task_type;
+typedef atom_ptr< task_base > task_ptr;
 
 //--- result_base ----------------------------------------------------------------------------------
 class result_base
 {
 protected:
-    task_type task;
+    task_ptr task;
 
-    result_base( const task_type& task_ )
+    result_base( const task_ptr& task_ )
         : task( task_ )
     {
     }
@@ -43,7 +43,7 @@ template< typename t >
     struct result
     : private result_base
 {
-    result( const task_type& task_ )
+    result( const task_ptr& task_ )
         : result_base( task_ )
     {
     }
@@ -59,7 +59,7 @@ template<>
     struct result< void >
     : private result_base
 {
-    result( const task_type& task_ )
+    result( const task_ptr& task_ )
         : result_base( task_ )
     {
     }
@@ -75,7 +75,7 @@ class thread_pool
 {
 public:
     thread_pool( void ) OOE_VISIBLE;
-    void insert( const task_type& ) OOE_VISIBLE;
+    void insert( const task_ptr& ) OOE_VISIBLE;
 
 private:
     typedef std::vector< opaque_ptr > vector_type;
@@ -105,7 +105,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 {
     typedef task< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > t;
     typedef typename t::partial_type p;
-    task_type task = new t( p( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ) );
+    task_ptr task = new t( p( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ) );
     pool.insert( task );
     return task;
 }

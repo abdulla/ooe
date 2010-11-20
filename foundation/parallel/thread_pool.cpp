@@ -25,7 +25,7 @@ public:
         thread.join();
     }
 
-    void insert( const task_type& task )
+    void insert( const task_ptr& task )
     {
         {
             lock lock( mutex );
@@ -37,19 +37,19 @@ public:
 private:
     ooe::mutex mutex;
     ooe::condition condition;
-    std::list< task_type > list;
+    std::list< task_ptr > list;
 
     atom< bool > state;
     ooe::thread thread;
 
-    task_type pop_front( void )
+    task_ptr pop_front( void )
     {
         lock lock( mutex );
 
         while ( list.empty() )
             condition.wait( lock );
 
-        task_type task = list.front();
+        task_ptr task = list.front();
         list.pop_front();
         return task;
     }
@@ -58,7 +58,7 @@ private:
     {
         while ( state )
         {
-            task_type task = pop_front();
+            task_ptr task = pop_front();
             {
                 lock lock( task->mutex );
                 task->state = task_base::error;
@@ -79,7 +79,7 @@ thread_pool::thread_pool( void )
         vector.push_back( opaque_ptr( new thread_unit, destroy< thread_unit > ) );
 }
 
-void thread_pool::insert( const task_type& task )
+void thread_pool::insert( const task_ptr& task )
 {
     vector[ index ].as< thread_unit >()->insert( task );
     ++index %= vector.size();

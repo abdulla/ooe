@@ -234,7 +234,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( png ) )
 
 //--- png ------------------------------------------------------------------------------------------
-reader_type open( const descriptor& desc )
+reader_ptr open( const descriptor& desc )
 {
     png_read_state state( desc );
     png_header header( state );

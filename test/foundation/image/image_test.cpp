@@ -204,7 +204,7 @@ template<>
         OOE_CHECK( "decoded data matches",
             !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) );
 
-        reader_type reader = png::open( descriptor( path ) );
+        reader_ptr reader = png::open( descriptor( path ) );
         OOE_CHECK( "reader size matches", byte_size( input[ i ] ) == byte_size( *reader ) );
 
         std::memset( output.get(), 0, byte_size( output ) );
