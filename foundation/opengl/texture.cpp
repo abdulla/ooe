@@ -319,7 +319,7 @@ void texture_array::check( const image& image, u32 x, u32 y, u32 index ) const
 compressed_texture_array::compressed_texture_array( const image_metadata& metadata_, u32 depth_ )
     : texture_array( metadata_, depth_ ), compressed_id( metadata_ )
 {
-    CompressedTexImage3D( TEXTURE_2D_ARRAY, 0, internal, width, height, depth, 0, size, 0 );
+    CompressedTexImage3D( TEXTURE_2D_ARRAY, 0, internal, width, height, depth, 0, size * depth, 0 );
 }
 
 void compressed_texture_array::write( const image& image, u32 x, u32 y, u32 index )
