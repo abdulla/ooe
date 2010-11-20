@@ -4,23 +4,25 @@
 #define OOE_FOUNDATION_IMAGE_DDS_HPP
 
 #include "foundation/image/image.hpp"
-#include "foundation/io/descriptor.hpp"
 
-namespace ooe
-{
-    namespace dds
-    {
-        compressed_image decode( const descriptor& ) OOE_VISIBLE;
-        compressed_image decode( const void*, up_t ) OOE_VISIBLE;
+OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-        void encode( const compressed_image&, const descriptor& ) OOE_VISIBLE;
-    }
+class descriptor;
 
-    namespace dxt
-    {
-        uncompressed_image decode( const compressed_image& ) OOE_VISIBLE;
-        compressed_image encode( const uncompressed_image&, image::type ) OOE_VISIBLE;
-    }
-}
+OOE_NAMESPACE_END( ( ooe ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( dds ) )
+
+image decode( const descriptor& ) OOE_VISIBLE;
+void encode( const image&, const descriptor& ) OOE_VISIBLE;
+
+OOE_NAMESPACE_END( ( ooe )( dds ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( dxt ) )
+
+image decode( const image& ) OOE_VISIBLE;
+image encode( const image&, image_format::type ) OOE_VISIBLE;
+
+OOE_NAMESPACE_END( ( ooe )( dxt ) )
 
 #endif  // OOE_FOUNDATION_IMAGE_DDS_HPP

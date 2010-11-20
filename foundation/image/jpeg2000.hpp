@@ -4,17 +4,18 @@
 #define OOE_FOUNDATION_IMAGE_JPEG2000_HPP
 
 #include "foundation/image/image.hpp"
-#include "foundation/io/descriptor.hpp"
 
-namespace ooe
-{
-    namespace jpeg2000
-    {
-        uncompressed_image decode( const descriptor& ) OOE_VISIBLE;
-        uncompressed_image decode( const void*, up_t ) OOE_VISIBLE;
+OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-        void encode( const uncompressed_image&, const descriptor& desc ) OOE_VISIBLE;
-    }
-}
+class descriptor;
+
+OOE_NAMESPACE_END( ( ooe ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( jpeg2000 ) )
+
+image decode( const descriptor& ) OOE_VISIBLE;
+void encode( const image&, const descriptor& desc ) OOE_VISIBLE;
+
+OOE_NAMESPACE_END( ( ooe )( jpeg2000 ) )
 
 #endif  // OOE_FOUNDATION_IMAGE_JPEG2000_HPP
