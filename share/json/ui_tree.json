@@ -7,13 +7,14 @@
     "data": {
         "text": "Workspace Map",
         "x": 16,
-        "y": 16
+        "y": 16,
+        "red": 127
     },
     "children": [
         {
             "width": 1100,
             "height": 500,
-            "x": 150,
+            "x": 100,
             "y": 150,
             "children": [
                 {
@@ -107,7 +108,7 @@
                         "x": 16,
                         "y": 16,
                         "level": 6,
-                        "blue": 127
+                        "red": 127
                     }
                 },
                 {
@@ -128,7 +129,7 @@
         {
             "width": 1100,
             "height": 800,
-            "x": 150,
+            "x": 100,
             "y": 700,
             "node": "text",
             "data": {
@@ -136,7 +137,7 @@
                 "x": 16,
                 "y": 16,
                 "level": 6,
-                "blue": 127
+                "red": 127
             },
             "children": [
                 {
@@ -242,7 +243,7 @@
                 "x": 16,
                 "y": 16,
                 "level": 6,
-                "blue": 127
+                "red": 127
             },
             "children": [
                 {
