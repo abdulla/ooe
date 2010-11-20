@@ -8,6 +8,7 @@
 
 #include "foundation/executable/program.hpp"
 #include "foundation/image/jpeg.hpp"
+#include "foundation/io/descriptor.hpp"
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
@@ -35,7 +36,7 @@ public:
     void process( const u8* frame )
     {
         u8* pointer = image.as< u8 >();
-        up_t byte_size = image.byte_size();
+        up_t byte_size = ooe::byte_size( image );
         up_t hit = 0;
 
         for ( up_t i = 0; i != byte_size; ++i )
@@ -54,7 +55,7 @@ private:
     const std::string directory;
     const up_t percent;
     up_t count;
-    uncompressed_image image;
+    ooe::image image;
 
     void write( void )
     {
