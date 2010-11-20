@@ -14,7 +14,7 @@
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 const u16 page_wide = 256;
-const image::type image_type = image::rgba_u8;
+const image_format::type image_type = image_format::rgba_u8;
 
 struct source_metric
     : public font::metric
@@ -80,7 +80,7 @@ void copy_row( const u8* i, u8* j, u16 size )
     }
 }
 
-void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u16 x, u16 y )
+void copy_partial( image& image, const font::bitmap& bitmap, u16 x, u16 y )
 {
     if ( x >= bitmap.metric.width || y >= bitmap.metric.height )
         return;
@@ -92,24 +92,24 @@ void copy_partial( uncompressed_image& image, const font::bitmap& bitmap, u16 x,
     u16 height = std::min< u16 >( page_wide, bitmap.metric.height - y );
 
     for ( u16 i = 0; i != height;
-        ++i, target += image.row_size(), source += bitmap.pitch )
+        ++i, target += row_size( image ), source += bitmap.pitch )
         copy_row( source + ( x ? 0 : 3 ), target, width );
 }
 
-void copy_square( uncompressed_image& image, const font::bitmap& bitmap, u16 x, u16 y )
+void copy_square( image& image, const font::bitmap& bitmap, u16 x, u16 y )
 {
     u8* target = image.as< u8 >() + ( x + y * image.width ) * 4;
     const u8* source = bitmap.data;
 
     for ( u16 i = 0; i != bitmap.metric.height;
-        ++i, target += image.row_size(), source += bitmap.pitch )
+        ++i, target += row_size( image ), source += bitmap.pitch )
         copy_row( source + 3, target, bitmap.metric.width );
 }
 
-const uncompressed_image& write_image( const uncompressed_image& image, const std::string& path )
+const image& write_image( const image& image, const std::string& path )
 {
     file file( descriptor( path, descriptor::write_new ) );
-    file.write( image.get(), image.byte_size() );
+    file.write( image.get(), byte_size( image ) );
     return image;
 }
 
@@ -152,7 +152,7 @@ u16 font_source::page_size( void ) const
     return page_wide;
 }
 
-image::type font_source::format( void ) const
+image_format::type font_source::format( void ) const
 {
     return image_type;
 }
@@ -197,7 +197,7 @@ font_source::glyph_type font_source::glyph( u32 code_point, u8 level ) const
 image font_source::read( const pyramid_index& index )
 {
     // note: arguments will be verified by virtual_texture, no need to here
-    uncompressed_image image( page_wide, page_wide, image_type );
+    image image( page_wide, page_wide, image_type );
     std::string path( root );
     u8 level_inverse = level_limit - index.level;
     path << '/' << index.x << '_' << index.y << '_' << level_inverse << ".raw";
@@ -205,11 +205,11 @@ image font_source::read( const pyramid_index& index )
     if ( exists( path ) )
     {
         file file( path );
-        file.read( image.get(), image.byte_size() );
+        file.read( image.get(), byte_size( image ) );
         return image;
     }
 
-    std::memset( image.get(), 0, image.byte_size() );
+    std::memset( image.get(), 0, byte_size( image ) );
     u16 level_size = face_size >> index.level;
     u32 glyphs_per_row = source_size / face_size;
     u32 code_point =

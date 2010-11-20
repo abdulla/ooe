@@ -12,7 +12,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef tuple< u32, u32, u32, u32 > region_type;
 typedef std::pair< page_cache::page_map::iterator, page_cache::page_map::iterator > pair_type;
-const image::type table_format = image::rg_s16;
+const image_format::type table_format = image_format::rg_s16;
 const u8 table_channels = 2;
 
 u32 check_page_size( u16 page_size )
@@ -26,8 +26,8 @@ u32 check_page_size( u16 page_size )
 
 physical_source& check_source( physical_source& source, page_cache& cache )
 {
-    image::type source_format = source.format();
-    image::type cache_format = cache.format();
+    image_format::type source_format = source.format();
+    image_format::type cache_format = cache.format();
     u16 source_page_size = source.page_size();
     u16 cache_page_size = cache.page_size();
 
@@ -43,10 +43,9 @@ physical_source& check_source( physical_source& source, page_cache& cache )
 
 image make_image( u32 size )
 {
-    uncompressed_image image( size, size, table_format );
+    image image( size, size, table_format );
 
-    for ( s16* i = image.as< s16 >(), * end = i + image.width * image.height * table_channels;
-        i != end; ++i )
+    for ( s16* i = image.as< s16 >(), * end = i + pixels( image ) * table_channels; i != end; ++i )
         *i = -1;
 
     return image;
@@ -68,10 +67,10 @@ texture_type make_table( const device_type& device, const image_pyramid& pyramid
     return device->texture( pyramid, texture::nearest, false );
 }
 
-texture_array_type make_array( const device_type& device, image::type format, u16 page_size )
+texture_array_type make_array( const device_type& device, image_format::type format, u16 page_size )
 {
     u32 size = device->limit( device::array_size );
-    return device->texture_array( page_size, page_size, size, format );
+    return device->texture_array( image_metadata( page_size, page_size, format ), size );
 }
 
 void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, s16 i, s16 exponent )
@@ -152,7 +151,7 @@ bool operator <( const pyramid_index& i, const pyramid_index& j )
 
 //--- page_cache -----------------------------------------------------------------------------------
 page_cache::page_cache
-    ( const device_type& device, thread_pool& pool_, u16 size, image::type cache_format )
+    ( const device_type& device, thread_pool& pool_, u16 size, image_format::type cache_format )
     : pool( pool_ ), page_size_( check_page_size( size ) ), format_( cache_format ),
     array( make_array( device, format_, page_size_ ) ), list(), map(), pages(), loads( 0 ), queue()
 {
@@ -165,7 +164,7 @@ u16 page_cache::page_size( void ) const
     return page_size_;
 }
 
-image::type page_cache::format( void ) const
+image_format::type page_cache::format( void ) const
 {
     return format_;
 }

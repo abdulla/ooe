@@ -21,7 +21,7 @@ public:
 
     virtual u32 size( void ) const;
     virtual u16 page_size( void ) const;
-    virtual image::type format( void ) const;
+    virtual image_format::type format( void ) const;
 
     u16 font_size( void ) const;
     f32 kerning( u32, u32, u8 ) const;

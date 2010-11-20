@@ -27,7 +27,7 @@ typedef tuple< f32, f32 > pin_type;
 const f32 width = 1024;
 const f32 height = 640;
 const u16 page_size = 256;
-const image::type format = image::rgba_u8;
+const image_format::type format = image_format::rgba_u8;
 u32 velocity = 4;
 
 //--- zoom_out -------------------------------------------------------------------------------------

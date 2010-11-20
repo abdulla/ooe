@@ -36,7 +36,7 @@ struct physical_source
 
     virtual u32 size( void ) const = 0;
     virtual u16 page_size( void ) const = 0;
-    virtual image::type format( void ) const = 0;
+    virtual image_format::type format( void ) const = 0;
 
     virtual image read( const pyramid_index& ) = 0;
 };
@@ -51,10 +51,10 @@ public:
     typedef std::list< cache_type > cache_list;
     typedef std::multimap< virtual_texture*, cache_list::iterator > page_map;
 
-    page_cache( const device_type&, thread_pool&, u16, image::type );
+    page_cache( const device_type&, thread_pool&, u16, image_format::type );
 
     u16 page_size( void ) const;
-    image::type format( void ) const;
+    image_format::type format( void ) const;
     up_t pending( void ) const;
 
     void write( void );
@@ -67,7 +67,7 @@ private:
     thread_pool& pool;
 
     const u16 page_size_;
-    const image::type format_;
+    const image_format::type format_;
     texture_array_type array;
 
     cache_list list;

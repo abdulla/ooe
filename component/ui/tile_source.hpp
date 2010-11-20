@@ -17,7 +17,7 @@ public:
 
     virtual u32 size( void ) const;
     virtual u16 page_size( void ) const;
-    virtual image::type format( void ) const;
+    virtual image_format::type format( void ) const;
 
 private:
     const std::string root;
@@ -26,7 +26,7 @@ private:
 
     u32 size_;
     u16 page_size_;
-    image::type format_;
+    image_format::type format_;
     u8 level_limit;
 
     virtual image read( const pyramid_index& );

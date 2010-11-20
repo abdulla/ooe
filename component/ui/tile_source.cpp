@@ -29,11 +29,11 @@ decoder_type find( const std::string& type )
 {
     decoder_pair pair[] =
     {
-        { "dds",        compressed_decode< dds::decode >        },
-        { "exr",        uncompressed_decode< exr::decode >      },
-        { "jpeg",       uncompressed_decode< jpeg::decode >     },
-        { "jpeg2000",   uncompressed_decode< jpeg2000::decode > },
-        { "png",        uncompressed_decode< png::decode >      }
+        { "dds",        dds::decode         },
+        { "exr",        exr::decode         },
+        { "jpeg",       jpeg::decode        },
+        { "jpeg2000",   jpeg2000::decode    },
+        { "png",        png::decode         }
     };
 
     decoder_pair* begin = pair;
@@ -81,7 +81,7 @@ u16 tile_source::page_size( void ) const
     return page_size_;
 }
 
-image::type tile_source::format( void ) const
+image_format::type tile_source::format( void ) const
 {
     return format_;
 }
