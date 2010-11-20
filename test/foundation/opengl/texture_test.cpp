@@ -2,6 +2,7 @@
 
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/image/dds.hpp"
 #include "foundation/math/math.hpp"
 #include "foundation/visual/event_queue.hpp"
 #include "foundation/visual/graphics.hpp"
@@ -14,7 +15,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 const f32 width = 640;
 const f32 height = 480;
 const u32 size = 256;
-const image_format::type format = image_format::rgb_u8;
+const image_format::type format = image_format::rgba_dxt1;
 
 const c8 vertex_shader[] =
     "uniform mat4 projection;\n\
@@ -84,7 +85,7 @@ buffer_type make_index( const device_type& device )
 
 image make_image( u8 red, u8 green, u8 blue )
 {
-    image image( size, size, format );
+    image image( size, size, image_format::rgba_u8 );
     u8 pixel_size = ooe::pixel_size( image );
 
     for ( u8* i = image.as< u8 >(), * end = i + byte_size( image ); i != end; i += pixel_size )
@@ -92,9 +93,10 @@ image make_image( u8 red, u8 green, u8 blue )
         i[ 0 ] = red;
         i[ 1 ] = green;
         i[ 2 ] = blue;
+        i[ 3 ] = 255;
     }
 
-    return image;
+    return dxt::encode( image, format );
 }
 
 typedef unit::group< anonymous_t, anonymous_t, 1 > group_type;
