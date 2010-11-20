@@ -60,7 +60,7 @@ void enable_attributes( attribute_set& x, attribute_set& y )
     x.swap( y );
 }
 
-void enable_frame( const frame_type& generic_frame, u32 program, s32 draw_buffers_limit )
+void enable_frame( const frame_ptr& generic_frame, u32 program, s32 draw_buffers_limit )
 {
     if ( dynamic_cast< opengl::default_frame* >( generic_frame.get() ) )
     {
@@ -101,19 +101,19 @@ public:
     device( const ooe::view_data&, bool );
     virtual ~device( void );
 
-    virtual void draw( const block_type&, const frame_type&, u32 );
+    virtual void draw( const block_ptr&, const frame_ptr&, u32 );
     virtual void swap( void );
 
     virtual void set( set_type, bool );
     virtual u32 limit( limit_type ) const;
 
-    virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
-    virtual texture_array_type texture_array( const image_metadata&, u32 ) const;
-    virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
-    virtual target_type target( const image_metadata& ) const;
-    virtual shader_type shader( const std::string&, shader::type ) const;
-    virtual program_type program( const shader_vector& ) const;
-    virtual frame_type default_frame( u32, u32 ) const;
+    virtual texture_ptr texture( const image_pyramid&, texture::type, bool ) const;
+    virtual texture_array_ptr texture_array( const image_metadata&, u32 ) const;
+    virtual buffer_ptr buffer( up_t, buffer::type, buffer::usage_type ) const;
+    virtual target_ptr target( const image_metadata& ) const;
+    virtual shader_ptr shader( const std::string&, shader::type ) const;
+    virtual program_ptr program( const shader_vector& ) const;
+    virtual frame_ptr default_frame( u32, u32 ) const;
 
 private:
     const view_data& view;
@@ -156,7 +156,7 @@ device::~device( void )
     context_destruct( view, context );
 }
 
-void device::draw( const block_type& generic_block, const frame_type& frame, u32 instances )
+void device::draw( const block_ptr& generic_block, const frame_ptr& frame, u32 instances )
 {
     if ( !instances )
         throw error::runtime( "opengl::device: " ) << "Number of instances must be > 0";
@@ -268,7 +268,7 @@ u32 device::limit( limit_type type ) const
     }
 }
 
-texture_type device::
+texture_ptr device::
     texture( const image_pyramid& pyramid, texture::type filter, bool generate_mipmap ) const
 {
     verify_texture( pyramid.width, pyramid.height, texture_size_limit );
@@ -279,7 +279,7 @@ texture_type device::
         return new uncompressed_texture( pyramid, filter, generate_mipmap );
 }
 
-texture_array_type device::texture_array( const image_metadata& metadata, u32 depth ) const
+texture_array_ptr device::texture_array( const image_metadata& metadata, u32 depth ) const
 {
     verify_texture( metadata.width, metadata.height, texture_size_limit );
 
@@ -293,34 +293,34 @@ texture_array_type device::texture_array( const image_metadata& metadata, u32 de
         return new uncompressed_texture_array( metadata, depth );
 }
 
-buffer_type device::buffer( up_t size, buffer::type format, buffer::usage_type usage ) const
+buffer_ptr device::buffer( up_t size, buffer::type format, buffer::usage_type usage ) const
 {
     return new opengl::buffer( size, format, usage );
 }
 
-target_type device::target( const image_metadata& metadata ) const
+target_ptr device::target( const image_metadata& metadata ) const
 {
     return new opengl::target( metadata );
 }
 
-shader_type device::shader( const std::string& source, shader::type type ) const
+shader_ptr device::shader( const std::string& source, shader::type type ) const
 {
     return new opengl::shader( source, type );
 }
 
-program_type device::program( const shader_vector& vector ) const
+program_ptr device::program( const shader_vector& vector ) const
 {
     return new opengl::program( vector );
 }
 
-frame_type device::default_frame( u32 width, u32 height ) const
+frame_ptr device::default_frame( u32 width, u32 height ) const
 {
     return new opengl::default_frame( width, height );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
-extern "C" device_type OOE_VISIBLE device_open( const view_data& view, bool sync )
+extern "C" device_ptr OOE_VISIBLE device_open( const view_data& view, bool sync )
 {
     return new opengl::device( view, sync );
 }

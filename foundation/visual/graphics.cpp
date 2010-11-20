@@ -48,7 +48,7 @@ u8 image_pyramid::size( void ) const
     return vector.size();
 }
 
-image::data_type image_pyramid::operator []( u8 level ) const
+image::data_ptr image_pyramid::operator []( u8 level ) const
 {
     return vector[ level ];
 }

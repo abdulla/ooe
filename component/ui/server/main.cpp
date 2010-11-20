@@ -168,12 +168,12 @@ box_unit make_unit( f32 value )
 }
 
 //--- make_input -----------------------------------------------------------------------------------
-void make_input( const device_type& device, block_type& block, const box_tree::box_vector& boxes,
+void make_input( const device_ptr& device, block_ptr& block, const box_tree::box_vector& boxes,
     f32 x, f32 y )
 {
-    buffer_type attribute = device->buffer( sizeof( f32 ) * 5 * boxes.size(), buffer::point );
+    buffer_ptr attribute = device->buffer( sizeof( f32 ) * 5 * boxes.size(), buffer::point );
     {
-        map_type map = attribute->map( buffer::write );
+        map_ptr map = attribute->map( buffer::write );
         std::memcpy( map->data, &boxes[ 0 ], map->size );
     }
 
@@ -184,10 +184,9 @@ void make_input( const device_type& device, block_type& block, const box_tree::b
 }
 
 //--- make_block -----------------------------------------------------------------------------------
-block_type make_block
-    ( const program_type& program, const buffer_type& index, const buffer_type& point )
+block_ptr make_block( const program_ptr& program, const buffer_ptr& index, const buffer_ptr& point )
 {
-    block_type block = program->block( index );
+    block_ptr block = program->block( index );
     block->input( "vertex", 2, point );
     block->input( "projection", orthographic( 0, width, height, 0, -64, 64 ) );
     return block;
@@ -216,7 +215,7 @@ class text_node
     : public node
 {
 public:
-    text_node( const block_type& in, text_layout& layout_, const property_tree& tree )
+    text_node( const block_ptr& in, text_layout& layout_, const property_tree& tree )
         : tuple( in, 0 ), layout( layout_ ), text(), x( tree.get( "x", 0 ) ),
         y( tree.get( "y", 0 ) ), level( tree.get( "level", 5 ) )
     {
@@ -260,8 +259,8 @@ private:
 class make_text
 {
 public:
-    make_text( const device_type& device, const std::string& root, const buffer_type& index_,
-        const buffer_type& point_, page_cache& cache )
+    make_text( const device_ptr& device, const std::string& root, const buffer_ptr& index_,
+        const buffer_ptr& point_, page_cache& cache )
         : program( make_program( device, root + "../share/glsl",
         root + "../share/json/text.effect" ) ), index( index_ ), point( point_ ), library(),
         face( library, root + "../share/font/ubuntu-regular.ttf" ),
@@ -271,15 +270,15 @@ public:
 
     node* operator ()( const property_tree& tree )
     {
-        block_type block = make_block( program, index, point );
+        block_ptr block = make_block( program, index, point );
         vector.push_back( new text_node( block, layout, tree ) );
         return vector.back();
     }
 
 private:
-    const program_type program;
-    const buffer_type& index;
-    const buffer_type& point;
+    const program_ptr program;
+    const buffer_ptr& index;
+    const buffer_ptr& point;
     font::library library;
     font::face face;
     font_source source;
@@ -292,7 +291,7 @@ class tile_node
     : public node
 {
 public:
-    tile_node( const block_type& data_, const device_type& device, page_cache& cache,
+    tile_node( const block_ptr& data_, const device_ptr& device, page_cache& cache,
         tile_source& source_ )
         : data( data_ ), source( source_ ), texture( device, cache, source )
     {
@@ -322,7 +321,7 @@ public:
     }
 
 private:
-    block_type data;
+    block_ptr data;
     tile_source source;
     virtual_texture texture;
 };
@@ -331,8 +330,8 @@ private:
 class make_tile
 {
 public:
-    make_tile( const device_type& device_, const std::string& root_, const buffer_type& index_,
-        const buffer_type& point_, page_cache& cache_ )
+    make_tile( const device_ptr& device_, const std::string& root_, const buffer_ptr& index_,
+        const buffer_ptr& point_, page_cache& cache_ )
         : device( device_ ), root( root_ ), program( make_program( device, root + "../share/glsl",
         root + "../share/json/tile.effect" ) ), index( index_ ), point( point_ ), cache( cache_ ),
         vector()
@@ -341,24 +340,24 @@ public:
 
     node* operator ()( const property_tree& tree )
     {
-        block_type block = make_block( program, index, point );
+        block_ptr block = make_block( program, index, point );
         tile_source source( root + "../" + tree.get< std::string >( "tile" ) );
         vector.push_back( new tile_node( block, device, cache, source ) );
         return vector.back();
     }
 
 private:
-    const device_type& device;
+    const device_ptr& device;
     const std::string& root;
-    const program_type program;
-    const buffer_type& index;
-    const buffer_type& point;
+    const program_ptr program;
+    const buffer_ptr& index;
+    const buffer_ptr& point;
     page_cache& cache;
     node_vector vector;
 };
 
 //--- draw_aux -------------------------------------------------------------------------------------
-void draw_aux( device_type& device, const frame_type& frame, const box_tree::box_vector& box,
+void draw_aux( device_ptr& device, const frame_ptr& frame, const box_tree::box_vector& box,
     const box_tree::aux_vector& aux, f32 x, f32 y )
 {
     for ( up_t i = 0, end = box.size(); i != end; ++i )
@@ -386,13 +385,13 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
     event_queue queue;
     view view( queue, width, height, false );
-    device_type device = library.find< device_open_type >( "device_open" )( view, true );
+    device_ptr device = library.find< device_open_type >( "device_open" )( view, true );
 
     thread_pool pool;
     page_cache cache( device, pool, page_size, format );
-    frame_type frame = device->default_frame( width, height );
-    buffer_type index = make_index( device );
-    buffer_type point = make_point( device );
+    frame_ptr frame = device->default_frame( width, height );
+    buffer_ptr index = make_index( device );
+    buffer_ptr point = make_point( device );
 
     make_text text( device, root, index, point, cache );
     make_tile tile( device, root, index, point, cache );
@@ -402,12 +401,12 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
     // box rendering
     box_tree tree = make_tree( root + "../share/json/ui_tree.json", map );
-    program_type program_box =
+    program_ptr program_box =
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
 
-    block_type block_boxes = make_block( program_box, index, point );
+    block_ptr block_boxes = make_block( program_box, index, point );
     block_boxes->input( "shadow", false );
-    block_type block_shadows = make_block( program_box, index, point );
+    block_ptr block_shadows = make_block( program_box, index, point );
     block_shadows->input( "shadow", true );
     device->set( device::depth_test, true );
     vec3 move( 0, 0, 0 );

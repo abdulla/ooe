@@ -19,7 +19,7 @@ image::image( u32 width_, u32 height_, image_format::type format_ )
 {
 }
 
-image::image( u32 width_, u32 height_, image_format::type format_, const data_type& data_ )
+image::image( u32 width_, u32 height_, image_format::type format_, const data_ptr& data_ )
     : image_metadata( width_, height_, format_ ), data( data_ )
 {
 }

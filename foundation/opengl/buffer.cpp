@@ -96,7 +96,7 @@ buffer::~buffer( void )
     DeleteBuffers( 1, &id );
 }
 
-map_type buffer::map( access_type access ) const
+map_ptr buffer::map( access_type access ) const
 {
     BindBuffer( target, id );
     void* data = MapBuffer( target, buffer_access( access ) );

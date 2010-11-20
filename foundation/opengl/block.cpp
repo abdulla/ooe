@@ -112,7 +112,7 @@ OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- block ----------------------------------------------------------------------------------------
-block::block( u32 id_, const buffer_type& index_ )
+block::block( u32 id_, const buffer_ptr& index_ )
     : id( id_ ), index( index_ ), uniforms(), textures(), texture_arrays(), buffers(), iterators(),
     locations()
 {
@@ -194,19 +194,19 @@ void block::input( const std::string& name, const mat4* data, u32 size )
     uniforms[ location ] = make_tuple( uniform_4m, size, array );
 }
 
-void block::input( const std::string& name, const texture_type& texture )
+void block::input( const std::string& name, const texture_ptr& texture )
 {
     s32 location = find( id, locations, name, GetUniformLocation );
     textures[ location ] = texture;
 }
 
-void block::input( const std::string& name, const texture_array_type& texture_array )
+void block::input( const std::string& name, const texture_array_ptr& texture_array )
 {
     s32 location = find( id, locations, name, GetUniformLocation );
     texture_arrays[ location ] = texture_array;
 }
 
-void block::input( const std::string& name, u8 size, const buffer_type& buffer, bool instanced )
+void block::input( const std::string& name, u8 size, const buffer_ptr& buffer, bool instanced )
 {
     if ( dynamic_cast< opengl::buffer& >( *buffer ).target != ARRAY_BUFFER )
         throw error::runtime( "opengl::block: " ) << "Point buffer expected";

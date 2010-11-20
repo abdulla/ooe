@@ -30,7 +30,7 @@ struct texture
     virtual void write( const image&, u32, u32, u8 = 0 ) = 0;
 };
 
-typedef shared_ptr< texture > texture_type;
+typedef shared_ptr< texture > texture_ptr;
 
 //--- texture_array --------------------------------------------------------------------------------
 struct texture_array
@@ -39,7 +39,7 @@ struct texture_array
     virtual void write( const image&, u32, u32, u32 ) = 0;
 };
 
-typedef shared_ptr< texture_array > texture_array_type;
+typedef shared_ptr< texture_array > texture_array_ptr;
 
 //--- map ------------------------------------------------------------------------------------------
 struct map
@@ -51,7 +51,7 @@ struct map
     virtual ~map( void ) {}
 };
 
-typedef shared_ptr< map > map_type;
+typedef shared_ptr< map > map_ptr;
 
 //--- buffer ---------------------------------------------------------------------------------------
 struct buffer
@@ -79,10 +79,10 @@ struct buffer
     };
 
     virtual ~buffer( void ) {}
-    virtual map_type map( access_type ) const = 0;
+    virtual map_ptr map( access_type ) const = 0;
 };
 
-typedef shared_ptr< buffer > buffer_type;
+typedef shared_ptr< buffer > buffer_ptr;
 
 //--- target ---------------------------------------------------------------------------------------
 struct target
@@ -90,7 +90,7 @@ struct target
     virtual ~target( void ) {}
 };
 
-typedef shared_ptr< target > target_type;
+typedef shared_ptr< target > target_ptr;
 
 //--- shader ---------------------------------------------------------------------------------------
 struct shader
@@ -105,8 +105,8 @@ struct shader
     virtual ~shader( void ) {}
 };
 
-typedef shared_ptr< shader > shader_type;
-typedef std::vector< shader_type > shader_vector;
+typedef shared_ptr< shader > shader_ptr;
+typedef std::vector< shader_ptr > shader_vector;
 
 //--- block ----------------------------------------------------------------------------------------
 struct block
@@ -123,9 +123,9 @@ struct block
     virtual void input( const std::string&, const mat3*, u32 ) = 0;
     virtual void input( const std::string&, const mat4*, u32 ) = 0;
 
-    virtual void input( const std::string&, const texture_type& ) = 0;
-    virtual void input( const std::string&, const texture_array_type& ) = 0;
-    virtual void input( const std::string&, u8, const buffer_type&, bool = false ) = 0;
+    virtual void input( const std::string&, const texture_ptr& ) = 0;
+    virtual void input( const std::string&, const texture_array_ptr& ) = 0;
+    virtual void input( const std::string&, u8, const buffer_ptr&, bool = false ) = 0;
 
     void input( const std::string& name, s32 a )
     {
@@ -188,33 +188,33 @@ struct block
     }
 };
 
-typedef shared_ptr< block > block_type;
+typedef shared_ptr< block > block_ptr;
 typedef std::vector< mat3 > mat3_vector;
 typedef std::vector< mat4 > mat4_vector;
 
 //--- frame ----------------------------------------------------------------------------------------
-typedef shared_ptr< struct frame > frame_type;
+typedef shared_ptr< struct frame > frame_ptr;
 
 struct frame
 {
     virtual ~frame( void ) {}
-    virtual void read( const std::string&, image_format::type, buffer_type& ) = 0;
-    virtual void write( const std::string&, const std::string&, const frame_type& ) = 0;
+    virtual void read( const std::string&, image_format::type, buffer_ptr& ) = 0;
+    virtual void write( const std::string&, const std::string&, const frame_ptr& ) = 0;
     virtual void clear( void ) = 0;
 
-    virtual void output( const std::string&, const texture_type& ) = 0;
-    virtual void output( const std::string&, const target_type& ) = 0;
+    virtual void output( const std::string&, const texture_ptr& ) = 0;
+    virtual void output( const std::string&, const target_ptr& ) = 0;
 };
 
 //--- program --------------------------------------------------------------------------------------
 struct program
 {
     virtual ~program( void ) {}
-    virtual block_type block( const buffer_type& ) const = 0;
-    virtual frame_type frame( u32, u32 ) const = 0;
+    virtual block_ptr block( const buffer_ptr& ) const = 0;
+    virtual frame_ptr frame( u32, u32 ) const = 0;
 };
 
-typedef shared_ptr< program > program_type;
+typedef shared_ptr< program > program_ptr;
 
 //--- image_pyramid --------------------------------------------------------------------------------
 class OOE_VISIBLE image_pyramid
@@ -227,10 +227,10 @@ public:
     void insert( const ooe::image& );
     ooe::image image( u8 ) const;
     u8 size( void ) const;
-    ooe::image::data_type operator []( u8 ) const;
+    ooe::image::data_ptr operator []( u8 ) const;
 
 private:
-    std::vector< ooe::image::data_type > vector;
+    std::vector< ooe::image::data_ptr > vector;
 };
 
 //--- device ---------------------------------------------------------------------------------------
@@ -252,25 +252,25 @@ struct device
     };
 
     virtual ~device( void ) {}
-    virtual void draw( const block_type&, const frame_type&, u32 ) = 0;
+    virtual void draw( const block_ptr&, const frame_ptr&, u32 ) = 0;
     virtual void swap( void ) = 0;
 
     virtual void set( set_type, bool ) = 0;
     virtual u32 limit( limit_type ) const = 0;
 
-    virtual texture_type texture
+    virtual texture_ptr texture
         ( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
-    virtual texture_array_type texture_array( const image_metadata&, u32 ) const = 0;
-    virtual buffer_type buffer
+    virtual texture_array_ptr texture_array( const image_metadata&, u32 ) const = 0;
+    virtual buffer_ptr buffer
         ( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
-    virtual target_type target( const image_metadata& ) const = 0;
-    virtual shader_type shader( const std::string&, shader::type ) const = 0;
-    virtual program_type program( const shader_vector& ) const = 0;
-    virtual frame_type default_frame( u32, u32 ) const = 0;
+    virtual target_ptr target( const image_metadata& ) const = 0;
+    virtual shader_ptr shader( const std::string&, shader::type ) const = 0;
+    virtual program_ptr program( const shader_vector& ) const = 0;
+    virtual frame_ptr default_frame( u32, u32 ) const = 0;
 };
 
-typedef shared_ptr< device > device_type;
-typedef device_type ( device_open_type )( const view_data&, bool );
+typedef shared_ptr< device > device_ptr;
+typedef device_ptr ( device_open_type )( const view_data&, bool );
 
 OOE_NAMESPACE_END( ( ooe ) )
 

@@ -27,12 +27,12 @@ struct text
 class text_layout
 {
 public:
-    text_layout( const device_type&, page_cache&, font_source& );
+    text_layout( const device_ptr&, page_cache&, font_source& );
 
-    u32 input( block_type&, const text&, f32 );
+    u32 input( block_ptr&, const text&, f32 );
 
 private:
-    const device_type& device;
+    const device_ptr& device;
     const font_source& source;
     virtual_texture texture;
 };

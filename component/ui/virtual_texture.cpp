@@ -62,12 +62,12 @@ image_pyramid make_pyramid( const physical_source& source )
     return pyramid;
 }
 
-texture_type make_table( const device_type& device, const image_pyramid& pyramid )
+texture_ptr make_table( const device_ptr& device, const image_pyramid& pyramid )
 {
     return device->texture( pyramid, texture::nearest, false );
 }
 
-texture_array_type make_array( const device_type& device, image_format::type format, u16 page_size )
+texture_array_ptr make_array( const device_ptr& device, image_format::type format, u16 page_size )
 {
     u32 size = device->limit( device::array_size );
     return device->texture_array( image_metadata( page_size, page_size, format ), size );
@@ -151,7 +151,7 @@ bool operator <( const pyramid_index& i, const pyramid_index& j )
 
 //--- page_cache -----------------------------------------------------------------------------------
 page_cache::page_cache
-    ( const device_type& device, thread_pool& pool_, u16 size, image_format::type cache_format )
+    ( const device_ptr& device, thread_pool& pool_, u16 size, image_format::type cache_format )
     : pool( pool_ ), page_size_( check_page_size( size ) ), format_( cache_format ),
     array( make_array( device, format_, page_size_ ) ), list(), map(), pages(), loads( 0 ), queue()
 {
@@ -272,7 +272,7 @@ void page_cache::evict( virtual_texture& texture )
 
 //--- virtual_texture ------------------------------------------------------------------------------
 virtual_texture::
-    virtual_texture( const device_type& device, page_cache& cache_, physical_source& source_ )
+    virtual_texture( const device_ptr& device, page_cache& cache_, physical_source& source_ )
     : cache( cache_ ), source( check_source( source_, cache ) ), pyramid( make_pyramid( source ) ),
     table( make_table( device, pyramid ) ), bitset()
 {
@@ -285,7 +285,7 @@ virtual_texture::~virtual_texture( void )
     cache.evict( *this );
 }
 
-void virtual_texture::input( block_type& block, const std::string& name ) const
+void virtual_texture::input( block_ptr& block, const std::string& name ) const
 {
     s32 begin = log2f( source.page_size() );
     s32 end = log2f( source.size() ) + 1;

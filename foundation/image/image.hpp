@@ -76,7 +76,7 @@ class image
     : public image_metadata
 {
 public:
-    typedef shared_free< void > data_type;
+    typedef shared_free< void > data_ptr;
 
     image( u32, u32, image_format::type );
 
@@ -91,15 +91,15 @@ public:
         return data.get();
     }
 
-    data_type ptr( void ) const
+    data_ptr ptr( void ) const
     {
         return data;
     }
 
 private:
-    const data_type data;
+    const data_ptr data;
 
-    image( u32, u32, image_format::type, const data_type& ) OOE_VISIBLE;
+    image( u32, u32, image_format::type, const data_ptr& ) OOE_VISIBLE;
 
     friend class image_pyramid;
 };

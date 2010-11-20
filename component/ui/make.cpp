@@ -58,7 +58,7 @@ void load_tree( const property_tree& pt, const node_map& node, box_tree& bt )
 }
 
 //--- make_shader ----------------------------------------------------------------------------------
-shader_type make_shader( const std::string& name, const device_type& device,
+shader_ptr make_shader( const std::string& name, const device_ptr& device,
     const std::string& source, shader::type type )
 {
     try
@@ -76,8 +76,8 @@ OOE_ANONYMOUS_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- make_program ---------------------------------------------------------------------------------
-program_type make_program
-    ( const device_type& device, const std::string& root, const std::string& path )
+program_ptr make_program
+    ( const device_ptr& device, const std::string& root, const std::string& path )
 {
     property_tree pt;
     read_json( canonical_path( path ), pt );
@@ -122,11 +122,11 @@ program_type make_program
 }
 
 //--- make_index -----------------------------------------------------------------------------------
-buffer_type make_index( const device_type& device )
+buffer_ptr make_index( const device_ptr& device )
 {
-    buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
+    buffer_ptr index = device->buffer( sizeof( u16 ) * 6, buffer::index );
     {
-        map_type map = index->map( buffer::write );
+        map_ptr map = index->map( buffer::write );
         u16* value = static_cast< u16* >( map->data );
 
         value[ 0 ] = 0;
@@ -140,11 +140,11 @@ buffer_type make_index( const device_type& device )
 }
 
 //--- make_point -----------------------------------------------------------------------------------
-buffer_type make_point( const device_type& device )
+buffer_ptr make_point( const device_ptr& device )
 {
-    buffer_type point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
+    buffer_ptr point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
     {
-        map_type map = point->map( buffer::write );
+        map_ptr map = point->map( buffer::write );
         f32* value = static_cast< f32* >( map->data );
 
         // top left

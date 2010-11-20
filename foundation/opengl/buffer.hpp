@@ -28,7 +28,7 @@ struct buffer
     buffer( up_t, type, usage_type );
     virtual ~buffer( void );
 
-    virtual map_type map( access_type ) const;
+    virtual map_ptr map( access_type ) const;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

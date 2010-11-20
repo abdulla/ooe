@@ -87,7 +87,7 @@ void frame_check( bool& do_check, u32 target )
     do_check = false;
 }
 
-void frame_read( buffer_type& generic_buffer, image_format::type format,
+void frame_read( buffer_ptr& generic_buffer, image_format::type format,
     s32 id, u32 width, u32 height, bool& do_check, u32 target )
 {
     opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
@@ -110,7 +110,7 @@ void frame_read( buffer_type& generic_buffer, image_format::type format,
     ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
 
-void frame_write( const frame_type& generic_frame, const std::string& read_name,
+void frame_write( const frame_ptr& generic_frame, const std::string& read_name,
     s32 id, u32 width, u32 height, bool& do_check, u32 draw_target )
 {
     opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
@@ -150,14 +150,14 @@ default_frame::~default_frame( void )
 }
 
 void default_frame::
-    read( const std::string& name, image_format::type format, buffer_type& generic_buffer )
+    read( const std::string& name, image_format::type format, buffer_ptr& generic_buffer )
 {
     bool do_check = false;
     frame_read( generic_buffer, format, 0, width, height, do_check, find( name ) );
 }
 
 void default_frame::write
-    ( const std::string& write_name, const std::string& read_name, const frame_type& generic_frame )
+    ( const std::string& write_name, const std::string& read_name, const frame_ptr& generic_frame )
 {
     bool do_check = false;
     frame_write( generic_frame, read_name, 0, width, height, do_check, find( write_name ) );
@@ -169,12 +169,12 @@ void default_frame::clear( void )
     frame_clear( 0, do_check );
 }
 
-void default_frame::output( const std::string&, const texture_type& )
+void default_frame::output( const std::string&, const texture_ptr& )
 {
     throw error::runtime( "opengl::default_frame: " ) << "Can not attach to default frame";
 }
 
-void default_frame::output( const std::string&, const target_type& )
+void default_frame::output( const std::string&, const target_ptr& )
 {
     throw error::runtime( "opengl::default_frame: " ) << "Can not attach to default frame";
 }
@@ -192,7 +192,7 @@ frame::~frame( void )
     DeleteFramebuffers( 1, &id );
 }
 
-void frame::read( const std::string& name, image_format::type format, buffer_type& generic_buffer )
+void frame::read( const std::string& name, image_format::type format, buffer_ptr& generic_buffer )
 {
     if ( !colours.size() )
         throw error::runtime( "opengl::frame: " ) << "Frame has no colour attachment";
@@ -202,7 +202,7 @@ void frame::read( const std::string& name, image_format::type format, buffer_typ
 }
 
 void frame::write
-    ( const std::string& write_name, const std::string& read_name, const frame_type& generic_frame )
+    ( const std::string& write_name, const std::string& read_name, const frame_ptr& generic_frame )
 {
     s32 location = find( program, locations, write_name );
     frame_write( generic_frame, read_name, id, width, height, do_check, location );
@@ -213,7 +213,7 @@ void frame::clear( void )
     frame_clear( id, do_check );
 }
 
-void frame::output( const std::string& name, const texture_type& generic_texture )
+void frame::output( const std::string& name, const texture_ptr& generic_texture )
 {
     const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
     s32 location = find( program, locations, name );
@@ -225,7 +225,7 @@ void frame::output( const std::string& name, const texture_type& generic_texture
     do_check = true;
 }
 
-void frame::output( const std::string& name, const target_type& generic_target )
+void frame::output( const std::string& name, const target_ptr& generic_target )
 {
     const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
     s32 location = find( program, locations, name );

@@ -51,7 +51,7 @@ public:
     typedef std::list< cache_type > cache_list;
     typedef std::multimap< virtual_texture*, cache_list::iterator > page_map;
 
-    page_cache( const device_type&, thread_pool&, u16, image_format::type );
+    page_cache( const device_ptr&, thread_pool&, u16, image_format::type );
 
     u16 page_size( void ) const;
     image_format::type format( void ) const;
@@ -68,7 +68,7 @@ private:
 
     const u16 page_size_;
     const image_format::type format_;
-    texture_array_type array;
+    texture_array_ptr array;
 
     cache_list list;
     cache_map map;
@@ -90,10 +90,10 @@ class virtual_texture
     : private noncopyable
 {
 public:
-    virtual_texture( const device_type&, page_cache&, physical_source& );
+    virtual_texture( const device_ptr&, page_cache&, physical_source& );
     ~virtual_texture( void );
 
-    void input( block_type&, const std::string& ) const;
+    void input( block_ptr&, const std::string& ) const;
     void load( u32, u32, u32, u32, u8, bool = false );
     void unlock( u32, u32, u32, u32, u8 );
 
@@ -104,7 +104,7 @@ private:
     physical_source& source;
 
     image_pyramid pyramid;
-    texture_type table;
+    texture_ptr table;
     table_bitset bitset;
 
     void write( void );

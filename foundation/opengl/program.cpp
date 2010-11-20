@@ -57,12 +57,12 @@ program::~program( void )
     DeleteProgram( id );
 }
 
-block_type program::block( const buffer_type& buffer ) const
+block_ptr program::block( const buffer_ptr& buffer ) const
 {
     return new opengl::block( id, buffer );
 }
 
-frame_type program::frame( u32 width, u32 height ) const
+frame_ptr program::frame( u32 width, u32 height ) const
 {
     return new opengl::frame( id, width, height );
 }

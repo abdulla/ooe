@@ -34,7 +34,7 @@ template<>
 
     event_queue queue;
     view view( queue, width, height, false );
-    device_type device = opengl_library.find< device_open_type >( "device_open" )( view, true );
+    device_ptr device = opengl_library.find< device_open_type >( "device_open" )( view, true );
 
     font::library font_library;
     font::face font_face( font_library, root + "../share/font/ubuntu-regular.ttf" );
@@ -44,9 +44,9 @@ template<>
     page_cache cache( device, pool, font_source.page_size(), font_source.format() );
     text_layout layout( device, cache, font_source );
 
-    program_type program =
+    program_ptr program =
         make_program( device, root + "../share/glsl", root + "../share/json/text.effect" );
-    frame_type frame = device->default_frame( width, height );
+    frame_ptr frame = device->default_frame( width, height );
     const c8 data[] = "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
     text text;
@@ -55,7 +55,7 @@ template<>
     text.green = 255;
     text.blue = 255;
 
-    block_type block = program->block( make_index( device ) );
+    block_ptr block = program->block( make_index( device ) );
     block->input( "vertex", 2, make_point( device ) );
     block->input( "projection", orthographic( 0, width, height, 0 ) );
     device->set( device::blend, true );

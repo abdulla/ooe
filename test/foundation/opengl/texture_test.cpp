@@ -40,11 +40,11 @@ const c8 fragment_shader[] =
         gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );\n\
     }";
 
-buffer_type make_point( const device_type& device )
+buffer_ptr make_point( const device_ptr& device )
 {
-    buffer_type point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
+    buffer_ptr point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
     {
-        map_type map = point->map( buffer::write );
+        map_ptr map = point->map( buffer::write );
         f32* value = static_cast< f32* >( map->data );
 
         // top left
@@ -66,11 +66,11 @@ buffer_type make_point( const device_type& device )
     return point;
 }
 
-buffer_type make_index( const device_type& device )
+buffer_ptr make_index( const device_ptr& device )
 {
-    buffer_type index = device->buffer( sizeof( u16 ) * 6, buffer::index );
+    buffer_ptr index = device->buffer( sizeof( u16 ) * 6, buffer::index );
     {
-        map_type map = index->map( buffer::write );
+        map_ptr map = index->map( buffer::write );
         u16* value = static_cast< u16* >( map->data );
 
         value[ 0 ] = 0;
@@ -118,19 +118,19 @@ template<>
 
     event_queue queue;
     view view( queue, width, height, false );
-    device_type device = library.find< device_open_type >( "device_open" )( view, false );
+    device_ptr device = library.find< device_open_type >( "device_open" )( view, false );
 
     const s32 array_size = device->limit( device::array_size );
-    texture_array_type texture_array =
+    texture_array_ptr texture_array =
         device->texture_array( image_metadata( size, size, format ), array_size );
     OOE_CHECK( "texture array size " << array_size << " > 0 ", array_size );
 
     shader_vector vector;
     vector.push_back( device->shader( vertex_shader, shader::vertex ) );
     vector.push_back( device->shader( fragment_shader, shader::fragment ) );
-    program_type program = device->program( vector );
+    program_ptr program = device->program( vector );
 
-    block_type block = program->block( make_index( device ) );
+    block_ptr block = program->block( make_index( device ) );
     block->input( "vertex", 2, make_point( device ) );
     block->input( "sampler", texture_array );
     block->input( "projection", orthographic( 0, width / height, 1, 0 ) );
@@ -142,7 +142,7 @@ template<>
         make_image( 0, 0, 255 )
     };
 
-    frame_type frame = device->default_frame( width, height );
+    frame_ptr frame = device->default_frame( width, height );
 
     for ( s32 i = 0; i != array_size; ++i )
     {

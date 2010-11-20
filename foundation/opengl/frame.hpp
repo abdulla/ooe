@@ -16,12 +16,12 @@ public:
     default_frame( u32, u32 );
     virtual ~default_frame( void );
 
-    virtual void read( const std::string&, image_format::type, buffer_type& );
-    virtual void write( const std::string&, const std::string&, const frame_type& );
+    virtual void read( const std::string&, image_format::type, buffer_ptr& );
+    virtual void write( const std::string&, const std::string&, const frame_ptr& );
     virtual void clear( void );
 
-    virtual void output( const std::string&, const texture_type& );
-    virtual void output( const std::string&, const target_type& );
+    virtual void output( const std::string&, const texture_ptr& );
+    virtual void output( const std::string&, const target_ptr& );
 
 private:
     const u32 width;
@@ -45,12 +45,12 @@ struct frame
     frame( u32, u32, u32 );
     virtual ~frame( void );
 
-    virtual void read( const std::string&, image_format::type, buffer_type& );
-    virtual void write( const std::string&, const std::string&, const frame_type& );
+    virtual void read( const std::string&, image_format::type, buffer_ptr& );
+    virtual void write( const std::string&, const std::string&, const frame_ptr& );
     virtual void clear( void );
 
-    virtual void output( const std::string&, const texture_type& );
-    virtual void output( const std::string&, const target_type& );
+    virtual void output( const std::string&, const texture_ptr& );
+    virtual void output( const std::string&, const target_ptr& );
 
     void check( void );
 };

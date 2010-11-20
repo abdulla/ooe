@@ -84,13 +84,12 @@ text::text( void )
 }
 
 //--- text_layout ----------------------------------------------------------------------------------
-text_layout::
-    text_layout( const device_type& device_, page_cache& cache, font_source& source_ )
+text_layout::text_layout( const device_ptr& device_, page_cache& cache, font_source& source_ )
     : device( device_ ), source( source_ ), texture( device_, cache, source_ )
 {
 }
 
-u32 text_layout::input( block_type& block, const text& text, f32 width )
+u32 text_layout::input( block_ptr& block, const text& text, f32 width )
 {
     u32 glyphs = glyph_size( text.data.begin(), text.data.end() );
     u32 font_size = 1 << text.level;
@@ -110,8 +109,8 @@ u32 text_layout::input( block_type& block, const text& text, f32 width )
     u32 code_point = 0;
     u32 last_point;
 
-    buffer_type point = device->buffer( sizeof( f32 ) * point_size * glyphs, buffer::point );
-    map_type map = point->map( buffer::write );
+    buffer_ptr point = device->buffer( sizeof( f32 ) * point_size * glyphs, buffer::point );
+    map_ptr map = point->map( buffer::write );
     f32* data = static_cast< f32* >( map->data );
     marker m( text.data.begin(), data, 0 );
 

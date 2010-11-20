@@ -19,22 +19,22 @@ public:
     typedef shared_array< u8 > uniform_array;
     typedef tuple< uniform_function, u32, uniform_array > uniform_tuple;
     typedef std::map< s32, uniform_tuple > uniform_map;
-    typedef std::map< s32, texture_type > texture_map;
-    typedef std::map< s32, texture_array_type > texture_array_map;
+    typedef std::map< s32, texture_ptr > texture_map;
+    typedef std::map< s32, texture_array_ptr > texture_array_map;
     typedef tuple< s32, u8 > buffer_tuple;
-    typedef std::multimap< buffer_type, buffer_tuple > buffer_map;
+    typedef std::multimap< buffer_ptr, buffer_tuple > buffer_map;
     typedef std::map< s32, buffer_map::iterator > iterator_map;
     typedef std::map< std::string, s32 > location_map;
 
     const u32 id;
-    const buffer_type index;
+    const buffer_ptr index;
 
     uniform_map uniforms;
     texture_map textures;
     texture_array_map texture_arrays;
     buffer_map buffers;
 
-    block( u32, const buffer_type& );
+    block( u32, const buffer_ptr& );
     virtual ~block( void );
 
     virtual void input( const std::string&, s32[][ 1 ], u32 );
@@ -48,9 +48,9 @@ public:
     virtual void input( const std::string&, const mat3*, u32 );
     virtual void input( const std::string&, const mat4*, u32 );
 
-    virtual void input( const std::string&, const texture_type& );
-    virtual void input( const std::string&, const texture_array_type& );
-    virtual void input( const std::string&, u8, const buffer_type&, bool );
+    virtual void input( const std::string&, const texture_ptr& );
+    virtual void input( const std::string&, const texture_array_ptr& );
+    virtual void input( const std::string&, u8, const buffer_ptr&, bool );
 
 private:
     iterator_map iterators;
