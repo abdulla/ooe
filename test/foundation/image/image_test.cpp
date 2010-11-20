@@ -207,12 +207,13 @@ template<>
         reader_type reader = png::open( descriptor( path ) );
         OOE_CHECK( "reader size matches", byte_size( input[ i ] ) == byte_size( *reader ) );
 
+        std::memset( output.get(), 0, byte_size( output ) );
         up_t row_size = ooe::row_size( *reader );
         u32 rows = 0;
 
-        for ( u8* out = output.as< u8 >(); reader->decode_row(); ++rows, out += row_size )
+        for ( u8* j = output.as< u8 >(); reader->decode_row(); ++rows, j += row_size )
             OOE_CHECK( "read row " << rows,
-                reader->read_pixels( out, reader->width ) == reader->width );
+                reader->read_pixels( j, reader->width ) == reader->width );
 
         OOE_CHECK( "reader read complete image", rows == reader->height );
         OOE_CHECK( "reader data matches",
