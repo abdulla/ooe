@@ -36,10 +36,9 @@ bool is_compressed( image_format::type format )
     return format >= image_format::type( image_format::compressed );
 }
 
-
-u8 subpixels( const image_metadata& metadata )
+u8 subpixels( image_format::type format )
 {
-    switch ( metadata.format )
+    switch ( format )
     {
     case image_format::y_u8:
     case image_format::y_s16:
@@ -83,13 +82,18 @@ u8 subpixels( const image_metadata& metadata )
         return 4;
 
     default:
-        throw error::runtime( "subpixels: " ) << "Unknown image type: " << metadata.format;
+        throw error::runtime( "subpixels: " ) << "Unknown image type: " << format;
     }
 }
 
-u8 subpixel_size( const image_metadata& metadata )
+u8 subpixels( const image_metadata& metadata )
 {
-    switch ( metadata.format )
+    return subpixels( metadata.format );
+}
+
+u8 subpixel_size( image_format::type format )
+{
+    switch ( format )
     {
     case image_format::bgr_u8:
     case image_format::bgra_u8:
@@ -131,11 +135,16 @@ u8 subpixel_size( const image_metadata& metadata )
     case image_format::rgba_dxt3:
     case image_format::rgba_dxt5:
         throw error::runtime( "subpixel_size: " ) <<
-            "Can not use compressed image format: " << metadata.format;
+            "Can not use compressed image format: " << format;
 
     default:
-        throw error::runtime( "subpixel_size: " ) << "Unknown image type: " << metadata.format;
+        throw error::runtime( "subpixel_size: " ) << "Unknown image type: " << format;
     }
+}
+
+u8 subpixel_size( const image_metadata& metadata )
+{
+    return subpixel_size( metadata.format );
 }
 
 up_t pixels( const image_metadata& metadata )
@@ -143,14 +152,19 @@ up_t pixels( const image_metadata& metadata )
     return metadata.width * metadata.height;
 }
 
-u8 pixel_size( const image_metadata& metadata )
+u8 pixel_size( image_format::type format )
 {
-    return subpixels( metadata ) * subpixel_size( metadata );
+    return subpixels( format ) * subpixel_size( format );
 }
 
-u8 block_size( const image_metadata& metadata )
+u8 pixel_size( const image_metadata& metadata )
 {
-    switch( metadata.format )
+    return pixel_size( metadata.format );
+}
+
+u8 block_size( image_format::type format )
+{
+    switch( format )
     {
     case image_format::bgr_u8:
     case image_format::bgra_u8:
@@ -182,8 +196,7 @@ u8 block_size( const image_metadata& metadata )
     case image_format::a_f32:
     case image_format::r_f32:
     case image_format::rg_f32:
-        throw error::runtime( "block_size: " ) <<
-            "Can not use uncompressed format: " << metadata.format;
+        throw error::runtime( "block_size: " ) << "Can not use uncompressed format: " << format;
 
     case image_format::rgba_dxt1:
         return 8;
@@ -193,8 +206,13 @@ u8 block_size( const image_metadata& metadata )
         return 16;
 
     default:
-        throw error::runtime( "block_size: " ) << "Unknown image type: " << metadata.format;
+        throw error::runtime( "block_size: " ) << "Unknown image type: " << format;
     }
+}
+
+u8 block_size( const image_metadata& metadata )
+{
+    return block_size( metadata.format );
 }
 
 up_t row_size( const image_metadata& metadata )

@@ -120,7 +120,12 @@ protected:
 typedef shared_ptr< image_reader > reader_type;
 
 //--------------------------------------------------------------------------------------------------
-bool is_compressed( image_format::type format ) OOE_VISIBLE;
+bool is_compressed( image_format::type ) OOE_VISIBLE;
+u8 subpixels( image_format::type ) OOE_VISIBLE;
+u8 subpixel_size( image_format::type ) OOE_VISIBLE;
+u8 pixel_size( image_format::type ) OOE_VISIBLE;
+u8 block_size( image_format::type ) OOE_VISIBLE;
+
 u8 subpixels( const image_metadata& ) OOE_VISIBLE;
 u8 subpixel_size( const image_metadata& ) OOE_VISIBLE;
 up_t pixels( const image_metadata& ) OOE_VISIBLE;
