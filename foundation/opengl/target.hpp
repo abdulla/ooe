@@ -14,7 +14,7 @@ struct target
     const u32 width;
     const u32 height;
 
-    target( u32, u32, image::type );
+    target( const image_metadata& );
     virtual ~target( void );
 };
 

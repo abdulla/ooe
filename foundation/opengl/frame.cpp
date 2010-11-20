@@ -38,35 +38,35 @@ s32 find( const std::string& name )
         throw error::runtime( "opengl::default_frame: " ) << "Variable \"" << name << "\" invalid";
 }
 
-format_tuple frame_format( image::type format )
+format_tuple frame_format( image_format::type format )
 {
     switch ( format )
     {
-    case image::bgr_u8:
+    case image_format::bgr_u8:
         return format_tuple( BGR, UNSIGNED_BYTE, 3 );
 
-    case image::bgra_u8:
+    case image_format::bgra_u8:
         return format_tuple( BGRA, UNSIGNED_BYTE, 4 );
 
     //--- u8 -------------------------------------------------------------------
-    case image::rgb_u8:
+    case image_format::rgb_u8:
         return format_tuple( RGB, UNSIGNED_BYTE, 3 );
 
-    case image::rgba_u8:
+    case image_format::rgba_u8:
         return format_tuple( RGBA, UNSIGNED_BYTE, 4 );
 
     //--- f16 ------------------------------------------------------------------
-    case image::rgb_f16:
+    case image_format::rgb_f16:
         return format_tuple( RGB, HALF_FLOAT, 6 );
 
-    case image::rgba_f16:
+    case image_format::rgba_f16:
         return format_tuple( RGBA, HALF_FLOAT, 8 );
 
     //--- f32 ------------------------------------------------------------------
-    case image::rgb_f32:
+    case image_format::rgb_f32:
         return format_tuple( RGB, FLOAT, 12 );
 
-    case image::rgba_f32:
+    case image_format::rgba_f32:
         return format_tuple( RGBA, FLOAT, 16 );
 
     default:
@@ -87,7 +87,7 @@ void frame_check( bool& do_check, u32 target )
     do_check = false;
 }
 
-void frame_read( buffer_type& generic_buffer, image::type format,
+void frame_read( buffer_type& generic_buffer, image_format::type format,
     s32 id, u32 width, u32 height, bool& do_check, u32 target )
 {
     opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
@@ -149,7 +149,8 @@ default_frame::~default_frame( void )
 {
 }
 
-void default_frame::read( const std::string& name, image::type format, buffer_type& generic_buffer )
+void default_frame::
+    read( const std::string& name, image_format::type format, buffer_type& generic_buffer )
 {
     bool do_check = false;
     frame_read( generic_buffer, format, 0, width, height, do_check, find( name ) );
@@ -191,7 +192,7 @@ frame::~frame( void )
     DeleteFramebuffers( 1, &id );
 }
 
-void frame::read( const std::string& name, image::type format, buffer_type& generic_buffer )
+void frame::read( const std::string& name, image_format::type format, buffer_type& generic_buffer )
 {
     if ( !colours.size() )
         throw error::runtime( "opengl::frame: " ) << "Frame has no colour attachment";

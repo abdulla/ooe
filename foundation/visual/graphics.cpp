@@ -12,30 +12,30 @@ map::map( void* data_, up_t size_ )
 }
 
 //--- image_pyramid --------------------------------------------------------------------------------
-image_pyramid::image_pyramid( const ooe::image& i )
-    : width( i.width ), height( i.height ), format( i.format ), vector( 1, i.ptr() )
+image_pyramid::image_pyramid( const ooe::image& image_ )
+    : image_metadata( image_ ), vector( 1, image_.ptr() )
 {
 }
 
-image_pyramid::image_pyramid( u32 width_, u32 height_, ooe::image::type format_ )
-    : width( width_ ), height( height_ ), format( format_ ), vector()
+image_pyramid::image_pyramid( const image_metadata& metadata )
+    : image_metadata( metadata ), vector()
 {
 }
 
-void image_pyramid::insert( const ooe::image& i )
+void image_pyramid::insert( const ooe::image& image_ )
 {
     u32 level_width = width >> vector.size();
     u32 level_height = height >> vector.size();
 
-    if ( i.width != level_width || i.height != level_height )
+    if ( image_.width != level_width || image_.height != level_height )
         throw error::runtime( "image_pyramid: " ) <<
-            "Image size " << i.width << 'x' << i.height << " != " <<
+            "Image size " << image_.width << 'x' << image_.height << " != " <<
             level_width << 'x' << level_height << " required for level " << vector.size();
-    else if ( i.format != format )
+    else if ( image_.format != format )
         throw error::runtime( "image_pyramid: " ) <<
-            "Image format " << i.format << " != " << format;
+            "Image format " << image_.format << " != " << format;
 
-    vector.push_back( i.ptr() );
+    vector.push_back( image_.ptr() );
 }
 
 ooe::image image_pyramid::image( u8 level ) const

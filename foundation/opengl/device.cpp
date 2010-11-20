@@ -108,9 +108,9 @@ public:
     virtual u32 limit( limit_type ) const;
 
     virtual texture_type texture( const image_pyramid&, texture::type, bool ) const;
-    virtual texture_array_type texture_array( u32, u32, u32, image::type ) const;
+    virtual texture_array_type texture_array( const image_metadata&, u32 ) const;
     virtual buffer_type buffer( up_t, buffer::type, buffer::usage_type ) const;
-    virtual target_type target( u32, u32, image::type ) const;
+    virtual target_type target( const image_metadata& ) const;
     virtual shader_type shader( const std::string&, shader::type ) const;
     virtual program_type program( const shader_vector& ) const;
     virtual frame_type default_frame( u32, u32 ) const;
@@ -279,19 +279,18 @@ texture_type device::
         return new uncompressed_texture( pyramid, filter, generate_mipmap );
 }
 
-texture_array_type device::
-    texture_array( u32 width, u32 height, u32 depth, image::type format ) const
+texture_array_type device::texture_array( const image_metadata& metadata, u32 depth ) const
 {
-    verify_texture( width, height, texture_size_limit );
+    verify_texture( metadata.width, metadata.height, texture_size_limit );
 
     if ( depth > u32( array_size_limit ) )
         throw error::runtime( "opengl::device: " ) <<
             "Array size " << depth << " > array size limit " << array_size_limit;
 
-    if ( is_compressed( format ) )
-        return new compressed_texture_array( width, height, depth, format );
+    if ( is_compressed( metadata.format ) )
+        return new compressed_texture_array( metadata, depth );
     else
-        return new uncompressed_texture_array( width, height, depth, format );
+        return new uncompressed_texture_array( metadata, depth );
 }
 
 buffer_type device::buffer( up_t size, buffer::type format, buffer::usage_type usage ) const
@@ -299,9 +298,9 @@ buffer_type device::buffer( up_t size, buffer::type format, buffer::usage_type u
     return new opengl::buffer( size, format, usage );
 }
 
-target_type device::target( u32 width, u32 height, image::type format ) const
+target_type device::target( const image_metadata& metadata ) const
 {
-    return new opengl::target( width, height, format );
+    return new opengl::target( metadata );
 }
 
 shader_type device::shader( const std::string& source, shader::type type ) const

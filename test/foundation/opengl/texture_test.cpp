@@ -13,8 +13,8 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 const f32 width = 640;
 const f32 height = 480;
-const u32 texture_size = 256;
-const image::type texture_format = image::rgb_u8;
+const u32 size = 256;
+const image_format::type format = image_format::rgb_u8;
 
 const c8 vertex_shader[] =
     "uniform mat4 projection;\n\
@@ -84,10 +84,10 @@ buffer_type make_index( const device_type& device )
 
 image make_image( u8 red, u8 green, u8 blue )
 {
-    uncompressed_image image( texture_size, texture_size, texture_format );
-    u8 pixel_size = image.pixel_size();
+    image image( size, size, format );
+    u8 pixel_size = ooe::pixel_size( image );
 
-    for ( u8* i = image.as< u8 >(), * end = i + image.byte_size(); i != end; i += pixel_size )
+    for ( u8* i = image.as< u8 >(), * end = i + byte_size( image ); i != end; i += pixel_size )
     {
         i[ 0 ] = red;
         i[ 1 ] = green;
@@ -120,7 +120,7 @@ template<>
 
     const s32 array_size = device->limit( device::array_size );
     texture_array_type texture_array =
-        device->texture_array( texture_size, texture_size, array_size, texture_format );
+        device->texture_array( image_metadata( size, size, format ), array_size );
     OOE_CHECK( "texture array size " << array_size << " > 0 ", array_size );
 
     shader_vector vector;

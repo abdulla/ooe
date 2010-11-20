@@ -198,7 +198,7 @@ typedef shared_ptr< struct frame > frame_type;
 struct frame
 {
     virtual ~frame( void ) {}
-    virtual void read( const std::string&, image::type, buffer_type& ) = 0;
+    virtual void read( const std::string&, image_format::type, buffer_type& ) = 0;
     virtual void write( const std::string&, const std::string&, const frame_type& ) = 0;
     virtual void clear( void ) = 0;
 
@@ -218,14 +218,11 @@ typedef shared_ptr< program > program_type;
 
 //--- image_pyramid --------------------------------------------------------------------------------
 class OOE_VISIBLE image_pyramid
+    : public image_metadata
 {
 public:
-    const u32 width;
-    const u32 height;
-    const ooe::image::type format;
-
     image_pyramid( const ooe::image& );
-    image_pyramid( u32, u32, ooe::image::type );
+    image_pyramid( const image_metadata& );
 
     void insert( const ooe::image& );
     ooe::image image( u8 ) const;
@@ -263,10 +260,10 @@ struct device
 
     virtual texture_type texture
         ( const image_pyramid&, texture::type = texture::linear, bool = true ) const = 0;
-    virtual texture_array_type texture_array( u32, u32, u32, image::type ) const = 0;
+    virtual texture_array_type texture_array( const image_metadata&, u32 ) const = 0;
     virtual buffer_type buffer
         ( up_t, buffer::type, buffer::usage_type = buffer::static_write ) const = 0;
-    virtual target_type target( u32, u32, image::type ) const = 0;
+    virtual target_type target( const image_metadata& ) const = 0;
     virtual shader_type shader( const std::string&, shader::type ) const = 0;
     virtual program_type program( const shader_vector& ) const = 0;
     virtual frame_type default_frame( u32, u32 ) const = 0;

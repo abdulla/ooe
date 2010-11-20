@@ -25,7 +25,7 @@ protected:
     const u32 internal;
     const u32 size;
 
-    compressed_id( u32, u32, image::type );
+    compressed_id( const image_metadata& );
 };
 
 //--- uncompressed_id ------------------------------------------------------------------------------
@@ -35,19 +35,14 @@ protected:
     const u32 external;
     const u32 data_type;
 
-    uncompressed_id( image::type );
+    uncompressed_id( image_format::type );
 };
 
 //--- texture --------------------------------------------------------------------------------------
 class texture
-    : public ooe::texture, public texture_id
+    : public ooe::texture, public texture_id, public image_metadata
 {
-public:
-    const u32 width;
-    const u32 height;
-
 protected:
-    const image::type format;
     const u8 levels;
     const bool generate_mipmap;
 
@@ -71,29 +66,26 @@ struct uncompressed_texture
 
 //--- texture_array --------------------------------------------------------------------------------
 class texture_array
-    : public ooe::texture_array, public texture_id
+    : public ooe::texture_array, public texture_id, public image_metadata
 {
 protected:
-    const u32 width;
-    const u32 height;
     const u32 depth;
-    const image::type format;
 
-    texture_array( u32, u32, u32, image::type );
+    texture_array( const image_metadata&, u32 );
     void check( const image&, u32, u32, u32 ) const;
 };
 
 struct compressed_texture_array
     : public texture_array, private compressed_id
 {
-    compressed_texture_array( u32, u32, u32, image::type );
+    compressed_texture_array( const image_metadata&, u32 );
     virtual void write( const image&, u32, u32, u32 );
 };
 
 struct uncompressed_texture_array
     : public texture_array, private uncompressed_id
 {
-    uncompressed_texture_array( u32, u32, u32, image::type );
+    uncompressed_texture_array( const image_metadata&, u32 );
     virtual void write( const image&, u32, u32, u32 );
 };
 
