@@ -26,8 +26,8 @@ struct OOE_VISIBLE file
     up_t read( void*, up_t );
     up_t write( const void*, up_t );
 
-    void seek( sp_t, seek_type = current );
     up_t tell( void ) const;
+    void seek( sp_t, seek_type = current );
 };
 
 //--- make_pipe ------------------------------------------------------------------------------------

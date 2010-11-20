@@ -56,6 +56,16 @@ up_t file::write( const void* buffer, up_t bytes )
     return wrote;
 }
 
+up_t file::tell( void ) const
+{
+    sp_t told = static_cast< s32 >( lseek( get(), 0, SEEK_CUR ) );
+
+    if ( told == -1 )
+        throw error::io( "file: " ) << "Unable to tell: " << error::number( errno );
+
+    return told;
+}
+
 void file::seek( sp_t offset, seek_type point )
 {
     s32 whence = SEEK_CUR;
@@ -67,16 +77,6 @@ void file::seek( sp_t offset, seek_type point )
 
     if ( lseek( get(), offset, whence ) == -1 )
         throw error::io( "file: " ) << "Unable to seek: " << error::number( errno );
-}
-
-up_t file::tell( void ) const
-{
-    sp_t told = static_cast< s32 >( lseek( get(), 0, SEEK_CUR ) );
-
-    if ( told == -1 )
-        throw error::io( "file: " ) << "Unable to tell: " << error::number( errno );
-
-    return told;
 }
 
 //--- make_pipe ------------------------------------------------------------------------------------
