@@ -11,6 +11,8 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
+const c8 path[] = _PATH_TMP "ooe.test.file";
+
 //--- setup ----------------------------------------------------------------------------------------
 class setup
 {
@@ -19,9 +21,14 @@ public:
         : pair( make_pair() ), poll( make_pair() )
     {
         u32 value = 0xdeadbeef;
-        descriptor desc( _PATH_TMP "test-file", descriptor::read_write | descriptor::truncate );
+        descriptor desc( path, descriptor::read_write | descriptor::truncate );
         file( desc ).write( &value, sizeof( value ) );
         pair._0.send( desc );
+    }
+
+    ~setup( void )
+    {
+        unlink( path );
     }
 
     descriptor receive( void )
