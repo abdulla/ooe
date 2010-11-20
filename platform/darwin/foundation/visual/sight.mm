@@ -7,11 +7,8 @@
 #include "foundation/utility/scoped.hpp"
 #include "foundation/visual/sight.hpp"
 
-using namespace ooe;
-
-//--- Sight --------------------------------------------------------------------
-OOE_HIDDEN
-@interface Sight
+//--- Sight ----------------------------------------------------------------------------------------
+OOE_HIDDEN @interface Sight
     : NSObject
 {
 @private
@@ -55,8 +52,8 @@ OOE_HIDDEN
         throw error::runtime( "sight: " ) << "Unable to link device to input";
 
     if ( ![ session addInput: input error: &error ] )
-        throw error::runtime( "sight: " ) << "Unable to add input to capture session: " <<
-            error.localizedDescription.UTF8String;
+        throw error::runtime( "sight: " ) <<
+            "Unable to add input to capture session: " << error.localizedDescription.UTF8String;
 
     output = [ [ QTCaptureVideoPreviewOutput alloc ] init ];
 
@@ -77,8 +74,8 @@ OOE_HIDDEN
     output.delegate = self;
 
     if ( ![ session addOutput: output error: &error ] )
-        throw error::runtime( "sight: " ) << "Unable to add output to capture session: " <<
-            error.localizedDescription.UTF8String;
+        throw error::runtime( "sight: " ) <<
+            "Unable to add output to capture session: " << error.localizedDescription.UTF8String;
 
     [ session startRunning ];
     scoped.clear();
@@ -98,7 +95,7 @@ OOE_HIDDEN
 }
 @end
 
-//--- Sight( Delegate ) --------------------------------------------------------
+//--- Sight( Delegate ) ----------------------------------------------------------------------------
 @interface Sight( Delegate )
 - ( void ) captureOutput: ( QTCaptureOutput* )output_ didOutputVideoFrame: ( CVImageBufferRef )image
     withSampleBuffer: ( QTSampleBuffer* )sample fromConnection: ( QTCaptureConnection* )connection;
@@ -118,29 +115,34 @@ OOE_HIDDEN
 }
 @end
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+//--- sight ----------------------------------------------------------------------------------------
+platform::sight::sight( const call_type& call_, u16 width, u16 height )
+    : call( call_ ), id( [ [ Sight alloc ] initWithCall: &call width: width height: height ] )
 {
-//--- platform::sight ----------------------------------------------------------
-    platform::sight::sight( const call_type& call_, u16 width, u16 height )
-        : call( call_ ), id( [ [ Sight alloc ] initWithCall: &call width: width height: height ] )
-    {
-        if ( !id )
-            throw error::runtime( "sight: " ) << "Unable to initialise";
-    }
-
-    platform::sight::~sight( void )
-    {
-        [ id release ];
-    }
-
-//--- sight --------------------------------------------------------------------
-    sight::sight( const call_type& call_, u16 width, u16 height )
-        : platform::sight( call_, width, height )
-    {
-    }
-
-    uncompressed_image::type sight::format( void )
-    {
-        return uncompressed_image::rgb_u8;
-    }
+    if ( !id )
+        throw error::runtime( "sight: " ) << "Unable to initialise";
 }
+
+platform::sight::~sight( void )
+{
+    [ id release ];
+}
+
+OOE_NAMESPACE_END( ( ooe )( platform ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+//--- sight ----------------------------------------------------------------------------------------
+sight::sight( const call_type& call_, u16 width, u16 height )
+    : platform::sight( call_, width, height )
+{
+}
+
+image_format::type sight::format( void )
+{
+    return image_format::rgb_u8;
+}
+
+OOE_NAMESPACE_END( ( ooe ) )

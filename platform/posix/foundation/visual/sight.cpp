@@ -31,9 +31,9 @@ sight::sight( const call_type& call_, u16 width_, u16 height_ )
 {
 }
 
-uncompressed_image::type sight::format( void )
+image_format::type sight::format( void )
 {
-    return uncompressed_image::rgb_u8;
+    return image_format::rgb_u8;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
