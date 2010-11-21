@@ -88,7 +88,7 @@ template<>
     OOE_CHECK( "ptr.operator ->() == value", ptr.operator ->() == value );
     OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
-    shared_ptr< up_t > other( 0 );
+    shared_ptr< up_t > other;
     ptr.swap( other );
     OOE_CHECK( "ptr.get() == 0", ptr.get() == 0 );
     OOE_CHECK( "other.get() == value", other.get() == value );
