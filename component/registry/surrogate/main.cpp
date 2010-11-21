@@ -71,7 +71,10 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     }
 
     if ( !library_path || !surrogate_path )
+    {
+        std::cout << "The library and surrogate paths must be specified\n";
         return false;
+    }
 
     library library( library_path );
     ipc::nameservice nameservice;
