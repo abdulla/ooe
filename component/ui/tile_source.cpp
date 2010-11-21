@@ -52,10 +52,10 @@ decoder_type find( const std::string& type )
 }
 
 std::string make_path
-    ( const std::string& root, const std::string& type, const pyramid_index& index, u8 level_limit )
+    ( const std::string& root, const pyramid_index& index, const std::string& type )
 {
     std::string path( root );
-    path << '/' << index.x << '_' << index.y << '_' << level_limit - index.level << '.' << type;
+    path << '/' << index.x << '_' << index.y << '_' << index.level << '.' << type;
     return path;
 }
 
@@ -70,10 +70,10 @@ page_vector make_pages( u32 pages_per_row, u16 page_size, image_format::type for
     return pages;
 }
 
-void encode_page( image_ptr image, const std::string& root, pyramid_index index, u8 level_limit )
+void encode( const std::string& root, pyramid_index index, image_ptr image )
 {
-    std::string path = make_path( root, "png", index, level_limit );
-    png::encode( *image, descriptor( path, descriptor::write_new ) );
+    descriptor desc( make_path( root, index, "png" ), descriptor::write_new );
+    png::encode( *image, desc );
 }
 
 OOE_ANONYMOUS_END( ( ooe ) )
@@ -116,47 +116,45 @@ image_format::type tile_source::format( void ) const
     return format_;
 }
 
-image tile_source::read( const pyramid_index& index )
+image tile_source::read( const pyramid_index& i )
 {
-    return decoder( make_path( root, type, index, level_limit ) );
+    pyramid_index index( i.x, i.y, level_limit - i.level );
+    return decoder( make_path( root, index, type ) );
 }
 
 //--- make_tile ------------------------------------------------------------------------------------
 void make_tile( const descriptor& desc, thread_pool& pool, const std::string& root, u16 page_size )
 {
     reader_ptr reader = png::open( desc );
+    u8 level_limit = log2f( std::max( reader->width, reader->height ) / page_size );
     u32 pages_per_row = ceiling< u32 >( reader->width, page_size );
     u8 pixel_size = ooe::pixel_size( *reader );
     up_t row_size = page_size * pixel_size;
     page_vector pages;
 
-    for ( u32 y = 0, row = 0; reader->decode_row() || row; ++row %= page_size )
+    for ( u32 i = 0, row = 0; reader->decode_row() || row; ++i, row = i % page_size )
     {
         if ( !row )
-        {
-            // must set end to pages.size() to prevent encoding on first iteration
-            for ( u32 x = 0, end = pages.size(); x != end; ++x )
-            {
-                result< void > r = async( pool, make_function( encode_page ), pages[ x ], root,
-                    pyramid_index( x, y, 0 ), 0 );
-
-                // synchronise on last page to avoid running too far ahead of encoding, this also
-                // prevents excess memory usage, limiting it to approximately one row of pages
-                if ( x == end - 1 )
-                    r();
-            }
-
             pages = make_pages( pages_per_row, page_size, reader->format );
-            ++y;
-        }
 
-        for ( page_vector::iterator i = pages.begin(), end = pages.end(); i != end; ++i )
+        for ( page_vector::iterator j = pages.begin(), end = pages.end(); j != end; ++j )
         {
-            u8* row_pointer = ( *i )->as< u8 >() + row * row_size;
+            u8* row_pointer = ( *j )->as< u8 >() + row * row_size;
             up_t p = reader->read_pixels( row_pointer, page_size );
 
             if ( p != page_size )
                 std::memset( row_pointer + p * pixel_size, 0, ( page_size - p ) * pixel_size );
+        }
+
+        for ( u32 x = 0, y = i / page_size; row == page_size - 1u && x != pages_per_row; ++x )
+        {
+            pyramid_index index( x, y, level_limit - 0 );
+            result< void > r = async( pool, make_function( encode ), root, index, pages[ x ] );
+
+            // synchronise on last page to avoid running too far ahead of encoding, this also
+            // prevents excess memory usage, limiting it to approximately one row of pages
+            if ( x == pages_per_row - 1 )
+                r();
         }
     }
 }
