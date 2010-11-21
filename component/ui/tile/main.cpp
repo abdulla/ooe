@@ -14,8 +14,8 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
-    const c8* directory = 0;
-    const c8* file = 0;
+    c8* directory = 0;
+    c8* file = 0;
     u16 page_size = 256;
 
     for ( s32 option; ( option = getopt( argc, argv, "d:f:p:" ) ) != -1; )
@@ -50,7 +50,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
         return false;
     }
 
-    thread_pool pool;
+    thread_pool pool( "pool" );
     make_tile( descriptor( file ), pool, directory, page_size );
     return true;
 }

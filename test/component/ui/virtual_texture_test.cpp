@@ -40,7 +40,7 @@ template<>
     font::face font_face( font_library, root + "../share/font/ubuntu-regular.ttf" );
     font_source font_source( font_face, 512, root + "../cache" );
 
-    thread_pool pool;
+    thread_pool pool( "pool" );
     page_cache cache( device, pool, font_source.page_size(), font_source.format() );
     text_layout layout( device, cache, font_source );
 

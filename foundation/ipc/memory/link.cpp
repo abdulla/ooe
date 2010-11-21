@@ -31,7 +31,7 @@ socket link_listen::accept( void ) const
 //--- link_server ----------------------------------------------------------------------------------
 link_server::link_server( const ooe::socket& socket_, link_t link_, server& server )
     : socket( socket_ ), pair( make_pair() ), link( link_ ), state( work ),
-    thread( make_function( *this, &link_server::main ), &server )
+    thread( "link_server", make_function( *this, &link_server::main ), &server )
 {
 }
 
@@ -75,7 +75,7 @@ void* link_server::main( void* pointer )
 //--- link_client ----------------------------------------------------------------------------------
 link_client::link_client( const std::string& name, transport& transport )
     : connect( local_address( local_name( name ) ) ), state( true ),
-    thread( make_function( *this, &link_client::main ), &transport )
+    thread( "link_client", make_function( *this, &link_client::main ), &transport )
 {
 }
 

@@ -15,7 +15,7 @@ void hello( void )
 
 bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
-    const c8* up_name = 0;
+    c8* up_name = 0;
 
     for ( s32 option; ( option = getopt( argc, argv, "u:" ) ) != -1; )
     {

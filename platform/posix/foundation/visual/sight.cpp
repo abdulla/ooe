@@ -43,7 +43,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 //--- sight ----------------------------------------------------------------------------------------
 sight::sight( const call_type& call_, u16 width_, u16 height_ )
     : call( call_ ), width( width_ ), height( height_ ), state( true ),
-    thread( make_function( *this, &sight::main ), 0 )
+    thread( "sight", make_function( *this, &sight::main ), 0 )
 {
 }
 

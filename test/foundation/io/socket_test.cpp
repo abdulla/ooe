@@ -81,7 +81,7 @@ template<>
     std::cerr << "poll on shutdown\n";
 
     socket poll_socket( setup.get() );
-    thread thread( make_function( setup, &setup::shutdown ), 0 );
+    thread thread( "shutdown", make_function( setup, &setup::shutdown ), 0 );
 
     poll poll;
     poll.insert( poll_socket );

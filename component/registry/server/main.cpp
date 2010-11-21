@@ -162,7 +162,7 @@ void print( const registry::info_vector& iv )
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
 {
-    const c8* up_name = 0;
+    c8* up_name = 0;
 
     for ( s32 option; ( option = getopt( argc, argv, "al:s:u:" ) ) != -1; )
     {

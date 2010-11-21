@@ -33,7 +33,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 servlet::servlet( servlet_iterator iterator_, ooe::socket& socket_,
     const ipc::switchboard& switchboard_, server& server )
     : iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ), state( true ),
-    thread( make_function( *this, &servlet::main ), &server )
+    thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
 }
 

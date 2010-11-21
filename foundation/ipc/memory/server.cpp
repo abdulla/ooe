@@ -99,7 +99,7 @@ servlet::servlet( const std::string& link_name, link_t link_, const ipc::switchb
     : transport( link_name, transport::create ), link( link_ ), switchboard( switchboard_ ),
     link_listen( new memory::link_listen( link_name ) ), link_server( 0 ), allocator(),
     buffer( transport.get(), transport.size(), allocator ), state( true ),
-    thread( make_function( *this, &servlet::main ), &server )
+    thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
 }
 
@@ -108,7 +108,7 @@ servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchbo
     : transport( socket ), link( link_ ), switchboard( switchboard_ ), link_listen( 0 ),
     link_server( new memory::link_server( socket.receive(), link, server ) ), allocator(),
     buffer( transport.get(), transport.size(), allocator ), state( true ),
-    thread( make_function( *this, &servlet::main ), &server )
+    thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
     client_data& data = *static_cast< client_data* >( transport.private_data() );
 

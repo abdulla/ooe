@@ -33,7 +33,7 @@ void load_nameservice( ipc::nameservice& nameservice, const module& module )
 
 void* registry_insert( void* surrogate_path )
 {
-    registry().insert( registry::server, static_cast< const c8* >( surrogate_path ) );
+    registry().insert( registry::server, static_cast< c8* >( surrogate_path ) );
     return 0;
 }
 
@@ -41,8 +41,8 @@ void* registry_insert( void* surrogate_path )
 bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
     bool public_server = false;
-    const c8* library_path = 0;
-    const c8* surrogate_path = 0;
+    c8* library_path = 0;
+    c8* surrogate_path = 0;
 
     for ( s32 option; ( option = getopt( argc, argv, "l:ps:" ) ) != -1; )
     {
@@ -84,7 +84,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     ipc::barrier_notify( std::string( surrogate_path ) + ".b" );
 
     if ( public_server )
-        thread( registry_insert, const_cast< c8* >( surrogate_path ) );
+        thread( "insert", registry_insert, surrogate_path );
 
     while ( !executable::has_signal() && ( public_server || server.decode() ) ) {}
 

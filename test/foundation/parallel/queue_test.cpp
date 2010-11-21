@@ -55,7 +55,7 @@ template<>
     std::cerr << "insert items from thread_pool in to queue\n";
 
     queue< s32 > queue;
-    thread_pool pool;
+    thread_pool pool( "pool" );
 
     for ( s32 i = 0; i != 10000; ++i )
         async( pool, make_function( insert ), queue, i );

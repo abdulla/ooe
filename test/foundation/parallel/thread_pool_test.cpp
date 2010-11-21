@@ -30,7 +30,7 @@ template<>
 {
     std::cerr << "start/stop thread_pool\n";
 
-    thread_pool pool;
+    thread_pool pool( "pool" );
 }
 
 template<>
@@ -39,7 +39,7 @@ template<>
 {
     std::cerr << "insert tasks in to thread_pool\n";
 
-    thread_pool pool;
+    thread_pool pool( "pool" );
     result< s32 > result_of_2 = async( pool, make_function( increment ), 1 );
     result< s32 > result_of_3 = async( pool, make_function( increment ), 2 );
 
@@ -53,7 +53,7 @@ template<>
 {
     std::cerr << "throw in thread_pool\n";
 
-    thread_pool pool;
+    thread_pool pool( "pool" );
     result< void > result_of_throw = async( pool, make_function( throwable ) );
 
     OOE_EXCEPT( "result_of_throw()", error::runtime, result_of_throw() );
@@ -65,7 +65,7 @@ template<>
 {
     std::cerr << "insert large number of tasks in to thread_pool\n";
 
-    thread_pool pool;
+    thread_pool pool( "pool" );
 
     for ( s32 i = 0; i != 10000; ++i )
         async( pool, make_function( increment ), i );

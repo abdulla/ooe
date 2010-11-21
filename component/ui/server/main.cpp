@@ -387,7 +387,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     view view( queue, width, height, false );
     device_ptr device = library.find< device_open_type >( "device_open" )( view, true );
 
-    thread_pool pool;
+    thread_pool pool( "pool" );
     page_cache cache( device, pool, page_size, format );
     frame_ptr frame = device->default_frame( width, height );
     buffer_ptr index = make_index( device );
