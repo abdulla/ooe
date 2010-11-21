@@ -10,13 +10,6 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- executable -----------------------------------------------------------------------------------
-bool executable::path( c8* buffer, up_t size )
-{
-    u32 length = size;
-    return !_NSGetExecutablePath( buffer, &length );
-}
-
 //--- platform -------------------------------------------------------------------------------------
 bool platform::launch( executable::launch_type launch,
     const std::string& root, const std::string& name, s32 argc, c8** argv )
@@ -41,6 +34,13 @@ bool platform::launch( executable::launch_type launch,
     }
 
     return status;
+}
+
+//--- executable -----------------------------------------------------------------------------------
+bool executable::path( c8* buffer, up_t size )
+{
+    u32 length = size;
+    return !_NSGetExecutablePath( buffer, &length );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
