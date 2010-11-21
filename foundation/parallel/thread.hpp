@@ -20,12 +20,13 @@ class OOE_VISIBLE thread
 {
 public:
     typedef function< void* ( void* ) > function_type;
-    typedef ooe::tuple< function_type, void* > tuple_type;
+    typedef ooe::tuple< const std::string, const function_type, void* > tuple_type;
 
     thread( void );
-    thread( const function_type&, void* );
+    thread( const std::string&, const function_type&, void* );
     ~thread( void );
 
+    std::string name( void ) const;
     bool operator ==( const thread& ) const;
     void* join( void );
 

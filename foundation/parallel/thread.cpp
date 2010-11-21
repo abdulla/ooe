@@ -12,8 +12,23 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 void* startup( void* pointer )
 {
     thread::tuple_type& tuple = *static_cast< thread::tuple_type* >( pointer );
-    OOE_PRINT( "thread", return tuple._0( tuple._1 ) );
+    platform::thread_name( tuple._0 );
+    OOE_PRINT( "thread \"" << tuple._0 << "\"", return tuple._1( tuple._2 ) );
     return 0;
+}
+
+std::string thread_name( pthread_t pthread )
+{
+    c8 name[ 256 ];
+    s32 status = pthread_getname_np( pthread, name, sizeof( name ) );
+
+    if ( status )
+    {
+        OOE_CONSOLE( "thread: Unable to get name: " << error::number( errno ) );
+        return std::string();
+    }
+
+    return name;
 }
 
 void specify( pthread_key_t key, const void* value )
@@ -30,17 +45,17 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- thread ---------------------------------------------------------------------------------------
 thread::thread( void )
-    : pthread( pthread_self() ), tuple(), joined( true )
+    : pthread( pthread_self() ), tuple( thread_name( pthread ), function_type(), 0 ), joined( true )
 {
 }
 
-thread::thread( const function_type& function, void* data )
-    : pthread(), tuple( function, data ), joined( false )
+thread::thread( const std::string& name_, const function_type& function, void* data )
+    : pthread(), tuple( name_, function, data ), joined( false )
 {
     s32 status = pthread_create( &pthread, 0, startup, &tuple );
 
     if ( status )
-        throw error::runtime( "thread: " ) <<
+        throw error::runtime( "thread \"" ) << tuple._0 << "\": "
             "Unable to create thread: " << error::number( status );
 }
 
@@ -52,7 +67,13 @@ thread::~thread( void )
     s32 status = pthread_detach( pthread );
 
     if ( status && status != ESRCH )
-        OOE_CONSOLE( "thread: " << "Unable to destroy thread: " << error::number( status ) );
+        OOE_CONSOLE( "thread \"" << tuple._0 << "\": "
+            "Unable to destroy thread: " << error::number( status ) );
+}
+
+std::string thread::name( void ) const
+{
+    return tuple._0;
 }
 
 bool thread::operator ==( const thread& compare ) const
@@ -69,8 +90,8 @@ void* thread::join( void )
     s32 status = pthread_join( pthread, &pointer );
 
     if ( status && status != ESRCH )
-        throw error::runtime( "thread: " ) << "Unable to join thread: " <<
-            error::number( status );
+        throw error::runtime( "thread \"" ) << tuple._0 << "\": "
+            "Unable to join thread: " << error::number( status );
 
     joined = true;
     return pointer;

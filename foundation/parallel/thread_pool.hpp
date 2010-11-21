@@ -74,7 +74,7 @@ template<>
 class thread_pool
 {
 public:
-    thread_pool( void ) OOE_VISIBLE;
+    thread_pool( const std::string& ) OOE_VISIBLE;
     void insert( const task_ptr& ) OOE_VISIBLE;
 
 private:

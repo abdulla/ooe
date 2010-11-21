@@ -13,8 +13,8 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 class thread_unit
 {
 public:
-    thread_unit( void )
-        : state( true ), thread( make_function( *this, &thread_unit::main ), 0 )
+    thread_unit( const std::string& name )
+        : state( true ), thread( name, make_function( *this, &thread_unit::main ), 0 )
     {
     }
 
@@ -62,7 +62,8 @@ private:
             {
                 lock lock( task->mutex );
                 task->state = task_base::error;
-                OOE_PRINT( "thread_pool", ( *task )(); task->state = task_base::done );
+                OOE_PRINT( "thread_pool \"" << thread.name() << "\"",
+                    ( *task )(); task->state = task_base::done );
             }
             task->condition.notify_all();
         }
@@ -72,11 +73,14 @@ private:
 };
 
 //--- thread_pool ----------------------------------------------------------------------------------
-thread_pool::thread_pool( void )
+thread_pool::thread_pool( const std::string& name )
     : index( 0 ), vector()
 {
     for ( up_t i = 0, end = executable::cpu_cores(); i != end; ++i )
-        vector.push_back( opaque_ptr( new thread_unit, destroy< thread_unit > ) );
+    {
+        std::string unit_name = name + '-';
+        vector.push_back( opaque_ptr( new thread_unit( unit_name << i ), destroy< thread_unit > ) );
+    }
 }
 
 void thread_pool::insert( const task_ptr& task )
