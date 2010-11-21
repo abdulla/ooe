@@ -164,7 +164,7 @@ u16 font_source::font_size( void ) const
 
 f32 font_source::kerning( u32 left, u32 right, u8 level ) const
 {
-    // lock lock( mutex );
+    lock lock( mutex );
     return face.kerning( left, right, face_size >> level );
 }
 
