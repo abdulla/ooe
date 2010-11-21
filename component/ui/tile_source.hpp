@@ -32,6 +32,9 @@ private:
     virtual image read( const pyramid_index& );
 };
 
+//--- make_tile ------------------------------------------------------------------------------------
+void make_tile( const descriptor&, thread_pool&, const std::string&, u16 );
+
 OOE_NAMESPACE_END( ( ooe ) )
 
 #endif  // OOE_COMPONENT_UI_TILE_SOURCE_HPP

@@ -105,6 +105,9 @@ ooe_executable( ui_server component/ui/server )
 target_link_libraries( ui_server executable math ui )
 set_target_properties( ui_server PROPERTIES OUTPUT_NAME ui )
 
+ooe_executable( tile component/ui/tile )
+target_link_libraries( tile executable ui )
+
 ### test: library ##################################################################################
 ooe_library( unit test/unit )
 target_link_libraries( unit executable io )
