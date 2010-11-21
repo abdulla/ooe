@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <iostream>
+
 #include <cmath>
 
 #include "component/ui/virtual_texture.hpp"
@@ -176,7 +178,8 @@ up_t page_cache::pending( void ) const
 
 void page_cache::read( virtual_texture& texture, pyramid_index index, bool locked )
 {
-    atom_ptr< ooe::image > image( new ooe::image( texture.source.read( index ) ) );
+    atom_ptr< ooe::image > image;
+    OOE_PRINT( "page_cache", image = new ooe::image( texture.source.read( index ) ) );
     queue.enqueue( pending_type( key_type( &texture, index ), locked, image ) );
 }
 
@@ -211,6 +214,13 @@ void page_cache::write( void )
 
     for ( ; queue.dequeue( value ); --loads )
     {
+        // if read failed, remove from map
+        if ( !value._2 )
+        {
+            map.erase( value._0 );
+            continue;
+        }
+
         // find least-recently-used unlocked page
         cache_list::iterator page = list.begin();
         cache_list::iterator end = list.end();
