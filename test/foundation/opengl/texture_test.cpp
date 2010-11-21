@@ -135,7 +135,7 @@ template<>
     block->input( "sampler", texture_array );
     block->input( "projection", orthographic( 0, width / height, 1, 0 ) );
 
-    image image_array[] =
+    image input[] =
     {
         make_image( 255, 0, 0 ),
         make_image( 0, 255, 0 ),
@@ -146,7 +146,7 @@ template<>
 
     for ( s32 i = 0; i != array_size; ++i )
     {
-        texture_array->write( image_array[ i % 3 ], 0, 0, i );
+        texture_array->write( input[ i % 3 ], 0, 0, i );
         block->input( "index", i );
 
         frame->clear();
