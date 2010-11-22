@@ -54,9 +54,10 @@ private:
 };
 
 //--------------------------------------------------------------------------------------------------
+bool exists( const std::string& ) OOE_VISIBLE;
+void erase( const std::string& ) OOE_VISIBLE;
 std::string canonical_path( const std::string& ) OOE_VISIBLE;
 void make_directory( const std::string& ) OOE_VISIBLE;
-bool exists( const std::string& ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe ) )
 

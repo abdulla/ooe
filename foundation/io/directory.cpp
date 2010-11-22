@@ -71,6 +71,27 @@ directory::iterator directory::end( void ) const
     return iterator( 0, 0 );
 }
 
+//--- exists ---------------------------------------------------------------------------------------
+bool exists( const std::string& path )
+{
+    struct stat status;
+
+    if ( !stat( path.c_str(), &status ) )
+        return true;
+    else if ( errno == ENOENT )
+        return false;
+    else
+        throw error::io( "exists: " ) << "Unable to stat: " << error::number( errno );
+}
+
+//--- erase ----------------------------------------------------------------------------------------
+void erase( const std::string& path )
+{
+    if ( unlink( path.c_str() ) )
+        throw error::io( "erase: " ) <<
+            "Unable to erase \"" << path << "\": " << error::number( errno );
+}
+
 //--- canonical_path -------------------------------------------------------------------------------
 std::string canonical_path( const std::string& path )
 {
@@ -89,19 +110,6 @@ void make_directory( const std::string& path )
     if ( mkdir( path.c_str(), 0700 ) )
         throw error::io( "make_directory: " ) <<
             "Unable to make directory \"" << path << "\": " << error::number( errno );
-}
-
-//--- exists ---------------------------------------------------------------------------------------
-bool exists( const std::string& path )
-{
-    struct stat status;
-
-    if ( !stat( path.c_str(), &status ) )
-        return true;
-    else if ( errno == ENOENT )
-        return false;
-    else
-        throw error::io( "exists: " ) << "Unable to stat: " << error::number( errno );
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
