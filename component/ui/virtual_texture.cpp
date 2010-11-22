@@ -15,7 +15,6 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 typedef tuple< u32, u32, u32, u32 > region_type;
 typedef std::pair< page_cache::page_map::iterator, page_cache::page_map::iterator > pair_type;
 const image_format::type table_format = image_format::rg_s16;
-const u8 table_subpixels = subpixels( table_format );
 
 u32 check_page_size( u16 page_size )
 {
@@ -45,12 +44,12 @@ physical_source& check_source( physical_source& source, page_cache& cache )
 
 image make_image( u32 size )
 {
-    image image( size, size, table_format );
+    image out( size, size, table_format );
 
-    for ( s16* i = image.as< s16 >(), * end = i + pixels( image ) * table_subpixels; i != end; ++i )
+    for ( s16* i = out.as< s16 >(), * end = i + pixels( out ) * subpixels( out ); i != end; ++i )
         *i = -1;
 
-    return image;
+    return out;
 }
 
 image_pyramid make_pyramid( const physical_source& source )
@@ -77,8 +76,8 @@ texture_array_ptr make_array( const device_ptr& device, image_format::type forma
 
 void write_pyramid( image_pyramid& pyramid, const pyramid_index& index, s16 i, s16 exponent )
 {
-    u32 width = pyramid.width >> index.level;
-    s16* rg = pyramid[ index.level ].as< s16 >() + ( index.x + index.y * width ) * table_subpixels;
+    image image = pyramid.image( index.level );
+    s16* rg = pixel_at< s16 >( image, index.x, index.y );
     rg[ 0 ] = i;
     rg[ 1 ] = exponent;
 }
