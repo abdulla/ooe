@@ -4,6 +4,7 @@
 
 #include <cerrno>
 
+#include "foundation/io/directory.hpp"
 #include "foundation/io/poll.hpp"
 #include "foundation/ipc/memory/link.hpp"
 #include "foundation/ipc/memory/server.hpp"
@@ -18,9 +19,7 @@ link_listen::link_listen( const std::string& name )
 
 link_listen::~link_listen( void )
 {
-    if ( unlink( path.c_str() ) )
-        OOE_CONSOLE( "ipc::link_listen: " <<
-            "Unable to unlink \"" << path << "\": " << error::number( errno ) );
+    OOE_PRINT( "ipc::link_listen", erase( path ) );
 }
 
 socket link_listen::accept( void ) const

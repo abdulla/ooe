@@ -2,6 +2,7 @@
 
 #include <paths.h>
 
+#include "foundation/io/directory.hpp"
 #include "foundation/io/file.hpp"
 #include "foundation/io/poll.hpp"
 #include "foundation/io/socket.hpp"
@@ -28,7 +29,7 @@ public:
 
     ~setup( void )
     {
-        unlink( path );
+        erase( path );
     }
 
     descriptor receive( void )

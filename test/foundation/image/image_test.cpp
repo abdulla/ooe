@@ -9,6 +9,7 @@
 #include "foundation/image/jpeg2000.hpp"
 #include "foundation/image/png.hpp"
 #include "foundation/io/descriptor.hpp"
+#include "foundation/io/directory.hpp"
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
@@ -125,7 +126,7 @@ template<>
         }
     }
 
-    unlink( path );
+    erase( path );
 }
 
 template<>
@@ -151,7 +152,7 @@ template<>
         // no test for data match due to minor differences caused by lossy compression
     }
 
-    unlink( path );
+    erase( path );
 }
 
 template<>
@@ -178,7 +179,7 @@ template<>
             !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) );
     }
 
-    unlink( path );
+    erase( path );
 }
 
 template<>
@@ -220,7 +221,7 @@ template<>
             !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) );
     }
 
-    unlink( path );
+    erase( path );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
