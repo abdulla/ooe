@@ -134,6 +134,14 @@ u8 block_size( const image_metadata& ) OOE_VISIBLE;
 up_t row_size( const image_metadata& ) OOE_VISIBLE;
 up_t byte_size( const image_metadata& ) OOE_VISIBLE;
 
+//--- pixel_at -------------------------------------------------------------------------------------
+template< typename t >
+    t* pixel_at( image& image, u32 x, u32 y )
+{
+    u8* pixel = image.as< u8 >() + x * pixel_size( image ) + y * row_size( image );
+    return reinterpret_cast< t* >( pixel );
+}
+
 class descriptor;
 typedef image ( * decoder_type )( const descriptor& );
 typedef void ( * encoder_type )( const image&, const descriptor& );
