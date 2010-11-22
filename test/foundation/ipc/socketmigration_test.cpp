@@ -2,6 +2,7 @@
 
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/io/directory.hpp"
 #include "foundation/ipc/nameservice.hpp"
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/socket/rpc.hpp"
@@ -75,7 +76,10 @@ private:
     void server_0( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
     {
         std::string local_name = ipc::local_name( "ooe.test.socket-migration" );
-        unlink( local_name.c_str() );
+
+        if ( exists( local_name ) )
+            erase( local_name );
+
         ipc::socket::server server( local_address( local_name ), nameservice );
         server_ptr = &server;
         socket_ptr = &socket;
@@ -89,7 +93,10 @@ private:
     void server_1( const ipc::nameservice& nameservice, ipc::semaphore& semaphore, socket& socket )
     {
         std::string local_name = ipc::local_name( ipc::unique_name() );
-        unlink( local_name.c_str() );
+
+        if ( exists( local_name ) )
+            erase( local_name );
+
         ipc::socket::server server( local_address( local_name ), nameservice );
         server_ptr = &server;
         socket_ptr = &socket;

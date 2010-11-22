@@ -2,6 +2,7 @@
 
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/io/directory.hpp"
 #include "foundation/ipc/container.hpp"
 #include "foundation/ipc/jumbo.hpp"
 #include "foundation/ipc/nameservice.hpp"
@@ -131,7 +132,10 @@ private:
         nameservice.insert( "jumbo_test", jumbo_test );
 
         std::string local_name = ipc::local_name( "ooe.test.socket-rpc" );
-        unlink( local_name.c_str() );
+
+        if ( exists( local_name ) )
+            erase( local_name );
+
         ipc::socket::server server( local_address( local_name ), nameservice );
         ipc::barrier_notify( name );
 
