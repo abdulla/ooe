@@ -30,6 +30,13 @@ struct OOE_VISIBLE file
     void seek( sp_t, seek_type = current );
 };
 
+template< typename t >
+    typename enable_if< is_string< t >, file >::type& operator <<( file& file, t string )
+{
+    file.write( string_data( string ), string_size( string ) );
+    return file;
+}
+
 //--- make_pipe ------------------------------------------------------------------------------------
 typedef tuple< file, file > file_pair;
 file_pair make_pipe( void ) OOE_VISIBLE;
