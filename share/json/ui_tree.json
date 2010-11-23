@@ -24,7 +24,7 @@
                     "y": 100,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-a1"
+                        "tile": "cache/earth-a1"
                     }
                 },
                 {
@@ -34,7 +34,7 @@
                     "y": 500,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-a2"
+                        "tile": "cache/earth-a2"
                     }
                 },
                 {
@@ -44,7 +44,7 @@
                     "y": 100,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-b1"
+                        "tile": "cache/earth-b1"
                     }
                 },
                 {
@@ -54,7 +54,7 @@
                     "y": 500,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-b2"
+                        "tile": "cache/earth-b2"
                     }
                 },
                 {
@@ -64,7 +64,7 @@
                     "y": 100,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-c1"
+                        "tile": "cache/earth-c1"
                     }
                 },
                 {
@@ -74,7 +74,7 @@
                     "y": 500,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-c2"
+                        "tile": "cache/earth-c2"
                     }
                 },
                 {
@@ -84,7 +84,7 @@
                     "y": 100,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-d1"
+                        "tile": "cache/earth-d1"
                     }
                 },
                 {
@@ -94,7 +94,7 @@
                     "y": 500,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/blue-marble-d2"
+                        "tile": "cache/earth-d2"
                     }
                 },
                 {
