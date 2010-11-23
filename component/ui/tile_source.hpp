@@ -12,12 +12,16 @@ class tile_source
     : public physical_source
 {
 public:
+    typedef tuple< u32, u32 > area_tuple;
+
     tile_source( const std::string& );
     virtual ~tile_source( void );
 
     virtual u32 size( void ) const;
     virtual u16 page_size( void ) const;
     virtual image_format::type format( void ) const;
+
+    area_tuple area( void ) const;
 
 private:
     const std::string root;
@@ -28,6 +32,8 @@ private:
     u16 page_size_;
     image_format::type format_;
     u8 level_limit;
+    u32 width;
+    u32 height;
 
     virtual image read( const pyramid_index& );
 };
