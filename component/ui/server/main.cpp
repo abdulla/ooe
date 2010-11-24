@@ -306,28 +306,30 @@ public:
 
     virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& aux )
     {
-        // TODO: expand load to a page boundary outside of view
-        f32 size = tile.size();
-        f32 level_limit = log2f( size / tile.page_size() );
-        u8 level = clamp( log2f( size / box._0 ), 0.f, level_limit );
+        u32 size = tile.size();
+        u8 level_limit = log2f( size / tile.page_size() );
+        u8 level = clamp< u8 >( log2f( size / box._0 ), 0, level_limit );
         tile_source::area_tuple area = tile.area();
         s32 w = aux._0 * area._0;
         s32 h = aux._1 * area._1;
         s32 x = aux._2 * area._0;
         s32 y = aux._3 * area._1;
 
-        if ( level )
+        /*if ( level )
             texture.load( w, h, x, y, level - 1 );
 
-        x = std::max( 0, x - w / 2 );
-        y = std::max( 0, y - h / 2 );
-        w = std::min< s32 >( w * 2, area._0 - x );
-        h = std::min< s32 >( h * 2, area._1 - y );
+        if ( level != level_limit )
+            texture.load( w, h, x, y, level + 1 );*/
+
+        x = std::max( 0, x - w );
+        y = std::max( 0, y - h );
+        w = std::min< s32 >( w * 3, area._0 - x );
+        h = std::min< s32 >( h * 3, area._1 - y );
         texture.load( w, h, x, y, level );
 
         u32 border = 1 << level;
-        f32 u = ( area._0 - border ) / size;
-        f32 v = ( area._1 - border ) / size;
+        f32 u = divide( area._0 - border, size );
+        f32 v = divide( area._1 - border, size );
 
         data->input( "scale", box._0, box._1 );
         data->input( "translate", box._2, box._3 );
