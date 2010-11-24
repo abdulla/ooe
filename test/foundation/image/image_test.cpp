@@ -143,13 +143,27 @@ template<>
         make_image< u8 >( 0, 0, 255, image_format::rgb_u8 )
     };
 
+    // no test for data match due to minor differences caused by lossy compression
     for ( u8 i = 0; i != 3; ++i )
     {
         jpeg::encode( input[ i ], descriptor( path, descriptor::write_new ) );
         image output = jpeg::decode( descriptor( path ) );
-
+        OOE_CHECK( "decoded metadata matches", input[ i ] == output );
         OOE_CHECK( "decoded sizes match", byte_size( input[ i ] ) == byte_size( output ) );
-        // no test for data match due to minor differences caused by lossy compression
+
+        reader_ptr reader = jpeg::open( descriptor( path ) );
+        OOE_CHECK( "reader metadata matches", input[ i ] == *reader );
+        OOE_CHECK( "reader size matches", byte_size( input[ i ] ) == byte_size( *reader ) );
+
+        std::memset( output.get(), 0, byte_size( output ) );
+        up_t row_size = ooe::row_size( *reader );
+        u32 rows = 0;
+
+        for ( u8* j = output.as< u8 >(); reader->decode_row(); ++rows, j += row_size )
+            OOE_CHECK( "read row " << rows,
+                reader->read_pixels( j, reader->width ) == reader->width );
+
+        OOE_CHECK( "reader read complete image", rows == reader->height );
     }
 
     erase( path );
@@ -200,12 +214,13 @@ template<>
     {
         png::encode( input[ i ], descriptor( path, descriptor::write_new ) );
         image output = png::decode( descriptor( path ) );
-
+        OOE_CHECK( "decoded metadata matches", input[ i ] == output );
         OOE_CHECK( "decoded sizes match", byte_size( input[ i ] ) == byte_size( output ) );
         OOE_CHECK( "decoded data matches",
             !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) );
 
         reader_ptr reader = png::open( descriptor( path ) );
+        OOE_CHECK( "reader metadata matches", input[ i ] == *reader );
         OOE_CHECK( "reader size matches", byte_size( input[ i ] ) == byte_size( *reader ) );
 
         std::memset( output.get(), 0, byte_size( output ) );
