@@ -8,12 +8,20 @@
 #include "foundation/image/jpeg.hpp"
 #include "foundation/io/file.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/scoped.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-typedef u8 buffer_type[ executable::static_page_size ];
-typedef tuple< file*, u8* > tuple_type;
+//--- jpeg_io --------------------------------------------------------------------------------------
+struct jpeg_io
+{
+    ooe::file file;
+    scoped_array< u8 > data;
+
+    jpeg_io( const descriptor& desc )
+        : file( desc ), data( new u8[ executable::static_page_size ] )
+    {
+    }
+};
 
 //--- error manager functions ----------------------------------------------------------------------
 void jpeg_error( jpeg_common_struct* common )
@@ -38,9 +46,9 @@ void jpeg_init( jpeg_decompress_struct* read_struct )
 
 s32 jpeg_fill( jpeg_decompress_struct* read_struct )
 {
-    tuple_type& tuple = *static_cast< tuple_type* >( read_struct->client_data );
-    read_struct->src->bytes_in_buffer = tuple._0->read( tuple._1, sizeof( buffer_type ) );
-    read_struct->src->next_input_byte = tuple._1;
+    jpeg_io& io = *static_cast< jpeg_io* >( read_struct->client_data );
+    read_struct->src->bytes_in_buffer = io.file.read( io.data, executable::static_page_size );
+    read_struct->src->next_input_byte = io.data;
     return true;
 }
 
@@ -58,29 +66,24 @@ void jpeg_skip( jpeg_decompress_struct* read_struct, sp_t size )
     else
     {
         size -= read_struct->src->bytes_in_buffer;
-        static_cast< tuple_type* >( read_struct->client_data )->_0->seek( size );
+        static_cast< jpeg_io* >( read_struct->client_data )->file.seek( size );
     }
 }
 
 //--- target manager functions ---------------------------------------------------------------------
 void jpeg_init( jpeg_compress_struct* write_struct )
 {
-    tuple_type& tuple = *static_cast< tuple_type* >( write_struct->client_data );
-    write_struct->dest->free_in_buffer = sizeof( buffer_type );
-    write_struct->dest->next_output_byte = tuple._1;
-}
-
-void jpeg_write( jpeg_compress_struct* write_struct, up_t size )
-{
-    tuple_type& tuple = *static_cast< tuple_type* >( write_struct->client_data );
-
-    if ( tuple._0->write( tuple._1, size ) != size )
-        throw error::runtime( "jpeg: " ) << "Unable to write";
+    write_struct->dest->free_in_buffer = executable::static_page_size;
+    write_struct->dest->next_output_byte =
+        static_cast< jpeg_io* >( write_struct->client_data )->data;
 }
 
 void jpeg_term( jpeg_compress_struct* write_struct )
 {
-    jpeg_write( write_struct, sizeof( buffer_type ) - write_struct->dest->free_in_buffer );
+    jpeg_io& io = *static_cast< jpeg_io* >( write_struct->client_data );
+
+    if ( io.file.write( io.data, executable::static_page_size ) != executable::static_page_size )
+        throw error::runtime( "jpeg: " ) << "Unable to write";
 }
 
 s32 jpeg_empty( jpeg_compress_struct* write_struct )
@@ -140,91 +143,179 @@ image jpeg_swap_br( const image& in )
     return out;
 }
 
+//--- jpeg_manager ---------------------------------------------------------------------------------
+struct jpeg_manager
+{
+    jpeg_error_mgr error;
+
+    jpeg_manager( void )
+        : error()
+    {
+        jpeg_std_error( &error );
+        error.error_exit = jpeg_error;
+        error.output_message = jpeg_warning;
+    }
+};
+
+//--- jpeg_read_state_base -------------------------------------------------------------------------
+struct jpeg_read_state_base
+{
+    jpeg_manager manager;
+    jpeg_decompress_struct decompress;
+
+    jpeg_read_state_base( void )
+        : manager(), decompress()
+    {
+        decompress.err = &manager.error;
+        jpeg_create_decompress( &decompress );
+    }
+
+    ~jpeg_read_state_base( void )
+    {
+        jpeg_destroy_decompress( &decompress );
+    }
+};
+
+//--- jpeg_read_state ------------------------------------------------------------------------------
+struct jpeg_read_state
+    : public jpeg_read_state_base
+{
+    jpeg_io io;
+    jpeg_source_mgr source;
+
+    jpeg_read_state( const descriptor& desc )
+        : jpeg_read_state_base(), io( desc ), source()
+    {
+        source.init_source = jpeg_init;
+        source.fill_input_buffer = jpeg_fill;
+        source.skip_input_data = jpeg_skip;
+        source.resync_to_restart = jpeg_resync_to_restart;
+        source.term_source = jpeg_term;
+
+        decompress.client_data = &io;
+        decompress.src = &source;
+        jpeg_read_header( &decompress, true );
+        jpeg_start_decompress( &decompress );
+    }
+
+    ~jpeg_read_state( void )
+    {
+        jpeg_finish_decompress( &decompress );
+    }
+
+    image_metadata metadata( void ) const
+    {
+        return image_metadata( decompress.output_width, decompress.output_height,
+            jpeg_image_format( decompress.out_color_space ) );
+    }
+};
+
+//--- jpeg_write_state_base ------------------------------------------------------------------------
+struct jpeg_write_state_base
+{
+    jpeg_manager manager;
+    jpeg_compress_struct compress;
+
+    jpeg_write_state_base( void )
+        : manager(), compress()
+    {
+        compress.err = &manager.error;
+        jpeg_create_compress( &compress );
+    }
+
+    ~jpeg_write_state_base( void )
+    {
+        jpeg_destroy_compress( &compress );
+    }
+};
+
+//--- jpeg_write_state -----------------------------------------------------------------------------
+struct jpeg_write_state
+    : public jpeg_write_state_base
+{
+    jpeg_io io;
+    jpeg_destination_mgr target;
+
+    jpeg_write_state( const descriptor& desc, const image& image )
+        : jpeg_write_state_base(), io( desc ), target()
+    {
+        target.init_destination = jpeg_init;
+        target.empty_output_buffer = jpeg_empty;
+        target.term_destination = jpeg_term;
+
+        compress.image_width = image.width;
+        compress.image_height = image.height;
+        compress.input_components = subpixels( image );
+        compress.in_color_space = jpeg_colour_space( image.format );
+
+        compress.client_data = &io;
+        compress.dest = &target;
+        jpeg_set_defaults( &compress );
+        jpeg_set_quality( &compress, 80, true );
+        jpeg_start_compress( &compress, true );
+    }
+
+    ~jpeg_write_state( void )
+    {
+        jpeg_finish_compress( &compress );
+    }
+};
+
+//--- jpeg_reader ----------------------------------------------------------------------------------
+struct jpeg_reader
+    : private jpeg_read_state, public image_reader
+{
+    jpeg_reader( const descriptor& desc )
+        : jpeg_read_state( desc ), image_reader( metadata() )
+    {
+    }
+
+    virtual bool decode_row( void )
+    {
+        if ( y == height )
+            return false;
+
+        u8* pointer = row.get();
+        jpeg_read_scanlines( &decompress, &pointer, 1 );
+        x = 0;
+        ++y;
+        return true;
+    }
+};
+
 OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( jpeg ) )
 
 //--- jpeg -----------------------------------------------------------------------------------------
+reader_ptr open( const descriptor& desc )
+{
+    return new jpeg_reader( desc );
+}
+
 image decode( const descriptor& desc )
 {
-    jpeg_decompress_struct read_struct;
-
-    jpeg_error_mgr error_struct;
-    read_struct.err = jpeg_std_error( &error_struct );
-    error_struct.error_exit = jpeg_error;
-    error_struct.output_message = jpeg_warning;
-
-    file file( desc );
-    buffer_type buffer;
-    tuple_type tuple( &file, buffer );
-    read_struct.client_data = &tuple;
-
-    jpeg_create_decompress( &read_struct );
-    scoped< void ( jpeg_decompress_struct* ) >
-        scoped_read( jpeg_destroy_decompress, &read_struct );
-
-    jpeg_source_mgr source_struct;
-    source_struct.init_source = jpeg_init;
-    source_struct.fill_input_buffer = jpeg_fill;
-    source_struct.skip_input_data = jpeg_skip;
-    source_struct.resync_to_restart = jpeg_resync_to_restart;
-    source_struct.term_source = jpeg_term;
-    read_struct.src = &source_struct;
-
-    jpeg_read_header( &read_struct, true );
-    jpeg_start_decompress( &read_struct );
-
-    image_format::type type = jpeg_image_format( read_struct.out_color_space );
-    image image( read_struct.output_width, read_struct.output_height, type );
+    jpeg_read_state state( desc );
+    image_metadata metadata = state.metadata();
+    image image( metadata.width, metadata.height, metadata.format );
     u8* pointer = image.as< u8 >();
     up_t row_size = ooe::row_size( image );
 
     for ( u32 i = 0; i != image.height; ++i, pointer += row_size )
-        jpeg_read_scanlines( &read_struct, &pointer, 1 );
+        jpeg_read_scanlines( &state.decompress, &pointer, 1 );
 
-    jpeg_finish_decompress( &read_struct );
     return image;
 }
 
 void encode( const image& in, const descriptor& desc )
 {
-    jpeg_compress_struct write_struct;
-
-    jpeg_error_mgr error_struct;
-    write_struct.err = jpeg_std_error( &error_struct );
-    error_struct.error_exit = jpeg_error;
-    error_struct.output_message = jpeg_warning;
-
-    file file( desc );
-    buffer_type buffer;
-    tuple_type tuple( &file, buffer );
-    write_struct.client_data = &tuple;
-
     image image = jpeg_swap_br( in );
-    jpeg_create_compress( &write_struct );
-    scoped< void ( jpeg_compress_struct* ) > scoped( jpeg_destroy_compress, &write_struct );
-    write_struct.image_width = image.width;
-    write_struct.image_height = image.height;
-    write_struct.input_components = subpixels( image );
-    write_struct.in_color_space = jpeg_colour_space( image.format );
-
-    jpeg_set_defaults( &write_struct );
-    jpeg_set_quality( &write_struct, 80, true );
-
-    jpeg_destination_mgr target_struct;
-    target_struct.init_destination = jpeg_init;
-    target_struct.empty_output_buffer = jpeg_empty;
-    target_struct.term_destination = jpeg_term;
-    write_struct.dest = &target_struct;
-
-    jpeg_start_compress( &write_struct, true );
+    jpeg_write_state state( desc, image );
     u8* pointer = image.as< u8 >();
     up_t row_size = ooe::row_size( image );
 
     for ( u32 i = 0; i != image.height; ++i, pointer += row_size )
-        jpeg_write_scanlines( &write_struct, &pointer, 1 );
-
-    jpeg_finish_compress( &write_struct );
+        jpeg_write_scanlines( &state.compress, &pointer, 1 );
 }
 
 OOE_NAMESPACE_END( ( ooe )( jpeg ) )

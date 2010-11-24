@@ -191,8 +191,7 @@ class png_reader
 {
 public:
     png_reader( const image_metadata& metadata, png_read_state& state_ )
-        : image_reader( metadata ), state( state_ ), row( new u8[ row_size( *this ) ] ), x( width ),
-        y( 0 )
+        : image_reader( metadata ), state( state_ )
     {
     }
 
@@ -213,20 +212,8 @@ public:
         return true;
     }
 
-    virtual u32 read_pixels( void* buffer, u32 pixels )
-    {
-        u8 size = pixel_size( *this );
-        pixels = std::min( width, x + pixels ) - x;
-        std::memcpy( buffer, row + x * size, pixels * size );
-        x += pixels;
-        return pixels;
-    }
-
 private:
     png_read_state state;
-    scoped_array< u8 > row;
-    u32 x;
-    u32 y;
 };
 
 OOE_ANONYMOUS_END( ( ooe ) )

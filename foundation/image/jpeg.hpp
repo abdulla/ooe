@@ -13,6 +13,7 @@ OOE_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( jpeg ) )
 
+reader_ptr open( const descriptor& ) OOE_VISIBLE;
 image decode( const descriptor& ) OOE_VISIBLE;
 void encode( const image&, const descriptor& ) OOE_VISIBLE;
 

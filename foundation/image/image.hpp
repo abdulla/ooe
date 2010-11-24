@@ -71,6 +71,8 @@ struct image_metadata
     image_metadata( u32, u32, image_format::type );
 };
 
+bool operator ==( const image_metadata&, const image_metadata& ) OOE_VISIBLE;
+
 //--- image ----------------------------------------------------------------------------------------
 class image
     : public image_metadata
@@ -111,9 +113,13 @@ class image_reader
 public:
     virtual ~image_reader( void ) {}
     virtual bool decode_row( void ) = 0;
-    virtual u32 read_pixels( void*, u32 ) = 0;
+    u32 read_pixels( void*, u32 );
 
 protected:
+    u32 x;
+    u32 y;
+    scoped_array< u8 > row;
+
     image_reader( const image_metadata& );
 };
 
@@ -143,6 +149,7 @@ template< typename t >
 }
 
 class descriptor;
+typedef reader_ptr ( * open_type )( const descriptor& );
 typedef image ( * decoder_type )( const descriptor& );
 typedef void ( * encoder_type )( const image&, const descriptor& );
 

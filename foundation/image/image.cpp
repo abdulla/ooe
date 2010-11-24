@@ -13,6 +13,11 @@ image_metadata::image_metadata( u32 width_, u32 height_, image_format::type form
 {
 }
 
+bool operator ==( const image_metadata& x, const image_metadata& y )
+{
+    return x.width == y.width && x.height == y.height && x.format == y.format;
+}
+
 //--- image ----------------------------------------------------------------------------------------
 image::image( u32 width_, u32 height_, image_format::type format_ )
     : image_metadata( width_, height_, format_ ), data( std::malloc( byte_size( *this ) ) )
@@ -26,8 +31,17 @@ image::image( u32 width_, u32 height_, image_format::type format_, const data_pt
 
 //--- image_reader ---------------------------------------------------------------------------------
 image_reader::image_reader( const image_metadata& metadata )
-    : image_metadata( metadata )
+    : image_metadata( metadata ), x( width ), y( 0 ), row( new u8[ row_size( *this ) ] )
 {
+}
+
+u32 image_reader::read_pixels( void* buffer, u32 pixels )
+{
+    u8 size = pixel_size( *this );
+    pixels = std::min( width, x + pixels ) - x;
+    std::memcpy( buffer, row + x * size, pixels * size );
+    x += pixels;
+    return pixels;
 }
 
 //--------------------------------------------------------------------------------------------------
