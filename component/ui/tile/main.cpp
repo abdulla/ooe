@@ -11,11 +11,22 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
+//--- extension ------------------------------------------------------------------------------------
+std::string extension( const c8* file )
+{
+    const c8* ext = std::strrchr( file, '.' );
+
+    if ( !ext )
+        throw error::runtime( "tile: " ) << "File \"" << file << "\" does not have an extension";
+
+    return ext + 1;
+}
+
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
-    c8* directory = 0;
-    c8* file = 0;
+    const c8* directory = 0;
+    const c8* file = 0;
     u16 page_size = 256;
 
     for ( s32 option; ( option = getopt( argc, argv, "d:f:p:" ) ) != -1; )
@@ -51,7 +62,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     }
 
     thread_pool pool( "pool" );
-    make_tile( descriptor( file ), pool, directory, page_size );
+    make_tile( descriptor( file ), pool, directory, extension( file ), page_size );
     return true;
 }
 

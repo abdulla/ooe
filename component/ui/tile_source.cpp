@@ -20,36 +20,68 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 typedef shared_ptr< image > image_ptr;
 typedef std::vector< image_ptr > page_vector;
 
-struct decoder_pair
+template< typename t >
+    struct codec_pair
 {
+    typedef t codec_type;
+
     const c8* type;
-    decoder_type decoder;
+    codec_type codec;
 };
 
-bool less( const decoder_pair& pair, const std::string& type )
+template< typename t >
+    bool less( const t& pair, const std::string& type )
 {
     return std::strcmp( pair.type, type.c_str() ) < 0;
 }
 
-decoder_type find( const std::string& type )
+template< typename t >
+    typename t::codec_type find( const std::string& type, t* begin, t* end )
 {
-    decoder_pair pair[] =
-    {
-        { "dds",        dds::decode         },
-        { "exr",        exr::decode         },
-        { "jpeg",       jpeg::decode        },
-        { "jpeg2000",   jpeg2000::decode    },
-        { "png",        png::decode         }
-    };
-
-    decoder_pair* begin = pair;
-    decoder_pair* end = begin + sizeof( pair ) / sizeof( *pair );
-    decoder_pair* i = std::lower_bound( begin, end, type, less );
+    t* i = std::lower_bound( begin, end, type, less< t > );
 
     if ( i == end )
         throw error::runtime( "tile_source: " ) << "Unknown image type \"" << type << '\"';
 
-    return i->decoder;
+    return i->codec;
+}
+
+open_type find_open( const std::string& type )
+{
+    codec_pair< open_type > pairs[] =
+    {
+        {   "jpg", jpeg::open   },
+        {   "png", png::open    }
+    };
+
+    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
+}
+
+decoder_type find_decoder( const std::string& type )
+{
+    codec_pair< decoder_type > pairs[] =
+    {
+        {   "dds", dds::decode      },
+        {   "exr", exr::decode      },
+        {   "jp2", jpeg2000::decode },
+        {   "jpg", jpeg::decode     },
+        {   "png", png::decode      }
+    };
+
+    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
+}
+
+encoder_type find_encoder( const std::string& type )
+{
+    codec_pair< encoder_type > pairs[] =
+    {
+        {   "dds", dds::encode      },
+        {   "jp2", jpeg2000::encode },
+        {   "jpg", jpeg::encode     },
+        {   "png", png::encode      }
+    };
+
+    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
 }
 
 std::string make_path
@@ -60,12 +92,13 @@ std::string make_path
     return path;
 }
 
-void write_metadata( const std::string& root, const reader_ptr reader, u32 level_limit )
+void write_metadata
+    ( const std::string& root, const std::string& type, const reader_ptr reader, u32 level_limit )
 {
     file file( descriptor( root + "/metadata", descriptor::write_new ) );
     file <<
         "{\n"
-        "    \"type\": \"png\",\n"
+        "    \"type\": \"" << type << "\",\n"
         "    \"level_limit\": " << level_limit << ",\n"
         "    \"width\": " << reader->width << ",\n"
         "    \"height\": " << reader->height << "\n"
@@ -123,15 +156,15 @@ void resample_page( const std::string& root, const pyramid_index& index, u16 pag
     write_raw( root, pi, target );
 }
 
-void resample_row( std::string root, u32 size, u32 y, u8 level, u16 page_size,
-    image_format::type format )
+void resample_row
+    ( std::string root, u32 size, u32 y, u8 level, u16 page_size, image_format::type format )
 {
     for ( u32 x = 0; x < size; x += 2 )
         resample_page( root, pyramid_index( x, y, level ), page_size, format );
 }
 
-void encode_row( std::string root, u32 size, u32 y, u8 level, u16 page_size,
-    image_format::type format )
+void encode_row( std::string root, std::string type, encoder_type encoder, u32 size, u32 y,
+    u8 level, u16 page_size, image_format::type format )
 {
     image image( page_size, page_size, format );
 
@@ -143,8 +176,8 @@ void encode_row( std::string root, u32 size, u32 y, u8 level, u16 page_size,
         file( path ).read( image.get(), byte_size( image ) );
         erase( path );
 
-        descriptor desc( make_path( root, index, "png" ), descriptor::write_new );
-        png::encode( image, desc );
+        descriptor desc( make_path( root, index, type ), descriptor::write_new );
+        encoder( image, desc );
     }
 }
 
@@ -165,7 +198,7 @@ tile_source::tile_source( const std::string& root_ )
     width = pt.get< u32 >( "width" );
     height = pt.get< u32 >( "height" );
 
-    decoder = find( type );
+    decoder = find_decoder( type );
     image image = decoder( root + "/0_0_0." + type );
     size_ = image.width << level_limit;
     page_size_ = image.width;
@@ -203,12 +236,13 @@ image tile_source::read( const pyramid_index& i )
 }
 
 //--- make_tile ------------------------------------------------------------------------------------
-void make_tile( const descriptor& desc, thread_pool& pool, const std::string& root, u16 page_size )
+void make_tile( const descriptor& desc, thread_pool& pool, const std::string& root,
+    const std::string& type, u16 page_size )
 {
     if ( exists( root ) )
         throw error::runtime( "make_tile: " ) << "Directory \"" << root << "\" exists";
 
-    reader_ptr reader = png::open( desc );
+    reader_ptr reader = find_open( type )( desc );
     image_format::type format = reader->format;
     u32 page_limit = ceiling< u32 >( std::max( reader->width, reader->height ), page_size );
     u8 level_limit = std::ceil( log2f( page_limit ) );
@@ -217,7 +251,7 @@ void make_tile( const descriptor& desc, thread_pool& pool, const std::string& ro
     up_t row_size = page_size * pixel_size;
 
     make_directory( root );
-    write_metadata( root, reader, level_limit );
+    write_metadata( root, type, reader, level_limit );
     page_vector pages;
     pages.reserve( pages_per_row );
 
@@ -240,34 +274,39 @@ void make_tile( const descriptor& desc, thread_pool& pool, const std::string& ro
             write_raw( root, pyramid_index( x, y, level_limit ), *pages[ x ] );
     }
 
+    u32 width_limit = ceiling< u32 >( reader->width, page_size );
+    u32 height_limit = ceiling< u32 >( reader->height, page_size );
+    u32 w = width_limit;
+    u32 h = height_limit;
     reader = 0;
     page_vector().swap( pages );
-    u32 size = page_limit;
 
     // resample
-    for ( u8 level = level_limit; level; --level, size = ceiling( size, 2u ) )
+    for ( u8 level = level_limit; level; --level, w = ceiling( w, 2u ), h = ceiling( h, 2u ) )
     {
-        for ( u32 y = 0; y < size; y += 2 )
+        for ( u32 y = 0; y < h; y += 2 )
         {
-            result< void > sync = async
-                ( pool, make_function( resample_row ), root, size, y, level, page_size, format );
+            result< void > sync = async( pool, make_function( resample_row ),
+                root, w, y, level, page_size, format );
 
-            if ( y + 2 >= size )
+            if ( y + 2 >= h )
                 sync();
         }
     }
 
-    size = page_limit;
+    encoder_type encoder = find_encoder( type );
+    w = width_limit;
+    h = height_limit;
 
     // encode
-    for ( s8 level = level_limit; level != -1; --level, size = ceiling( size, 2u ) )
+    for ( s8 level = level_limit; level != -1; --level, w = ceiling( w, 2u ), h = ceiling( h, 2u ) )
     {
-        for ( u32 y = 0; y != size; ++y )
+        for ( u32 y = 0; y != h; ++y )
         {
-            result< void > sync = async
-                ( pool, make_function( encode_row ), root, size, y, level, page_size, format );
+            result< void > sync = async( pool, make_function( encode_row ),
+                root, type, encoder, w, y, level, page_size, format );
 
-            if ( y == size - 1 )
+            if ( y == h - 1 )
                 sync();
         }
     }

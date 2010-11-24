@@ -39,7 +39,7 @@ private:
 };
 
 //--- make_tile ------------------------------------------------------------------------------------
-void make_tile( const descriptor&, thread_pool&, const std::string&, u16 );
+void make_tile( const descriptor&, thread_pool&, const std::string&, const std::string&, u16 );
 
 OOE_NAMESPACE_END( ( ooe ) )
 
