@@ -327,7 +327,7 @@ public:
         h = std::min< s32 >( h * 3, area._1 - y );
         texture.load( w, h, x, y, level );
 
-        u32 border = 1 << level;
+        u32 border = ( 1 << level ) - 1;
         f32 u = divide( area._0 - border, size );
         f32 v = divide( area._1 - border, size );
 
