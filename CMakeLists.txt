@@ -7,7 +7,7 @@ include( platform/build.cmake )
 ### packages #######################################################################################
 find_package( Boost REQUIRED )
 find_package( Freetype REQUIRED )
-find_package( JPEG REQUIRED )
+find_package( JPEGTurbo REQUIRED )
 find_package( Lua51 REQUIRED )
 find_package( OpenEXR REQUIRED )
 find_package( OpenGL REQUIRED )
@@ -22,7 +22,7 @@ find_package( ZLIB REQUIRED )
 
 include_directories( . )
 include_directories( ${FREETYPE_INCLUDE_DIRS} )
-include_directories( ${JPEG_INCLUDE_DIR} )
+include_directories( ${JPEGTURBO_INCLUDE_DIRS} )
 include_directories( ${LUA_INCLUDE_DIR} )
 include_directories( ${OPENGL_INCLUDE_DIR} )
 include_directories( ${OPENJPEG_INCLUDE_DIRS} )
@@ -45,7 +45,7 @@ ooe_library( executable foundation/executable )
 target_link_libraries( executable ${EXECUTABLE_LIBRARIES} )
 
 ooe_library( image foundation/image )
-target_link_libraries( image io ${JPEG_LIBRARIES} ${OPENEXR_LIBRARIES} ${OPENJPEG_LIBRARIES}
+target_link_libraries( image io ${JPEGTURBO_LIBRARIES} ${OPENEXR_LIBRARIES} ${OPENJPEG_LIBRARIES}
     ${PNG_LIBRARIES} ${SQUISH_LIBRARIES} )
 
 ooe_library( io foundation/io )
