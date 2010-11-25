@@ -33,8 +33,8 @@ void add_glyph( const font_source::glyph_type& glyph, f32* data, u32 size, f32 x
 
     data[ 0 ] = bit_shift( metric.width, shift );
     data[ 1 ] = bit_shift( metric.height, shift );
-    data[ 2 ] = std::floor( x + bit_shift( metric.left, shift ) );
-    data[ 3 ] = std::ceil( y + font_size - bit_shift( metric.top, shift ) );
+    data[ 2 ] = round( x + bit_shift( metric.left, shift ) );
+    data[ 3 ] = round( y + font_size - bit_shift( metric.top, shift ) );
 
     data[ 4 ] = divide( metric.width << level, size );
     data[ 5 ] = divide( metric.height << level, size );
