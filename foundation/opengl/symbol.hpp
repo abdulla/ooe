@@ -50,7 +50,7 @@ enum
     NEAREST                     = 0x2600,
     LINEAR                      = 0x2601,
     NEAREST_MIPMAP_NEAREST      = 0x2700,
-    LINEAR_MIPMAP_NEAREST       = 0x2701,
+    LINEAR_MIPMAP_LINEAR        = 0x2703,
 
     TEXTURE_MAG_FILTER          = 0x2800,
     TEXTURE_MIN_FILTER          = 0x2801,
