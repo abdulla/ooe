@@ -18,83 +18,13 @@
             "y": 150,
             "children": [
                 {
-                    "width": 400,
-                    "height": 400,
+                    "width": 1600,
+                    "height": 800,
                     "x": 100,
                     "y": 100,
                     "node": "tile",
                     "data": {
-                        "tile": "cache/earth-a1"
-                    }
-                },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 100,
-                    "y": 500,
-                    "node": "tile",
-                    "data": {
-                        "tile": "cache/earth-a2"
-                    }
-                },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 500,
-                    "y": 100,
-                    "node": "tile",
-                    "data": {
-                        "tile": "cache/earth-b1"
-                    }
-                },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 500,
-                    "y": 500,
-                    "node": "tile",
-                    "data": {
-                        "tile": "cache/earth-b2"
-                    }
-                },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 900,
-                    "y": 100,
-                    "node": "tile",
-                    "data": {
-                        "tile": "cache/earth-c1"
-                    }
-                },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 900,
-                    "y": 500,
-                    "node": "tile",
-                    "data": {
-                        "tile": "cache/earth-c2"
-                    }
-                },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 1300,
-                    "y": 100,
-                    "node": "tile",
-                    "data": {
-                        "tile": "cache/earth-d1"
-                    }
-                },
-                {
-                    "width": 400,
-                    "height": 400,
-                    "x": 1300,
-                    "y": 500,
-                    "node": "tile",
-                    "data": {
-                        "tile": "cache/earth-d2"
+                        "tile": "cache/earth"
                     }
                 },
                 {
@@ -108,7 +38,7 @@
                         "x": 16,
                         "y": 16,
                         "level": 6,
-                        "red": 191
+                        "blue": 191
                     }
                 },
                 {
