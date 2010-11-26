@@ -315,18 +315,15 @@ public:
         s32 x = aux._2 * area._0;
         s32 y = aux._3 * area._1;
 
-        /*if ( level )
-            texture.load( w, h, x, y, level - 1 );
-
-        if ( level != level_limit )
-            texture.load( w, h, x, y, level + 1 );*/
-
         x = std::max( 0, x - w );
         y = std::max( 0, y - h );
         w = std::min< s32 >( w * 3, area._0 - x );
         h = std::min< s32 >( h * 3, area._1 - y );
-        texture.load( w, h, x, y, level );
 
+        if ( level != level_limit )
+            texture.load( w, h, x, y, level + 1 );
+
+        texture.load( w, h, x, y, level );
         u32 border = ( 1 << level ) - 1;
         f32 u = divide( area._0 - border, size );
         f32 v = divide( area._1 - border, size );
