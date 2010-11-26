@@ -66,6 +66,7 @@ void jpeg_skip( jpeg_decompress_struct* read_struct, sp_t size )
     else
     {
         size -= read_struct->src->bytes_in_buffer;
+        read_struct->src->bytes_in_buffer = 0;
         static_cast< jpeg_io* >( read_struct->client_data )->file.seek( size );
     }
 }
