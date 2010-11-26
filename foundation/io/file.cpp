@@ -68,12 +68,25 @@ up_t file::tell( void ) const
 
 void file::seek( sp_t offset, seek_type point )
 {
-    s32 whence = SEEK_CUR;
+    s32 whence;
 
-    if ( point == begin )
+    switch ( point )
+    {
+    case current:
+        whence = SEEK_CUR;
+        break;
+
+    case begin:
         whence = SEEK_SET;
-    else if ( point == end )
+        break;
+
+    case end:
         whence = SEEK_END;
+        break;
+
+    default:
+        throw error::io( "file: " ) << "Unknown seek type: " << point;
+    }
 
     if ( lseek( get(), offset, whence ) == -1 )
         throw error::io( "file: " ) << "Unable to seek: " << error::number( errno );
