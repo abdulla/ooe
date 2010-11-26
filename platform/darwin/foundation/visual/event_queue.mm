@@ -2,6 +2,7 @@
 
 #include <AppKit/AppKit.h>
 
+#include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/visual/event_queue.hpp"
 
@@ -46,7 +47,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 event_queue::event_queue( void )
 {
     if ( ![ NSApplication sharedApplication ] )
-        throw error::runtime( "executable: " ) << "Unable to initialise shared application";
+        throw error::runtime( "event_queue: " ) << "Unable to initialise shared application";
 
     [ NSApp finishLaunching ];
 }
@@ -58,6 +59,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 //--- event_queue ----------------------------------------------------------------------------------
 event::type event_queue::dequeue( event& event, epoch_t timeout ) const
 {
+    platform::autorelease autorelease;
     NSDate* date = [ NSDate dateWithTimeIntervalSinceNow: timeout._0 + timeout._1 * 1e-9 ];
     NSEvent* nsevent = [ NSApp nextEventMatchingMask: NSAnyEventMask untilDate: date
         inMode: NSDefaultRunLoopMode dequeue: true ];

@@ -6,33 +6,23 @@
 #include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_BEGIN( ( ooe ) )
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
-class autorelease
+//--- autorelease ----------------------------------------------------------------------------------
+autorelease::autorelease( void )
+    : pool( [ [ NSAutoreleasePool alloc ] init ] )
 {
-public:
-    autorelease( void )
-        : pool( [ [ NSAutoreleasePool alloc ] init ] )
-    {
-        if ( !pool )
-            throw error::runtime( "autorelease: " ) << "Unable to initialise";
-    }
+    if ( !pool )
+        throw error::runtime( "autorelease: " ) << "Unable to initialise pool";
+}
 
-    ~autorelease( void )
-    {
-        [ pool release ];
-    }
+autorelease::~autorelease( void )
+{
+    [ pool release ];
+}
 
-private:
-    NSAutoreleasePool* pool;
-};
-
-OOE_ANONYMOUS_END( ( ooe ) )
-
-OOE_NAMESPACE_BEGIN( ( ooe ) )
-
-//--- platform -------------------------------------------------------------------------------------
-bool platform::launch( executable::launch_type launch,
+//--- launch ---------------------------------------------------------------------------------------
+bool launch( executable::launch_type launch,
     const std::string& root, const std::string& name, s32 argc, c8** argv )
 {
     autorelease autorelease;
@@ -49,6 +39,10 @@ bool platform::launch( executable::launch_type launch,
 
     return status;
 }
+
+OOE_NAMESPACE_END( ( ooe )( platform ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- executable -----------------------------------------------------------------------------------
 bool executable::path( c8* buffer, up_t size )

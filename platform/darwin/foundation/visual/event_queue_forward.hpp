@@ -3,7 +3,6 @@
 #ifndef OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_EVENT_QUEUE_FORWARD_HPP
 #define OOE_PLATFORM_DARWIN_FOUNDATION_VISUAL_EVENT_QUEUE_FORWARD_HPP
 
-#include "foundation/utility/macro.hpp"
 #include "foundation/utility/namespace.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -28,7 +27,7 @@ OOE_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
-class OOE_VISIBLE event_queue
+class event_queue
 {
 protected:
     event_queue( void );
