@@ -1,12 +1,33 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <objc/message.h>
 #include <Foundation/Foundation.h>
 #include <mach-o/dyld.h>
 
 #include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/scoped.hpp"
+
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
+
+class autorelease
+{
+public:
+    autorelease( void )
+        : pool( [ [ NSAutoreleasePool alloc ] init ] )
+    {
+        if ( !pool )
+            throw error::runtime( "autorelease: " ) << "Unable to initialise";
+    }
+
+    ~autorelease( void )
+    {
+        [ pool release ];
+    }
+
+private:
+    NSAutoreleasePool* pool;
+};
+
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -14,15 +35,8 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 bool platform::launch( executable::launch_type launch,
     const std::string& root, const std::string& name, s32 argc, c8** argv )
 {
+    autorelease autorelease;
     bool status = false;
-    NSAutoreleasePool* pool = [ [ NSAutoreleasePool alloc ] init ];
-
-    if ( !pool )
-        throw error::runtime( "executable: " ) << "Unable to initialise auto-release pool";
-
-    typedef id ( send_type )( id, SEL );
-    scoped< send_type >
-        scoped( reinterpret_cast< send_type* >( objc_msgSend ), pool, @selector( release ) );
 
     @try
     {
