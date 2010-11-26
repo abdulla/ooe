@@ -6,12 +6,6 @@
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/namespace.hpp"
 
-#ifdef __OBJC__
-    @class NSAutoreleasePool;
-#else
-    struct NSAutoreleasePool;
-#endif
-
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 enum key_type
