@@ -308,7 +308,7 @@ public:
     {
         u32 size = tile.size();
         u8 level_limit = log2f( size / tile.page_size() );
-        u8 level = clamp< u8 >( log2f( size / box._0 ), 0, level_limit );
+        u8 level = clamp< s8 >( log2f( size / box._0 ), 0, level_limit );
         tile_source::area_tuple area = tile.area();
         s32 w = aux._0 * area._0;
         s32 h = aux._1 * area._1;
