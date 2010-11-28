@@ -26,8 +26,8 @@ struct marker
     }
 };
 
-void add_glyph( const font_source::glyph_type& glyph, f32* data, u32 size, f32 x, f32 y,
-    u32 font_size, u8 level, s8 shift )
+void add_glyph( const font_source::glyph_type& glyph, f32* data, f32 x, f32 y, u32 size,
+    u32 font_size, s8 shift, u8 level )
 {
     const font::metric& metric = glyph._0;
 
@@ -55,7 +55,7 @@ u32 glyph_size( iterator_type i, iterator_type end )
     return glyphs;
 }
 
-bool handle_space( u32 code_point, f32& x, f32& y, u32 font_size )
+bool handle_space( u32 code_point, u32 start_x, u32 font_size, f32& x, f32& y )
 {
     switch ( code_point )
     {
@@ -64,7 +64,7 @@ bool handle_space( u32 code_point, f32& x, f32& y, u32 font_size )
         return true;
 
     case '\n':
-        x = 0;
+        x = start_x;
         y += font_size * line_spacing;
         return true;
 
@@ -103,8 +103,7 @@ u32 text_layout::input( block_ptr& block, const text& text, f32 width )
     u8 level_min = level_max - level_limit;
     u8 level = level_max - clamp( text.level, level_min, level_max );
     s8 shift = inverse_clamp< s8 >( text.level, level_min, level_max );
-    width -= text.x;
-    f32 x = 0;
+    f32 x = text.x;
     f32 y = text.y;
     u32 code_point = 0;
     u32 last_point;
@@ -118,12 +117,12 @@ u32 text_layout::input( block_ptr& block, const text& text, f32 width )
     {
         code_point = utf8::next( i, end );
 
-        if ( handle_space( code_point, x, y, font_size ) )
+        if ( handle_space( code_point, text.x, font_size, x, y ) )
         {
             m = marker( i, data, 0 );
             continue;
         }
-        else if ( x > 0 )
+        else if ( x > text.x )
             x += source.kerning( last_point, code_point, level ) * exp2f( shift );
 
         font_source::glyph_type glyph = source.glyph( code_point, level );
@@ -131,7 +130,7 @@ u32 text_layout::input( block_ptr& block, const text& text, f32 width )
 
         if ( x + advance > width )
         {
-            x = 0;
+            x = text.x;
             y += font_size * line_spacing;
 
             if ( m.width + advance > width )
@@ -147,7 +146,7 @@ u32 text_layout::input( block_ptr& block, const text& text, f32 width )
         }
 
         texture.load( glyph._0.width, glyph._0.height, glyph._1, glyph._2, level );
-        add_glyph( glyph, data, size, x + text.x, y, font_size, level, shift );
+        add_glyph( glyph, data, x, y, size, font_size, shift, level );
 
         data += point_size;
         x += advance;
