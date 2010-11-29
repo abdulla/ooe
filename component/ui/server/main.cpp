@@ -217,14 +217,20 @@ class text_node
 {
 public:
     text_node( const block_ptr& in, text_layout& layout_, const property_tree& tree )
-        : tuple( in, 0 ), layout( layout_ ), text(), x( tree.get( "x", 0 ) ),
-        y( tree.get( "y", 0 ) ), level( tree.get( "level", 5 ) )
+        : tuple( in, 0 ), layout( layout_ ), text( tree.size() ), level( -128 )
     {
-        text.data = tree.get< std::string >( "text" );
-        text.red = tree.get( "red", 0 );
-        text.green = tree.get( "green", 0 );
-        text.blue = tree.get( "blue", 0 );
-        text.level = 255;
+        up_t j = 0;
+
+        for ( property_tree::const_iterator i = tree.begin(), end = tree.end(); i != end; ++i, ++j )
+        {
+            text[ j ].data = i->second.get< std::string >( "text" );
+            text[ j ].x = i->second.get( "x", 0 );
+            text[ j ].y = i->second.get( "y", 0 );
+            text[ j ].level = i->second.get( "level", 5 );
+            text[ j ].red = i->second.get( "red", 0 );
+            text[ j ].green = i->second.get( "green", 0 );
+            text[ j ].blue = i->second.get( "blue", 0 );
+        }
     }
 
     virtual ~text_node( void )
@@ -234,26 +240,22 @@ public:
     virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& )
     {
         tuple._0->input( "translate", box._2, box._3 );
-        u8 text_level = std::max( 0.f, level - box._4 );
+        s8 box_level = -box._4;
 
-        if ( text_level == text.level )
+        if ( box_level == level )
             return tuple;
 
-        text.x = bit_shift( x, -box._4 );
-        text.y = bit_shift( y, -box._4 );
-        text.level = text_level;
+        level = box_level;
         tuple._0->input( "depth", box._4 );
-        tuple._1 = layout.input( tuple._0, text_vector( 1, text ), box._0 - text.x );
+        tuple._1 = layout.input( tuple._0, text, box._0, level );
         return tuple;
     }
 
 private:
     block_tuple tuple;
     text_layout& layout;
-    ooe::text text;
-    u16 x;
-    u16 y;
-    u8 level;
+    text_vector text;
+    s8 level;
 };
 
 //--- make_text ------------------------------------------------------------------------------------

@@ -49,16 +49,16 @@ template<>
     frame_ptr frame = device->default_frame( width, height );
     const c8 data[] = "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
-    text_vector text( 2 );
+    text_vector text( 3 );
     text[ 0 ].data = "test";
-    text[ 0 ].level = 6;
-    text[ 0 ].red = 127;
-    text[ 0 ].green = 127;
-    text[ 0 ].blue = 255;
-    text[ 1 ].level = 5;
-    text[ 1 ].red = 255;
+    text[ 0 ].red = 255;
+    text[ 1 ].data = "test";
+    text[ 1 ].level = 6;
     text[ 1 ].green = 255;
-    text[ 1 ].blue = 255;
+    text[ 2 ].level = 5;
+    text[ 2 ].red = 255;
+    text[ 2 ].green = 255;
+    text[ 2 ].blue = 255;
 
     block_ptr block = program->block( make_index( device ) );
     block->input( "vertex", block::f32_2, make_point( device ) );
@@ -67,8 +67,8 @@ template<>
 
     for ( const c8* i = data, * end = i + sizeof( data ); i != end; ++i )
     {
-        text[ 1 ].data = std::string( data, i + 1 );
-        u32 instances = layout.input( block, text, width );
+        text[ 2 ].data = std::string( data, i + 1 );
+        u32 instances = layout.input( block, text, width, 0 );
 
         while ( cache.pending() )
             cache.write();
