@@ -31,7 +31,7 @@ class text_layout
 public:
     text_layout( const device_ptr&, page_cache&, font_source& );
 
-    u32 input( block_ptr&, const text_vector&, f32 );
+    u32 input( block_ptr&, const text_vector&, f32, s8 );
 
 private:
     const device_ptr& device;

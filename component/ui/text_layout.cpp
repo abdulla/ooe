@@ -7,34 +7,40 @@
 #include "component/ui/text_layout.hpp"
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/binary.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-typedef std::string::const_iterator iterator_type;
-const up_t point_size = 8;
-const f32 line_spacing = 1.5;
-
-struct marker
-{
-    iterator_type i;
-    f32* data;
-    f32 width;
-
-    marker( iterator_type i_, f32* data_, f32 width_ )
-        : i( i_ ), data( data_ ), width( width_ )
-    {
-    }
-};
+typedef text_vector::const_iterator text_iterator;
+typedef std::string::const_iterator string_iterator;
+const up_t point_size = 8 * sizeof( f32 ) + 4 * sizeof( u8 );
+const f32 line_spacing = .5;
+const f32 word_spacing = .25;
 
 struct limit
 {
     u32 size;
+    f32 width;
+    s8 zoom;
     u8 max;
     u8 min;
 
-    limit( const font_source& source )
-        : size( source.size() ), max( log2f( source.font_size() ) ),
+    limit( const font_source& source, f32 width_, s8 zoom_ )
+        : size( source.size() ), width( width_ ), zoom( zoom_ ), max( log2f( source.font_size() ) ),
         min( max - log2f( size / source.page_size() ) )
+    {
+    }
+};
+
+struct marker
+{
+    text_iterator i;
+    string_iterator j;
+    void* data;
+    f32 width;
+
+    marker( text_iterator i_, string_iterator j_, void* data_, f32 width_ )
+        : i( i_ ), j( j_ ), data( data_ ), width( width_ )
     {
     }
 };
@@ -43,9 +49,9 @@ u32 glyph_size( const text_vector& text )
 {
     u32 glyphs = 0;
 
-    for ( text_vector::const_iterator i = text.begin(), i_end = text.end(); i != i_end; ++i )
+    for ( text_iterator i = text.begin(), i_end = text.end(); i != i_end; ++i )
     {
-        for ( iterator_type j = i->data.begin(), j_end = i->data.end(); j != j_end; )
+        for ( string_iterator j = i->data.begin(), j_end = i->data.end(); j != j_end; )
         {
             if ( !std::iswspace( utf8::next( j, j_end ) ) )
                 ++glyphs;
@@ -55,16 +61,18 @@ u32 glyph_size( const text_vector& text )
     return glyphs;
 }
 
-bool handle_space( u32 code_point, u32 start_x, u32 font_size, f32& x, f32& y )
+bool handle_space( u32 code_point, const text& text, u32& font_size, f32& x, f32& y, s8 zoom )
 {
     switch ( code_point )
     {
     case ' ':
-        x += font_size >> 2;
+        x += ( 1 << ( text.level + zoom ) ) * word_spacing;
         return true;
 
     case '\n':
-        x = start_x;
+        x = bit_shift( text.x, zoom );
+        y += font_size;
+        font_size = 1 << ( text.level + zoom );
         y += font_size * line_spacing;
         return true;
 
@@ -73,38 +81,58 @@ bool handle_space( u32 code_point, u32 start_x, u32 font_size, f32& x, f32& y )
     }
 }
 
-void add_glyph( const font_source::glyph_type& glyph, f32* data, f32 x, f32 y, u32 size,
-    u32 font_size, s8 shift, u8 level )
+void add_glyph( const font_source::glyph_type& glyph, void* data, const text& text, f32 x, f32 y,
+    u32 font_size, u32 size, s8 shift, u8 level )
 {
     const font::metric& metric = glyph._0;
 
-    data[ 0 ] = bit_shift( metric.width, shift );
-    data[ 1 ] = bit_shift( metric.height, shift );
-    data[ 2 ] = round( x + bit_shift( metric.left, shift ) );
-    data[ 3 ] = round( y + font_size - bit_shift( metric.top, shift ) );
+    f32* point = add< f32 >( data, 0 );
+    point[ 0 ] = bit_shift( metric.width, shift );
+    point[ 1 ] = bit_shift( metric.height, shift );
+    point[ 2 ] = std::ceil( x + bit_shift( metric.left, shift ) );
+    point[ 3 ] = std::ceil( y + font_size - bit_shift( metric.top, shift ) );
 
-    data[ 4 ] = divide( metric.width << level, size );
-    data[ 5 ] = divide( metric.height << level, size );
-    data[ 6 ] = divide( glyph._1, size );
-    data[ 7 ] = divide( glyph._2, size );
+    point[ 4 ] = divide( metric.width << level, size );
+    point[ 5 ] = divide( metric.height << level, size );
+    point[ 6 ] = divide( glyph._1, size );
+    point[ 7 ] = divide( glyph._2, size );
+
+    u8* colour = add< u8 >( data, 8 * sizeof( f32 ) );
+    colour[ 0 ] = text.red;
+    colour[ 1 ] = text.green;
+    colour[ 2 ] = text.blue;
+    colour[ 3 ] = 255;
 }
 
-void add_text( const font_source& source, virtual_texture& texture, const limit& limit,
-    const text& text, f32*& data, f32& x, f32& y, f32 width )
+marker add_text( const font_source& source, virtual_texture& texture, const limit& limit, f32& x,
+    f32& y, u32& font_size, const marker& next, marker& line, marker& word,
+    const text_iterator& i_end )
 {
-    u32 font_size = 1 << text.level;
-    s8 shift = inverse_clamp< s8 >( text.level, limit.min, limit.max );
-    u8 level = limit.max - clamp( text.level, limit.min, limit.max );
-    u32 last_point = 0;
-    marker m( text.data.begin(), data, 0 );
+    const text& text = *next.i;
+    u32 line_size = 1 << ( text.level + limit.zoom );
 
-    for ( iterator_type i = m.i, end = text.data.end(); i != end; )
+    if ( line_size > font_size )
     {
-        u32 code_point = utf8::next( i, end );
+        x = bit_shift( line.i->x, limit.zoom );
+        font_size = line_size;
+        return line;
+    }
 
-        if ( handle_space( code_point, text.x, font_size, x, y ) )
+    y = std::max< f32 >( y, bit_shift( text.y, limit.zoom ) );
+    f32 width = limit.width - bit_shift( text.x, limit.zoom );
+    void* data = next.data;
+    u32 last_point = 0;
+    s8 shift = inverse_clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
+    u8 level = limit.max - clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
+
+    for ( string_iterator j = next.j, j_end = text.data.end(); j != j_end; )
+    {
+        u32 code_point = utf8::next( j, j_end );
+
+        // word boundary
+        if ( handle_space( code_point, text, font_size, x, y, limit.zoom ) )
         {
-            m = marker( i, data, 0 );
+            word = marker( next.i, j, data, 0 );
             continue;
         }
         else if ( last_point )
@@ -113,33 +141,33 @@ void add_text( const font_source& source, virtual_texture& texture, const limit&
         font_source::glyph_type glyph = source.glyph( code_point, level );
         f32 advance = glyph._0.advance * exp2f( shift );
 
+        // line boundary
         if ( x + advance > width )
         {
-            x = text.x;
-            y += font_size * line_spacing;
+            handle_space( '\n', text, font_size, x, y, limit.zoom );
+
+            if ( word.width + advance < width )
+                return line = word;
 
             // if the word is larger than the line width, break up the word
-            if ( m.width + advance > width )
-                utf8::prior( i, text.data.begin() );
-            else
-            {
-                i = m.i;
-                data = m.data;
-            }
-
-            m.width = 0;
+            word.width = 0;
             last_point = 0;
+            utf8::prior( j, text.data.begin() );
+            line = marker( next.i, j, data, 0 );
             continue;
         }
 
         texture.load( glyph._0.width, glyph._0.height, glyph._1, glyph._2, level );
-        add_glyph( glyph, data, x, y, limit.size, font_size, shift, level );
+        add_glyph( glyph, data, text, x, y, font_size, limit.size, shift, level );
 
-        data += point_size;
+        data = add< void >( data, point_size );
         x += advance;
-        m.width += advance;
+        word.width += advance;
         last_point = code_point;
     }
+
+    text_iterator i = next.i + 1;
+    return marker( i, i != i_end ? i->data.begin() : string_iterator(), data, 0 );
 }
 
 OOE_ANONYMOUS_END( ( ooe ) )
@@ -158,28 +186,34 @@ text_layout::text_layout( const device_ptr& device_, page_cache& cache, font_sou
 {
 }
 
-u32 text_layout::input( block_ptr& block, const text_vector& text, f32 width )
+u32 text_layout::input( block_ptr& block, const text_vector& text, f32 width, s8 zoom )
 {
     u32 glyphs = glyph_size( text );
 
     if ( !glyphs )
         return 0;
 
-    limit limit( source );
-    buffer_ptr point = device->buffer( sizeof( f32 ) * point_size * glyphs, buffer::point );
+    buffer_ptr point = device->buffer( point_size * glyphs, buffer::point );
     map_ptr map = point->map( buffer::write );
-    f32* data = static_cast< f32* >( map->data );
-    f32 x = text.front().x;
-    f32 y = text.front().y;
+    void* data = map->data;
 
-    for ( text_vector::const_iterator i = text.begin(), end = text.end(); i != end; ++i )
-        add_text( source, texture, limit, *i, data, x, y, width );
+    limit limit( source, width, zoom );
+    f32 x = bit_shift( text[ 0 ].x, zoom );
+    f32 y = 0;
+    u32 font_size = 1 << ( text[ 0 ].level + zoom );
+
+    marker next( text.begin(), text[ 0 ].data.begin(), data, 0 );
+    marker line = next;
+    marker word = next;
+
+    for ( text_iterator i = next.i, i_end = text.end(); i != i_end; i = next.i )
+        next = add_text( source, texture, limit, x, y, font_size, next, line, word, i_end );
 
     block->input( "vertex_scale", block::f32_2, point, true );
     block->input( "vertex_translate", block::f32_2, point, true );
     block->input( "coord_scale", block::f32_2, point, true );
     block->input( "coord_translate", block::f32_2, point, true );
-    block->input( "colour", 0, 0, 0, 255 );
+    block->input( "colour", block::u8_4, point, true );
     texture.input( block, "texture" );
     return glyphs;
 }
