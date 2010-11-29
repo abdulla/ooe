@@ -32,6 +32,19 @@ struct limit
     }
 };
 
+struct state
+{
+    f32 x;
+    f32 y;
+    u32 font_size;
+    u32 last_point;
+
+    state( f32 x_, f32 y_, u32 font_size_, u32 last_point_ )
+        : x( x_ ), y( y_ ), font_size( font_size_ ), last_point( last_point_ )
+    {
+    }
+};
+
 struct marker
 {
     text_iterator i;
@@ -61,19 +74,19 @@ u32 glyph_size( const text_vector& text )
     return glyphs;
 }
 
-bool handle_space( u32 code_point, const text& text, u32& font_size, f32& x, f32& y, s8 zoom )
+bool handle_space( u32 code_point, const text& text, state& state, s8 zoom )
 {
     switch ( code_point )
     {
     case ' ':
-        x += ( 1 << ( text.level + zoom ) ) * word_spacing;
+        state.x += ( 1 << ( text.level + zoom ) ) * word_spacing;
         return true;
 
     case '\n':
-        x = bit_shift( text.x, zoom );
-        y += font_size;
-        font_size = 1 << ( text.level + zoom );
-        y += font_size * line_spacing;
+        state.x = bit_shift( text.x, zoom );
+        state.y += state.font_size;
+        state.font_size = 1 << ( text.level + zoom );
+        state.y += state.font_size * line_spacing;
         return true;
 
     default:
@@ -81,16 +94,16 @@ bool handle_space( u32 code_point, const text& text, u32& font_size, f32& x, f32
     }
 }
 
-void add_glyph( const font_source::glyph_type& glyph, void* data, const text& text, f32 x, f32 y,
-    u32 font_size, u32 size, s8 shift, u8 level )
+void add_glyph( const font_source::glyph_type& glyph, const text& text, const state& state,
+    void* data, u32 size, s8 shift, u8 level )
 {
     const font::metric& metric = glyph._0;
 
     f32* point = add< f32 >( data, 0 );
     point[ 0 ] = bit_shift( metric.width, shift );
     point[ 1 ] = bit_shift( metric.height, shift );
-    point[ 2 ] = std::ceil( x + bit_shift( metric.left, shift ) );
-    point[ 3 ] = std::ceil( y + font_size - bit_shift( metric.top, shift ) );
+    point[ 2 ] = std::ceil( state.x + bit_shift( metric.left, shift ) );
+    point[ 3 ] = std::ceil( state.y + state.font_size - bit_shift( metric.top, shift ) );
 
     point[ 4 ] = divide( metric.width << level, size );
     point[ 5 ] = divide( metric.height << level, size );
@@ -104,24 +117,22 @@ void add_glyph( const font_source::glyph_type& glyph, void* data, const text& te
     colour[ 3 ] = 255;
 }
 
-marker add_text( const font_source& source, virtual_texture& texture, const limit& limit, f32& x,
-    f32& y, u32& font_size, const marker& next, marker& line, marker& word,
-    const text_iterator& i_end )
+marker add_text( const font_source& source, virtual_texture& texture, const limit& limit,
+    state& state, const marker& next, marker& line, marker& word, const text_iterator& i_end )
 {
     const text& text = *next.i;
     u32 line_size = 1 << ( text.level + limit.zoom );
 
-    if ( line_size > font_size )
+    if ( line_size > state.font_size )
     {
-        x = bit_shift( line.i->x, limit.zoom );
-        font_size = line_size;
+        state.x = bit_shift( line.i->x, limit.zoom );
+        state.font_size = line_size;
         return line;
     }
 
-    y = std::max< f32 >( y, bit_shift( text.y, limit.zoom ) );
+    state.y = std::max< f32 >( state.y, bit_shift( text.y, limit.zoom ) );
     f32 width = limit.width - bit_shift( text.x, limit.zoom );
     void* data = next.data;
-    u32 last_point = 0;
     s8 shift = inverse_clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
     u8 level = limit.max - clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
 
@@ -130,40 +141,40 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
         u32 code_point = utf8::next( j, j_end );
 
         // word boundary
-        if ( handle_space( code_point, text, font_size, x, y, limit.zoom ) )
+        if ( handle_space( code_point, text, state, limit.zoom ) )
         {
             word = marker( next.i, j, data, 0 );
             continue;
         }
-        else if ( last_point )
-            x += source.kerning( last_point, code_point, level ) * exp2f( shift );
+        else if ( state.last_point )
+            state.x += source.kerning( state.last_point, code_point, level ) * exp2f( shift );
 
         font_source::glyph_type glyph = source.glyph( code_point, level );
         f32 advance = glyph._0.advance * exp2f( shift );
 
         // line boundary
-        if ( x + advance > width )
+        if ( state.x + advance > width )
         {
-            handle_space( '\n', text, font_size, x, y, limit.zoom );
+            handle_space( '\n', text, state, limit.zoom );
 
             if ( word.width + advance < width )
                 return line = word;
 
             // if the word is larger than the line width, break up the word
             word.width = 0;
-            last_point = 0;
+            state.last_point = 0;
             utf8::prior( j, text.data.begin() );
             line = marker( next.i, j, data, 0 );
             continue;
         }
 
         texture.load( glyph._0.width, glyph._0.height, glyph._1, glyph._2, level );
-        add_glyph( glyph, data, text, x, y, font_size, limit.size, shift, level );
+        add_glyph( glyph, text, state, data, limit.size, shift, level );
 
         data = add< void >( data, point_size );
-        x += advance;
+        state.x += advance;
         word.width += advance;
-        last_point = code_point;
+        state.last_point = code_point;
     }
 
     text_iterator i = next.i + 1;
@@ -195,19 +206,15 @@ u32 text_layout::input( block_ptr& block, const text_vector& text, f32 width, s8
 
     buffer_ptr point = device->buffer( point_size * glyphs, buffer::point );
     map_ptr map = point->map( buffer::write );
-    void* data = map->data;
 
     limit limit( source, width, zoom );
-    f32 x = bit_shift( text[ 0 ].x, zoom );
-    f32 y = 0;
-    u32 font_size = 1 << ( text[ 0 ].level + zoom );
-
-    marker next( text.begin(), text[ 0 ].data.begin(), data, 0 );
+    state state( bit_shift( text[ 0 ].x, zoom ), 0, 1 << ( text[ 0 ].level + zoom ), 0 );
+    marker next( text.begin(), text[ 0 ].data.begin(), map->data, 0 );
     marker line = next;
     marker word = next;
 
     for ( text_iterator i = next.i, i_end = text.end(); i != i_end; i = next.i )
-        next = add_text( source, texture, limit, x, y, font_size, next, line, word, i_end );
+        next = add_text( source, texture, limit, state, next, line, word, i_end );
 
     block->input( "vertex_scale", block::f32_2, point, true );
     block->input( "vertex_translate", block::f32_2, point, true );
