@@ -49,20 +49,25 @@ template<>
     frame_ptr frame = device->default_frame( width, height );
     const c8 data[] = "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
-    text text;
-    text.level = 5;
-    text.red = 255;
-    text.green = 255;
-    text.blue = 255;
+    text_vector text( 2 );
+    text[ 0 ].data = "test";
+    text[ 0 ].level = 6;
+    text[ 0 ].red = 127;
+    text[ 0 ].green = 127;
+    text[ 0 ].blue = 255;
+    text[ 1 ].level = 5;
+    text[ 1 ].red = 255;
+    text[ 1 ].green = 255;
+    text[ 1 ].blue = 255;
 
     block_ptr block = program->block( make_index( device ) );
-    block->input( "vertex", 2, make_point( device ) );
+    block->input( "vertex", block::f32_2, make_point( device ) );
     block->input( "projection", orthographic( 0, width, height, 0 ) );
     device->set( device::blend, true );
 
     for ( const c8* i = data, * end = i + sizeof( data ); i != end; ++i )
     {
-        text.data = std::string( data, i + 1 );
+        text[ 1 ].data = std::string( data, i + 1 );
         u32 instances = layout.input( block, text, width );
 
         while ( cache.pending() )
