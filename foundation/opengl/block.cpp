@@ -85,28 +85,6 @@ opengl::block::uniform_array make_array( const void* data, up_t size )
     return array;
 }
 
-input_tuple buffer_input( const std::string& name, u8 size )
-{
-    switch ( size )
-    {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-        return input_tuple( 1, size );
-
-    case 9:
-        return input_tuple( 3, 3 );
-
-    case 16:
-        return input_tuple( 4, 4 );
-
-    default:
-        throw error::runtime( "opengl::block: " ) <<
-            "Attribute \"" << name << "\" does not support size " << size;
-    }
-}
-
 OOE_ANONYMOUS_END( ( ooe )( opengl ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -206,27 +184,23 @@ void block::input( const std::string& name, const texture_array_ptr& texture_arr
     texture_arrays[ location ] = texture_array;
 }
 
-void block::input( const std::string& name, u8 size, const buffer_ptr& buffer, bool instanced )
+void block::
+    input( const std::string& name, block::type format, const buffer_ptr& buffer, bool instanced )
 {
     if ( dynamic_cast< opengl::buffer& >( *buffer ).target != ARRAY_BUFFER )
         throw error::runtime( "opengl::block: " ) << "Point buffer expected";
 
     s32 location = find( id, locations, name, GetAttribLocation );
-    input_tuple in = buffer_input( name, size );
+    buffer_map::iterator i =
+        buffers.insert( buffer_map::value_type( buffer, buffer_tuple( location, format ) ) );
+    iterator_map::iterator j = iterators.find( location );
 
-    for ( u8 i = 0; i != in._0; ++i )
+    if ( j == iterators.end() )
+        iterators[ location ] = i;
+    else
     {
-        buffer_map::iterator j =
-            buffers.insert( buffer_map::value_type( buffer, buffer_tuple( location + i, in._1 ) ) );
-        iterator_map::iterator k = iterators.find( location + i );
-
-        if ( k == iterators.end() )
-            iterators[ location + i ] = j;
-        else
-        {
-            buffers.erase( k->second );
-            k->second = j;
-        }
+        buffers.erase( j->second );
+        j->second = i;
     }
 
     VertexAttribDivisor( location, instanced );

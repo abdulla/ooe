@@ -78,7 +78,7 @@ thread_pool::thread_pool( const std::string& name )
 {
     for ( up_t i = 0, end = executable::cpu_cores(); i != end; ++i )
     {
-        std::string unit_name = name + '-';
+        std::string unit_name = name + ' ';
         vector.push_back( opaque_ptr( new thread_unit( unit_name << i ), destroy< thread_unit > ) );
     }
 }

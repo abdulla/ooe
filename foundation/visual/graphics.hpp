@@ -111,6 +111,20 @@ typedef std::vector< shader_ptr > shader_vector;
 //--- block ----------------------------------------------------------------------------------------
 struct block
 {
+    enum type
+    {
+        u8_1,
+        u8_2,
+        u8_3,
+        u8_4,
+        f32_1,
+        f32_2,
+        f32_3,
+        f32_4,
+        f32_mat3,
+        f32_mat4
+    };
+
     virtual ~block( void ) {}
     virtual void input( const std::string&, s32[][ 1 ], u32 ) = 0;
     virtual void input( const std::string&, s32[][ 2 ], u32 ) = 0;
@@ -125,7 +139,7 @@ struct block
 
     virtual void input( const std::string&, const texture_ptr& ) = 0;
     virtual void input( const std::string&, const texture_array_ptr& ) = 0;
-    virtual void input( const std::string&, u8, const buffer_ptr&, bool = false ) = 0;
+    virtual void input( const std::string&, type, const buffer_ptr&, bool = false ) = 0;
 
     void input( const std::string& name, s32 a )
     {

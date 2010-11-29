@@ -21,7 +21,7 @@ public:
     typedef std::map< s32, uniform_tuple > uniform_map;
     typedef std::map< s32, texture_ptr > texture_map;
     typedef std::map< s32, texture_array_ptr > texture_array_map;
-    typedef tuple< s32, u8 > buffer_tuple;
+    typedef tuple< s32, type > buffer_tuple;
     typedef std::multimap< buffer_ptr, buffer_tuple > buffer_map;
     typedef std::map< s32, buffer_map::iterator > iterator_map;
     typedef std::map< std::string, s32 > location_map;
@@ -50,7 +50,7 @@ public:
 
     virtual void input( const std::string&, const texture_ptr& );
     virtual void input( const std::string&, const texture_array_ptr& );
-    virtual void input( const std::string&, u8, const buffer_ptr&, bool );
+    virtual void input( const std::string&, type, const buffer_ptr&, bool );
 
 private:
     iterator_map iterators;

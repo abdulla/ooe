@@ -13,31 +13,156 @@
 #include "foundation/opengl/symbol.hpp"
 #include "foundation/opengl/target.hpp"
 #include "foundation/opengl/texture.hpp"
-#include "foundation/utility/convert.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
 typedef std::set< s32 > attribute_set;
 
+u8 block_indices( ooe::block::type type )
+{
+    switch ( type )
+    {
+    case ooe::block::u8_1:
+    case ooe::block::u8_2:
+    case ooe::block::u8_3:
+    case ooe::block::u8_4:
+    case ooe::block::f32_1:
+    case ooe::block::f32_2:
+    case ooe::block::f32_3:
+    case ooe::block::f32_4:
+        return 1;
+
+    case ooe::block::f32_mat3:
+        return 3;
+
+    case ooe::block::f32_mat4:
+        return 4;
+
+    default:
+        throw error::runtime( "opengl::device: " ) << "Unknown block type: " << type;
+    }
+}
+
+u8 block_stride( ooe::block::type type )
+{
+    switch ( type )
+    {
+    case ooe::block::u8_1:
+        return 1 * sizeof( u8 );
+
+    case ooe::block::u8_2:
+        return 2 * sizeof( u8 );
+
+    case ooe::block::u8_3:
+        return 3 * sizeof( u8 );
+
+    case ooe::block::u8_4:
+        return 4 * sizeof( u8 );
+
+    case ooe::block::f32_1:
+        return 1 * sizeof( f32 );
+
+    case ooe::block::f32_2:
+        return 2 * sizeof( f32 );
+
+    case ooe::block::f32_mat3:
+    case ooe::block::f32_3:
+        return 3 * sizeof( f32 );
+
+    case ooe::block::f32_mat4:
+    case ooe::block::f32_4:
+        return 4 * sizeof( f32 );
+
+    default:
+        throw error::runtime( "opengl::device: " ) << "Unknown block type: " << type;
+    }
+}
+
+u8 block_size( ooe::block::type type )
+{
+    switch ( type )
+    {
+    case ooe::block::u8_1:
+        return 1;
+
+    case ooe::block::u8_2:
+        return 2;
+
+    case ooe::block::u8_3:
+        return 3;
+
+    case ooe::block::u8_4:
+        return 4;
+
+    case ooe::block::f32_1:
+        return 1;
+
+    case ooe::block::f32_2:
+        return 2;
+
+    case ooe::block::f32_mat3:
+    case ooe::block::f32_3:
+        return 3;
+
+    case ooe::block::f32_mat4:
+    case ooe::block::f32_4:
+        return 4;
+
+    default:
+        throw error::runtime( "opengl::device: " ) << "Unknown block type: " << type;
+    }
+}
+
+u32 block_type( ooe::block::type type )
+{
+    switch ( type )
+    {
+    case ooe::block::u8_1:
+    case ooe::block::u8_2:
+    case ooe::block::u8_3:
+    case ooe::block::u8_4:
+        return UNSIGNED_BYTE;
+
+    case ooe::block::f32_1:
+    case ooe::block::f32_2:
+    case ooe::block::f32_3:
+    case ooe::block::f32_4:
+    case ooe::block::f32_mat3:
+    case ooe::block::f32_mat4:
+        return FLOAT;
+
+    default:
+        throw error::runtime( "opengl::device: " ) << "Unknown block type: " << type;
+    }
+}
+
 void set_attributes( attribute_set& set, const opengl::block::buffer_map::const_iterator begin,
     const opengl::block::buffer_map::const_iterator end )
 {
     opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *begin->first );
     BindBuffer( buffer.target, buffer.id );
-    s32 size = 0;
+    s32 stride = 0;
 
     for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
-        size += i->second._1;
+    {
+        for ( u8 j = 0, indices = block_indices( i->second._1 ); j != indices; ++j )
+            stride += block_stride( i->second._1 );
+    }
 
-    size *= sizeof( f32 );
     u8* offset = 0;
 
     for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
     {
         set.insert( i->second._0 );
-        VertexAttribPointer( i->second._0, i->second._1, FLOAT, false, size, offset );
-        offset += i->second._1 * sizeof( f32 );
+
+        for ( u8 j = 0, indices = block_indices( i->second._1 ); j != indices; ++j )
+        {
+            s32 size = block_size( i->second._1 );
+            u32 type = block_type( i->second._1 );
+            VertexAttribPointer( i->second._0 + j, size, type, false, stride, offset );
+            offset += block_stride( i->second._1 );
+        }
     }
 }
 
