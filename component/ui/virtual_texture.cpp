@@ -299,8 +299,8 @@ void virtual_texture::input( block_ptr& block, const std::string& name ) const
     s32 begin = log2f( source.page_size() );
     s32 end = log2f( source.size() ) + 1;
     block->input( name + ".bias_range", begin, end );
-    block->input( name + ".page_cache", cache.array );
     block->input( name + ".page_table", table );
+    block->input( name + ".page_cache", cache.array );
 }
 
 void virtual_texture::load( u32 width, u32 height, u32 x, u32 y, u8 level, bool locked )

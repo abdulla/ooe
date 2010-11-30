@@ -3,8 +3,8 @@
 struct vsampler2D
 {
     ivec2 bias_range;
-    sampler2DArray page_cache;
     isampler2D page_table;
+    sampler2DArray page_cache;
 };
 
 vec4 vtexture2D( vsampler2D, vec2 );
