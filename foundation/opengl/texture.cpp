@@ -155,7 +155,7 @@ void set_filter( u32 target, ooe::texture::type filter )
         break;
 
     case ooe::texture::linear:
-        min_filter = LINEAR_MIPMAP_LINEAR;
+        min_filter = LINEAR_MIPMAP_NEAREST;
         mag_filter = LINEAR;
         break;
 
