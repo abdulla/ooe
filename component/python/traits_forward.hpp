@@ -3,8 +3,6 @@
 #ifndef OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP
 #define OOE_COMPONENT_PYTHON_TRAITS_FORWARD_HPP
 
-#include "component/python/error.hpp"
-#include "component/python/header.hpp"
 #include "component/python/object.hpp"
 #include "component/registry/traits.hpp"
 #include "foundation/utility/miscellany.hpp"

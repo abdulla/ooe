@@ -3,10 +3,14 @@
 #ifndef OOE_COMPONENT_PYTHON_HEADER_HPP
 #define OOE_COMPONENT_PYTHON_HEADER_HPP
 
-#ifndef SIZEOF_SOCKET_T
-#define SIZEOF_SOCKET_T 4
-#endif
-
 #include <python3.1/Python.h>
+
+#undef isalnum
+#undef isalpha
+#undef islower
+#undef isspace
+#undef isupper
+#undef tolower
+#undef toupper
 
 #endif  // OOE_COMPONENT_PYTHON_HEADER_HPP
