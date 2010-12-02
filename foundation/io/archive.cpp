@@ -166,20 +166,23 @@ archive::archive( const descriptor& desc )
     if ( memory.as< file_header >()->id != file_header::signature )
         throw error::io( "archive: " ) << "Descriptor is not a ZIP archive";
 
+    const directory_header* sentinel = memory.as< directory_header >();
     const directory_header* directory =
-        add< directory_header >( memory.get(), memory.size() - sizeof( *directory ) );
+        add< directory_header >( sentinel, memory.size() - sizeof( *directory ) );
 
-    while ( directory && directory->id != directory_header::signature )
+    while ( directory >= sentinel && directory->id != directory_header::signature )
         directory = add< directory_header >( directory, -1 );
 
-    if ( directory->disk_number != 0 || directory->disk_length != 0 ||
+    if ( directory == sentinel )
+        throw error::io( "archive: " ) << "Unable to find central directory entry in ZIP archive";
+    else if ( directory->disk_number != 0 || directory->disk_length != 0 ||
         directory->entries_number != directory->entries_length )
-        throw error::io( "archive: " ) << "Multi-part ZIP archive not supported\n";
+        throw error::io( "archive: " ) << "Multi-part ZIP archive not supported";
 
     const entry_header* entry = add< entry_header >( memory.get(), directory->offset );
 
     if ( entry->id != entry_header::signature )
-        throw error::io( "archive: " ) << "Invalid central directory entry in ZIP archive\n";
+        throw error::io( "archive: " ) << "Invalid central directory entry in ZIP archive";
 
     central_directory = entry;
 }
@@ -202,7 +205,7 @@ archive::file archive::open( iterator i ) const
     const c8* file_name = add< c8 >( &file_, sizeof( file_ ) );
 
     if ( file_.id != file_header::signature )
-        throw error::io( "archive: " ) << "Invalid file entry in ZIP archive\n";
+        throw error::io( "archive: " ) << "Invalid file entry in ZIP archive";
     else if ( entry.name_length != file_.name_length ||
         std::memcmp( entry_name, file_name, entry.name_length ) )
         throw error::io( "archive: " ) << "Name mismatch: " <<
