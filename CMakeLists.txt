@@ -151,6 +151,9 @@ ooe_module( hello external/hello )
 target_link_libraries( hello javascript lua python registry )
 
 ### external: executable ###########################################################################
+ooe_executable( itctopng external/itctopng )
+target_link_libraries( itctopng executable io )
+
 ooe_executable( hello_server external/hello/server )
 target_link_libraries( hello_server executable ipc )
 set_target_properties( hello_server PROPERTIES OUTPUT_NAME hello )
