@@ -27,8 +27,7 @@ view_data::view_data( const event_queue&, u16 width, u16 height, bool full )
 
     ProcessSerialNumber serial = { 0, kCurrentProcess };
 
-    if ( TransformProcessType( &serial, kProcessTransformToForegroundApplication ) ||
-        SetFrontProcess( &serial ) )
+    if ( TransformProcessType( &serial, kProcessTransformToForegroundApplication ) )
         throw error::runtime( "view: " ) << "Unable to move process to foreground";
 
     NSRect rect = { { 0, 0 }, { width, height } };
