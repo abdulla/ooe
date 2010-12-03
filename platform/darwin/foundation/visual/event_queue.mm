@@ -69,6 +69,7 @@ event::type event_queue::dequeue( event& event, epoch_t timeout ) const
 
     NSView* view;
     modifier_tuple tuple;
+    ProcessSerialNumber serial = { 0, kCurrentProcess };
 
     switch ( nsevent.type )
     {
@@ -136,6 +137,9 @@ event::type event_queue::dequeue( event& event, epoch_t timeout ) const
     case NSEventTypeEndGesture:
         return event::gesture_end;
 
+    case NSAppKitDefined:
+        if ( nsevent.subtype != NSApplicationDeactivatedEventType )
+            SetFrontProcess( &serial );
     default:
         [ NSApp sendEvent: nsevent ];
         return event::ignore;
