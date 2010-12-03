@@ -102,7 +102,7 @@ void add_glyph( const font_source::glyph_type& glyph, const text& text, const st
     f32* point = add< f32 >( data, 0 );
     point[ 0 ] = bit_shift( metric.width, shift );
     point[ 1 ] = bit_shift( metric.height, shift );
-    point[ 2 ] = std::ceil( state.x + bit_shift( metric.left, shift ) );
+    point[ 2 ] = std::floor( state.x + bit_shift( metric.left, shift ) );
     point[ 3 ] = std::ceil( state.y + state.font_size - bit_shift( metric.top, shift ) );
 
     point[ 4 ] = divide( metric.width << level, size );
