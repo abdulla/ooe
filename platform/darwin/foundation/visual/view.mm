@@ -40,6 +40,7 @@ view_data::view_data( const event_queue&, u16 width, u16 height, bool full )
     [ window orderFront: 0 ];
     window.title = @"OOE";
     window.acceptsMouseMovedEvents = true;
+    [ NSApp activateIgnoringOtherApps: true ];
 }
 
 view_data::~view_data( void )
