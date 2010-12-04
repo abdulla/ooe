@@ -8,25 +8,25 @@
 #include "foundation/io/descriptor.hpp"
 #include "foundation/utility/tuple.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+class OOE_VISIBLE vfs
 {
-    class OOE_VISIBLE vfs
-        : private noncopyable
-    {
-    public:
-        typedef tuple< const std::string, const std::string > tuple_type;
-        typedef std::list< tuple_type > list_type;
+public:
+    typedef tuple< const std::string, const std::string > tuple_type;
+    typedef std::list< tuple_type > list_type;
 
-        vfs( void );
+    vfs( void );
 
-        void insert( const std::string&, const std::string& );
-        bool empty( void ) const;
+    void insert( const std::string&, const std::string& );
+    bool empty( void ) const;
 
-        descriptor operator []( const std::string& ) const;
+    descriptor operator []( const std::string& ) const;
 
-    private:
-        mutable list_type list;
-    };
-}
+private:
+    mutable list_type list;
+};
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 #endif  // OOE_FOUNDATION_IO_VFS_HPP
