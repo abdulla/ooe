@@ -7,8 +7,8 @@ vec3 vaddress( vsampler2D sampler, vec2 virtual_address )
     // handle page fault by ascending mipmap levels to find valid data
     for ( int bias = sampler.bias_range.x; entry.x == -1 && bias != sampler.bias_range.y; ++bias )
     {
-        float scale = exp2( float( -bias ) );
-        entry = texture2DGrad( sampler.page_table, virtual_address, dx / scale, dy / scale ).xy;
+        float scale = exp2( float( bias ) );
+        entry = texture2DGrad( sampler.page_table, virtual_address, dx * scale, dy * scale ).xy;
     }
 
     // default to loading first page if lookup fails to find valid data
