@@ -1,8 +1,8 @@
 ### flags ##########################################################################################
 set( CMAKE_CXX_COMPILER g++-4 )
 set( CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath,@executable_path/../lib" )
-set( CMAKE_MODULE_LINKER_FLAGS "-undefined dynamic_lookup" )
-set( CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup" )
+set( CMAKE_MODULE_LINKER_FLAGS "-undefined dynamic_lookup -dead_strip" )
+set( CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup -dead_strip" )
 
 ### packages #######################################################################################
 find_package( AppKit REQUIRED )
