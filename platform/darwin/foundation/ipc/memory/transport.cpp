@@ -82,8 +82,8 @@ transport::transport( ooe::socket& socket )
     ooe::memory::region window( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, window );
 
-    in.unlinkable = true;
-    out.unlinkable = true;
+    in.set( true );
+    out.set( true );
 }
 
 transport::~transport( void )
@@ -129,8 +129,8 @@ void transport::migrate( ooe::socket& socket )
     send_name( socket, out.name() );
     socket.send( memory );
 
-    in.unlinkable = false;
-    out.unlinkable = false;
+    in.set( false );
+    out.set( false );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

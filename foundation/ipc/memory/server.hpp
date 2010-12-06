@@ -3,6 +3,7 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_SERVER_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_SERVER_HPP
 
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/switchboard.hpp"
 #include "foundation/ipc/memory/link.hpp"
 

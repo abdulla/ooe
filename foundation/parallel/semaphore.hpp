@@ -1,0 +1,22 @@
+/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
+
+#ifndef OOE_FOUNDATION_PARALLEL_SEMAPHORE_HPP
+#define OOE_FOUNDATION_PARALLEL_SEMAPHORE_HPP
+
+#include "foundation/parallel/semaphore_forward.hpp"
+#include "foundation/utility/macro.hpp"
+
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+struct OOE_VISIBLE semaphore
+    : private platform::semaphore
+{
+    semaphore( u32 );
+
+    void up( void );
+    void down( void );
+};
+
+OOE_NAMESPACE_END( ( ooe ) )
+
+#endif  // OOE_FOUNDATION_PARALLEL_SEMAPHORE_HPP

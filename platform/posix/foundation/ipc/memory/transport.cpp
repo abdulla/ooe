@@ -24,7 +24,7 @@ transport::transport( bool created_ )
 }
 
 OOE_STATIC_ASSERT( executable::static_page_size >
-    sizeof( unnamed_semaphore ) * 2 + ooe::ipc::memory::transport::private_size );
+    sizeof( ooe::semaphore ) * 2 + ooe::ipc::memory::transport::private_size );
 
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
@@ -37,14 +37,12 @@ transport::transport( const std::string& name_, type mode )
 {
     ooe::memory::region window( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, window );
-
-    platform::ipc::unnamed_semaphore* pointer =
-        add< platform::ipc::unnamed_semaphore >( memory.get(), private_size );
+    ooe::semaphore* pointer = add< ooe::semaphore >( memory.get(), private_size );
 
     if ( created )
     {
-        in = new( pointer + 0 ) platform::ipc::unnamed_semaphore( 0 );
-        out = new( pointer + 1 ) platform::ipc::unnamed_semaphore( 0 );
+        in = new( pointer + 0 ) ooe::semaphore( 0 );
+        out = new( pointer + 1 ) ooe::semaphore( 0 );
     }
     else
     {
@@ -59,9 +57,8 @@ transport::transport( ooe::socket& socket )
 {
     ooe::memory::region window( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, window );
+    ooe::semaphore* pointer = add< ooe::semaphore >( memory.get(), private_size );
 
-    platform::ipc::unnamed_semaphore* pointer =
-        add< platform::ipc::unnamed_semaphore >( memory.get(), private_size );
     in = pointer + 0;
     out = pointer + 1;
 }
@@ -70,8 +67,8 @@ transport::~transport( void )
 {
     if ( created )
     {
-        out->~unnamed_semaphore();
-        in->~unnamed_semaphore();
+        out->~semaphore();
+        in->~semaphore();
     }
 }
 
@@ -100,12 +97,12 @@ void transport::wake_notify( void )
 
 u8* transport::get( void ) const
 {
-    return memory.as< u8 >() + sizeof( platform::ipc::unnamed_semaphore ) * 2 + private_size;
+    return memory.as< u8 >() + sizeof( ooe::semaphore ) * 2 + private_size;
 }
 
 up_t transport::size( void ) const
 {
-    return memory.size() - sizeof( platform::ipc::unnamed_semaphore ) * 2 - private_size -
+    return memory.size() - sizeof( ooe::semaphore ) * 2 - private_size -
         executable::static_page_size;
 }
 

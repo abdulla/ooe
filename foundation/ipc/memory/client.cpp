@@ -14,7 +14,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 link_t ipc_connect( const std::string& name, pid_t pid, time_t time )
 {
     transport transport( name, transport::open );
-    semaphore semaphore( name, semaphore::open );
+    ipc::semaphore semaphore( name, ipc::semaphore::open );
     process_lock lock( semaphore );
 
     rpc< link_t ( pid_t, time_t ) > link( transport, 1 );
@@ -25,7 +25,7 @@ link_t ipc_connect( const std::string& name, pid_t pid, time_t time )
 void ipc_disconnect( const std::string& name, link_t link )
 {
     transport transport( name, ipc::memory::transport::open );
-    semaphore semaphore( name, ipc::semaphore::open );
+    ipc::semaphore semaphore( name, ipc::semaphore::open );
     process_lock lock( semaphore );
 
     rpc< void ( link_t ) > unlink( transport, 2 );
