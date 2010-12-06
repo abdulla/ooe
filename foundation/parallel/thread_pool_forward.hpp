@@ -6,6 +6,7 @@
     #define OOE_FOUNDATION_PARALLEL_THREAD_POOL_FORWARD_HPP
 
 #include "foundation/parallel/lock.hpp"
+#include "foundation/utility/atom.hpp"
 #include "foundation/utility/partial.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -38,7 +39,7 @@ protected:
         error
     };
 
-    state_type state;
+    atom< state_type > state;
     ooe::mutex mutex;
     ooe::condition condition;
 

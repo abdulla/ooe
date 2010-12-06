@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "foundation/parallel/thread_pool_forward.hpp"
-#include "foundation/utility/atom.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
