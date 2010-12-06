@@ -17,6 +17,16 @@ struct OOE_VISIBLE semaphore
     void down( void );
 };
 
+class OOE_VISIBLE semaphore_lock
+{
+public:
+    semaphore_lock( ooe::semaphore& );
+    ~semaphore_lock( void );
+
+private:
+    ooe::semaphore& semaphore;
+};
+
 OOE_NAMESPACE_END( ( ooe ) )
 
 #endif  // OOE_FOUNDATION_PARALLEL_SEMAPHORE_HPP
