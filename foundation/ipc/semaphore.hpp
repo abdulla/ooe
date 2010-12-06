@@ -38,13 +38,13 @@ private:
     sem_t* const sem;
 };
 
-//--- process_lock ---------------------------------------------------------------------------------
-class OOE_VISIBLE process_lock
+//--- semaphore_lock -------------------------------------------------------------------------------
+class OOE_VISIBLE semaphore_lock
     : private noncopyable
 {
 public:
-    process_lock( ipc::semaphore& );
-    ~process_lock( void );
+    semaphore_lock( ipc::semaphore& );
+    ~semaphore_lock( void );
 
 private:
     ipc::semaphore& semaphore;

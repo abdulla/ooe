@@ -15,7 +15,7 @@ link_t ipc_connect( const std::string& name, pid_t pid, time_t time )
 {
     transport transport( name, transport::open );
     ipc::semaphore semaphore( name, ipc::semaphore::open );
-    process_lock lock( semaphore );
+    semaphore_lock lock( semaphore );
 
     rpc< link_t ( pid_t, time_t ) > link( transport, 1 );
     return link( pid, time );
@@ -26,7 +26,7 @@ void ipc_disconnect( const std::string& name, link_t link )
 {
     transport transport( name, ipc::memory::transport::open );
     ipc::semaphore semaphore( name, ipc::semaphore::open );
-    process_lock lock( semaphore );
+    semaphore_lock lock( semaphore );
 
     rpc< void ( link_t ) > unlink( transport, 2 );
     unlink( link );

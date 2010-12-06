@@ -133,7 +133,7 @@ void servlet::migrate( socket& socket, semaphore& semaphore, server& server )
     link_server->migrate( socket );
     state = false;
 
-    process_lock lock( semaphore );
+    semaphore_lock lock( semaphore );
     server.unlink( link, false );
 }
 
@@ -241,7 +241,7 @@ void server::unlink( link_t id, bool join )
 
 atom_ptr< servlet > server::find( link_t id ) const
 {
-    process_lock lock( semaphore );
+    semaphore_lock lock( semaphore );
     servlet_map::const_iterator i = map.find( id );
 
     if ( i == map.end() )
@@ -258,7 +258,7 @@ void server::migrate( socket& socket )
 void server::relink( socket& socket )
 {
     link_t id = seed++;
-    process_lock lock( semaphore );
+    semaphore_lock lock( semaphore );
 
     servlet_map::value_type value( id, new servlet( socket, id, external, *this ) );
     map.insert( map.end(), value );

@@ -97,14 +97,14 @@ void semaphore::set( bool value )
     unlinkable = value;
 }
 
-//--- process_lock ---------------------------------------------------------------------------------
-process_lock::process_lock( ipc::semaphore& semaphore_ )
+//--- semaphore_lock -------------------------------------------------------------------------------
+semaphore_lock::semaphore_lock( ipc::semaphore& semaphore_ )
     : semaphore( semaphore_ )
 {
     semaphore.down();
 }
 
-process_lock::~process_lock( void )
+semaphore_lock::~semaphore_lock( void )
 {
     semaphore.up();
 }
