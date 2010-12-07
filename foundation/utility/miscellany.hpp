@@ -66,19 +66,6 @@ template< typename type >
     delete static_cast< const type* >( object );
 }
 
-//--- destruct -------------------------------------------------------------------------------------
-template< typename type >
-    void destruct( type& object )
-{
-    object.~type();
-}
-
-template< typename type >
-    void destruct( type* object )
-{
-    object->~type();
-}
-
 //--- any ------------------------------------------------------------------------------------------
 union any
 {
