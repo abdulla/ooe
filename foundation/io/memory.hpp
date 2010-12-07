@@ -15,7 +15,7 @@ struct memory_id
     void* const area;
 
     memory_id( s32, u8, up_t, up_t );
-    ~memory_id( void );
+    ~memory_id( void ) OOE_VISIBLE;
 };
 
 //--- memory ---------------------------------------------------------------------------------------
@@ -45,7 +45,6 @@ public:
 
     memory( const descriptor&, u8 = read );
     memory( const descriptor&, u8, region );
-    ~memory( void );
 
     void advise( advise_type ) const;
     void sync( void ) const;

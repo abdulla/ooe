@@ -36,11 +36,6 @@ memory::memory( const descriptor& desc, u8 flags, region window )
 {
 }
 
-// defined so that memory_id::~memory_id() can be hidden
-memory::~memory( void )
-{
-}
-
 void memory::advise( advise_type advice ) const
 {
     if ( posix_madvise( get(), size(), advice ) )
