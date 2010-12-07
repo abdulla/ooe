@@ -76,7 +76,7 @@ public:
     template< typename to >
         to* as( void ) const
     {
-        return reinterpret_cast< to* >( value.get() );
+        return static_cast< to* >( value.get() );
     }
 
     template< typename to >

@@ -24,6 +24,12 @@ public:
     {
     }
 
+    template< typename to >
+        to as( void ) const
+    {
+        return static_cast< to >( atomic );
+    }
+
     operator type( void ) const
     {
         return atomic;
