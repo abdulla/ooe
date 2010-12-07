@@ -112,17 +112,17 @@ template<>
 
     bool did_destruct = false;
     {
-        opaque_ptr ptr( new destruct_test( did_destruct ), destroy< destruct_test > );
+        opaque_ptr ptr( new destruct_test( did_destruct ) );
     }
     OOE_CHECK( "destruct_test::~destruct_test()", did_destruct );
 
     up_t* value = new up_t( 7 );
-    opaque_ptr ptr( value, destroy< up_t > );
+    opaque_ptr ptr( value );
     OOE_CHECK( "ptr == value", ptr == value );
     OOE_CHECK( "ptr.get() == value", ptr.get() == value );
     OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
-    opaque_ptr other( 0, destroy< up_t > );
+    opaque_ptr other( static_cast< up_t* >( 0 ) );
     ptr.swap( other );
     OOE_CHECK( "ptr.get() == 0", ptr.get() == 0 );
     OOE_CHECK( "other.get() == value", other.get() == value );

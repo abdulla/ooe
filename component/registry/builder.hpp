@@ -29,7 +29,7 @@ OOE_NAMESPACE_END( ( ooe ) )
     #define LIMIT BOOST_PP_ITERATION()
     #define BUILDER_INSERT( z, n, d ) a ## n .as< t ## n >()->insert< d >( i );
     #define MODULE_INSERT( z, n, d ) module.insert( typeid( t ## n ).name(), a ## n );
-    #define POINTER_NEW( z, n, _ ) a ## n( new t ## n, destroy< t ## n > )
+    #define POINTER_NEW( z, n, _ ) a ## n( new t ## n )
     #define POINTER_DECLARE( z, n, _ ) opaque_ptr a ## n;
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -44,7 +44,7 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 {
 public:
     builder( ooe::module& module_ )
-        : module( module_ ), local( new facade::local, destroy< facade::local > )
+        : module( module_ ), local( new facade::local )
         BOOST_PP_ENUM_TRAILING( LIMIT, POINTER_NEW, ~ )
     {
     }
