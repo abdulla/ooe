@@ -30,7 +30,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 class event_queue
 {
 protected:
-    event_queue( void );
+    event_queue( void ) OOE_VISIBLE;
 };
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )

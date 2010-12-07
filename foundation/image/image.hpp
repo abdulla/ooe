@@ -68,13 +68,13 @@ struct image_metadata
     const u32 height;
     const image_format::type format;
 
-    image_metadata( u32, u32, image_format::type );
+    image_metadata( u32, u32, image_format::type ) OOE_VISIBLE;
 };
 
 bool operator ==( const image_metadata&, const image_metadata& ) OOE_VISIBLE;
 
 //--- image ----------------------------------------------------------------------------------------
-class image
+class OOE_VISIBLE image
     : public image_metadata
 {
 public:
@@ -101,7 +101,7 @@ public:
 private:
     const data_ptr data;
 
-    image( u32, u32, image_format::type, const data_ptr& ) OOE_VISIBLE;
+    image( u32, u32, image_format::type, const data_ptr& );
 
     friend class image_pyramid;
 };
@@ -112,8 +112,9 @@ class image_reader
 {
 public:
     virtual ~image_reader( void ) {}
+
     virtual bool decode_row( void ) = 0;
-    u32 read_pixels( void*, u32 );
+    u32 read_pixels( void*, u32 ) OOE_VISIBLE;
 
 protected:
     u32 x;

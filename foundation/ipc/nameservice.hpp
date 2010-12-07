@@ -8,25 +8,25 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
 //--- nameservice ----------------------------------------------------------------------------------
-class nameservice
+class OOE_VISIBLE nameservice
     : private noncopyable
 {
 public:
     typedef tuple< std::string, std::string > tuple_type;
     typedef std::vector< tuple_type > list_type;
 
-    nameservice( void ) OOE_VISIBLE;
+    nameservice( void );
 
-    void upgrade( const list_type& ) OOE_VISIBLE;
-    operator const ipc::switchboard&( void ) const OOE_VISIBLE;
+    void upgrade( const list_type& );
+    operator const ipc::switchboard&( void ) const;
 
     index_t find( const std::string&, const std::string& ) const;
     list_type list( void ) const;
     std::string doc( const std::string&, const std::string& ) const;
 
-    void insert_direct( const std::string&, const std::string&, const c8*, index_t ) OOE_VISIBLE;
+    void insert_direct( const std::string&, const std::string&, const c8*, index_t );
     void insert_direct( const std::string&, const std::string&, const c8*, switchboard::call_type,
-        any ) OOE_VISIBLE;
+        any );
 
     template< typename t >
         void insert( const std::string& name, t function, const c8* doc_ = 0,

@@ -4,7 +4,6 @@
 #define OOE_FOUNDATION_PARALLEL_SEMAPHORE_HPP
 
 #include "foundation/parallel/semaphore_forward.hpp"
-#include "foundation/utility/macro.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

@@ -3,6 +3,7 @@
 #ifndef OOE_PLATFORM_DARWIN_FOUNDATION_EXECUTABLE_PROGRAM_FORWARD_HPP
 #define OOE_PLATFORM_DARWIN_FOUNDATION_EXECUTABLE_PROGRAM_FORWARD_HPP
 
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/namespace.hpp"
 
 #define OOE_SIGFAULT SIGBUS
@@ -15,7 +16,7 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
-class autorelease
+class OOE_VISIBLE autorelease
 {
 public:
     autorelease( void );

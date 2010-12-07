@@ -6,6 +6,7 @@
 #include <semaphore.h>
 
 #include "foundation/utility/fundamental.hpp"
+#include "foundation/utility/macro.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
 
@@ -15,7 +16,7 @@ protected:
     sem_t sem;
 
     semaphore( u32 );
-    ~semaphore( void );
+    ~semaphore( void ) OOE_VISIBLE;
 };
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )
