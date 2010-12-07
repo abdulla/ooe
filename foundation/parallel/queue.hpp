@@ -7,38 +7,13 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-struct queue_node_base;
-
-//--- queue_ptr ------------------------------------------------------------------------------------
-struct queue_ptr
-{
-    atom< queue_node_base* > ptr;
-    atom< unsigned > count;
-
-    queue_ptr( queue_node_base* ptr_ = 0, unsigned count_ = 0 )
-        : ptr( ptr_ ), count( count_ )
-    {
-    }
-
-    bool cas( const queue_ptr& compare, queue_node_base* value )
-    {
-        unsigned i = compare.count + 1;
-
-        if ( !ptr.cas( compare.ptr, value ) )
-            return false;
-
-        count = i;
-        return true;
-    }
-};
-
 //--- queue_node_base ------------------------------------------------------------------------------
 struct queue_node_base
 {
-    queue_ptr next;
+    atom< queue_node_base* > next;
 
     queue_node_base( void )
-        : next()
+        : next( 0 )
     {
     }
 };
@@ -62,15 +37,11 @@ class queue_base
 protected:
     typedef queue_node_base base_type;
 
-    queue_ptr queue_head;
-    queue_ptr queue_tail;
+    atom< base_type* > queue_head;
+    atom< base_type* > queue_tail;
 
     queue_base( base_type* node )
         : queue_head( node ), queue_tail( node )
-    {
-    }
-
-    ~queue_base( void )
     {
     }
 };
@@ -90,9 +61,9 @@ public:
 
     ~queue( void )
     {
-        for ( base_type* node = queue_head.ptr; node; )
+        for ( base_type* node = queue_head; node; )
         {
-            base_type* next = node->next.ptr;
+            base_type* next = node->next;
             delete static_cast< node_type* >( node );
             node = next;
         }
@@ -103,23 +74,23 @@ public:
     void enqueue( const t& value )
     {
         base_type* node = new node_type( value );
-        queue_ptr tail;
+        base_type* tail;
 
         while ( true )
         {
             tail = queue_tail;
-            queue_ptr next = tail.ptr->next;
+            base_type* next = tail->next;
 
-            if ( tail.ptr != queue_tail.ptr || tail.count != queue_tail.count )
+            if ( tail != queue_tail )
                 continue;
 
-            if ( next.ptr )
+            if ( next )
             {
-                queue_tail.cas( tail, next.ptr );
+                queue_tail.cas( tail, next );
                 continue;
             }
 
-            if ( tail.ptr->next.cas( next, node ) )
+            if ( tail->next.cas( next, node ) )
                 break;
         }
 
@@ -128,33 +99,33 @@ public:
 
     bool dequeue( t& value )
     {
-        queue_ptr head;
+        base_type* head;
 
         while ( true )
         {
             head = queue_head;
-            queue_ptr tail = queue_tail;
-            queue_ptr next = head.ptr->next;
+            base_type* tail = queue_tail;
+            base_type* next = head->next;
 
-            if ( head.ptr != queue_head.ptr || head.count != queue_head.count )
+            if ( head != queue_head )
                 continue;
 
-            if ( head.ptr == tail.ptr )
+            if ( head == tail )
             {
-                if ( !next.ptr )
+                if ( !next )
                     return false;
 
-                queue_tail.cas( tail, next.ptr );
+                queue_tail.cas( tail, next );
                 continue;
             }
 
-            value = next.ptr.as< node_type* >()->value;
+            value = static_cast< node_type* >( next )->value;
 
-            if ( queue_head.cas( head, next.ptr ) )
+            if ( queue_head.cas( head, next ) )
                 break;
         }
 
-        delete head.ptr.as< node_type* >();
+        delete static_cast< node_type* >( head );
         return true;
     }
 
