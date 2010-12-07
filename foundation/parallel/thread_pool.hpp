@@ -27,10 +27,8 @@ protected:
 
     void wait( void )
     {
-        lock lock( task->mutex );
-
-        while ( task->state == task_base::wait )
-            task->condition.wait( lock );
+        if ( task->state == task_base::wait )
+            task->semaphore.down();
 
         if ( task->state == task_base::error )
             throw error::runtime( "result: " ) << "An error occured processing the result";
@@ -70,11 +68,11 @@ template<>
 };
 
 //--- thread_pool ----------------------------------------------------------------------------------
-class thread_pool
+class OOE_VISIBLE thread_pool
 {
 public:
-    thread_pool( const std::string& ) OOE_VISIBLE;
-    void insert( const task_ptr& ) OOE_VISIBLE;
+    thread_pool( const std::string& );
+    void insert( const task_ptr& );
 
 private:
     typedef std::vector< opaque_ptr > vector_type;

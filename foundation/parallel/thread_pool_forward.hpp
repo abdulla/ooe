@@ -5,7 +5,7 @@
     #ifndef OOE_FOUNDATION_PARALLEL_THREAD_POOL_FORWARD_HPP
     #define OOE_FOUNDATION_PARALLEL_THREAD_POOL_FORWARD_HPP
 
-#include "foundation/parallel/lock.hpp"
+#include "foundation/parallel/semaphore.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/partial.hpp"
 
@@ -39,12 +39,12 @@ protected:
         error
     };
 
+    // can support multiple waiters by counting each waiter and incrementing semaphore for each
     atom< state_type > state;
-    ooe::mutex mutex;
-    ooe::condition condition;
+    ooe::semaphore semaphore;
 
     task_base( void )
-        : state( wait ), mutex(), condition()
+        : state( wait ), semaphore( 0 )
     {
     }
 

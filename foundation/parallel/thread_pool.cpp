@@ -1,10 +1,10 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include <iostream>
-#include <list>
 
 #include "foundation/executable/environment.hpp"
 #include "foundation/parallel/queue.hpp"
+#include "foundation/parallel/semaphore.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/parallel/thread_pool.hpp"
 
@@ -15,46 +15,48 @@ class thread_unit
 {
 public:
     thread_unit( const std::string& name )
-        : mutex(), condition(), queue(), state( true ),
+        : is_waiting( true ), is_running( true ), semaphore( 0 ), queue(),
         thread( name, make_function( *this, &thread_unit::main ), 0 )
     {
     }
 
     ~thread_unit( void )
     {
-        state = false;
-        condition.notify_one();
+        is_running = false;
+        semaphore.up();
         thread.join();
     }
 
     void insert( const task_ptr& task )
     {
         queue.enqueue( task );
-        condition.notify_one();
+
+        if ( is_waiting )
+            semaphore.up();
     }
 
 private:
-    ooe::mutex mutex;
-    ooe::condition condition;
-    ooe::queue< task_ptr > queue;
+    atom< bool > is_waiting;
+    atom< bool > is_running;
 
-    atom< bool > state;
+    ooe::semaphore semaphore;
+    ooe::queue< task_ptr > queue;
     ooe::thread thread;
 
     void* main( void* )
     {
-        while ( state )
+        while ( is_running )
         {
-            lock lock( mutex );
-
-            for ( task_ptr task; queue.dequeue( task ); task->condition.notify_all() )
+            for ( task_ptr task; queue.dequeue( task ); task->semaphore.up() )
             {
                 task->state = task_base::error;
                 OOE_PRINT( "thread_pool \"" << thread.name() << "\"",
                     ( *task )(); task->state = task_base::done );
             }
 
-            condition.wait( lock );
+            is_waiting = true;
+            semaphore.down();
+            is_waiting = false;
         }
 
         return 0;
@@ -68,7 +70,7 @@ thread_pool::thread_pool( const std::string& name )
     for ( up_t i = 0, end = executable::cpu_cores(); i != end; ++i )
     {
         std::string unit_name = name + ' ';
-        vector.push_back( opaque_ptr( new thread_unit( unit_name << i ), destroy< thread_unit > ) );
+        vector.push_back( new thread_unit( unit_name << i ) );
     }
 }
 
