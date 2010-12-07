@@ -360,8 +360,9 @@ class opaque_ptr
 public:
     typedef opaque_ref::function_type function_type;
 
-    opaque_ptr( void* value, function_type function )
-        : ref( new opaque_ref( value, function ) )
+    template< typename t >
+        opaque_ptr( t* value )
+        : ref( new opaque_ref( value, opaque_delete< t > ) )
     {
     }
 
@@ -414,6 +415,12 @@ public:
 
 private:
     opaque_ref* ref;
+
+    template< typename t >
+        friend void opaque_delete( const void* value )
+    {
+        delete static_cast< const t* >( value );
+    }
 };
 
 OOE_NAMESPACE_END( ( ooe ) )
