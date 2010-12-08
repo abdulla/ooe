@@ -1,9 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <algorithm>
-#include <iterator>
-#include <set>
-
 #include "foundation/opengl/block.hpp"
 #include "foundation/opengl/buffer.hpp"
 #include "foundation/opengl/context.hpp"
@@ -17,7 +13,7 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
-typedef std::set< s32 > attribute_set;
+typedef opengl::block::buffer_map::iterator buffer_iterator;
 
 u8 block_indices( ooe::block::type type )
 {
@@ -137,14 +133,13 @@ u32 block_type( ooe::block::type type )
     }
 }
 
-void set_attributes( attribute_set& set, const opengl::block::buffer_map::const_iterator begin,
-    const opengl::block::buffer_map::const_iterator end )
+void set_attributes( buffer_iterator begin, buffer_iterator end )
 {
     opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *begin->first );
     BindBuffer( buffer.target, buffer.id );
     s32 stride = 0;
 
-    for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
+    for ( buffer_iterator i = begin; i != end; ++i )
     {
         for ( u8 j = 0, indices = block_indices( i->second._1 ); j != indices; ++j )
             stride += block_stride( i->second._1 );
@@ -152,37 +147,54 @@ void set_attributes( attribute_set& set, const opengl::block::buffer_map::const_
 
     u8* offset = 0;
 
-    for ( opengl::block::buffer_map::const_iterator i = begin; i != end; ++i )
+    for ( buffer_iterator i = begin; i != end; ++i )
     {
-        set.insert( i->second._0 );
+        if ( !i->second._3 )
+            continue;
 
         for ( u8 j = 0, indices = block_indices( i->second._1 ); j != indices; ++j )
         {
             s32 size = block_size( i->second._1 );
             u32 type = block_type( i->second._1 );
+            EnableVertexAttribArray( i->second._0 );
             VertexAttribPointer( i->second._0 + j, size, type, false, stride, offset );
             offset += block_stride( i->second._1 );
+
+            if ( !i->second._2 )
+                continue;
+
+            VertexAttribDivisor( i->second._0 + j, 1 );
         }
+
+        i->second._2 = false;
+        i->second._3 = false;
     }
 }
 
-void enable_attributes( attribute_set& x, attribute_set& y )
+void enable_buffers( opengl::block& block, opengl::buffer& index )
 {
-    typedef std::vector< s32 > attribute_vector;
-    typedef std::insert_iterator< attribute_vector > inserter;
-    attribute_vector v;
-    std::set_difference( x.begin(), x.end(), y.begin(), y.end(), inserter( v, v.begin() ) );
+    BindVertexArray( block.id );
+    opengl::block::buffer_map& map = block.buffers;
 
-    for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
-        DisableVertexAttribArray( *i );
+    if ( !block.rebuild )
+        return;
+    else if ( map.empty() )
+        throw error::runtime( "opengl::device: " ) << "Block does not contain any point buffers";
 
-    v.clear();
-    std::set_difference( y.begin(), y.end(), x.begin(), x.end(), inserter( v, v.begin() ) );
+    typedef std::pair< buffer_iterator, buffer_iterator > buffer_pair;
+    buffer_iterator end = map.end();
 
-    for ( attribute_vector::const_iterator i = v.begin(), end = v.end(); i != end; ++i )
-        EnableVertexAttribArray( *i );
+    for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
+        pair = map.equal_range( pair.second->first ) )
+    {
+        set_attributes( pair.first, pair.second );
 
-    x.swap( y );
+        if ( pair.second == end )
+            break;
+    }
+
+    BindBuffer( index.target, index.id );
+    block.rebuild = false;
 }
 
 void enable_frame( const frame_ptr& generic_frame, u32 program, s32 draw_buffers_limit )
@@ -243,7 +255,6 @@ public:
 private:
     const view_data& view;
     platform::context_type context;
-    attribute_set attributes;
 
     s32 draw_buffers_limit;
     s32 texture_size_limit;
@@ -253,7 +264,7 @@ private:
 
 device::device( const ooe::view_data& view_, bool sync )
 try
-    : view( view_ ), context( context_construct( view ) ), attributes(), draw_buffers_limit(),
+    : view( view_ ), context( context_construct( view ) ), draw_buffers_limit(),
     texture_size_limit(), texture_units_limit(), array_size_limit()
 {
     context_current( view, context );
@@ -287,12 +298,7 @@ void device::draw( const block_ptr& generic_block, const frame_ptr& frame, u32 i
         throw error::runtime( "opengl::device: " ) << "Number of instances must be > 0";
 
     opengl::block& block = dynamic_cast< opengl::block& >( *generic_block );
-    UseProgram( block.id );
-
-    for ( block::uniform_map::const_iterator i = block.uniforms.begin(),
-        end = block.uniforms.end(); i != end; ++i )
-        i->second._0( i->first, i->second._1, i->second._2 );
-
+    UseProgram( block.program );
     s32 j = 0;
     s32 size = block.textures.size() + block.texture_arrays.size();
 
@@ -316,30 +322,13 @@ void device::draw( const block_ptr& generic_block, const frame_ptr& frame, u32 i
         BindTexture( TEXTURE_2D_ARRAY, dynamic_cast< opengl::texture_array& >( *i->second ).id );
     }
 
-    block::buffer_map& map = block.buffers;
-
-    if ( map.empty() )
-        throw error::runtime( "opengl::device: " ) << "Block does not contain any point buffers";
-
-    typedef block::buffer_map::const_iterator buffer_iterator;
-    typedef std::pair< buffer_iterator, buffer_iterator > buffer_pair;
-    buffer_iterator end = map.end();
-    attribute_set enable_set;
-
-    for ( buffer_pair pair = map.equal_range( map.begin()->first ); ;
-        pair = map.equal_range( pair.second->first ) )
-    {
-        set_attributes( enable_set, pair.first, pair.second );
-
-        if ( pair.second == end )
-            break;
-    }
-
-    enable_attributes( attributes, enable_set );
-    enable_frame( frame, block.id, draw_buffers_limit );
+    for ( block::uniform_map::const_iterator i = block.uniforms.begin(),
+        end = block.uniforms.end(); i != end; ++i )
+        i->second._0( i->first, i->second._1, i->second._2 );
 
     opengl::buffer& index = dynamic_cast< opengl::buffer& >( *block.index );
-    BindBuffer( index.target, index.id );
+    enable_buffers( block, index );
+    enable_frame( frame, block.program, draw_buffers_limit );
     DrawElementsInstanced( TRIANGLES, index.size / sizeof( u16 ), UNSIGNED_SHORT, 0, instances );
 }
 
