@@ -6,7 +6,7 @@
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/client.hpp"
-#include "foundation/ipc/memory/rpc_forward.hpp"
+#include "foundation/ipc/memory/rpc.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 
