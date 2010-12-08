@@ -194,16 +194,19 @@ void block::
     buffer_map::iterator i =
         buffers.insert( buffer_map::value_type( buffer, buffer_tuple( location, format ) ) );
     iterator_map::iterator j = iterators.find( location );
+    bool is_instanced = false;
 
     if ( j == iterators.end() )
-        iterators[ location ] = i;
+        iterators[ location ] = make_tuple( i, instanced );
     else
     {
-        buffers.erase( j->second );
-        j->second = i;
+        buffers.erase( j->second._0 );
+        is_instanced = j->second._1;
+        j->second = make_tuple( i, instanced );
     }
 
-    VertexAttribDivisor( location, instanced );
+    if ( instanced != is_instanced )
+        VertexAttribDivisor( location, instanced );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
