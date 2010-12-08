@@ -45,8 +45,6 @@ enum
     LUMINANCE                   = 0x1909,
     LUMINANCE_ALPHA             = 0x190A,
 
-    EXTENSIONS                  = 0x1F03,
-
     NEAREST                     = 0x2600,
     LINEAR                      = 0x2601,
     NEAREST_MIPMAP_NEAREST      = 0x2700,
@@ -147,7 +145,6 @@ enum
 };
 
 //--- typedefs -------------------------------------------------------------------------------------
-typedef const c8* ( GetString_t )( u32 );
 typedef void ( GetIntegerv_t )( u32, s32* );
 typedef void ( Enable_t )( u32 );
 typedef void ( Disable_t )( u32 );
@@ -232,7 +229,6 @@ typedef void ( DrawBuffers_t )( s32, const u32* );
 typedef void ( DrawElementsInstanced_t )( u32, s32, u32, const void*, s32 );
 
 //--- functions ------------------------------------------------------------------------------------
-extern GetString_t* GetString;
 extern GetIntegerv_t* GetIntegerv;
 extern Enable_t* Enable;
 extern Disable_t* Disable;

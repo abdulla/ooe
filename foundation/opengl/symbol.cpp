@@ -18,7 +18,6 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 //--- load_symbols ---------------------------------------------------------------------------------
 void load_symbols( void )
 {
-    GetString = find< GetString_t >( "glGetString" );
     GetIntegerv = find< GetIntegerv_t >( "glGetIntegerv" );
     Enable = find< Enable_t >( "glEnable" );
     Disable = find< Disable_t >( "glDisable" );
@@ -100,12 +99,9 @@ void load_symbols( void )
     VertexAttribDivisor = find< VertexAttribDivisor_t >( "glVertexAttribDivisorARB" );
     DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
     DrawElementsInstanced = find< DrawElementsInstanced_t >( "glDrawElementsInstancedARB" );
-
-    /*const c8* extensions = */GetString( EXTENSIONS );
 }
 
 //--- functions ------------------------------------------------------------------------------------
-GetString_t* GetString;
 GetIntegerv_t* GetIntegerv;
 Enable_t* Enable;
 Disable_t* Disable;
