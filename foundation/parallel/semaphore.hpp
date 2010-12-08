@@ -11,6 +11,7 @@ struct OOE_VISIBLE semaphore
     : private platform::semaphore
 {
     semaphore( u32 );
+    ~semaphore( void );
 
     void up( void );
     void down( void );

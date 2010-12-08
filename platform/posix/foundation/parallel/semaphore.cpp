@@ -29,6 +29,10 @@ semaphore::semaphore( u32 value )
 {
 }
 
+semaphore::~semaphore( void )
+{
+}
+
 void semaphore::up( void )
 {
     if ( sem_post( &sem ) )

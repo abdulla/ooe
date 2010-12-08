@@ -16,7 +16,7 @@ protected:
     sem_t sem;
 
     semaphore( u32 );
-    ~semaphore( void ) OOE_VISIBLE;
+    ~semaphore( void );
 };
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )

@@ -30,6 +30,10 @@ semaphore::semaphore( u32 value )
 {
 }
 
+semaphore::~semaphore( void )
+{
+}
+
 void semaphore::up( void )
 {
     if ( semaphore_signal( sem ) )
