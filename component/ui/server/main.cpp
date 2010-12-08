@@ -179,9 +179,9 @@ void make_input( const device_ptr& device, block_ptr& block, const box_tree::box
     }
 
     block->input( "view", x, y );
-    block->input( "scale", block::f32_2, attribute, true );
-    block->input( "translate", block::f32_2, attribute, true );
-    block->input( "depth", block::f32_1, attribute, true );
+    block->input( "scale", block::f32_2, attribute );
+    block->input( "translate", block::f32_2, attribute );
+    block->input( "depth", block::f32_1, attribute );
 }
 
 //--- make_block -----------------------------------------------------------------------------------
