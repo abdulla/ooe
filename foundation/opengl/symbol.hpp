@@ -3,6 +3,7 @@
 #ifndef OOE_FOUNDATION_OPENGL_SYMBOL_HPP
 #define OOE_FOUNDATION_OPENGL_SYMBOL_HPP
 
+#include "foundation/opengl/symbol_forward.hpp"
 #include "foundation/utility/fundamental.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -221,10 +222,14 @@ typedef void ( ReadBuffer_t )( u32 );
 typedef void ( ReadPixels_t )( s32, s32, s32, s32, u32, u32, const void* );
 typedef void ( Clear_t )( u32 );
 
+typedef void ( GenVertexArrays_t )( s32, u32* );
+typedef void ( DeleteVertexArrays_t )( s32, const u32* );
+typedef void ( BindVertexArray_t )( u32 );
 typedef void ( EnableVertexAttribArray_t )( u32 );
 typedef void ( DisableVertexAttribArray_t )( u32 );
 typedef void ( VertexAttribPointer_t )( u32, s32, u32, u8, s32, const void* );
 typedef void ( VertexAttribDivisor_t )( u32, u32 );
+
 typedef void ( DrawBuffers_t )( s32, const u32* );
 typedef void ( DrawElementsInstanced_t )( u32, s32, u32, const void*, s32 );
 
@@ -304,10 +309,14 @@ extern ReadBuffer_t* ReadBuffer;
 extern ReadPixels_t* ReadPixels;
 extern Clear_t* Clear;
 
+extern GenVertexArrays_t* GenVertexArrays;
+extern DeleteVertexArrays_t* DeleteVertexArrays;
+extern BindVertexArray_t* BindVertexArray;
 extern EnableVertexAttribArray_t* EnableVertexAttribArray;
 extern DisableVertexAttribArray_t* DisableVertexAttribArray;
 extern VertexAttribPointer_t* VertexAttribPointer;
 extern VertexAttribDivisor_t* VertexAttribDivisor;
+
 extern DrawBuffers_t* DrawBuffers;
 extern DrawElementsInstanced_t* DrawElementsInstanced;
 

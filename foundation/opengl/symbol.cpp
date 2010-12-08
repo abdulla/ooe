@@ -93,10 +93,14 @@ void load_symbols( void )
     ReadPixels = find< ReadPixels_t >( "glReadPixels" );
     Clear = find< Clear_t >( "glClear" );
 
+    GenVertexArrays = find< GenVertexArrays_t >( "glGenVertexArrays" OOE_APPLE_SYMBOL );
+    DeleteVertexArrays = find< DeleteVertexArrays_t >( "glDeleteVertexArrays" OOE_APPLE_SYMBOL );
+    BindVertexArray = find< BindVertexArray_t >( "glBindVertexArray" OOE_APPLE_SYMBOL );
     EnableVertexAttribArray = find< EnableVertexAttribArray_t >( "glEnableVertexAttribArray" );
     DisableVertexAttribArray = find< DisableVertexAttribArray_t >( "glDisableVertexAttribArray" );
     VertexAttribPointer = find< VertexAttribPointer_t >( "glVertexAttribPointer" );
     VertexAttribDivisor = find< VertexAttribDivisor_t >( "glVertexAttribDivisorARB" );
+
     DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
     DrawElementsInstanced = find< DrawElementsInstanced_t >( "glDrawElementsInstancedARB" );
 }
@@ -177,10 +181,14 @@ ReadBuffer_t* ReadBuffer;
 ReadPixels_t* ReadPixels;
 Clear_t* Clear;
 
+GenVertexArrays_t* GenVertexArrays;
+DeleteVertexArrays_t* DeleteVertexArrays;
+BindVertexArray_t* BindVertexArray;
 EnableVertexAttribArray_t* EnableVertexAttribArray;
 DisableVertexAttribArray_t* DisableVertexAttribArray;
 VertexAttribPointer_t* VertexAttribPointer;
 VertexAttribDivisor_t* VertexAttribDivisor;
+
 DrawBuffers_t* DrawBuffers;
 DrawElementsInstanced_t* DrawElementsInstanced;
 
