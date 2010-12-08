@@ -16,7 +16,7 @@ typedef tuple< u32, u32, u32, u32 > region_type;
 typedef std::pair< page_cache::page_map::iterator, page_cache::page_map::iterator > pair_type;
 const image_format::type table_format = image_format::rg_s16;
 
-u32 check_page_size( u16 page_size )
+u16 check_page_size( u16 page_size )
 {
     if ( !is_bit_round( page_size ) )
         throw error::runtime( "physical_cache: " ) <<
