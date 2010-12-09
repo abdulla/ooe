@@ -47,11 +47,14 @@ private:
     {
         while ( is_running )
         {
-            for ( task_ptr task; queue.dequeue( task ); task->semaphore.up() )
+            for ( task_ptr task; queue.dequeue( task ); )
             {
                 task->state = task_base::error;
                 OOE_PRINT( "thread_pool \"" << thread.name() << "\"",
                     ( *task )(); task->state = task_base::done );
+
+                if ( !task.unique() )
+                    task->semaphore.up();
             }
 
             is_waiting = true;
