@@ -179,6 +179,11 @@ public:
         delete this;
     }
 
+    bool unique( void ) const
+    {
+        return refs == 1;
+    }
+
     type* get( void ) const
     {
         return value;
@@ -216,6 +221,11 @@ public:
     type* operator ->( void ) const
     {
         return ref->get();
+    }
+
+    bool unique( void ) const
+    {
+        return ref->unique();
     }
 
     type* get( void ) const
@@ -338,6 +348,11 @@ public:
         delete this;
     }
 
+    bool unique( void ) const
+    {
+        return refs == 1;
+    }
+
     void* get( void ) const
     {
         return value;
@@ -388,6 +403,11 @@ public:
     operator void*( void ) const
     {
         return ref->get();
+    }
+
+    bool unique( void ) const
+    {
+        return ref->unique();
     }
 
     void* get( void ) const
