@@ -98,15 +98,18 @@ ooe_executable( registry_server component/registry/server )
 target_link_libraries( registry_server executable registry )
 set_target_properties( registry_server PROPERTIES OUTPUT_NAME registry )
 
+ooe_executable( retile component/ui/retile )
+target_link_libraries( retile executable ui )
+
 ooe_executable( surrogate component/registry/surrogate )
 target_link_libraries( surrogate executable registry )
+
+ooe_executable( tile component/ui/tile )
+target_link_libraries( tile executable ui )
 
 ooe_executable( ui_server component/ui/server )
 target_link_libraries( ui_server executable math ui )
 set_target_properties( ui_server PROPERTIES OUTPUT_NAME ui )
-
-ooe_executable( tile component/ui/tile )
-target_link_libraries( tile executable ui )
 
 ### test: library ##################################################################################
 ooe_library( unit test/unit )
