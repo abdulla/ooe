@@ -79,17 +79,22 @@ void jpeg_init( jpeg_compress_struct* write_struct )
         static_cast< jpeg_io* >( write_struct->client_data )->data;
 }
 
-void jpeg_term( jpeg_compress_struct* write_struct )
+void jpeg_write( jpeg_compress_struct* write_struct, u32 size )
 {
     jpeg_io& io = *static_cast< jpeg_io* >( write_struct->client_data );
 
-    if ( io.file.write( io.data, executable::static_page_size ) != executable::static_page_size )
+    if ( io.file.write( io.data, size ) != size )
         throw error::runtime( "jpeg: " ) << "Unable to write";
+}
+
+void jpeg_term( jpeg_compress_struct* write_struct )
+{
+    jpeg_write( write_struct, executable::static_page_size - write_struct->dest->free_in_buffer );
 }
 
 s32 jpeg_empty( jpeg_compress_struct* write_struct )
 {
-    jpeg_term( write_struct );
+    jpeg_write( write_struct, executable::static_page_size );
     jpeg_init( write_struct );
     return true;
 }
@@ -252,7 +257,7 @@ struct jpeg_write_state
         compress.client_data = &io;
         compress.dest = &target;
         jpeg_set_defaults( &compress );
-        jpeg_set_quality( &compress, 80, true );
+        jpeg_set_quality( &compress, 90, true );
         jpeg_start_compress( &compress, true );
     }
 
