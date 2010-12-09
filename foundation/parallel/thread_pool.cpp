@@ -15,14 +15,14 @@ class thread_unit
 {
 public:
     thread_unit( const std::string& name )
-        : is_waiting( true ), is_running( true ), semaphore( 0 ), queue(),
+        : state( true ), loads( 0 ), semaphore( 0 ), queue(),
         thread( name, make_function( *this, &thread_unit::main ), 0 )
     {
     }
 
     ~thread_unit( void )
     {
-        is_running = false;
+        state = false;
         semaphore.up();
         thread.join();
     }
@@ -31,13 +31,13 @@ public:
     {
         queue.enqueue( task );
 
-        if ( is_waiting )
+        if ( !loads++ )
             semaphore.up();
     }
 
 private:
-    atom< bool > is_waiting;
-    atom< bool > is_running;
+    atom< bool > state;
+    atom< up_t > loads;
 
     ooe::semaphore semaphore;
     ooe::queue< task_ptr > queue;
@@ -45,9 +45,9 @@ private:
 
     void* main( void* )
     {
-        while ( is_running )
+        while ( state )
         {
-            for ( task_ptr task; queue.dequeue( task ); )
+            for ( task_ptr task; queue.dequeue( task ); --loads )
             {
                 task->state = task_base::error;
                 OOE_PRINT( "thread_pool \"" << thread.name() << "\"",
@@ -57,9 +57,8 @@ private:
                     task->semaphore.up();
             }
 
-            is_waiting = true;
-            semaphore.down();
-            is_waiting = false;
+            if ( !loads )
+                semaphore.down();
         }
 
         return 0;
