@@ -170,6 +170,9 @@ target_link_libraries( memoryrpc_output executable ipc )
 ooe_executable( memoryrpc_server external/memoryrpc/server )
 target_link_libraries( memoryrpc_server executable ipc )
 
+ooe_executable( pool_bench external/pool_bench )
+target_link_libraries( pool_bench executable parallel )
+
 ooe_executable( monitor external/monitor )
 target_link_libraries( monitor executable image visual )
 
