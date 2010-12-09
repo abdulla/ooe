@@ -38,7 +38,12 @@ private:
     virtual image read( const pyramid_index& );
 };
 
-//--- make_tile ------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+open_type find_open( const std::string& );
+decoder_type find_decoder( const std::string& );
+encoder_type find_encoder( const std::string& );
+
+std::string make_path( const std::string&, const pyramid_index&, const std::string& );
 void make_tile( const descriptor&, thread_pool&, const std::string&, const std::string&, u16 );
 
 OOE_NAMESPACE_END( ( ooe ) )

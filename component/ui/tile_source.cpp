@@ -46,52 +46,6 @@ template< typename t >
     return i->codec;
 }
 
-open_type find_open( const std::string& type )
-{
-    codec_pair< open_type > pairs[] =
-    {
-        {   "jpg", jpeg::open   },
-        {   "png", png::open    }
-    };
-
-    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
-}
-
-decoder_type find_decoder( const std::string& type )
-{
-    codec_pair< decoder_type > pairs[] =
-    {
-        {   "dds", dds::decode      },
-        {   "exr", exr::decode      },
-        {   "jp2", jpeg2000::decode },
-        {   "jpg", jpeg::decode     },
-        {   "png", png::decode      }
-    };
-
-    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
-}
-
-encoder_type find_encoder( const std::string& type )
-{
-    codec_pair< encoder_type > pairs[] =
-    {
-        {   "dds", dds::encode      },
-        {   "jp2", jpeg2000::encode },
-        {   "jpg", jpeg::encode     },
-        {   "png", png::encode      }
-    };
-
-    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
-}
-
-std::string make_path
-    ( const std::string& root, const pyramid_index& index, const std::string& type )
-{
-    std::string path( root );
-    path << '/' << index.x << '_' << index.y << '_' << index.level << '.' << type;
-    return path;
-}
-
 void write_metadata
     ( const std::string& root, const std::string& type, const reader_ptr reader, u32 level_limit )
 {
@@ -233,6 +187,56 @@ image tile_source::read( const pyramid_index& i )
 {
     pyramid_index index( i.x, i.y, level_limit - i.level );
     return decoder( make_path( root, index, type ) );
+}
+
+//--- find_open ------------------------------------------------------------------------------------
+open_type find_open( const std::string& type )
+{
+    codec_pair< open_type > pairs[] =
+    {
+        {   "jpg", jpeg::open   },
+        {   "png", png::open    }
+    };
+
+    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
+}
+
+//--- find_decoder ---------------------------------------------------------------------------------
+decoder_type find_decoder( const std::string& type )
+{
+    codec_pair< decoder_type > pairs[] =
+    {
+        {   "dds", dds::decode      },
+        {   "exr", exr::decode      },
+        {   "jp2", jpeg2000::decode },
+        {   "jpg", jpeg::decode     },
+        {   "png", png::decode      }
+    };
+
+    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
+}
+
+//--- find_encoder ---------------------------------------------------------------------------------
+encoder_type find_encoder( const std::string& type )
+{
+    codec_pair< encoder_type > pairs[] =
+    {
+        {   "dds", dds::encode      },
+        {   "jp2", jpeg2000::encode },
+        {   "jpg", jpeg::encode     },
+        {   "png", png::encode      }
+    };
+
+    return find( type, pairs, pairs + sizeof( pairs ) / sizeof( *pairs ) );
+}
+
+//--- make_path ------------------------------------------------------------------------------------
+std::string make_path
+    ( const std::string& root, const pyramid_index& index, const std::string& type )
+{
+    std::string path( root );
+    path << '/' << index.x << '_' << index.y << '_' << index.level << '.' << type;
+    return path;
 }
 
 //--- make_tile ------------------------------------------------------------------------------------
