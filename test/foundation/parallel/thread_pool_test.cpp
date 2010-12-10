@@ -68,7 +68,7 @@ template<>
     thread_pool pool( "pool" );
 
     for ( s32 i = 0; i != 10000; ++i )
-        async( pool, make_function( increment ), i );
+        async( pool, function< void ( void ) >() );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
