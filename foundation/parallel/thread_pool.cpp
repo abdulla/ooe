@@ -101,10 +101,14 @@ void thread_pool::insert( const task_ptr& task )
 
 bool thread_pool::snoop( task_ptr& task )
 {
-    // TODO: start at index - 1, and iterate backwards
-    for ( vector_type::iterator i = vector.begin(), end = vector.end(); i != end; ++i )
+    // start at last index, which would have a high probability of containing a task
+    up_t start = index - 1;
+
+    for ( up_t size = vector.size(), j = size; j; --j )
     {
-        if ( i->as< thread_unit >()->dequeue( task ) )
+        up_t i = ( start + j ) % size;
+
+        if ( vector[ i ].as< thread_unit >()->dequeue( task ) )
             return true;
     }
 
