@@ -156,7 +156,7 @@ template< typename type >
 };
 
 //--- shared_ref -----------------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename ref_t >
+template< typename type, void ( * function )( type* ) >
     class shared_ref
 {
 public:
@@ -190,12 +190,12 @@ public:
     }
 
 private:
-    ref_t refs;
+    unsigned refs;
     type* const value;
 };
 
 //--- shared_base ----------------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename ref_t >
+template< typename type, void ( * function )( type* ) >
     class shared_base
 {
 public:
@@ -247,7 +247,7 @@ public:
     }
 
 protected:
-    typedef shared_ref< type, function, ref_t > ref_type;
+    typedef shared_ref< type, function > ref_type;
     ref_type* ref;
 
     shared_base( type* value )
@@ -262,9 +262,9 @@ protected:
 };
 
 //--- shared_dereference ---------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename ref_t >
+template< typename type, void ( * function )( type* ) >
     class shared_dereference
-    : public shared_base< type, function, ref_t >
+    : public shared_base< type, function >
 {
 public:
     type& operator *( void ) const
@@ -274,18 +274,18 @@ public:
 
 protected:
     shared_dereference( type* value )
-        : shared_base< type, function, ref_t >( value )
+        : shared_base< type, function >( value )
     {
     }
 };
 
-template< void ( * function )( void* ), typename ref_t >
-    class shared_dereference< void, function, ref_t >
-    : public shared_base< void, function, ref_t >
+template< void ( * function )( void* ) >
+    class shared_dereference< void, function >
+    : public shared_base< void, function >
 {
 protected:
     shared_dereference( void* value )
-        : shared_base< void, function, ref_t >( value )
+        : shared_base< void, function >( value )
     {
     }
 };
@@ -293,10 +293,10 @@ protected:
 //--- shared_ptr -----------------------------------------------------------------------------------
 template< typename type >
     struct shared_ptr
-    : public shared_dereference< type, deallocate_ptr< type >, unsigned >
+    : public shared_dereference< type, deallocate_ptr< type > >
 {
     shared_ptr( type* value = 0 )
-        : shared_dereference< type, deallocate_ptr< type >, unsigned >( value )
+        : shared_dereference< type, deallocate_ptr< type > >( value )
     {
     }
 };
@@ -304,10 +304,10 @@ template< typename type >
 //--- shared_array ---------------------------------------------------------------------------------
 template< typename type >
     struct shared_array
-    : public shared_dereference< type, deallocate_array< type >, unsigned >
+    : public shared_dereference< type, deallocate_array< type > >
 {
     shared_array( type* value = 0 )
-        : shared_dereference< type, deallocate_array< type >, unsigned >( value )
+        : shared_dereference< type, deallocate_array< type > >( value )
     {
     }
 };
@@ -315,10 +315,10 @@ template< typename type >
 //--- shared_free ----------------------------------------------------------------------------------
 template< typename type >
     struct shared_free
-    : public shared_dereference< type, deallocate_free< type >, unsigned >
+    : public shared_dereference< type, deallocate_free< type > >
 {
     shared_free( type* value = 0 )
-        : shared_dereference< type, deallocate_free< type >, unsigned >( value )
+        : shared_dereference< type, deallocate_free< type > >( value )
     {
     }
 };
