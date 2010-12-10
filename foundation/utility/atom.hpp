@@ -3,18 +3,16 @@
 #ifndef OOE_FOUNDATION_UTILITY_ATOM_HPP
 #define OOE_FOUNDATION_UTILITY_ATOM_HPP
 
-#include <tr1/memory>
-
-#include "foundation/utility/namespace.hpp"
+#include "foundation/utility/pointer.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
+#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
 inline void memory_barrier( void )
 {
-#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
     __sync_synchronize();
-#endif
 }
+#endif
 
 //--- atom_base ------------------------------------------------------------------------------------
 template< typename type >
@@ -142,10 +140,32 @@ template< typename type >
 //--- atom_ptr -------------------------------------------------------------------------------------
 template< typename type >
     struct atom_ptr
-    : public std::tr1::shared_ptr< type >
+    : public shared_dereference< type, deallocate_ptr< type >, atom< unsigned > >
 {
     atom_ptr( type* value = 0 )
-        : std::tr1::shared_ptr< type >( value )
+        : shared_dereference< type, deallocate_ptr< type >, atom< unsigned > >( value )
+    {
+    }
+};
+
+//--- atom_array -----------------------------------------------------------------------------------
+template< typename type >
+    struct atom_array
+    : public shared_dereference< type, deallocate_array< type >, atom< unsigned > >
+{
+    atom_array( type* value = 0 )
+        : shared_dereference< type, deallocate_array< type >, atom< unsigned > >( value )
+    {
+    }
+};
+
+//--- atom_free ------------------------------------------------------------------------------------
+template< typename type >
+    struct atom_free
+    : public shared_dereference< type, deallocate_free< type >, atom< unsigned > >
+{
+    atom_free( type* value = 0 )
+        : shared_dereference< type, deallocate_free< type >, atom< unsigned > >( value )
     {
     }
 };
