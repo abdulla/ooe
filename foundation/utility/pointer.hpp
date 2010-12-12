@@ -155,24 +155,24 @@ template< typename type >
     }
 };
 
-//--- shared_ref -----------------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename ref_t >
-    class shared_ref
+//--- shared_data ----------------------------------------------------------------------------------
+template< typename type, void ( * function )( type* ), typename use_t >
+    class shared_data
 {
 public:
-    shared_ref( type* value_ )
-        : refs( 1 ), value( value_ )
+    shared_data( type* value_ )
+        : use_count( 1 ), value( value_ )
     {
     }
 
     void increment( void )
     {
-        ++refs;
+        ++use_count;
     }
 
     void decrement( void )
     {
-        if ( --refs )
+        if ( --use_count )
             return;
 
         function( value );
@@ -181,7 +181,7 @@ public:
 
     bool unique( void ) const
     {
-        return refs == 1;
+        return use_count == 1;
     }
 
     type* get( void ) const
@@ -190,102 +190,102 @@ public:
     }
 
 private:
-    ref_t refs;
+    use_t use_count;
     type* const value;
 };
 
 //--- shared_base ----------------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename ref_t >
+template< typename type, void ( * function )( type* ), typename use_t >
     class shared_base
 {
 public:
     shared_base( const shared_base& copy )
-        : ref( copy.ref )
+        : data( copy.data )
     {
-        ref->increment();
+        data->increment();
     }
 
     shared_base& operator =( const shared_base& copy )
     {
-        copy.ref->increment();
-        ref->decrement();
-        ref = copy.ref;
+        copy.data->increment();
+        data->decrement();
+        data = copy.data;
         return *this;
     }
 
     operator type*( void ) const
     {
-        return ref->get();
+        return data->get();
     }
 
     type* operator ->( void ) const
     {
-        return ref->get();
+        return data->get();
     }
 
     bool unique( void ) const
     {
-        return ref->unique();
+        return data->unique();
     }
 
     type* get( void ) const
     {
-        return ref->get();
+        return data->get();
     }
 
     template< typename to >
         to* as( void ) const
     {
-        return reinterpret_cast< to* >( ref->get() );
+        return reinterpret_cast< to* >( data->get() );
     }
 
     void swap( shared_base& exchange )
     {
-        ref_type* save = ref;
-        ref = exchange.ref;
-        exchange.ref = save;
+        data_type* save = data;
+        data = exchange.data;
+        exchange.data = save;
     }
 
 protected:
-    typedef shared_ref< type, function, ref_t > ref_type;
-    ref_type* ref;
+    typedef shared_data< type, function, use_t > data_type;
+    data_type* data;
 
     shared_base( type* value )
-        : ref( new ref_type( value ) )
+        : data( new data_type( value ) )
     {
     }
 
     ~shared_base( void )
     {
-        ref->decrement();
+        data->decrement();
     }
 };
 
 //--- shared_dereference ---------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename ref_t >
+template< typename type, void ( * function )( type* ), typename use_t >
     class shared_dereference
-    : public shared_base< type, function, ref_t >
+    : public shared_base< type, function, use_t >
 {
 public:
     type& operator *( void ) const
     {
-        return *this->ref->get();
+        return *this->data->get();
     }
 
 protected:
     shared_dereference( type* value )
-        : shared_base< type, function, ref_t >( value )
+        : shared_base< type, function, use_t >( value )
     {
     }
 };
 
-template< void ( * function )( void* ), typename ref_t >
-    class shared_dereference< void, function, ref_t >
-    : public shared_base< void, function, ref_t >
+template< void ( * function )( void* ), typename use_t >
+    class shared_dereference< void, function, use_t >
+    : public shared_base< void, function, use_t >
 {
 protected:
     shared_dereference( void* value )
-        : shared_base< void, function, ref_t >( value )
+        : shared_base< void, function, use_t >( value )
     {
     }
 };
@@ -323,25 +323,25 @@ template< typename type >
     }
 };
 
-//--- opaque_ref -----------------------------------------------------------------------------------
-class opaque_ref
+//--- opaque_data ----------------------------------------------------------------------------------
+class opaque_data
 {
 public:
     typedef void ( * function_type )( const void* );
 
-    opaque_ref( void* value_, function_type function_ )
-        : refs( 1 ), value( value_ ), function( function_ )
+    opaque_data( void* value_, function_type function_ )
+        : use_count( 1 ), value( value_ ), function( function_ )
     {
     }
 
     void increment( void )
     {
-        ++refs;
+        ++use_count;
     }
 
     void decrement( void )
     {
-        if ( --refs )
+        if ( --use_count )
             return;
 
         function( value );
@@ -350,7 +350,7 @@ public:
 
     bool unique( void ) const
     {
-        return refs == 1;
+        return use_count == 1;
     }
 
     void* get( void ) const
@@ -364,7 +364,7 @@ public:
     }
 
 private:
-    unsigned refs;
+    unsigned use_count;
     void* const value;
     const function_type function;
 };
@@ -373,68 +373,68 @@ private:
 class opaque_ptr
 {
 public:
-    typedef opaque_ref::function_type function_type;
+    typedef opaque_data::function_type function_type;
 
     template< typename t >
         opaque_ptr( t* value )
-        : ref( new opaque_ref( value, opaque_delete< t > ) )
+        : data( new opaque_data( value, opaque_delete< t > ) )
     {
     }
 
     opaque_ptr( const opaque_ptr& copy )
-        : ref( copy.ref )
+        : data( copy.data )
     {
-        ref->increment();
+        data->increment();
     }
 
     ~opaque_ptr( void )
     {
-        ref->decrement();
+        data->decrement();
     }
 
     opaque_ptr& operator =( const opaque_ptr& copy )
     {
-        copy.ref->increment();
-        ref->decrement();
-        ref = copy.ref;
+        copy.data->increment();
+        data->decrement();
+        data = copy.data;
         return *this;
     }
 
     operator void*( void ) const
     {
-        return ref->get();
+        return data->get();
     }
 
     bool unique( void ) const
     {
-        return ref->unique();
+        return data->unique();
     }
 
     void* get( void ) const
     {
-        return ref->get();
+        return data->get();
     }
 
     template< typename to >
         to* as( void ) const
     {
-        return reinterpret_cast< to* >( ref->get() );
+        return reinterpret_cast< to* >( data->get() );
     }
 
     function_type destructor( void )
     {
-        return ref->destructor();
+        return data->destructor();
     }
 
     void swap( opaque_ptr& exchange )
     {
-        opaque_ref* save = ref;
-        ref = exchange.ref;
-        exchange.ref = save;
+        opaque_data* save = data;
+        data = exchange.data;
+        exchange.data = save;
     }
 
 private:
-    opaque_ref* ref;
+    opaque_data* data;
 
     template< typename t >
         friend void opaque_delete( const void* value )
