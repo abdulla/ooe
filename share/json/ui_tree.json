@@ -6,7 +6,7 @@
     "node": "text",
     "data": [
         {
-            "text": "Workspace Map",
+            "text": "Wörkspäcë Mäp",
             "x": 16,
             "y": 16,
             "red": 191
@@ -38,14 +38,13 @@
                     "data": [
                         {
                             "text": "Blue Marble ",
-                            "x": 24,
+                            "x": 32,
                             "y": 16,
                             "blue": 191
                         },
                         {
                                 "text": "In celebration of the deployment of its Earth Observing System, NASA is pleased to share the newest in its series of stunning Earth images, affectionately named the 'Blue Marble.' This new Earth imagery enhances the Blue Marble legacy by providing a detailed look at an entire year in the life of our planet. In sharing these Blue Marble images, NASA hopes the public will join with the agency in its continuing exploration of our world from the unique perspective of space.",
                             "x": 16,
-                            "y": 24,
                             "level": 4
                         }
                     ]
