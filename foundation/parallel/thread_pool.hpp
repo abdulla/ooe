@@ -25,7 +25,7 @@ protected:
     {
     }
 
-    void wait( void )
+    void wait( void ) const
     {
         if ( task->state == task_base::wait )
             task->semaphore.down();
@@ -45,7 +45,7 @@ template< typename t >
     {
     }
 
-    t& operator ()( void )
+    t& operator ()( void ) const
     {
         wait();
         return dynamic_cast< task_value< t >& >( *task ).value;
@@ -61,7 +61,7 @@ template<>
     {
     }
 
-    void operator ()( void )
+    void operator ()( void ) const
     {
         wait();
     }
