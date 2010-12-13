@@ -179,16 +179,16 @@ void make_input( const device_ptr& device, block_ptr& block, const box_tree::box
     }
 
     block->input( "view", x, y );
-    block->input( "scale", block::f32_2, attribute );
-    block->input( "translate", block::f32_2, attribute );
-    block->input( "depth", block::f32_1, attribute );
+    block->input( "scale", block::f32_2, true, attribute );
+    block->input( "translate", block::f32_2, true, attribute );
+    block->input( "depth", block::f32_1, true, attribute );
 }
 
 //--- make_block -----------------------------------------------------------------------------------
 block_ptr make_block( const program_ptr& program, const buffer_ptr& index, const buffer_ptr& point )
 {
     block_ptr block = program->block( index );
-    block->input( "vertex", block::f32_2, point );
+    block->input( "vertex", block::f32_2, false, point );
     block->input( "projection", orthographic( 0, width, height, 0, -64, 64 ) );
     return block;
 }

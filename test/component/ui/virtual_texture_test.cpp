@@ -61,7 +61,7 @@ template<>
     text[ 2 ].blue = 255;
 
     block_ptr block = program->block( make_index( device ) );
-    block->input( "vertex", block::f32_2, make_point( device ) );
+    block->input( "vertex", block::f32_2, false, make_point( device ) );
     block->input( "projection", orthographic( 0, width, height, 0 ) );
     device->set( device::blend, true );
 

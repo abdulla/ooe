@@ -131,7 +131,7 @@ template<>
     program_ptr program = device->program( vector );
 
     block_ptr block = program->block( make_index( device ) );
-    block->input( "vertex", block::f32_2, make_point( device ) );
+    block->input( "vertex", block::f32_2, false, make_point( device ) );
     block->input( "sampler", texture_array );
     block->input( "projection", orthographic( 0, width / height, 1, 0 ) );
 

@@ -216,11 +216,11 @@ u32 text_layout::input( block_ptr& block, const text_vector& text, f32 width, s8
     for ( text_iterator i = next.i, i_end = text.end(); i != i_end; i = next.i )
         next = add_text( source, texture, limit, state, next, line, word, i_end );
 
-    block->input( "vertex_scale", block::f32_2, point );
-    block->input( "vertex_translate", block::f32_2, point );
-    block->input( "coord_scale", block::f32_2, point );
-    block->input( "coord_translate", block::f32_2, point );
-    block->input( "colour", block::u8_4, point );
+    block->input( "vertex_scale", block::f32_2, true, point );
+    block->input( "vertex_translate", block::f32_2, true, point );
+    block->input( "coord_scale", block::f32_2, true, point );
+    block->input( "coord_translate", block::f32_2, true, point );
+    block->input( "colour", block::u8_4, true, point );
     texture.input( block, "texture" );
     return glyphs;
 }
