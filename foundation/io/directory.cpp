@@ -99,7 +99,7 @@ std::string canonical_path( const std::string& path )
 
     if ( !realpath( path.c_str(), buffer ) )
         throw error::io( "canonical_path: " ) <<
-            "Unable to canonicalize \"" << path << "\": " << error::number( errno );
+            "Unable to canonicalise \"" << path << "\": " << error::number( errno );
 
     return buffer;
 }
