@@ -160,6 +160,7 @@ void set_attributes( buffer_iterator begin, buffer_iterator end )
             VertexAttribPointer( i->second._0 + j, size, type, false, stride, offset );
             offset += block_stride( i->second._1 );
 
+            // only set this to false once the divisor has been set for all locations
             if ( !i->second._2 )
                 continue;
 
@@ -288,7 +289,6 @@ catch ( ... )
 
 device::~device( void )
 {
-    context_current( view, 0 );
     context_destruct( view, context );
 }
 

@@ -139,7 +139,7 @@ struct block
 
     virtual void input( const std::string&, const texture_ptr& ) = 0;
     virtual void input( const std::string&, const texture_array_ptr& ) = 0;
-    virtual void input( const std::string&, type, const buffer_ptr& ) = 0;
+    virtual void input( const std::string&, type, bool, const buffer_ptr& ) = 0;
 
     void input( const std::string& name, s32 a )
     {

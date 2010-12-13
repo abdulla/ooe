@@ -51,7 +51,7 @@ public:
 
     virtual void input( const std::string&, const texture_ptr& );
     virtual void input( const std::string&, const texture_array_ptr& );
-    virtual void input( const std::string&, type, const buffer_ptr& );
+    virtual void input( const std::string&, type, bool, const buffer_ptr& );
 
 private:
     typedef std::map< s32, buffer_map::iterator > iterator_map;

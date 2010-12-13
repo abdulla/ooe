@@ -192,14 +192,15 @@ void block::input( const std::string& name, const texture_array_ptr& texture_arr
     texture_arrays[ location ] = texture_array;
 }
 
-void block::input( const std::string& name, block::type format, const buffer_ptr& buffer )
+void block::
+    input( const std::string& name, block::type format, bool instanced, const buffer_ptr& buffer )
 {
     if ( dynamic_cast< opengl::buffer& >( *buffer ).target != ARRAY_BUFFER )
         throw error::runtime( "opengl::block: " ) << "Point buffer expected";
 
     s32 location = find( program, locations, name, GetAttribLocation );
-    buffer_map::iterator i =
-        buffers.insert( std::make_pair( buffer, buffer_tuple( location, format, true, true ) ) );
+    buffer_map::iterator i = buffers.
+        insert( std::make_pair( buffer, buffer_tuple( location, format, instanced, true ) ) );
     iterator_map::iterator j = iterators.find( location );
 
     if ( j == iterators.end() )

@@ -97,7 +97,6 @@ void load_symbols( void )
     DeleteVertexArrays = find< DeleteVertexArrays_t >( "glDeleteVertexArrays" OOE_APPLE_SYMBOL );
     BindVertexArray = find< BindVertexArray_t >( "glBindVertexArray" OOE_APPLE_SYMBOL );
     EnableVertexAttribArray = find< EnableVertexAttribArray_t >( "glEnableVertexAttribArray" );
-    DisableVertexAttribArray = find< DisableVertexAttribArray_t >( "glDisableVertexAttribArray" );
     VertexAttribPointer = find< VertexAttribPointer_t >( "glVertexAttribPointer" );
     VertexAttribDivisor = find< VertexAttribDivisor_t >( "glVertexAttribDivisorARB" );
 
@@ -185,7 +184,6 @@ GenVertexArrays_t* GenVertexArrays;
 DeleteVertexArrays_t* DeleteVertexArrays;
 BindVertexArray_t* BindVertexArray;
 EnableVertexAttribArray_t* EnableVertexAttribArray;
-DisableVertexAttribArray_t* DisableVertexAttribArray;
 VertexAttribPointer_t* VertexAttribPointer;
 VertexAttribDivisor_t* VertexAttribDivisor;
 

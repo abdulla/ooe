@@ -226,7 +226,6 @@ typedef void ( GenVertexArrays_t )( s32, u32* );
 typedef void ( DeleteVertexArrays_t )( s32, const u32* );
 typedef void ( BindVertexArray_t )( u32 );
 typedef void ( EnableVertexAttribArray_t )( u32 );
-typedef void ( DisableVertexAttribArray_t )( u32 );
 typedef void ( VertexAttribPointer_t )( u32, s32, u32, u8, s32, const void* );
 typedef void ( VertexAttribDivisor_t )( u32, u32 );
 
@@ -313,7 +312,6 @@ extern GenVertexArrays_t* GenVertexArrays;
 extern DeleteVertexArrays_t* DeleteVertexArrays;
 extern BindVertexArray_t* BindVertexArray;
 extern EnableVertexAttribArray_t* EnableVertexAttribArray;
-extern DisableVertexAttribArray_t* DisableVertexAttribArray;
 extern VertexAttribPointer_t* VertexAttribPointer;
 extern VertexAttribDivisor_t* VertexAttribDivisor;
 
