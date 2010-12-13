@@ -33,13 +33,13 @@ void context_destruct( const ooe::view_data& view, platform::context_type glx )
 
 void context_current( const ooe::view_data& view, platform::context_type glx )
 {
-    if ( !glXMakeCurrent( view.queue.display, !glx ? 0 : view.window, glx ) )
+    if ( !glXMakeCurrent( view.queue.display, view.window, glx ) )
         throw error::runtime( "opengl: " ) << "Unable to set current context";
 }
 
-void context_sync( const ooe::view_data&, platform::context_type, bool vsync )
+void context_sync( const ooe::view_data& view, platform::context_type, bool vsync )
 {
-    if ( glXSwapIntervalSGI( vsync ) )
+    if ( glXSwapIntervalEXT( view.queue.display, view.window, vsync ) )
         throw error::runtime( "opengl: " ) << "Unable to set vertical sync";
 }
 
