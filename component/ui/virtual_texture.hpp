@@ -7,7 +7,9 @@
 #include <list>
 #include <map>
 
-#include "foundation/parallel/queue.hpp"
+#include <tbb/concurrent_queue.h>
+
+#include "foundation/utility/atom.hpp"
 #include "foundation/utility/tuple.hpp"
 #include "foundation/visual/graphics.hpp"
 
@@ -62,7 +64,7 @@ public:
 private:
     typedef std::map< key_type, cache_list::iterator > cache_map;
     typedef tuple< key_type, bool, atom_ptr< image > > pending_type;
-    typedef ooe::queue< pending_type > pending_queue;
+    typedef tbb::concurrent_queue< pending_type > pending_queue;
 
     thread_pool& pool;
 

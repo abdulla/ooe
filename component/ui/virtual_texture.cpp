@@ -179,7 +179,7 @@ void page_cache::read( virtual_texture& texture, pyramid_index index, bool locke
 {
     atom_ptr< ooe::image > image;
     OOE_PRINT( "page_cache", image = new ooe::image( texture.source.read( index ) ) );
-    queue.enqueue( pending_type( key_type( &texture, index ), locked, image ) );
+    queue.push( pending_type( key_type( &texture, index ), locked, image ) );
 }
 
 void page_cache::load( virtual_texture& texture, const pyramid_index& index, bool locked )
@@ -211,7 +211,7 @@ void page_cache::write( void )
     dirty_type dirty;
     pending_type value;
 
-    for ( ; queue.dequeue( value ); --loads )
+    for ( ; queue.try_pop( value ); --loads )
     {
         // if read failed, remove from map
         if ( !value._2 )
