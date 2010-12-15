@@ -20,7 +20,7 @@ void enqueue( queue< s32 >& queue, s32 value )
 
 s32 dequeue( queue< s32 >& queue )
 {
-    s32 value;
+    s32 value = 0;
     OOE_CHECK( "queue.dequeue( value )", queue.dequeue( value ) );
     return value;
 }
@@ -67,7 +67,7 @@ template<>
     for ( s32 i = 0; i != 10000; ++i )
         queue.enqueue( i );
 
-    for ( s32 i = 0, value; i != 10000; ++i )
+    for ( s32 i = 0, value = 0; i != 10000; ++i )
     {
         OOE_CHECK( "queue.dequeue( value )", queue.dequeue( value ) );
         OOE_CHECK( value << " == " << i, value == i );
