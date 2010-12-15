@@ -2,8 +2,9 @@
 
 #include <iostream>
 
+#include <tbb/concurrent_queue.h>
+
 #include "foundation/executable/environment.hpp"
-#include "foundation/parallel/queue.hpp"
 #include "foundation/parallel/semaphore.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/parallel/thread_pool.hpp"
@@ -29,7 +30,7 @@ public:
 
     void enqueue( const task_ptr& task )
     {
-        queue.enqueue( task );
+        queue.push( task );
 
         if ( !loads++ )
             semaphore.up();
@@ -37,7 +38,7 @@ public:
 
     bool dequeue( task_ptr& task )
     {
-        if ( !loads || !queue.dequeue( task ) )
+        if ( !loads || !queue.try_pop( task ) )
             return false;
 
         --loads;
@@ -49,7 +50,7 @@ private:
     atom< up_t > loads;
 
     ooe::semaphore semaphore;
-    ooe::queue< task_ptr > queue;
+    tbb::concurrent_queue< task_ptr > queue;
     ooe::thread thread;
 
     void* main( void* pointer )
