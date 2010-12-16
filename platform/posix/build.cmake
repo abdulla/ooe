@@ -1,6 +1,6 @@
 ### flags ##########################################################################################
-set( CMAKE_MODULE_LINKER_FLAGS "--allow-shlib-undefined --as-needed" )
-set( CMAKE_SHARED_LINKER_FLAGS "--allow-shlib-undefined --as-needed" )
+set( CMAKE_MODULE_LINKER_FLAGS "-Wl,--allow-shlib-undefined -Wl,--as-needed" )
+set( CMAKE_SHARED_LINKER_FLAGS "-Wl,--allow-shlib-undefined -Wl,--as-needed" )
 
 ### packages #######################################################################################
 find_library( DL_LIBRARY dl )
