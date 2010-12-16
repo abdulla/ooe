@@ -5,7 +5,6 @@
 #include <tbb/concurrent_queue.h>
 
 #include "foundation/executable/environment.hpp"
-#include "foundation/parallel/semaphore.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/parallel/thread_pool.hpp"
 

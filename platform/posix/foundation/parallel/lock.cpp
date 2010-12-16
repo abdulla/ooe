@@ -2,7 +2,7 @@
 
 #include <cerrno>
 
-#include "foundation/parallel/semaphore.hpp"
+#include "foundation/parallel/lock.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )

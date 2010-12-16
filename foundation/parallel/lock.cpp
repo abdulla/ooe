@@ -172,4 +172,16 @@ write_lock::~write_lock( void )
         OOE_CONSOLE( "write_lock: " << "Unable to unlock write: " << error::number( status ) );
 }
 
+//--- semaphore_lock -------------------------------------------------------------------------------
+semaphore_lock::semaphore_lock( ooe::semaphore& semaphore_ )
+    : semaphore( semaphore_ )
+{
+    semaphore.down();
+}
+
+semaphore_lock::~semaphore_lock( void )
+{
+    semaphore.up();
+}
+
 OOE_NAMESPACE_END( ( ooe ) )

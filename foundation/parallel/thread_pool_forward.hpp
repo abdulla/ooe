@@ -5,7 +5,7 @@
     #ifndef OOE_FOUNDATION_PARALLEL_THREAD_POOL_FORWARD_HPP
     #define OOE_FOUNDATION_PARALLEL_THREAD_POOL_FORWARD_HPP
 
-#include "foundation/parallel/semaphore.hpp"
+#include "foundation/parallel/lock.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/partial.hpp"
 
