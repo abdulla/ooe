@@ -51,14 +51,12 @@ template<>
 
     text_vector text( 3 );
     text[ 0 ].data = "test";
-    text[ 0 ].red = 255;
+    text[ 0 ].colour = colour( 255, 0, 0, 255 );
     text[ 1 ].data = "test";
     text[ 1 ].level = 6;
-    text[ 1 ].green = 255;
+    text[ 1 ].colour = colour( 0, 255, 0, 255 );
     text[ 2 ].level = 5;
-    text[ 2 ].red = 255;
-    text[ 2 ].green = 255;
-    text[ 2 ].blue = 255;
+    text[ 2 ].colour = colour( 255, 255, 255, 255 );
 
     block_ptr block = program->block( make_index( device ) );
     block->input( "vertex", block::f32_2, false, make_point( device ) );

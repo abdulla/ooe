@@ -4,6 +4,7 @@
 #define OOE_COMPONENT_UI_TEXT_LAYOUT_HPP
 
 #include "component/ui/font_source.hpp"
+#include "component/ui/miscellany.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -11,14 +12,11 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 struct text
 {
     std::string data;
+    ooe::colour colour;
 
     u16 x;
     u16 y;
     u8 level;
-
-    u8 red;
-    u8 green;
-    u8 blue;
 
     text( void );
 };
