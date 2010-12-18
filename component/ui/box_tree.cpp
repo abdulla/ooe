@@ -53,18 +53,18 @@ box_tree* find_root( box_tree* root, box_unit& x, box_unit& y )
     return root;
 }
 
-bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux_vector& auxes,
+void find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux_vector& auxes,
     u16 width, u16 height, box_unit x, box_unit y, u16 z, u8 level, u8 level_limit )
 {
     if ( level == level_limit )
-        return false;
+        return;
 
     box view( width >> z, height >> z, x.integer, y.integer );
     box box = tree.box();
     geometry::intersection result = includes( view, box );
 
     if ( result == geometry::outside )
-        return false;
+        return;
 
     u32 w = box.width;
     u32 h = box.height;
@@ -81,10 +81,7 @@ bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux
         y.fraction += box.y * exp2f( z );
 
         for ( box_tree::const_iterator j = tree.begin(), end = tree.end(); j != end; ++j )
-        {
-            if ( find_view( *j, boxes, auxes, width, height, x, y, z - 1, level, level_limit ) )
-                return true;
-        }
+            find_view( *j, boxes, auxes, width, height, x, y, z - 1, level, level_limit );
     }
     else
     {
@@ -92,7 +89,7 @@ bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux
         h >>= level;
 
         if ( !w || !h )
-            return false;
+            return;
 
         x.fraction += box.x / exp2f( level );
         y.fraction += box.y / exp2f( level );
@@ -100,10 +97,7 @@ bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux
         height = saturated_shift( width );
 
         for ( box_tree::const_iterator j = tree.begin(), end = tree.end(); j != end; ++j )
-        {
-            if ( find_view( *j, boxes, auxes, width, height, x, y, 0, level + 1, level_limit ) )
-                return true;
-        }
+            find_view( *j, boxes, auxes, width, height, x, y, 0, level + 1, level_limit );
     }
 
     if ( result == geometry::inside )
@@ -119,7 +113,6 @@ bool find_view( const box_tree& tree, box_tree::box_vector& boxes, box_tree::aux
     }
 
     boxes.push_back( make_tuple( w, h, x.fraction, y.fraction, -z + level ) );
-    return includes( box, view ) == geometry::inside;
 }
 
 OOE_ANONYMOUS_END( ( ooe ) )
