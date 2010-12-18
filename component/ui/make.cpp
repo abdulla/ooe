@@ -21,20 +21,21 @@ box make_box( const property_tree& pt )
 }
 
 //--- make_aux -------------------------------------------------------------------------------------
-void* make_aux( const property_tree& pt, const node_map& map )
+colour_node* make_aux( const property_tree& pt, const node_map& map )
 {
+    colour colour = make_colour( pt, 0 );
     boost::optional< std::string > node = pt.get_optional< std::string >( "node" );
     boost::optional< const property_tree& > data = pt.get_child_optional( "data" );
 
     if ( !node || !data )
-        return 0;
+        return new colour_node( colour, 0 );
 
     node_map::const_iterator i = map.find( *node );
 
     if ( i == map.end() )
         throw error::runtime( "make_tree: " ) << "Unknown node \"" << *node << '\"';
 
-    return i->second( *data );
+    return new colour_node( colour, i->second( *data ) );
 }
 
 //--- load_tree ------------------------------------------------------------------------------------
@@ -164,6 +165,24 @@ buffer_ptr make_point( const device_ptr& device )
         value[ 7 ] = 0;
     }
     return point;
+}
+
+//--- make_colour ----------------------------------------------------------------------------------
+colour make_colour( const property_tree& pt, u8 alpha )
+{
+    boost::optional< const property_tree& > child = pt.get_child_optional( "colour" );
+    u8 rgba[] = { 0, 0, 0, alpha };
+
+    if ( child )
+    {
+        property_tree::const_iterator j = child->begin();
+        property_tree::const_iterator end = child->end();
+
+        for ( up_t i = 0; i != sizeof( rgba ) && j != end; ++i, ++j )
+            rgba[ i ] = j->second.get_value< u8 >();
+    }
+
+    return colour( rgba[ 0 ], rgba[ 1 ], rgba[ 2 ], rgba[ 3 ] );
 }
 
 //--- make_tree ------------------------------------------------------------------------------------

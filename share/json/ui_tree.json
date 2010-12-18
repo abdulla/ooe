@@ -3,13 +3,14 @@
     "height": 800,
     "x": 0,
     "y": 0,
+    "colour": [ 255, 255, 255, 255 ],
     "node": "text",
     "data": [
         {
             "text": "Wörkspäcë Mäp",
             "x": 16,
             "y": 16,
-            "red": 191
+            "colour": [ 191 ]
         }
     ],
     "children": [
@@ -18,6 +19,7 @@
             "height": 500,
             "x": 100,
             "y": 150,
+            "colour": [ 0, 0, 0, 127 ],
             "children": [
                 {
                     "width": 1600,
@@ -40,7 +42,7 @@
                             "text": "Blue Marble ",
                             "x": 32,
                             "y": 16,
-                            "blue": 191
+                            "colour": [ 0, 0, 191 ]
                         },
                         {
                                 "text": "In celebration of the deployment of its Earth Observing System, NASA is pleased to share the newest in its series of stunning Earth images, affectionately named the 'Blue Marble.' This new Earth imagery enhances the Blue Marble legacy by providing a detailed look at an entire year in the life of our planet. In sharing these Blue Marble images, NASA hopes the public will join with the agency in its continuing exploration of our world from the unique perspective of space.",
@@ -56,6 +58,7 @@
             "height": 800,
             "x": 100,
             "y": 700,
+            "colour": [ 0, 0, 0, 127 ],
             "node": "text",
             "data": [
                 {
@@ -63,7 +66,7 @@
                     "x": 16,
                     "y": 16,
                     "level": 6,
-                    "red": 191
+                    "colour": [ 255, 255, 255 ]
                 }
             ],
             "children": [
@@ -171,7 +174,7 @@
                     "x": 16,
                     "y": 16,
                     "level": 6,
-                    "red": 191
+                    "colour": [ 191 ]
                 }
             ],
             "children": [
@@ -279,6 +282,7 @@
                     "height": 1400,
                     "x": 1450,
                     "y": 200,
+                    "colour": [ 255, 255, 255, 255 ],
                     "node": "text",
                     "data": [
                         {

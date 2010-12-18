@@ -22,7 +22,6 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-typedef std::vector< shared_ptr< node > > node_vector;
 typedef tuple< f32, f32 > pin_type;
 
 const f32 width = 1024;
@@ -169,19 +168,48 @@ box_unit make_unit( f32 value )
 }
 
 //--- make_input -----------------------------------------------------------------------------------
-void make_input( const device_ptr& device, block_ptr& block, const box_tree::box_vector& boxes,
-    f32 x, f32 y )
+u32 make_input( const device_ptr& device, block_ptr& block, const box_tree::box_vector& box,
+    const box_tree::aux_vector& aux, f32 x, f32 y )
 {
-    buffer_ptr attribute = device->buffer( sizeof( f32 ) * 5 * boxes.size(), buffer::point );
+    u32 box_size = 0;
+
+    for ( box_tree::aux_vector::const_iterator j = aux.begin(), end = aux.end(); j != end; ++j )
     {
-        map_ptr map = attribute->map( buffer::write );
-        std::memcpy( map->data, &boxes[ 0 ], map->size );
+        if ( static_cast< colour_node* >( j->_4 )->colour.alpha )
+            ++box_size;
+    }
+
+    if ( !box_size )
+        return 0;
+
+    u8 point_size = 5 * sizeof( f32 ) + 4 * sizeof( u8 );
+    buffer_ptr point = device->buffer( point_size * box_size, buffer::point );
+    {
+        map_ptr map = point->map( buffer::write );
+        void* data = map->data;
+
+        for ( up_t i = box.size(), j = 0; i-- && j != box_size; )
+        {
+            ooe::colour& colour = static_cast< colour_node* >( aux[ i ]._4 )->colour;
+
+            if ( !colour.alpha )
+                continue;
+
+            std::memcpy( data, &box[ i ], 5 * sizeof( f32 ) );
+            data = add< void >( data, 5 * sizeof( f32 ) );
+            std::memcpy( data, &colour, 4 * sizeof( u8 ) );
+            data = add< void >( data, 4 * sizeof( u8 ) );
+
+            ++j;
+        }
     }
 
     block->input( "view", x, y );
-    block->input( "scale", block::f32_2, true, attribute );
-    block->input( "translate", block::f32_2, true, attribute );
-    block->input( "depth", block::f32_1, true, attribute );
+    block->input( "scale", block::f32_2, true, point );
+    block->input( "translate", block::f32_2, true, point );
+    block->input( "depth", block::f32_1, true, point );
+    block->input( "colour", block::u8_4, true, point );
+    return box_size;
 }
 
 //--- make_block -----------------------------------------------------------------------------------
@@ -193,30 +221,12 @@ block_ptr make_block( const program_ptr& program, const buffer_ptr& index, const
     return block;
 }
 
-//--- make_shadow ----------------------------------------------------------------------------------
-box_tree::box_vector make_shadow( const box_tree::box_vector& boxes )
-{
-    box_tree::box_vector shadows;
-
-    for ( box_tree::box_vector::const_reverse_iterator i = boxes.rbegin(), end = boxes.rend();
-        i != end; ++i )
-    {
-        f32 w = i->_0 + 12;
-        f32 h = i->_1 + 16;
-        f32 x = i->_2 - 6;
-        f32 y = i->_3 - 6;
-        shadows.push_back( make_tuple( w, h, x, y, i->_4 - .5 ) );
-    }
-
-    return shadows;
-}
-
 //--- text_node ------------------------------------------------------------------------------------
 class text_node
     : public node
 {
 public:
-    text_node( const block_ptr& in, text_layout& layout_, const property_tree& tree )
+    text_node( const property_tree& tree, const block_ptr& in, text_layout& layout_ )
         : tuple( in, 0 ), layout( layout_ ), text( tree.size() ), level( -128 )
     {
         up_t j = 0;
@@ -227,9 +237,7 @@ public:
             text[ j ].x = i->second.get( "x", 0 );
             text[ j ].y = i->second.get( "y", 0 );
             text[ j ].level = i->second.get( "level", 5 );
-            text[ j ].red = i->second.get( "red", 0 );
-            text[ j ].green = i->second.get( "green", 0 );
-            text[ j ].blue = i->second.get( "blue", 0 );
+            text[ j ].colour = make_colour( i->second, 255 );
         }
     }
 
@@ -237,7 +245,7 @@ public:
     {
     }
 
-    virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& )
+    virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& aux )
     {
         tuple._0->input( "translate", box._2, box._3 );
         s8 box_level = -box._4;
@@ -246,7 +254,9 @@ public:
             return tuple;
 
         level = box_level;
+        colour& colour = static_cast< colour_node* >( aux._4 )->colour;
         tuple._0->input( "depth", box._4 );
+        tuple._0->input( "background", colour.red, colour.green, colour.blue, colour.alpha );
         tuple._1 = layout.input( tuple._0, text, box._0, level );
         return tuple;
     }
@@ -267,15 +277,14 @@ public:
         : program( make_program( device, root + "../share/glsl",
         root + "../share/json/text.effect" ) ), index( index_ ), point( point_ ), library(),
         face( library, root + "../share/font/ubuntu-regular.ttf" ),
-        source( face, 512, root + "../cache" ), layout( device, cache, source ), vector()
+        source( face, 512, root + "../cache" ), layout( device, cache, source )
     {
     }
 
     node* operator ()( const property_tree& tree )
     {
         block_ptr block = make_block( program, index, point );
-        vector.push_back( new text_node( block, layout, tree ) );
-        return vector.back();
+        return new text_node( tree, block, layout );
     }
 
 private:
@@ -286,7 +295,6 @@ private:
     font::face face;
     font_source source;
     text_layout layout;
-    node_vector vector;
 };
 
 //--- tile_node ------------------------------------------------------------------------------------
@@ -294,8 +302,8 @@ class tile_node
     : public node
 {
 public:
-    tile_node( const block_ptr& data_, const device_ptr& device, page_cache& cache,
-        tile_source& tile_ )
+    tile_node( const block_ptr& data_, const device_ptr& device,
+        page_cache& cache, tile_source& tile_ )
         : data( data_ ), tile( tile_ ), convert( tile, cache.format() ),
         texture( device, cache, convert )
     {
@@ -351,8 +359,7 @@ public:
     make_tile( const device_ptr& device_, const std::string& root_, const buffer_ptr& index_,
         const buffer_ptr& point_, page_cache& cache_ )
         : device( device_ ), root( root_ ), program( make_program( device, root + "../share/glsl",
-        root + "../share/json/tile.effect" ) ), index( index_ ), point( point_ ), cache( cache_ ),
-        vector()
+        root + "../share/json/tile.effect" ) ), index( index_ ), point( point_ ), cache( cache_ )
     {
     }
 
@@ -360,8 +367,7 @@ public:
     {
         block_ptr block = make_block( program, index, point );
         tile_source source( root + "../" + tree.get< std::string >( "tile" ) );
-        vector.push_back( new tile_node( block, device, cache, source ) );
-        return vector.back();
+        return new tile_node( block, device, cache, source );
     }
 
 private:
@@ -371,7 +377,6 @@ private:
     const buffer_ptr& index;
     const buffer_ptr& point;
     page_cache& cache;
-    node_vector vector;
 };
 
 //--- draw_aux -------------------------------------------------------------------------------------
@@ -380,16 +385,12 @@ void draw_aux( device_ptr& device, const frame_ptr& frame, const box_tree::box_v
 {
     for ( up_t i = 0, end = box.size(); i != end; ++i )
     {
-        ooe::node* node = static_cast< ooe::node* >( aux[ i ]._4 );
+        ooe::node* node = static_cast< colour_node* >( aux[ i ]._4 )->node;
 
         if ( !node )
             continue;
 
         node::block_tuple bt = node->block( box[ i ], aux[ i ] );
-
-        if ( !bt._1 )
-            continue;
-
         bt._0->input( "view", x, y );
         device->draw( bt._0, frame, bt._1 );
     }
@@ -419,13 +420,11 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
     // box rendering
     box_tree tree = make_tree( root + "../share/json/ui_tree.json", map );
-    program_ptr program_box =
+    program_ptr program =
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
 
-    block_ptr block_boxes = make_block( program_box, index, point );
-    block_boxes->input( "shadow", false );
-    block_ptr block_shadows = make_block( program_box, index, point );
-    block_shadows->input( "shadow", true );
+    block_ptr block = make_block( program, index, point );
+    device->set( device::blend, true );
     device->set( device::depth_test, true );
     vec3 move( 0, 0, 0 );
     pin_type pin( width / 2, height / 2 );
@@ -437,19 +436,15 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
         if ( vt._0.size() )
         {
-            box_tree::box_vector shadows = make_shadow( vt._0 );
+            frame->clear();
             f32 v_x = std::max( 0.f, -move.x * exp2f( move.z ) );
             f32 v_y = std::max( 0.f, -move.y * exp2f( move.z ) );
+            u32 instances = make_input( device, block, vt._0, vt._1, v_x, v_y );
 
-            make_input( device, block_boxes, vt._0, v_x, v_y );
-            make_input( device, block_shadows, shadows, v_x, v_y );
+            if ( instances )
+                device->draw( block, frame, instances );
 
-            frame->clear();
-            device->set( device::blend, false );
-            device->draw( block_boxes, frame, vt._0.size() );
-            device->set( device::blend, true );
             draw_aux( device, frame, vt._0, vt._1, v_x, v_y );
-            device->draw( block_shadows, frame, shadows.size() );
             device->swap();
         }
 

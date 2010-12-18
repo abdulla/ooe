@@ -13,7 +13,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef text_vector::const_iterator text_iterator;
 typedef std::string::const_iterator string_iterator;
-const up_t point_size = 8 * sizeof( f32 ) + 4 * sizeof( u8 );
+const u8 point_size = 8 * sizeof( f32 ) + 4 * sizeof( u8 );
 const f32 line_spacing = .5;
 const f32 word_spacing = .25;
 
@@ -94,27 +94,27 @@ bool handle_space( u32 code_point, const text& text, state& state, s8 zoom )
     }
 }
 
-void add_glyph( const font_source::glyph_type& glyph, const text& text, const state& state,
+void add_glyph( const font_source::glyph_type& glyph, const colour& colour, const state& state,
     void* data, u32 size, s8 shift, u8 level )
 {
     const font::metric& metric = glyph._0;
 
-    f32* point = add< f32 >( data, 0 );
-    point[ 0 ] = bit_shift( metric.width, shift );
-    point[ 1 ] = bit_shift( metric.height, shift );
-    point[ 2 ] = std::floor( state.x + bit_shift( metric.left, shift ) );
-    point[ 3 ] = std::ceil( state.y + state.font_size - bit_shift( metric.top, shift ) );
+    f32* coords = add< f32 >( data, 0 );
+    coords[ 0 ] = bit_shift( metric.width, shift );
+    coords[ 1 ] = bit_shift( metric.height, shift );
+    coords[ 2 ] = std::floor( state.x + bit_shift( metric.left, shift ) );
+    coords[ 3 ] = std::ceil( state.y + state.font_size - bit_shift( metric.top, shift ) );
 
-    point[ 4 ] = divide( metric.width << level, size );
-    point[ 5 ] = divide( metric.height << level, size );
-    point[ 6 ] = divide( glyph._1, size );
-    point[ 7 ] = divide( glyph._2, size );
+    coords[ 4 ] = divide( metric.width << level, size );
+    coords[ 5 ] = divide( metric.height << level, size );
+    coords[ 6 ] = divide( glyph._1, size );
+    coords[ 7 ] = divide( glyph._2, size );
 
-    u8* colour = add< u8 >( data, 8 * sizeof( f32 ) );
-    colour[ 0 ] = text.red;
-    colour[ 1 ] = text.green;
-    colour[ 2 ] = text.blue;
-    colour[ 3 ] = 255;
+    u8* rgba = add< u8 >( data, 8 * sizeof( f32 ) );
+    rgba[ 0 ] = colour.red;
+    rgba[ 1 ] = colour.green;
+    rgba[ 2 ] = colour.blue;
+    rgba[ 3 ] = colour.alpha;
 }
 
 marker add_text( const font_source& source, virtual_texture& texture, const limit& limit,
@@ -169,7 +169,7 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
         }
 
         texture.load( glyph._0.width, glyph._0.height, glyph._1, glyph._2, level );
-        add_glyph( glyph, text, state, data, limit.size, shift, level );
+        add_glyph( glyph, text.colour, state, data, limit.size, shift, level );
 
         data = add< void >( data, point_size );
         state.x += advance;
@@ -187,7 +187,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- text -----------------------------------------------------------------------------------------
 text::text( void )
-    : data(), x( 0 ), y( 0 ), level( 4 ), red( 0 ), green( 0 ), blue( 0 )
+    : data(), colour( 255, 255, 255, 255 ), x( 0 ), y( 0 ), level( 4 )
 {
 }
 
@@ -220,7 +220,7 @@ u32 text_layout::input( block_ptr& block, const text_vector& text, f32 width, s8
     block->input( "vertex_translate", block::f32_2, true, point );
     block->input( "coord_scale", block::f32_2, true, point );
     block->input( "coord_translate", block::f32_2, true, point );
-    block->input( "colour", block::u8_4, true, point );
+    block->input( "foreground", block::u8_4, true, point );
     texture.input( block, "texture" );
     return glyphs;
 }
