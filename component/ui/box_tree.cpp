@@ -141,7 +141,7 @@ box::box( u16 width_, u16 height_, u16 x_, u16 y_ )
 }
 
 //--- box_tree -------------------------------------------------------------------------------------
-box_tree::box_tree( const ooe::box& bound_, void* pointer_ )
+box_tree::box_tree( const ooe::box& bound_, const opaque_ptr& pointer_ )
     : bound( bound_ ), pointer( pointer_ ), children()
 {
 }
@@ -176,7 +176,7 @@ box_tree::const_iterator box_tree::end( void ) const
     return children.end();
 }
 
-box_tree::iterator box_tree::insert( const ooe::box& bound_, void* pointer_ )
+box_tree::iterator box_tree::insert( const ooe::box& bound_, const opaque_ptr& pointer_ )
 {
     iterator back = end();
 

@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "foundation/utility/pointer.hpp"
 #include "foundation/utility/tuple.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -43,7 +44,7 @@ public:
     typedef tuple< box_tree&, u16, u16 > find_tuple;
     typedef tuple< box_vector, aux_vector > view_tuple;
 
-    box_tree( const ooe::box&, void* );
+    box_tree( const ooe::box&, const opaque_ptr& );
     ooe::box box( void ) const;
     void* get( void ) const;
 
@@ -52,13 +53,13 @@ public:
     const_iterator begin( void ) const;
     const_iterator end( void ) const;
 
-    iterator insert( const ooe::box&, void* );
+    iterator insert( const ooe::box&, const opaque_ptr& );
     find_tuple find( box_unit, box_unit );
     view_tuple view( u16, u16, box_unit, box_unit, u16 ) const;
 
 private:
     ooe::box bound;
-    void* pointer;
+    opaque_ptr pointer;
     tree_vector children;
 };
 
