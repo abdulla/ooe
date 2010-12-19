@@ -19,8 +19,8 @@ public:
     typedef shared_array< u8 > uniform_array;
     typedef tuple< uniform_function, u32, uniform_array > uniform_tuple;
     typedef std::map< s32, uniform_tuple > uniform_map;
-    typedef std::map< s32, texture_ptr > texture_map;
-    typedef std::map< s32, texture_array_ptr > texture_array_map;
+    typedef tuple< texture_ptr, texture_array_ptr > texture_tuple;
+    typedef std::map< s32, texture_tuple > texture_map;
     typedef tuple< s32, type, bool /* divisor */, bool /* pointer */ > buffer_tuple;
     typedef std::multimap< buffer_ptr, buffer_tuple > buffer_map;
     typedef std::map< std::string, s32 > location_map;
@@ -32,7 +32,6 @@ public:
 
     uniform_map uniforms;
     texture_map textures;
-    texture_array_map texture_arrays;
     buffer_map buffers;
 
     block( u32, const buffer_ptr& );

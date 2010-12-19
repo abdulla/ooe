@@ -307,7 +307,7 @@ void device::draw( const block_ptr& generic_block, const frame_ptr& frame, u32 i
     opengl::block& block = dynamic_cast< opengl::block& >( *generic_block );
     UseProgram( block.program );
     s32 j = 0;
-    s32 size = block.textures.size() + block.texture_arrays.size();
+    s32 size = block.textures.size();
 
     if ( size > texture_units_limit )
         throw error::runtime( "opengl::device: " ) <<
@@ -318,15 +318,12 @@ void device::draw( const block_ptr& generic_block, const frame_ptr& frame, u32 i
     {
         Uniform1iv( i->first, 1, &j );
         ActiveTexture( TEXTURE0 + j );
-        BindTexture( TEXTURE_2D, dynamic_cast< opengl::texture& >( *i->second ).id );
-    }
 
-    for ( block::texture_array_map::const_iterator i = block.texture_arrays.begin(),
-        end = block.texture_arrays.end(); i != end; ++i, ++j )
-    {
-        Uniform1iv( i->first, 1, &j );
-        ActiveTexture( TEXTURE0 + j );
-        BindTexture( TEXTURE_2D_ARRAY, dynamic_cast< opengl::texture_array& >( *i->second ).id );
+        if ( i->second._0 )
+            BindTexture( TEXTURE_2D, dynamic_cast< opengl::texture& >( *i->second._0 ).id );
+        else
+            BindTexture
+                ( TEXTURE_2D_ARRAY, dynamic_cast< opengl::texture_array& >( *i->second._1 ).id );
     }
 
     for ( block::uniform_map::const_iterator i = block.uniforms.begin(),
