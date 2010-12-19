@@ -207,7 +207,7 @@ void enable_frame( const frame_ptr& generic_frame, u32 program, s32 draw_buffers
     }
 
     opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
-    s32 size = frame.colours.size();
+    s32 size = frame.attachments.size();
 
     if ( frame.program != program )
         throw error::runtime( "opengl::device: " ) <<
@@ -217,7 +217,14 @@ void enable_frame( const frame_ptr& generic_frame, u32 program, s32 draw_buffers
             "Frame has " << size << " colour attachments, device supports " << draw_buffers_limit;
 
     frame.check();
-    DrawBuffers( size, &frame.colours[ 0 ] );
+    std::vector< u32 > colours;
+    colours.reserve( size );
+
+    for ( opengl::frame::attachment_map::const_iterator i = frame.attachments.begin(),
+        end = frame.attachments.end(); i != end; ++i )
+        colours.push_back( i->first );
+
+    DrawBuffers( size, &colours[ 0 ] );
 }
 
 void verify_texture( u32 width, u32 height, u32 limit )

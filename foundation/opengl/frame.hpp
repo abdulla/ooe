@@ -5,6 +5,7 @@
 
 #include <map>
 
+#include "foundation/utility/tuple.hpp"
 #include "foundation/visual/graphics.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
@@ -28,10 +29,12 @@ private:
     const u32 height;
 };
 
-struct frame
+class frame
     : public ooe::frame
 {
-    typedef std::vector< u32 > colour_vector;
+public:
+    typedef tuple< texture_ptr, target_ptr > attachment_tuple;
+    typedef std::map< s32, attachment_tuple > attachment_map;
     typedef std::map< std::string, s32 > location_map;
 
     const u32 id;
@@ -39,8 +42,8 @@ struct frame
     const u32 width;
     const u32 height;
     bool do_check;
-    colour_vector colours;
-    location_map locations;
+
+    attachment_map attachments;
 
     frame( u32, u32, u32 );
     virtual ~frame( void );
@@ -53,6 +56,9 @@ struct frame
     virtual void output( const std::string&, const target_ptr& );
 
     void check( void );
+
+private:
+    location_map locations;
 };
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

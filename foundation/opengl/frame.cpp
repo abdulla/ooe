@@ -10,11 +10,12 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
+typedef opengl::frame::location_map location_map;
 typedef tuple< u32, u32, u8 > format_tuple;
 
-s32 find( s32 id, opengl::frame::location_map& locations, const std::string& name )
+s32 find( s32 id, location_map& locations, const std::string& name )
 {
-    opengl::frame::location_map::const_iterator i = locations.find( name );
+    location_map::const_iterator i = locations.find( name );
 
     if ( i != locations.end() )
         return i->second;
@@ -24,7 +25,7 @@ s32 find( s32 id, opengl::frame::location_map& locations, const std::string& nam
     if ( location == -1 )
         throw error::runtime( "opengl::frame: " ) << "Variable \"" << name << "\" does not exist";
 
-    locations.insert( opengl::frame::location_map::value_type( name, location ) );
+    locations.insert( location_map::value_type( name, location ) );
     return location;
 }
 
@@ -177,8 +178,8 @@ void default_frame::output( const std::string&, const target_ptr& )
 
 //--- frame ----------------------------------------------------------------------------------------
 frame::frame( u32 program_, u32 width_, u32 height_ )
-    : id(), program( program_ ), width( width_ ), height( height_ ), do_check( true ), colours(),
-    locations()
+    : id(), program( program_ ), width( width_ ), height( height_ ), do_check( true ),
+    attachments(), locations()
 {
     GenFramebuffers( 1, const_cast< u32* >( &id ) );
 }
@@ -190,8 +191,8 @@ frame::~frame( void )
 
 void frame::read( const std::string& name, image_format::type format, buffer_ptr& generic_buffer )
 {
-    if ( !colours.size() )
-        throw error::runtime( "opengl::frame: " ) << "Frame has no colour attachment";
+    if ( !attachments.size() )
+        throw error::runtime( "opengl::frame: " ) << "Frame has no attachments";
 
     s32 location = find( program, locations, name );
     u32 attachment = COLOR_ATTACHMENT0 + location;
@@ -211,26 +212,24 @@ void frame::clear( void )
 void frame::output( const std::string& name, const texture_ptr& generic_texture )
 {
     const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
-    s32 location = find( program, locations, name );
-    u32 attachment = COLOR_ATTACHMENT0 + location;
+    u32 attachment = COLOR_ATTACHMENT0 + find( program, locations, name );
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
     FramebufferTexture2D( DRAW_FRAMEBUFFER, attachment, TEXTURE_2D, texture.id, 0 );
 
-    colours.push_back( attachment );
+    attachments[ attachment ] = attachment_tuple( generic_texture, 0 );
     do_check = true;
 }
 
 void frame::output( const std::string& name, const target_ptr& generic_target )
 {
     const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
-    s32 location = find( program, locations, name );
-    u32 attachment = COLOR_ATTACHMENT0 + location;
+    u32 attachment = COLOR_ATTACHMENT0 + find( program, locations, name );
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
     FramebufferRenderbuffer( DRAW_FRAMEBUFFER, attachment, RENDERBUFFER, target.id );
 
-    colours.push_back( attachment );
+    attachments[ attachment ] = attachment_tuple( 0, generic_target );
     do_check = true;
 }
 
