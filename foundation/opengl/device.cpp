@@ -207,19 +207,18 @@ void enable_frame( const frame_ptr& generic_frame, u32 program, s32 draw_buffers
     }
 
     opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
+    BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
     s32 size = frame.attachments.size();
 
-    if ( frame.program != program )
+    if ( frame.state == opengl::frame::built )
+        return;
+    else if ( frame.program != program )
         throw error::runtime( "opengl::device: " ) <<
             "Frame program " << frame.program << " != block program " << program;
     else if ( size > draw_buffers_limit )
         throw error::runtime( "opengl::device: " ) <<
             "Frame has " << size << " colour attachments, device supports " << draw_buffers_limit;
 
-    if ( frame.state == opengl::frame::built )
-        return;
-
-    BindFramebuffer( DRAW_FRAMEBUFFER, frame.id );
     frame_check( DRAW_FRAMEBUFFER, frame.state );
     std::vector< u32 > colours( frame.attachments.rbegin()->first + 1, 0 );
 
