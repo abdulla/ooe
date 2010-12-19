@@ -212,24 +212,26 @@ void frame::clear( void )
 void frame::output( const std::string& name, const texture_ptr& generic_texture )
 {
     const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
-    u32 attachment = COLOR_ATTACHMENT0 + find( program, locations, name );
+    s32 location = find( program, locations, name );
+    u32 attachment = COLOR_ATTACHMENT0 + location;
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
     FramebufferTexture2D( DRAW_FRAMEBUFFER, attachment, TEXTURE_2D, texture.id, 0 );
 
-    attachments[ attachment ] = attachment_tuple( generic_texture, 0 );
+    attachments[ location ] = attachment_tuple( generic_texture, 0 );
     do_check = true;
 }
 
 void frame::output( const std::string& name, const target_ptr& generic_target )
 {
     const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
-    u32 attachment = COLOR_ATTACHMENT0 + find( program, locations, name );
+    s32 location = find( program, locations, name );
+    u32 attachment = COLOR_ATTACHMENT0 + location;
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
     FramebufferRenderbuffer( DRAW_FRAMEBUFFER, attachment, RENDERBUFFER, target.id );
 
-    attachments[ attachment ] = attachment_tuple( 0, generic_target );
+    attachments[ location ] = attachment_tuple( 0, generic_target );
     do_check = true;
 }
 
