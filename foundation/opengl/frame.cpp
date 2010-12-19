@@ -122,9 +122,10 @@ void frame_clear( s32 id, state_type& state )
     Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
 }
 
-void frame_output( s32 location, const opengl::frame::attachment_tuple& tuple,
+void frame_output( s32 id, s32 location, const opengl::frame::attachment_tuple& tuple,
     attachment_map& attachments, state_type& state )
 {
+    BindFramebuffer( DRAW_FRAMEBUFFER, id );
     std::pair< attachment_map::iterator, bool > pair =
         attachments.insert( std::make_pair( location, tuple ) );
 
@@ -196,8 +197,7 @@ void frame::read( const std::string& name, image_format::type format, buffer_ptr
         throw error::runtime( "opengl::frame: " ) << "Frame has no attachments";
 
     s32 location = find( program, locations, name );
-    u32 attachment = COLOR_ATTACHMENT0 + location;
-    frame_read( generic_buffer, format, attachment, id, width, height, state );
+    frame_read( generic_buffer, format, COLOR_ATTACHMENT0 + location, id, width, height, state );
 }
 
 void frame::write( const frame_ptr& generic_frame )
@@ -212,28 +212,22 @@ void frame::clear( void )
 
 void frame::output( const std::string& name, const texture_ptr& generic_texture )
 {
-    const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
     s32 location = find( program, locations, name );
-    u32 attachment = COLOR_ATTACHMENT0 + location;
+    frame_output( id, location, attachment_tuple( generic_texture, 0 ), attachments, state );
 
-    BindFramebuffer( DRAW_FRAMEBUFFER, id );
-    FramebufferTexture2D( DRAW_FRAMEBUFFER, attachment, TEXTURE_2D, texture.id, 0 );
-
-    attachment_tuple tuple( generic_texture, 0 );
-    frame_output( location, tuple, attachments, state );
+    const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
+    FramebufferTexture2D
+        ( DRAW_FRAMEBUFFER, COLOR_ATTACHMENT0 + location, TEXTURE_2D, texture.id, 0 );
 }
 
 void frame::output( const std::string& name, const target_ptr& generic_target )
 {
-    const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
     s32 location = find( program, locations, name );
-    u32 attachment = COLOR_ATTACHMENT0 + location;
+    frame_output( id, location, attachment_tuple( 0, generic_target ), attachments, state );
 
-    BindFramebuffer( DRAW_FRAMEBUFFER, id );
-    FramebufferRenderbuffer( DRAW_FRAMEBUFFER, attachment, RENDERBUFFER, target.id );
-
-    attachment_tuple tuple( 0, generic_target );
-    frame_output( location, tuple, attachments, state );
+    const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
+    FramebufferRenderbuffer
+        ( DRAW_FRAMEBUFFER, COLOR_ATTACHMENT0 + location, RENDERBUFFER, target.id );
 }
 
 //--- frame_check ----------------------------------------------------------------------------------
