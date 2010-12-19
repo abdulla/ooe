@@ -100,7 +100,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 //--- block ----------------------------------------------------------------------------------------
 block::block( u32 program_, const buffer_ptr& index_ )
     : id(), program( program_ ), index( check( index_ ) ), rebuild( true ), uniforms(), textures(),
-    texture_arrays(), buffers(), iterators(), locations()
+    buffers(), iterators(), locations()
 {
     GenVertexArrays( 1, const_cast< u32* >( &id ) );
 }
@@ -183,13 +183,13 @@ void block::input( const std::string& name, const mat4* data, u32 size )
 void block::input( const std::string& name, const texture_ptr& texture )
 {
     s32 location = find( program, locations, name, GetUniformLocation );
-    textures[ location ] = texture;
+    textures[ location ] = texture_tuple( texture, 0 );
 }
 
 void block::input( const std::string& name, const texture_array_ptr& texture_array )
 {
     s32 location = find( program, locations, name, GetUniformLocation );
-    texture_arrays[ location ] = texture_array;
+    textures[ location ] = texture_tuple( 0, texture_array );
 }
 
 void block::
