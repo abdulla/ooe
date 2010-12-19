@@ -4,26 +4,14 @@
 #include <vector>
 
 #include <cerrno>
-#include <csignal>
 #include <cstdarg>
 #include <cstdlib>
 
 #include <sys/wait.h>
 
 #include "foundation/executable/fork_io.hpp"
+#include "foundation/executable/program.hpp"
 #include "foundation/utility/error.hpp"
-
-OOE_ANONYMOUS_BEGIN( ( ooe ) )
-
-void replace( s32 index, s32 fd )
-{
-    if ( dup2( fd, index ) == -1 )
-        throw error::runtime( "fork_io: " ) << "Unable to replace fd " << index << " with " << fd;
-    else if ( close( fd ) )
-        throw error::runtime( "fork_io: " ) << "Unable to close fd " << fd;
-}
-
-OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -44,13 +32,13 @@ fork_id::fork_id( const io_triplet& io )
         return;
 
     if ( io._0 != -1 )
-        replace( STDIN_FILENO, io._0 );
+        executable::move_fd( io._0, STDIN_FILENO );
 
     if ( io._1 != -1 )
-        replace( STDOUT_FILENO, io._1 );
+        executable::move_fd( io._1, STDOUT_FILENO );
 
     if ( io._2 != -1 )
-        replace( STDERR_FILENO, io._2 );
+        executable::move_fd( io._2, STDERR_FILENO );
 }
 
 //--- fork_io --------------------------------------------------------------------------------------

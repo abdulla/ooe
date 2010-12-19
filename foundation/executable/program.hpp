@@ -21,8 +21,11 @@ signal_handler_type signal( struct sigaction&, signal_handler_type, s32 ) OOE_VI
 s32 has_signal( void ) OOE_VISIBLE;
 void quit( void ) OOE_VISIBLE;
 
-s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
+s32 copy_fd( s32 ) OOE_VISIBLE;
+void move_fd( s32, s32 ) OOE_VISIBLE;
 void null_fd( s32 ) OOE_VISIBLE;
+
+s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
 path_type path( void ) OOE_VISIBLE;
 bool path( c8*, up_t );
 
