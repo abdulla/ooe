@@ -218,6 +218,7 @@ struct frame
 
     virtual void output( const std::string&, const texture_ptr& ) = 0;
     virtual void output( const std::string&, const target_ptr& ) = 0;
+    virtual void output( const target_ptr& ) = 0;
 };
 
 //--- program --------------------------------------------------------------------------------------

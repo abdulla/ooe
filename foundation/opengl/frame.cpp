@@ -178,10 +178,15 @@ void default_frame::output( const std::string&, const target_ptr& )
     throw error::runtime( "opengl::default_frame: " ) << "Can not attach to default frame";
 }
 
+void default_frame::output( const target_ptr& )
+{
+    throw error::runtime( "opengl::default_frame: " ) << "Can not attach to default frame";
+}
+
 //--- frame ----------------------------------------------------------------------------------------
 frame::frame( u32 program_, u32 width_, u32 height_ )
-    : id(), program( program_ ), width( width_ ), height( height_ ), state( none ), attachments(),
-    locations()
+    : id(), program( program_ ), width( width_ ), height( height_ ), state( none ), depth(),
+    attachments(), locations()
 {
     GenFramebuffers( 1, const_cast< u32* >( &id ) );
 }
@@ -212,22 +217,33 @@ void frame::clear( void )
 
 void frame::output( const std::string& name, const texture_ptr& generic_texture )
 {
+    const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
     s32 location = find( program, locations, name );
     frame_output( id, location, attachment_tuple( generic_texture, 0 ), attachments, state );
 
-    const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
     FramebufferTexture2D
         ( DRAW_FRAMEBUFFER, COLOR_ATTACHMENT0 + location, TEXTURE_2D, texture.id, 0 );
 }
 
 void frame::output( const std::string& name, const target_ptr& generic_target )
 {
+    const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
     s32 location = find( program, locations, name );
     frame_output( id, location, attachment_tuple( 0, generic_target ), attachments, state );
 
-    const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
     FramebufferRenderbuffer
         ( DRAW_FRAMEBUFFER, COLOR_ATTACHMENT0 + location, RENDERBUFFER, target.id );
+}
+
+void frame::output( const target_ptr& generic_target )
+{
+    const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
+
+    if ( !depth )
+        state = none;
+
+    depth = generic_target;
+    FramebufferRenderbuffer( DRAW_FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, target.id );
 }
 
 //--- frame_check ----------------------------------------------------------------------------------

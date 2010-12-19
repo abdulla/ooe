@@ -37,6 +37,10 @@ u32 target_format( image_format::type format )
     case image_format::rgba_f32:
         return RGBA32F;
 
+    //--- depth ----------------------------------------------------------------
+    case image_format::depth_u24:
+        return DEPTH_COMPONENT24;
+
     //--------------------------------------------------------------------------
     default:
         throw error::runtime( "opengl::target: " ) << "Unknown image format: " << format;

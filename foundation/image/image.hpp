@@ -12,7 +12,8 @@ OOE_NAMESPACE_BEGIN( ( ooe )( image_format ) )
 enum
 {
     uncompressed = 0,
-    compressed = 128
+    compressed = 128,
+    depth = 192
 };
 
 enum type
@@ -54,7 +55,9 @@ enum type
 
     rgba_dxt1   = compressed,
     rgba_dxt3,
-    rgba_dxt5
+    rgba_dxt5,
+
+    depth_u24   = depth
 };
 
 OOE_NAMESPACE_END( ( ooe )( image_format ) )

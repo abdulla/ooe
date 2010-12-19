@@ -24,6 +24,7 @@ public:
 
     virtual void output( const std::string&, const texture_ptr& );
     virtual void output( const std::string&, const target_ptr& );
+    virtual void output( const target_ptr& );
 
 private:
     const u32 width;
@@ -52,6 +53,7 @@ public:
     const u32 height;
     state_type state;
 
+    target_ptr depth;
     attachment_map attachments;
 
     frame( u32, u32, u32 );
@@ -63,6 +65,7 @@ public:
 
     virtual void output( const std::string&, const texture_ptr& );
     virtual void output( const std::string&, const target_ptr& );
+    virtual void output( const target_ptr& );
 
 private:
     location_map locations;
