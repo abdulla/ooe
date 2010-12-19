@@ -35,7 +35,8 @@ s32 find( const std::string& name )
     else if ( name == "BACK_RIGHT" )
         return BACK_LEFT + 1;
     else
-        throw error::runtime( "opengl::default_frame: " ) << "Variable \"" << name << "\" invalid";
+        throw error::runtime( "opengl::default_frame: " ) <<
+            "Variable \"" << name << "\" is invalid";
 }
 
 format_tuple frame_format( image_format::type format )
@@ -82,13 +83,13 @@ void frame_check( bool& do_check, u32 target )
     s32 status = CheckFramebufferStatus( target );
 
     if ( status != FRAMEBUFFER_COMPLETE )
-        throw error::runtime( "opengl::frame: " ) << "Frame is incomplete: 0x" << hex( status );
+        throw error::runtime( "opengl::frame: " ) << "Incomplete frame: 0x" << hex( status );
 
     do_check = false;
 }
 
-void frame_read( buffer_ptr& generic_buffer, image_format::type format,
-    s32 id, u32 width, u32 height, bool& do_check, u32 target )
+void frame_read( buffer_ptr& generic_buffer, image_format::type format, u32 target, s32 id,
+    u32 width, u32 height, bool& do_check )
 {
     opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
 
@@ -110,19 +111,15 @@ void frame_read( buffer_ptr& generic_buffer, image_format::type format,
     ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
 
-void frame_write( const frame_ptr& generic_frame, const std::string& read_name,
-    s32 id, u32 width, u32 height, bool& do_check, u32 draw_target )
+void frame_write( const frame_ptr& generic_frame, s32 id, u32 width, u32 height, bool& do_check )
 {
     opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
-    s32 read_target = find( frame.program, frame.locations, read_name );
 
     BindFramebuffer( READ_FRAMEBUFFER, frame.id );
     frame_check( frame.do_check, READ_FRAMEBUFFER );
-    ReadBuffer( read_target );
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
     frame_check( do_check, DRAW_FRAMEBUFFER );
-    DrawBuffers( 1, &draw_target );
 
     BlitFramebuffer( 0, 0, frame.width, frame.height, 0, 0, width, height,
         COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
@@ -153,14 +150,13 @@ void default_frame::
     read( const std::string& name, image_format::type format, buffer_ptr& generic_buffer )
 {
     bool do_check = false;
-    frame_read( generic_buffer, format, 0, width, height, do_check, find( name ) );
+    frame_read( generic_buffer, format, find( name ), 0, width, height, do_check );
 }
 
-void default_frame::write
-    ( const std::string& write_name, const std::string& read_name, const frame_ptr& generic_frame )
+void default_frame::write( const frame_ptr& generic_frame )
 {
     bool do_check = false;
-    frame_write( generic_frame, read_name, 0, width, height, do_check, find( write_name ) );
+    frame_write( generic_frame, 0, width, height, do_check );
 }
 
 void default_frame::clear( void )
@@ -198,14 +194,13 @@ void frame::read( const std::string& name, image_format::type format, buffer_ptr
         throw error::runtime( "opengl::frame: " ) << "Frame has no colour attachment";
 
     s32 location = find( program, locations, name );
-    frame_read( generic_buffer, format, id, width, height, do_check, location );
+    u32 attachment = COLOR_ATTACHMENT0 + location;
+    frame_read( generic_buffer, format, attachment, id, width, height, do_check );
 }
 
-void frame::write
-    ( const std::string& write_name, const std::string& read_name, const frame_ptr& generic_frame )
+void frame::write( const frame_ptr& generic_frame )
 {
-    s32 location = find( program, locations, write_name );
-    frame_write( generic_frame, read_name, id, width, height, do_check, location );
+    frame_write( generic_frame, id, width, height, do_check );
 }
 
 void frame::clear( void )
@@ -217,11 +212,12 @@ void frame::output( const std::string& name, const texture_ptr& generic_texture 
 {
     const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
     s32 location = find( program, locations, name );
+    u32 attachment = COLOR_ATTACHMENT0 + location;
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
-    FramebufferTexture2D( DRAW_FRAMEBUFFER, location, TEXTURE_2D, texture.id, 0 );
+    FramebufferTexture2D( DRAW_FRAMEBUFFER, attachment, TEXTURE_2D, texture.id, 0 );
 
-    colours.push_back( location );
+    colours.push_back( attachment );
     do_check = true;
 }
 
@@ -229,11 +225,12 @@ void frame::output( const std::string& name, const target_ptr& generic_target )
 {
     const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
     s32 location = find( program, locations, name );
+    u32 attachment = COLOR_ATTACHMENT0 + location;
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
-    FramebufferRenderbuffer( DRAW_FRAMEBUFFER, location, RENDERBUFFER, target.id );
+    FramebufferRenderbuffer( DRAW_FRAMEBUFFER, attachment, RENDERBUFFER, target.id );
 
-    colours.push_back( location );
+    colours.push_back( attachment );
     do_check = true;
 }
 
