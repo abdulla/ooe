@@ -3,7 +3,11 @@
 #ifndef OOE_PLATFORM_POSIX_FOUNDATION_IPC_MEMORY_TRANSPORT_FORWARD_HPP
 #define OOE_PLATFORM_POSIX_FOUNDATION_IPC_MEMORY_TRANSPORT_FORWARD_HPP
 
-#include "foundation/parallel/semaphore.hpp"
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+class semaphore;
+
+OOE_NAMESPACE_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 

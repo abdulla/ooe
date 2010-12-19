@@ -3,6 +3,7 @@
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"
+#include "foundation/parallel/lock.hpp"
 #include "foundation/utility/miscellany.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
