@@ -10,6 +10,8 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( opengl ) )
 
+typedef opengl::frame::state_type state_type;
+typedef opengl::frame::attachment_map attachment_map;
 typedef opengl::frame::location_map location_map;
 typedef tuple< u32, u32, u8 > format_tuple;
 
@@ -76,21 +78,8 @@ format_tuple frame_format( image_format::type format )
     }
 }
 
-void frame_check( bool& do_check, u32 target )
-{
-    if ( !do_check )
-        return;
-
-    s32 status = CheckFramebufferStatus( target );
-
-    if ( status != FRAMEBUFFER_COMPLETE )
-        throw error::runtime( "opengl::frame: " ) << "Incomplete frame: 0x" << hex( status );
-
-    do_check = false;
-}
-
 void frame_read( buffer_ptr& generic_buffer, image_format::type format, u32 target, s32 id,
-    u32 width, u32 height, bool& do_check )
+    u32 width, u32 height, state_type& state )
 {
     opengl::buffer& buffer = dynamic_cast< opengl::buffer& >( *generic_buffer );
 
@@ -105,32 +94,44 @@ void frame_read( buffer_ptr& generic_buffer, image_format::type format, u32 targ
             "Pixel buffer size " << buffer.size << " < " << size;
 
     BindFramebuffer( READ_FRAMEBUFFER, id );
-    frame_check( do_check, READ_FRAMEBUFFER );
+    frame_check( READ_FRAMEBUFFER, state );
     ReadBuffer( target );
 
     BindBuffer( PIXEL_PACK_BUFFER, buffer.id );
     ReadPixels( 0, 0, width, height, tuple._0, tuple._1, 0 );
 }
 
-void frame_write( const frame_ptr& generic_frame, s32 id, u32 width, u32 height, bool& do_check )
+void frame_write( const frame_ptr& generic_frame, s32 id, u32 width, u32 height, state_type& state )
 {
     opengl::frame& frame = dynamic_cast< opengl::frame& >( *generic_frame );
 
     BindFramebuffer( READ_FRAMEBUFFER, frame.id );
-    frame_check( frame.do_check, READ_FRAMEBUFFER );
+    frame_check( READ_FRAMEBUFFER, frame.state );
 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
-    frame_check( do_check, DRAW_FRAMEBUFFER );
+    frame_check( DRAW_FRAMEBUFFER, state );
 
     BlitFramebuffer( 0, 0, frame.width, frame.height, 0, 0, width, height,
         COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT, NEAREST );
 }
 
-void frame_clear( s32 id, bool& do_check )
+void frame_clear( s32 id, state_type& state )
 {
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
-    frame_check( do_check, DRAW_FRAMEBUFFER );
+    frame_check( DRAW_FRAMEBUFFER, state );
     Clear( COLOR_BUFFER_BIT | DEPTH_BUFFER_BIT );
+}
+
+void frame_output( s32 location, const opengl::frame::attachment_tuple& tuple,
+    attachment_map& attachments, state_type& state )
+{
+    std::pair< attachment_map::iterator, bool > pair =
+        attachments.insert( std::make_pair( location, tuple ) );
+
+    if ( pair.second )
+        state = opengl::frame::none;
+    else
+        pair.first->second = tuple;
 }
 
 OOE_ANONYMOUS_END( ( ooe )( opengl ) )
@@ -150,20 +151,20 @@ default_frame::~default_frame( void )
 void default_frame::
     read( const std::string& name, image_format::type format, buffer_ptr& generic_buffer )
 {
-    bool do_check = false;
-    frame_read( generic_buffer, format, find( name ), 0, width, height, do_check );
+    state_type state = opengl::frame::checked;
+    frame_read( generic_buffer, format, find( name ), 0, width, height, state );
 }
 
 void default_frame::write( const frame_ptr& generic_frame )
 {
-    bool do_check = false;
-    frame_write( generic_frame, 0, width, height, do_check );
+    state_type state = opengl::frame::checked;
+    frame_write( generic_frame, 0, width, height, state );
 }
 
 void default_frame::clear( void )
 {
-    bool do_check = false;
-    frame_clear( 0, do_check );
+    state_type state = opengl::frame::checked;
+    frame_clear( 0, state );
 }
 
 void default_frame::output( const std::string&, const texture_ptr& )
@@ -178,8 +179,8 @@ void default_frame::output( const std::string&, const target_ptr& )
 
 //--- frame ----------------------------------------------------------------------------------------
 frame::frame( u32 program_, u32 width_, u32 height_ )
-    : id(), program( program_ ), width( width_ ), height( height_ ), do_check( true ),
-    attachments(), locations()
+    : id(), program( program_ ), width( width_ ), height( height_ ), state( none ), attachments(),
+    locations()
 {
     GenFramebuffers( 1, const_cast< u32* >( &id ) );
 }
@@ -196,17 +197,17 @@ void frame::read( const std::string& name, image_format::type format, buffer_ptr
 
     s32 location = find( program, locations, name );
     u32 attachment = COLOR_ATTACHMENT0 + location;
-    frame_read( generic_buffer, format, attachment, id, width, height, do_check );
+    frame_read( generic_buffer, format, attachment, id, width, height, state );
 }
 
 void frame::write( const frame_ptr& generic_frame )
 {
-    frame_write( generic_frame, id, width, height, do_check );
+    frame_write( generic_frame, id, width, height, state );
 }
 
 void frame::clear( void )
 {
-    frame_clear( id, do_check );
+    frame_clear( id, state );
 }
 
 void frame::output( const std::string& name, const texture_ptr& generic_texture )
@@ -218,8 +219,8 @@ void frame::output( const std::string& name, const texture_ptr& generic_texture 
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
     FramebufferTexture2D( DRAW_FRAMEBUFFER, attachment, TEXTURE_2D, texture.id, 0 );
 
-    attachments[ location ] = attachment_tuple( generic_texture, 0 );
-    do_check = true;
+    attachment_tuple tuple( generic_texture, 0 );
+    frame_output( location, tuple, attachments, state );
 }
 
 void frame::output( const std::string& name, const target_ptr& generic_target )
@@ -231,14 +232,22 @@ void frame::output( const std::string& name, const target_ptr& generic_target )
     BindFramebuffer( DRAW_FRAMEBUFFER, id );
     FramebufferRenderbuffer( DRAW_FRAMEBUFFER, attachment, RENDERBUFFER, target.id );
 
-    attachments[ location ] = attachment_tuple( 0, generic_target );
-    do_check = true;
+    attachment_tuple tuple( 0, generic_target );
+    frame_output( location, tuple, attachments, state );
 }
 
-void frame::check( void )
+//--- frame_check ----------------------------------------------------------------------------------
+void frame_check( u32 target, state_type& state )
 {
-    BindFramebuffer( DRAW_FRAMEBUFFER, id );
-    frame_check( do_check, DRAW_FRAMEBUFFER );
+    if ( state != opengl::frame::none )
+        return;
+
+    s32 status = CheckFramebufferStatus( target );
+
+    if ( status != FRAMEBUFFER_COMPLETE )
+        throw error::runtime( "opengl::frame: " ) << "Incomplete frame: 0x" << hex( status );
+
+    state = opengl::frame::checked;
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
