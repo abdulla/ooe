@@ -24,8 +24,8 @@ public:
     const_iterator begin( void ) const;
     const_iterator end( void ) const;
     void insert( const std::string&, group_base& ) OOE_VISIBLE;
-    bool run( time_t = 60, bool = true ) const;
-    bool run( const std::string&, time_t = 60, bool = true ) const;
+    bool run( time_t, bool, bool ) const;
+    bool run( const std::string&, time_t, bool, bool ) const;
 
 private:
     map_type map;
