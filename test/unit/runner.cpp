@@ -96,9 +96,8 @@ void collect_tests( vector_type& vector, list_type& list, time_t timeout )
     }
 }
 
-vector_type run_group( group_base& group, time_t timeout, bool no_stdout )
+vector_type run_group( group_base& group, void* pointer, time_t timeout, bool no_stdout )
 {
-    opaque_ptr pointer = group.create_setup();
     list_type list;
     up_t j = 0;
 
@@ -118,6 +117,25 @@ vector_type run_group( group_base& group, time_t timeout, bool no_stdout )
     while ( !list.empty() )
         collect_tests( vector, list, timeout );
 
+    return vector;
+}
+
+vector_type run_group_nofork( group_base& group, void* pointer, bool no_stdout )
+{
+    file_pair pair = make_pipe();
+    s32 stderr_fd = executable::copy_fd( STDERR_FILENO );
+    executable::move_fd( executable::copy_fd( pair._1.get() ), STDERR_FILENO );
+    vector_type vector;
+
+    for ( group_base::const_iterator i = group.begin(), end = group.end(); i != end; ++i )
+    {
+        bool result = run_test( i, pointer, no_stdout );
+        vector.push_back( make_tuple( result, read( pair._0 ) ) );
+    }
+
+    s32 stdout_fd = executable::copy_fd( descriptor( "/dev/tty", descriptor::write ).get() );
+    executable::move_fd( stdout_fd, STDOUT_FILENO );
+    executable::move_fd( stderr_fd, STDERR_FILENO );
     return vector;
 }
 
@@ -159,13 +177,21 @@ bool is_successful( const vector_type& vector )
     return true;
 }
 
-bool safe_run( const runner::map_type::const_iterator i, time_t timeout, bool no_stdout )
+bool safe_run
+    ( const runner::map_type::const_iterator i, time_t timeout, bool no_stdout, bool no_fork )
 {
     std::string output;
 
     try
     {
-        vector_type vector = run_group( *i->second, timeout, no_stdout );
+        opaque_ptr pointer = i->second->create_setup();
+        vector_type vector;
+
+        if ( no_fork )
+            vector = run_group_nofork( *i->second, pointer, no_stdout );
+        else
+            vector = run_group( *i->second, pointer, timeout, no_stdout );
+
         print_tests( i->first, vector );
         return is_successful( vector );
     }
@@ -220,24 +246,24 @@ void runner::insert( const std::string& name, group_base& group )
     map.insert( map_type::value_type( name, &group ) );
 }
 
-bool runner::run( time_t timeout, bool no_stdout ) const
+bool runner::run( time_t timeout, bool no_stdout, bool no_fork ) const
 {
     bool success = true;
 
     for ( map_type::const_iterator i = begin(), j = end(); i != j; ++i )
-        success = safe_run( i, timeout, no_stdout );
+        success = success && safe_run( i, timeout, no_stdout, no_fork );
 
     return success;
 }
 
-bool runner::run( const std::string& name, time_t timeout, bool no_stdout ) const
+bool runner::run( const std::string& name, time_t timeout, bool no_stdout, bool no_fork ) const
 {
     map_type::const_iterator i = map.find( name );
 
     if ( i == map.end() )
         throw error::runtime( "unit::runner: " ) << "Unable to find group \"" << name << '"';
 
-    return safe_run( i, timeout, no_stdout );
+    return safe_run( i, timeout, no_stdout, no_fork );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

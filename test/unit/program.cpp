@@ -15,11 +15,16 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
     ::signal( SIGCHLD, SIG_DFL );
     time_t timeout = 60;
     bool no_stdout = true;
+    bool no_fork = false;
 
-    for ( s32 option; ( option = getopt( argc, argv, "lst:" ) ) != -1; )
+    for ( s32 option; ( option = getopt( argc, argv, "flst:" ) ) != -1; )
     {
         switch ( option )
         {
+        case 'f':
+            no_fork = true;
+            break;
+
         case 'l':
             std::cout << "Available groups of tests:\n";
 
@@ -44,6 +49,7 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
                 "    " << name << " -l\n"
                 "\n"
                 "Options:\n"
+                "    -f             Disable forking of tests\n"
                 "    -s             Enable stdout in tests\n"
                 "    -t <timeout>   Time out for each test\n"
                 "    -l             List all groups of tests\n";
@@ -53,13 +59,13 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
     }
 
     if ( optind == argc )
-        return global_runner.run( timeout, no_stdout );
+        return global_runner.run( timeout, no_stdout, no_fork );
 
     bool success = true;
 
     for ( s32 i = optind; i != argc; ++i )
     {
-        if ( !global_runner.run( argv[ i ], timeout, no_stdout ) )
+        if ( !global_runner.run( argv[ i ], timeout, no_stdout, no_fork ) )
             success = false;
     }
 

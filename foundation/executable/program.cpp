@@ -71,6 +71,36 @@ void quit( void )
     signal_code = SIGQUIT;
 }
 
+s32 copy_fd( s32 fd )
+{
+    s32 copy = dup( fd );
+
+    if ( copy == -1 )
+        throw error::runtime( "executable::copy_fd: " ) << "Unable to copy fd " << fd;
+
+    return copy;
+}
+
+void move_fd( s32 source, s32 target )
+{
+    if ( dup2( source, target ) == -1 )
+        throw error::runtime( "executable::move_fd: " ) <<
+            "Unable to replace fd " << target << " with " << source;
+    else if ( close( source ) )
+        throw error::runtime( "executable::move_fd: " ) << "Unable to close fd " << source;
+}
+
+void null_fd( s32 fd )
+{
+    s32 null = open( "/dev/null", O_RDWR );
+
+    if ( null == -1 )
+        throw error::runtime( "executable::null_fd: " ) <<
+            "Unable to open /dev/null: " << error::number( errno );
+
+    move_fd( null, fd );
+}
+
 s32 launch( launch_type launch, s32 argc, c8** argv )
 {
     std::set_terminate( __gnu_cxx::__verbose_terminate_handler );
@@ -116,24 +146,6 @@ s32 launch( launch_type launch, s32 argc, c8** argv )
     }
 
     return status;
-}
-
-void null_fd( s32 fd )
-{
-    s32 null = open( "/dev/null", O_RDWR );
-
-    if ( null == -1 )
-        throw error::runtime( "executable::null_fd: " ) <<
-            "Unable to open /dev/null: " << error::number( errno );
-
-    s32 result = dup2( null, fd );
-
-    if ( close( null ) )
-        OOE_CONSOLE( "executable::null_fd: " <<
-            "Unable to close /dev/null" << error::number( errno ) );
-    else if ( result == -1 )
-        throw error::runtime( "executable::null_fd: " ) <<
-            "Unable to duplicate fd: " << error::number( errno );
 }
 
 path_type path( void )
