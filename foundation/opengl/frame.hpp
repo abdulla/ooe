@@ -10,6 +10,7 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
+//--- default_frame --------------------------------------------------------------------------------
 class default_frame
     : public ooe::frame
 {
@@ -29,10 +30,18 @@ private:
     const u32 height;
 };
 
+//--- frame ----------------------------------------------------------------------------------------
 class frame
     : public ooe::frame
 {
 public:
+    enum state_type
+    {
+        none,
+        checked,
+        built
+    };
+
     typedef tuple< texture_ptr, target_ptr > attachment_tuple;
     typedef std::map< s32, attachment_tuple > attachment_map;
     typedef std::map< std::string, s32 > location_map;
@@ -41,7 +50,7 @@ public:
     const u32 program;
     const u32 width;
     const u32 height;
-    bool do_check;
+    state_type state;
 
     attachment_map attachments;
 
@@ -55,11 +64,11 @@ public:
     virtual void output( const std::string&, const texture_ptr& );
     virtual void output( const std::string&, const target_ptr& );
 
-    void check( void );
-
 private:
     location_map locations;
 };
+
+void frame_check( u32, frame::state_type& );
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
