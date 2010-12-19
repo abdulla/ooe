@@ -1,5 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include "component/ui/miscellany.hpp"
 #include "foundation/executable/library.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/image/dds.hpp"
@@ -39,49 +40,6 @@ const c8 fragment_shader[] =
     {\n\
         gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );\n\
     }";
-
-buffer_ptr make_point( const device_ptr& device )
-{
-    buffer_ptr point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
-    {
-        map_ptr map = point->map( buffer::write );
-        f32* value = static_cast< f32* >( map->data );
-
-        // top left
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-
-        // bottom left
-        value[ 2 ] = 0;
-        value[ 3 ] = 0;
-
-        // top right
-        value[ 4 ] = 1;
-        value[ 5 ] = 1;
-
-        // bottom right
-        value[ 6 ] = 1;
-        value[ 7 ] = 0;
-    }
-    return point;
-}
-
-buffer_ptr make_index( const device_ptr& device )
-{
-    buffer_ptr index = device->buffer( sizeof( u16 ) * 6, buffer::index );
-    {
-        map_ptr map = index->map( buffer::write );
-        u16* value = static_cast< u16* >( map->data );
-
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-        value[ 2 ] = 2;
-        value[ 3 ] = 2;
-        value[ 4 ] = 1;
-        value[ 5 ] = 3;
-    }
-    return index;
-}
 
 image make_image( u8 red, u8 green, u8 blue )
 {
