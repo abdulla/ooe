@@ -68,6 +68,8 @@ enum
     CLAMP_TO_EDGE               = 0x812F,
     TEXTURE_MAX_LEVEL           = 0x813D,
 
+    DEPTH_COMPONENT24           = 0x81A6,
+
     RG                          = 0x8227,
     RG_INTEGER                  = 0x8228,
     R8                          = 0x8229,
@@ -125,6 +127,7 @@ enum
     DRAW_FRAMEBUFFER            = 0x8CA9,
     FRAMEBUFFER_COMPLETE        = 0x8CD5,
     COLOR_ATTACHMENT0           = 0x8CE0,
+    DEPTH_ATTACHMENT            = 0x8D00,
     RENDERBUFFER                = 0x8D41,
 
     RGBA16I                     = 0x8D88,

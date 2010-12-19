@@ -17,21 +17,23 @@ const u32 size = 256;
 
 const c8 vertex_shader[] =
     "uniform mat4 projection;\n\
+    uniform float depth;\n\
     attribute vec2 vertex;\n\
     \n\
     void main( void )\n\
     {\n\
-        gl_Position = projection * vec4( vertex, 0, 1 );\n\
+        gl_Position = projection * vec4( vertex, depth, 1 );\n\
     }";
 
 const c8 fragment_shader[] =
     "#extension GL_EXT_gpu_shader4 : enable\n\
     \n\
+    uniform vec3 colour;\n\
     varying out vec4 texture;\n\
     \n\
     void main( void )\n\
     {\n\
-        texture = vec4( 1. );\n\
+        texture = vec4( colour, 1. );\n\
     }";
 
 typedef unit::group< anonymous_t, anonymous_t, 1 > group_type;
@@ -54,6 +56,7 @@ template<>
     event_queue queue;
     view view( queue, width, height, false );
     device_ptr device = library.find< device_open_type >( "device_open" )( view, false );
+    device->set( device::depth_test, true );
 
     shader_vector vector;
     vector.push_back( device->shader( vertex_shader, shader::vertex ) );
@@ -64,11 +67,14 @@ template<>
     block->input( "vertex", block::f32_2, false, make_point( device ) );
     block->input( "projection", orthographic( 0, width / height, 1, 0 ) );
 
-    image_metadata metadata( width, height, image_format::rgb_u8 );
-    texture_ptr texture = device->texture( metadata, texture::nearest, false );
+    image_metadata texture_metadata( width, height, image_format::rgb_u8 );
+    image_metadata target_metadata( width, height, image_format::depth_u24 );
+    texture_ptr texture = device->texture( texture_metadata, texture::nearest, false );
+    target_ptr target = device->target( target_metadata );
 
     frame_ptr frame = program->frame( width, height );
     frame->output( "texture", texture );
+    frame->output( target );
 
     frame_ptr default_frame = device->default_frame( width, height );
     default_frame->clear();
@@ -77,6 +83,15 @@ template<>
     {
         frame->clear();
         device->draw( block, frame, 1 );
+
+        block->input( "depth", 1.f );
+        block->input( "colour", 0.f, 1.f, 0.f );
+        device->draw( block, frame, 1 );
+
+        block->input( "depth", 0.f );
+        block->input( "colour", 1.f, 0.f, 0.f );
+        device->draw( block, frame, 1 );
+
         default_frame->write( frame );
         device->swap();
 
