@@ -4,6 +4,7 @@
 
 #include <fcntl.h>
 
+#include "foundation/executable/program.hpp"
 #include "foundation/io/directory.hpp"
 #include "foundation/io/error.hpp"
 
@@ -19,7 +20,7 @@ DIR* directory_open( const ooe::descriptor& desc )
     else if ( close( dir->__dd_fd ) )
         throw error::io( "directory: " ) << "Unable to close \"/\": " << error::number( errno );
 
-    dir->__dd_fd = dup( desc.get() );
+    dir->__dd_fd = executable::copy_fd( desc.get() );
 
     if ( fcntl( dir->__dd_fd, F_SETFD, FD_CLOEXEC ) )
         throw error::io( "directory: " ) <<
