@@ -17,7 +17,7 @@ public:
     virtual ~default_frame( void );
 
     virtual void read( const std::string&, image_format::type, buffer_ptr& );
-    virtual void write( const std::string&, const std::string&, const frame_ptr& );
+    virtual void write( const frame_ptr& );
     virtual void clear( void );
 
     virtual void output( const std::string&, const texture_ptr& );
@@ -46,7 +46,7 @@ struct frame
     virtual ~frame( void );
 
     virtual void read( const std::string&, image_format::type, buffer_ptr& );
-    virtual void write( const std::string&, const std::string&, const frame_ptr& );
+    virtual void write( const frame_ptr& );
     virtual void clear( void );
 
     virtual void output( const std::string&, const texture_ptr& );

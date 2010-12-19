@@ -213,7 +213,7 @@ struct frame
 {
     virtual ~frame( void ) {}
     virtual void read( const std::string&, image_format::type, buffer_ptr& ) = 0;
-    virtual void write( const std::string&, const std::string&, const frame_ptr& ) = 0;
+    virtual void write( const frame_ptr& ) = 0;
     virtual void clear( void ) = 0;
 
     virtual void output( const std::string&, const texture_ptr& ) = 0;
