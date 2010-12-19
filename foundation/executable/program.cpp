@@ -76,7 +76,8 @@ s32 copy_fd( s32 fd )
     s32 copy = dup( fd );
 
     if ( copy == -1 )
-        throw error::runtime( "executable::copy_fd: " ) << "Unable to copy fd " << fd;
+        throw error::runtime( "executable::copy_fd: " ) <<
+            "Unable to copy fd " << fd << ": " << error::number( errno );
 
     return copy;
 }
@@ -84,10 +85,11 @@ s32 copy_fd( s32 fd )
 void move_fd( s32 source, s32 target )
 {
     if ( dup2( source, target ) == -1 )
-        throw error::runtime( "executable::move_fd: " ) <<
-            "Unable to replace fd " << target << " with " << source;
+        throw error::runtime( "executable::move_fd: " ) << "Unable to replace fd " << target <<
+            " with " << source << ": " << error::number( errno );
     else if ( close( source ) )
-        throw error::runtime( "executable::move_fd: " ) << "Unable to close fd " << source;
+        throw error::runtime( "executable::move_fd: " ) <<
+            "Unable to close fd " << source << ": " << error::number( errno );
 }
 
 void null_fd( s32 fd )
