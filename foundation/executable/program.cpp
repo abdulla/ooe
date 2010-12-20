@@ -39,6 +39,17 @@ void signal_handler( s32 code, siginfo_t* info, void* )
     }
 }
 
+void open_log( const std::string& path )
+{
+    s32 fd = open( path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600 );
+
+    if ( fd == -1 )
+        throw error::runtime( "executable::launch: " ) <<
+            "Unable to open log \"" << path <<  "\": " << error::number( errno );
+
+    executable::move_fd( fd, STDERR_FILENO );
+}
+
 OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
@@ -119,17 +130,12 @@ s32 launch( launch_type launch, s32 argc, c8** argv )
     try
     {
         path_type path = executable::path();
-        std::string log = path._0 + "../log/" + path._1 + ".log";
+        open_log( path._0 + "../log/" + path._1 + ".log" );
+        up_t page_size = executable::page_size();
 
-        if ( close( STDERR_FILENO ) == -1 )
+        if ( page_size != static_page_size )
             throw error::runtime( "executable::launch: " ) <<
-                "Unable to close standard error: " << error::number( errno );
-        else if ( open( log.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0600 ) != STDERR_FILENO )
-            throw error::runtime( "executable::launch: " ) <<
-                "Unable to override standard error: " << error::number( errno );
-        else if ( page_size() != static_page_size )
-            throw error::runtime( "executable::launch: " ) <<
-                "Incorrect static page size: " << page_size() << " != " << static_page_size;
+                "Incorrect static page size: " << page_size << " != " << static_page_size;
         else if ( platform::launch( launch, path._0, path._1, argc, argv ) )
             status = EXIT_SUCCESS;
     }
