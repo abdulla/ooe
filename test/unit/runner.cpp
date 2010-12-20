@@ -131,9 +131,9 @@ vector_type run_group_nofork( group_base& group, void* pointer, bool no_stdout )
     {
         bool result = run_test( i, pointer, no_stdout );
         vector.push_back( make_tuple( result, read( pair._0 ) ) );
-        std::cout.flush();
     }
 
+    std::cout.flush();
     s32 stdout_fd = executable::copy_fd( descriptor( "/dev/tty", descriptor::write ).get() );
     executable::move_fd( stdout_fd, STDOUT_FILENO );
     executable::move_fd( stderr_fd, STDERR_FILENO );
