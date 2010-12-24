@@ -1,0 +1,3 @@
+add timeline code
+    - use to implement smooth zooming
+    - this can be used to blend between mipmap levels to avoid LOD snap

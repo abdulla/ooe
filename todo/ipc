@@ -7,5 +7,5 @@ add a way to replay responses
     - this could be used for unit testing
 
 look at a linux-specific way to accelerate IPC
-    - sys_process_vm_read() and sys_process_vm_write()
-    - http://lwn.net/Articles/405346
+    - sys_process_vm_read() and sys_process_vm_write(): http://lwn.net/Articles/405346
+    - directed yield with yield_to(): http://lwn.net/Articles/419961

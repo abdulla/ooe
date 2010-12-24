@@ -4,3 +4,23 @@ modify runner to have flexible output
 add the ability to benchmark as well as test
     - use gotest as an example of testing and benchmarking
     - http://www.youtube.com/watch?v=3brH0zOqm0w
+
+----------------------------------------------------------------------------------------------------
+
+have "static std::string name( void )" that is used to get test name
+
+OOE_TEMPLATE std::string fixture_type::name< 0 >( void )
+{
+    return ...;
+}
+
+OOE_TEMPLATE void fixture_type::test< 0 >( ... )
+{
+    ...
+}
+
+add the ability to benchmark tests with a -b option (possibly have -w for warmup iterations and -s
+for seconds to benchmark for).
+
+have timer thread that'll flip flag in benchmark thread once the timer expires, then spit out
+details as ops/sec and amount of iterations and time taken.
