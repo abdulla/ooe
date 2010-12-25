@@ -24,12 +24,6 @@ public:
     {
     }
 
-    template< typename to >
-        to as( void ) const
-    {
-        return static_cast< to >( atomic );
-    }
-
     operator type( void ) const
     {
         return atomic;
@@ -37,65 +31,64 @@ public:
 
     void operator =( type value )
     {
-        exchange( value );
+        test_and_set( value );
     }
 
     type operator ++( void )
     {
-        return exchange_add( 1 ) + 1;
+        return add_and_fetch( 1 );
     }
 
     type operator ++( int )
     {
-        return exchange_add( 1 );
+        return fetch_and_add( 1 );
     }
 
     type operator --( void )
     {
-        return exchange_add( -1 ) - 1;
+        return add_and_fetch( -1 );
     }
 
     type operator --( int )
     {
-        return exchange_add( -1 );
+        return fetch_and_add( -1 );
     }
 
     type operator +=( type value )
     {
-        return exchange_add( value ) + value;
+        return add_and_fetch( value );
     }
 
     type operator -=( type value )
     {
-        return exchange_add( -value ) - value;
-    }
-
-    type swap( type value )
-    {
-        return exchange( value );
+        return add_and_fetch( -value );
     }
 
     bool cas( type compare, type value )
     {
-        return compare_exchange( compare, value );
+        return compare_and_swap( compare, value );
     }
 
-protected:
+private:
     type atomic;
 
-private:
 #if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
-    type exchange_add( type value )
+    type fetch_and_add( type value )
     {
         return __sync_fetch_and_add( &atomic, value );
     }
 
-    type exchange( type value )
+    type add_and_fetch( type value )
+    {
+        return __sync_add_and_fetch( &atomic, value );
+    }
+
+    type test_and_set( type value )
     {
         return __sync_lock_test_and_set( &atomic, value );
     }
 
-    bool compare_exchange( type compare, type value )
+    bool compare_and_swap( type compare, type value )
     {
         return __sync_bool_compare_and_swap( &atomic, compare, value );
     }
@@ -128,12 +121,12 @@ template< typename type >
 
     type* operator ->( void ) const
     {
-        return this->atomic;
+        return *this;
     }
 
     type& operator *( void ) const
     {
-        return *this->atomic;
+        return **this;
     }
 };
 
