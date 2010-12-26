@@ -5,19 +5,15 @@
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/utility/error.hpp"
 
-OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-//--- cast_sem -------------------------------------------------------------------------------------
-inline semaphore::type cast_sem( bool create )
+//--- control --------------------------------------------------------------------------------------
+struct control
 {
-    return create ? semaphore::create : semaphore::open;
-}
+    u8 private_data[ ipc::memory::transport::private_size ];
+};
 
-//--- cast_shm -------------------------------------------------------------------------------------
-inline shared_memory::type cast_shm( bool create )
-{
-    return create ? shared_memory::create : shared_memory::open;
-}
+OOE_STATIC_ASSERT( executable::static_page_size > sizeof( control ) );
 
 //--- receive_name ---------------------------------------------------------------------------------
 inline std::string receive_name( socket& socket )
@@ -46,13 +42,14 @@ inline void send_name( socket& socket, const std::string& name )
         throw error::runtime( "ipc::memory::transport: " ) << "Unable to send name";
 }
 
-OOE_ANONYMOUS_END( ( ooe )( ipc ) )
+OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( const std::string& name_, bool create )
-    : in( name_ + ".i", cast_sem( create ), 0 ), out( name_ + ".o", cast_sem( create ), 0 )
+    : in( name_ + ".i", ooe::ipc::semaphore::type( create ), 0 ),
+    out( name_ + ".o", ooe::ipc::semaphore::type( create ), 0 )
 {
 }
 
@@ -61,8 +58,6 @@ transport::transport( ooe::socket& socket )
 {
 }
 
-OOE_STATIC_ASSERT( executable::static_page_size > ooe::ipc::memory::transport::private_size );
-
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
@@ -70,17 +65,17 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( const std::string& name_, type mode )
     : platform::ipc::memory::transport( name_, mode == create ),
-    memory( name_, cast_shm( mode ), executable::static_page_size * 2 )
+    memory( name_, shared_memory::type( mode ), executable::static_page_size * 2 )
 {
-    ooe::memory::region window( executable::static_page_size, executable::static_page_size );
-    memory.protect( ooe::memory::none, window );
+    ooe::memory::region region( executable::static_page_size, executable::static_page_size );
+    memory.protect( ooe::memory::none, region );
 }
 
 transport::transport( ooe::socket& socket )
     : platform::ipc::memory::transport( socket ), memory( std::string(), socket.receive() )
 {
-    ooe::memory::region window( executable::static_page_size, executable::static_page_size );
-    memory.protect( ooe::memory::none, window );
+    ooe::memory::region region( executable::static_page_size, executable::static_page_size );
+    memory.protect( ooe::memory::none, region );
 
     in.set( true );
     out.set( true );
@@ -115,12 +110,12 @@ void transport::wake_notify( void )
 
 u8* transport::get( void ) const
 {
-    return memory.as< u8 >() + private_size;
+    return memory.as< u8 >() + sizeof( control );
 }
 
 up_t transport::size( void ) const
 {
-    return memory.size() - private_size - executable::static_page_size;
+    return memory.size() - sizeof( control ) - executable::static_page_size;
 }
 
 void transport::migrate( ooe::socket& socket )

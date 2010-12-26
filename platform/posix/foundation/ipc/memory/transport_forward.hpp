@@ -15,8 +15,6 @@ class transport
 {
 protected:
     bool created;
-    ooe::semaphore* in;
-    ooe::semaphore* out;
 
     transport( bool );
 };
