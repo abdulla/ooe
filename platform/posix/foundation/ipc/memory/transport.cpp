@@ -3,7 +3,10 @@
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"
+#include "foundation/ipc/memory/transport_private.hpp"
 #include "foundation/parallel/lock.hpp"
+#include "foundation/parallel/thread.hpp"
+#include "foundation/utility/atom.hpp"
 #include "foundation/utility/miscellany.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
@@ -14,9 +17,10 @@ struct control
     u8 private_data[ transport::private_size ];
     ooe::semaphore in;
     ooe::semaphore out;
+    atom< lock_type > lock;
 
     control( void )
-        : private_data(), in( 0 ), out( 0 )
+        : private_data(), in( 0 ), out( 0 ), lock( unlocked )
     {
     }
 };
@@ -67,14 +71,24 @@ void transport::wait( wait_type function, const void* pointer )
     ::control& control = *memory.as< ::control >();
     control.in.down();
     function( pointer );
-    control.out.up();
+    control.lock.cas( locked, unlocked );
+    thread::yield();
+
+    if ( control.lock.cas( sleeping, unlocked ) )
+        control.out.up();
 }
 
 void transport::notify( void )
 {
     ::control& control = *memory.as< ::control >();
+    control.lock.cas( unlocked, locked );
     control.in.up();
-    control.out.down();
+
+    for ( u8 i = 1 << 4; i && control.lock == locked; --i )
+        thread::yield();
+
+    if ( control.lock.cas( locked, sleeping ) )
+        control.out.down();
 }
 
 void transport::wake_wait( void )

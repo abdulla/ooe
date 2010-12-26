@@ -3,6 +3,7 @@
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport.hpp"
+#include "foundation/utility/atom.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
@@ -11,6 +12,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 struct control
 {
     u8 private_data[ ipc::memory::transport::private_size ];
+    atom< bool > lock;
 };
 
 OOE_STATIC_ASSERT( executable::static_page_size > sizeof( control ) );
