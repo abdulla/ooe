@@ -6,26 +6,32 @@
 #include "foundation/parallel/lock.hpp"
 #include "foundation/utility/miscellany.hpp"
 
-OOE_ANONYMOUS_BEGIN( ( ooe )( ipc ) )
+OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 
-//--- cast -----------------------------------------------------------------------------------------
-inline shared_memory::type cast( bool create )
+//--- control --------------------------------------------------------------------------------------
+struct control
 {
-    return create ? shared_memory::create : shared_memory::open;
-}
+    u8 private_data[ transport::private_size ];
+    ooe::semaphore in;
+    ooe::semaphore out;
 
-OOE_ANONYMOUS_END( ( ooe )( ipc ) )
+    control( void )
+        : private_data(), in( 0 ), out( 0 )
+    {
+    }
+};
+
+OOE_STATIC_ASSERT( executable::static_page_size > sizeof( control ) );
+
+OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( platform )( ipc )( memory ) )
 
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( bool created_ )
-    : created( created_ ), in(), out()
+    : created( created_ )
 {
 }
-
-OOE_STATIC_ASSERT( executable::static_page_size >
-    sizeof( ooe::semaphore ) * 2 + ooe::ipc::memory::transport::private_size );
 
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
@@ -34,77 +40,61 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- transport ------------------------------------------------------------------------------------
 transport::transport( const std::string& name_, type mode )
     : platform::ipc::memory::transport( mode == create ),
-    memory( name_, cast( mode == create ), executable::static_page_size * 2 )
+    memory( name_, shared_memory::type( mode ), executable::static_page_size * 2 )
 {
-    ooe::memory::region window( executable::static_page_size, executable::static_page_size );
-    memory.protect( ooe::memory::none, window );
-    ooe::semaphore* pointer = add< ooe::semaphore >( memory.get(), private_size );
+    ooe::memory::region region( executable::static_page_size, executable::static_page_size );
+    memory.protect( ooe::memory::none, region );
 
     if ( created )
-    {
-        in = new( pointer + 0 ) ooe::semaphore( 0 );
-        out = new( pointer + 1 ) ooe::semaphore( 0 );
-    }
-    else
-    {
-        in = pointer + 0;
-        out = pointer + 1;
-    }
+        new( memory.get() ) control;
 }
 
 transport::transport( ooe::socket& socket )
-    : platform::ipc::memory::transport( shared_memory::open ),
-    memory( std::string(), socket.receive() )
+    : platform::ipc::memory::transport( true ), memory( std::string(), socket.receive() )
 {
-    ooe::memory::region window( executable::static_page_size, executable::static_page_size );
-    memory.protect( ooe::memory::none, window );
-    ooe::semaphore* pointer = add< ooe::semaphore >( memory.get(), private_size );
-
-    in = pointer + 0;
-    out = pointer + 1;
+    ooe::memory::region region( executable::static_page_size, executable::static_page_size );
+    memory.protect( ooe::memory::none, region );
 }
 
 transport::~transport( void )
 {
     if ( created )
-    {
-        out->~semaphore();
-        in->~semaphore();
-    }
+        memory.as< control >()->~control();
 }
 
 void transport::wait( wait_type function, const void* pointer )
 {
-    in->down();
+    ::control& control = *memory.as< ::control >();
+    control.in.down();
     function( pointer );
-    out->up();
+    control.out.up();
 }
 
 void transport::notify( void )
 {
-    in->up();
-    out->down();
+    ::control& control = *memory.as< ::control >();
+    control.in.up();
+    control.out.down();
 }
 
 void transport::wake_wait( void )
 {
-    in->up();
+    memory.as< control >()->in.up();
 }
 
 void transport::wake_notify( void )
 {
-    out->up();
+    memory.as< control >()->out.up();
 }
 
 u8* transport::get( void ) const
 {
-    return memory.as< u8 >() + sizeof( ooe::semaphore ) * 2 + private_size;
+    return memory.as< u8 >() + sizeof( control );
 }
 
 up_t transport::size( void ) const
 {
-    return memory.size() - sizeof( ooe::semaphore ) * 2 - private_size -
-        executable::static_page_size;
+    return memory.size() - sizeof( control ) - executable::static_page_size;
 }
 
 void transport::migrate( ooe::socket& socket )
