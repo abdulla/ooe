@@ -121,7 +121,7 @@ servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchbo
 void servlet::join( void )
 {
     // wake for arguments, indicating that the servlet should call null and exit
-    state = false;
+    state.exchange( false );
     stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
     transport.wake_wait();
     thread.join();
@@ -131,7 +131,7 @@ void servlet::migrate( socket& socket, semaphore& semaphore, server& server )
 {
     transport.migrate( socket );
     link_server->migrate( socket );
-    state = false;
+    state.exchange( false );
 
     semaphore_lock lock( semaphore );
     server.unlink( link, false );

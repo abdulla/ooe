@@ -40,7 +40,7 @@ link_server::~link_server( void )
         return;
     else if ( state == work )
     {
-        state = idle;
+        state.exchange( idle );
         socket.shutdown( socket::read );
     }
 
@@ -49,7 +49,7 @@ link_server::~link_server( void )
 
 void link_server::migrate( ooe::socket& migrate_socket )
 {
-    state = move;
+    state.exchange( move );
     migrate_socket.send( socket );
     pair._1.shutdown( socket::write );
 }
@@ -66,7 +66,7 @@ void* link_server::main( void* pointer )
     if ( state != work )
         return 0;
 
-    state = idle;
+    state.exchange( idle );
     server.unlink( link, true );
     return 0;
 }
@@ -83,7 +83,7 @@ link_client::~link_client( void )
     if ( !state )
         return;
 
-    state = false;
+    state.exchange( false );
     connect.shutdown( socket::read );
     thread.join();
 }
@@ -107,7 +107,7 @@ void* link_client::main( void* pointer )
     // wake for result, indicating that an error in the link has occurred
     stream_write< bool_t, error_t, const c8* >::call( transport.get(), true, error::link, "" );
     transport.wake_notify();
-    state = false;
+    state.exchange( false );
     return 0;
 }
 

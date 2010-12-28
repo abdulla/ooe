@@ -17,6 +17,7 @@ inline void memory_barrier( void )
 //--- atom_base ------------------------------------------------------------------------------------
 template< typename type >
     class atom_base
+    : private noncopyable
 {
 public:
     explicit atom_base( type value = 0 )
@@ -27,11 +28,6 @@ public:
     operator type( void ) const
     {
         return atomic;
-    }
-
-    void operator =( type value )
-    {
-        test_and_set( value );
     }
 
     type operator ++( void )
@@ -64,7 +60,12 @@ public:
         return add_and_fetch( -value );
     }
 
-    bool cas( type compare, type value )
+    type exchange( type value )
+    {
+        return test_and_set( value );
+    }
+
+    type compare_exchange( type compare, type value )
     {
         return compare_and_swap( compare, value );
     }
@@ -88,9 +89,9 @@ private:
         return __sync_lock_test_and_set( &atomic, value );
     }
 
-    bool compare_and_swap( type compare, type value )
+    type compare_and_swap( type compare, type value )
     {
-        return __sync_bool_compare_and_swap( &atomic, compare, value );
+        return __sync_val_compare_and_swap( &atomic, compare, value );
     }
 #endif
 };

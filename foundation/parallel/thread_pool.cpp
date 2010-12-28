@@ -22,7 +22,7 @@ public:
 
     void stop( void )
     {
-        state = false;
+        state.exchange( false );
         semaphore.up();
         thread.join();
     }
@@ -60,9 +60,9 @@ private:
         {
             for ( task_ptr task; dequeue( task ) || pool.snoop( task ); )
             {
-                task->state = task_base::error;
+                task->state.exchange( task_base::error );
                 OOE_PRINT( "thread_pool \"" << thread.name() << "\"",
-                    ( *task )(); task->state = task_base::done );
+                    ( *task )(); task->state.exchange( task_base::done ) );
 
                 if ( !task.unique() )
                     task->semaphore.up();

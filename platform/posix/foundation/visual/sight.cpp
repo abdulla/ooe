@@ -49,14 +49,14 @@ sight::sight( const call_type& call_, u16 width_, u16 height_ )
 
 sight::~sight( void )
 {
-    state = false;
+    state.exchange( false );
     thread.join();
 }
 
 void sight::status( const descriptor&, poll::type type )
 {
     if ( type != poll::input )
-        state = false;
+        state.exchange( false );
 }
 
 void* sight::main( void* )
