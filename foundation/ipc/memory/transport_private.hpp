@@ -31,23 +31,23 @@ struct control
     {
         in.down();
         function( pointer );
-        lock.cas( locked, unlocked );
+        lock.compare_exchange( locked, unlocked );
         thread::yield();
 
-        if ( lock.cas( sleeping, unlocked ) )
+        if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
             out.up();
     }
 
     template< typename t >
         void notify( t& in, t& out )
     {
-        lock.cas( unlocked, locked );
+        lock.compare_exchange( unlocked, locked );
         in.up();
 
         for ( u8 i = 1 << 4; i && lock == locked; --i )
             thread::yield();
 
-        if ( lock.cas( locked, sleeping ) )
+        if ( lock.compare_exchange( locked, sleeping ) == locked )
             out.down();
     }
 };
