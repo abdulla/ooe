@@ -7,13 +7,6 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
-inline void memory_barrier( void )
-{
-    __sync_synchronize();
-}
-#endif
-
 //--- atom_base ------------------------------------------------------------------------------------
 template< typename type >
     class atom_base
@@ -27,7 +20,7 @@ public:
 
     operator type( void ) const
     {
-        return atomic;
+        return static_cast< const volatile type& >( atomic );
     }
 
     type operator ++( void )
