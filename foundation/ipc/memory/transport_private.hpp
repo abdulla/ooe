@@ -50,6 +50,19 @@ struct control
         if ( lock.compare_exchange( locked, sleeping ) == locked )
             out.down();
     }
+
+    template< typename t >
+        void wake_wait( t& in )
+    {
+        in.up();
+    }
+
+    template< typename t >
+        void wake_notify( t& out )
+    {
+        if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
+            out.up();
+    }
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

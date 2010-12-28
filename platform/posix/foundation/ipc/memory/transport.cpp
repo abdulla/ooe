@@ -75,12 +75,14 @@ void transport::notify( void )
 
 void transport::wake_wait( void )
 {
-    memory.as< control_io >()->in.up();
+    control_io& control = *memory.as< control_io >();
+    control.wake_wait( control.in );
 }
 
 void transport::wake_notify( void )
 {
-    memory.as< control_io >()->out.up();
+    control_io& control = *memory.as< control_io >();
+    control.wake_notify( control.out );
 }
 
 u8* transport::get( void ) const

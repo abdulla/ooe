@@ -84,24 +84,22 @@ transport::~transport( void )
 
 void transport::wait( wait_type function, const void* pointer )
 {
-    memory::control& control = *memory.as< memory::control >();
-    control.wait( in, out, function, pointer );
+    memory.as< memory::control >()->wait( in, out, function, pointer );
 }
 
 void transport::notify( void )
 {
-    memory::control& control = *memory.as< memory::control >();
-    control.notify( in, out );
+    memory.as< memory::control >()->notify( in, out );
 }
 
 void transport::wake_wait( void )
 {
-    in.up();
+    memory.as< memory::control >()->wake_wait( in );
 }
 
 void transport::wake_notify( void )
 {
-    out.up();
+    memory.as< memory::control >()->wake_notify( out );
 }
 
 u8* transport::get( void ) const
