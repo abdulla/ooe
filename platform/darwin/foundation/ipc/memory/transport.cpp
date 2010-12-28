@@ -63,6 +63,9 @@ transport::transport( const std::string& name_, type mode )
 {
     ooe::memory::region region( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, region );
+
+    if ( mode == create )
+        new( memory.get() ) control;
 }
 
 transport::transport( ooe::socket& socket )
