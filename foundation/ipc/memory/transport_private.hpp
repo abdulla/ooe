@@ -31,17 +31,17 @@ struct control
     {
         in.down();
         function( pointer );
-        lock.compare_exchange( locked, unlocked );
-        thread::yield();
 
-        if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
+        if ( lock.compare_exchange( locked, unlocked ) == locked )
+            thread::yield();
+        else if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
             out.up();
     }
 
     template< typename t >
         void notify( t& in, t& out )
     {
-        lock.compare_exchange( unlocked, locked );
+        lock.exchange( locked );
         in.up();
 
         for ( u8 i = 1 << 4; i && lock == locked; --i )
@@ -54,6 +54,7 @@ struct control
     template< typename t >
         void wake_wait( t& in )
     {
+        lock.exchange( locked );
         in.up();
     }
 
