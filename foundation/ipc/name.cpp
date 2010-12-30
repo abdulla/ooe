@@ -6,29 +6,30 @@
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/convert.hpp"
 
-namespace
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
+
+atom< u32 > seed( 0 );
+
+OOE_ANONYMOUS_END( ( ooe ) )
+
+OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
+
+//--- ipc ------------------------------------------------------------------------------------------
+std::string link_name( pid_t pid, time_t time, link_t link )
 {
-    using namespace ooe;
-    atom< u32 > seed( 0 );
+    std::string name( "/ooe." );
+    return name << hex( pid ) << 't' << hex( time ) << 'l' << hex( link );
 }
 
-namespace ooe
+std::string local_name( const std::string& name )
 {
-//--- ipc ----------------------------------------------------------------------
-    std::string ipc::link_name( pid_t pid, time_t time, link_t link )
-    {
-        std::string name( "/ooe." );
-        return name << hex( pid ) << 't' << hex( time ) << 'l' << hex( link );
-    }
-
-    std::string ipc::local_name( const std::string& name )
-    {
-        return _PATH_TMP + name + ".local";
-    }
-
-    std::string ipc::unique_name( void )
-    {
-        std::string name( "/ooe." );
-        return name << hex( getpid() ) << 'u' << hex( seed++ );
-    }
+    return _PATH_TMP + name + ".local";
 }
+
+std::string unique_name( void )
+{
+    std::string name( "/ooe." );
+    return name << hex( getpid() ) << 'u' << hex( seed++ );
+}
+
+OOE_NAMESPACE_END( ( ooe )( ipc ) )

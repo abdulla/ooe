@@ -6,32 +6,28 @@
 #include "component/lua/stack.hpp"
 #include "foundation/utility/error.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( error ) )
+
+struct OOE_VISIBLE lua
+    : virtual public runtime
 {
-    namespace error
+    lua( ooe::lua::stack& stack )
+        : runtime( "lua: " )
     {
-        struct lua;
+        *this << stack.to_lstring( -1 );
+        stack.pop( 1 );
     }
 
-    struct OOE_VISIBLE error::lua
-        : virtual public runtime
+    lua( void )
+        : runtime( "lua: " )
     {
-        lua( ooe::lua::stack& stack )
-            : runtime( "lua: " )
-        {
-            *this << stack.to_lstring( -1 );
-            stack.pop( 1 );
-        }
+    }
 
-        lua( void )
-            : runtime( "lua: " )
-        {
-        }
+    virtual ~lua( void ) throw()
+    {
+    }
+};
 
-        virtual ~lua( void ) throw()
-        {
-        }
-    };
-}
+OOE_NAMESPACE_END( ( ooe )( error ) )
 
 #endif  // OOE_COMPONENT_LUA_ERROR_HPP
