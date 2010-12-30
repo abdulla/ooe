@@ -6,6 +6,7 @@
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/server.hpp"
+#include "foundation/ipc/memory/server_private.hpp"
 #include "foundation/utility/scoped.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
@@ -135,13 +136,13 @@ void servlet::migrate( socket& socket, server& server )
     server.unlink( link, false );
 }
 
-void servlet::check( const void* pointer )
+void servlet::check( const void* address )
 {
     bool inside =
-        buffer.is_internal() ? transport.in_canary( pointer ) : allocator.in_canary( pointer );
+        buffer.is_internal() ? transport.in_canary( address ) : allocator.in_canary( address );
 
     if ( inside )
-        OOE_CONSOLE( "servlet: " << "Data violation at " << pointer );
+        canary_handler( address );
 }
 
 void* servlet::main( void* pointer )
