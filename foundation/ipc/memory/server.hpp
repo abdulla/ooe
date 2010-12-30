@@ -6,6 +6,7 @@
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/switchboard.hpp"
 #include "foundation/ipc/memory/link.hpp"
+#include "foundation/parallel/lock.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
@@ -17,7 +18,7 @@ public:
     servlet( ooe::socket&, link_t, const ipc::switchboard&, server& );
 
     void join( void );
-    void migrate( ooe::socket&, semaphore&, server& );
+    void migrate( ooe::socket&, server& );
     void check( const void* );
 
 private:
@@ -57,12 +58,13 @@ public:
 private:
     typedef std::map< link_t, atom_ptr< servlet > > servlet_map;
 
-    mutable ipc::semaphore semaphore;
+    ipc::semaphore semaphore;
     memory::transport transport;
     const switchboard& external;
     switchboard internal;
 
-    link_t seed;
+    atom< link_t > seed;
+    mutable ooe::mutex mutex;
     servlet_map map;
 };
 

@@ -6,6 +6,7 @@
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "foundation/utility/atom.hpp"
+#include "foundation/utility/error.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
@@ -31,18 +32,13 @@ struct control
     {
         in.down();
         function( pointer );
-
-        if ( lock.compare_exchange( locked, unlocked ) == locked )
-            thread::yield();
-        else if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
-            out.up();
+        wake_notify( out );
     }
 
     template< typename t >
         void notify( t& in, t& out )
     {
-        lock.exchange( locked );
-        in.up();
+        wake_wait( in );
 
         for ( u8 i = 1 << 4; i && lock == locked; --i )
             thread::yield();
@@ -54,15 +50,21 @@ struct control
     template< typename t >
         void wake_wait( t& in )
     {
-        lock.exchange( locked );
+        if ( lock.exchange( locked ) != unlocked )
+            throw error::runtime( "control: " ) << "Invalid lock state";
+
         in.up();
     }
 
     template< typename t >
         void wake_notify( t& out )
     {
-        if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
+        if ( lock.compare_exchange( locked, unlocked ) == locked )
+            thread::yield();
+        else if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
             out.up();
+        else
+            throw error::runtime( "control: " ) << "Invalid lock state";
     }
 };
 

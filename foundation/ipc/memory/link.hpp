@@ -31,13 +31,6 @@ private:
 class link_server
 {
 public:
-    enum type
-    {
-        idle,
-        work,
-        move
-    };
-
     link_server( const ooe::socket&, link_t, server& );
     ~link_server( void );
 
@@ -48,7 +41,7 @@ private:
     socket_pair pair;
 
     const link_t link;
-    atom< type > state;
+    atom< bool > state;
     ooe::thread thread;
 
     void* main( void* );
@@ -62,9 +55,12 @@ public:
     ~link_client( void );
 
     operator bool( void ) const;
+    void shutdown( void );
 
 private:
     ooe::connect connect;
+    socket_pair pair;
+
     atom< bool > state;
     ooe::thread thread;
 

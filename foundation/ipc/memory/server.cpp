@@ -13,7 +13,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool* > tuple_type;
 
 OOE_TLS( servlet* ) servlet_tls;
-atom< u32 > active_servers;
+up_t active_servers;
 executable::signal_handler_type prior_handler;
 
 //--- signal_handler -------------------------------------------------------------------------------
@@ -110,11 +110,11 @@ servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchbo
     buffer( transport.get(), transport.size(), allocator ), state( true ),
     thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
-    client_data& data = *static_cast< client_data* >( transport.private_data() );
+    std::string name = server.name();
 
     // rewrite connection data in transport
+    client_data& data = *static_cast< client_data* >( transport.private_data() );
     data.link = link;
-    std::string name = server.name();
     std::memcpy( data.name, name.c_str(), name.size() + 1 );
 }
 
@@ -127,13 +127,11 @@ void servlet::join( void )
     thread.join();
 }
 
-void servlet::migrate( socket& socket, semaphore& semaphore, server& server )
+void servlet::migrate( socket& socket, server& server )
 {
     transport.migrate( socket );
     link_server->migrate( socket );
     state.exchange( false );
-
-    semaphore_lock lock( semaphore );
     server.unlink( link, false );
 }
 
@@ -173,7 +171,7 @@ void* servlet::main( void* pointer )
 //--- server ---------------------------------------------------------------------------------------
 server::server( const std::string& name_, const switchboard& external_ )
     : semaphore( name_, semaphore::create ), transport( name_, transport::create ),
-    external( external_ ), internal(), seed(), map()
+    external( external_ ), internal(), seed(), mutex(), map()
 {
     if ( name_.size() + 1 > sizeof( client_data ) - sizeof( link_t ) )
         throw error::runtime( "ipc::memory::server: " ) << '"' << name_ << "\" is too long";
@@ -212,23 +210,24 @@ bool server::decode( void )
     io_buffer buffer( transport.get(), transport.size(), allocator );
     tuple_type tuple( internal, allocator, buffer, 0 );
     transport.wait( ipc_decode, &tuple );
+
+    lock lock( mutex );
     return !map.empty();
 }
 
-// note: no need for lock or atomics, semaphore is used when calling link/unlink via decode
 link_t server::link( pid_t pid, time_t time )
 {
     link_t id = seed++;
     std::string link_name = ipc::link_name( pid, time, id );
 
-    servlet_map::value_type value( id, new servlet( link_name, id, external, *this ) );
-    map.insert( map.end(), value );
-
+    lock lock( mutex );
+    map.insert( map.end(), std::make_pair( id, new servlet( link_name, id, external, *this ) ) );
     return id;
 }
 
 void server::unlink( link_t id, bool join )
 {
+    lock lock( mutex );
     servlet_map::iterator i = map.find( id );
 
     if ( i == map.end() )
@@ -241,7 +240,7 @@ void server::unlink( link_t id, bool join )
 
 atom_ptr< servlet > server::find( link_t id ) const
 {
-    semaphore_lock lock( semaphore );
+    lock lock( mutex );
     servlet_map::const_iterator i = map.find( id );
 
     if ( i == map.end() )
@@ -252,15 +251,15 @@ atom_ptr< servlet > server::find( link_t id ) const
 
 void server::migrate( socket& socket )
 {
-    servlet_tls->migrate( socket, semaphore, *this );
+    servlet_tls->migrate( socket, *this );
 }
 
 void server::relink( socket& socket )
 {
     link_t id = seed++;
-    semaphore_lock lock( semaphore );
-
     servlet_map::value_type value( id, new servlet( socket, id, external, *this ) );
+
+    lock lock( mutex );
     map.insert( map.end(), value );
 }
 
