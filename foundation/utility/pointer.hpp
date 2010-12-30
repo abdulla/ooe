@@ -4,16 +4,7 @@
 #define OOE_FOUNDATION_UTILITY_POINTER_HPP
 
 #include "foundation/utility/noncopyable.hpp"
-
-#ifdef __linux__
-    #ifndef __THROW
-    #define __THROW throw()
-    #endif
-#else
-    #define __THROW
-#endif
-
-extern "C" void free( void* ) __THROW;
+#include "foundation/utility/pointer_forward.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
