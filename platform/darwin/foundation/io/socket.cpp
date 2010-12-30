@@ -4,12 +4,13 @@
 
 #include "foundation/io/socket.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( platform ) )
+
+//--- socket ---------------------------------------------------------------------------------------
+socket::socket( const descriptor& fd )
+    : descriptor( fd )
 {
-//--- platform::socket ---------------------------------------------------------
-    platform::socket::socket( const descriptor& fd )
-        : descriptor( fd )
-    {
-        static_cast< ooe::socket* >( this )->option( SO_NOSIGPIPE, true );
-    }
+    static_cast< ooe::socket* >( this )->option( SO_NOSIGPIPE, true );
 }
+
+OOE_NAMESPACE_END( ( ooe )( platform ) )

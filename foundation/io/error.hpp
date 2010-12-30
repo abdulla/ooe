@@ -5,26 +5,22 @@
 
 #include "foundation/utility/error.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe )( error ) )
+
+struct OOE_VISIBLE io
+    : virtual public runtime
 {
-    namespace error
+    io( const c8* string_ )
+        : runtime( "io: " )
     {
-        struct io;
+        *this << string_;
     }
 
-    struct OOE_VISIBLE error::io
-        : virtual public runtime
+    virtual ~io( void ) throw()
     {
-        io( const c8* string_ )
-            : runtime( "io: " )
-        {
-            *this << string_;
-        }
+    }
+};
 
-        virtual ~io( void ) throw()
-        {
-        }
-    };
-}
+OOE_NAMESPACE_END( ( ooe )( error ) )
 
 #endif  // OOE_FOUNDATION_IO_ERROR_HPP
