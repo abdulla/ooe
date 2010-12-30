@@ -55,7 +55,7 @@ const void* module::find( const std::string& name ) const
 
 void module::insert( const std::string& name, const opaque_ptr& pointer )
 {
-    if ( !map.insert( map_type::value_type( name, pointer ) ).second )
+    if ( !map.insert( std::make_pair( name, pointer ) ).second )
         throw error::runtime( "module: " ) << "Unable to insert \"" << name << "\", facade exists";
 }
 

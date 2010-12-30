@@ -98,7 +98,7 @@ void insert( registry::type type, const std::string& path )
     write_lock lock( read_write );
 
     for ( iterator_type i = vector.begin(), end = vector.end(); i != end; ++i )
-        map.insert( module_map::value_type( *i, info ) );
+        map.insert( std::make_pair( *i, info ) );
 }
 
 //--- find -----------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ registry::info_vector find( const interface::vector_type& names )
         for ( pair_type j = map.equal_range( *i ); j.first != j.second; ++j.first )
         {
             std::pair< histogram_map::iterator, bool > pair =
-                histogram.insert( histogram_map::value_type( j.first->second, 1 ) );
+                histogram.insert( std::make_pair( j.first->second, 1 ) );
 
             if ( !pair.second )
                 ++pair.first->second;

@@ -32,7 +32,7 @@ s32 find( s32 id, location_map& locations, const std::string& name, function_typ
     if ( location == -1 )
         throw error::runtime( "opengl::block: " ) << "Variable \"" << name << "\" does not exist";
 
-    locations.insert( location_map::value_type( name, location ) );
+    locations.insert( std::make_pair( name, location ) );
     return location;
 }
 

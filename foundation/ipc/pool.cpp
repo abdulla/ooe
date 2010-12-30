@@ -14,7 +14,7 @@ pool::~pool( void )
 
 void pool::insert( const void* p, function_type f )
 {
-    map.insert( map_type::value_type( p, f ) );
+    map.insert( std::make_pair( p, f ) );
 }
 
 void pool::erase( const void* p )

@@ -93,7 +93,7 @@ void client::erase( const iterator& i )
 client::iterator client::insert( void )
 {
     lock lock( mutex );
-    return map.insert( map.end(), map_type::value_type( ++out, map_tuple() ) );
+    return map.insert( map.end(), std::make_pair( ++out, map_tuple() ) );
 }
 
 u8* client::get( void ) const
