@@ -59,7 +59,7 @@ client::client( const std::string& name )
 
 client::~client( void )
 {
-    if ( !link_client )
+    if ( !*link_client )
         return;
 
     link_client->shutdown();
