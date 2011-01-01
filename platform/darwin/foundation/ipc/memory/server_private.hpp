@@ -3,6 +3,8 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_SERVER_PRIVATE_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_SERVER_PRIVATE_HPP
 
+#include <iostream>
+
 #include "foundation/utility/macro.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )

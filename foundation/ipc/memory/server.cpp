@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/client.hpp"
