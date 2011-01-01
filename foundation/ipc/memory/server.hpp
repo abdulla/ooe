@@ -38,6 +38,8 @@ private:
     void* main( void* );
 };
 
+typedef atom_ptr< servlet > servlet_ptr;
+
 //--- server ---------------------------------------------------------------------------------------
 class server
 {
@@ -50,13 +52,13 @@ public:
 
     link_t link( pid_t, time_t );
     void unlink( link_t, bool );
-    atom_ptr< servlet > find( link_t ) const;
+    servlet_ptr find( link_t ) const;
 
     void migrate( ooe::socket& ) OOE_VISIBLE;
     void relink( ooe::socket& ) OOE_VISIBLE;
 
 private:
-    typedef std::map< link_t, atom_ptr< servlet > > servlet_map;
+    typedef std::map< link_t, servlet_ptr > servlet_map;
 
     ipc::semaphore semaphore;
     memory::transport transport;

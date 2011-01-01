@@ -148,7 +148,7 @@ void servlet::check( const void* address )
 void* servlet::main( void* pointer )
 {
     memory::server& server = *static_cast< memory::server* >( pointer );
-    atom_ptr< servlet > guard = server.find( link );
+    servlet_ptr guard = server.find( link );
 
     if ( link_listen )
     {
@@ -239,7 +239,7 @@ void server::unlink( link_t id, bool join )
     map.erase( i );
 }
 
-atom_ptr< servlet > server::find( link_t id ) const
+servlet_ptr server::find( link_t id ) const
 {
     lock lock( mutex );
     servlet_map::const_iterator i = map.find( id );
@@ -258,10 +258,9 @@ void server::migrate( socket& socket )
 void server::relink( socket& socket )
 {
     link_t id = seed++;
-    servlet_map::value_type value( id, new servlet( socket, id, external, *this ) );
 
     lock lock( mutex );
-    map.insert( map.end(), value );
+    map.insert( map.end(), std::make_pair( id, new servlet( socket, id, external, *this ) ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
