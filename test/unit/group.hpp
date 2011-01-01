@@ -67,7 +67,7 @@ public:
 private:
     virtual opaque_ptr create_setup( void )
     {
-        return new setup_type;
+        return opaque_ptr( new setup_type );
     }
 };
 

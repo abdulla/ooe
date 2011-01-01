@@ -4,32 +4,31 @@
 #include "component/lua/vm.hpp"
 #include "foundation/executable/program.hpp"
 
-namespace
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
+
+bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
-    using namespace ooe;
+    lua::vm vm;
+    vm.setup( lua::component_setup );
 
-    bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
+    for ( s32 i = 1; i < argc; ++i )
     {
-        lua::vm vm;
-        vm.setup( lua::component_setup );
+        const c8* name = std::strrchr( argv[ i ], '/' );
 
-        for ( s32 i = 1; i < argc; ++i )
-        {
-            const c8* name = std::strrchr( argv[ i ], '/' );
+        if ( !name )
+            continue;
 
-            if ( !name )
-                continue;
-
-            std::string file;
-            file << '@' << name + 1;
-            vm.load( file, descriptor( argv[ i ] ) );
-        }
-
-        return true;
+        std::string file;
+        file << '@' << name + 1;
+        vm.load( file, descriptor( argv[ i ] ) );
     }
+
+    return true;
 }
 
-//--- main ---------------------------------------------------------------------
+OOE_ANONYMOUS_END( ( ooe ) )
+
+//--- main -----------------------------------------------------------------------------------------
 extern "C" s32 main( s32 argc, c8** argv/*, c8** envp*/ )
 {
     return executable::launch( launch, argc, argv );

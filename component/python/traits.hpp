@@ -147,7 +147,7 @@ template< typename t >
             as< typename type::key_type >::call( key, k );
             typename type::mapped_type m;
             as< typename type::mapped_type >::call( mapped, m );
-            out.insert( typename type::value_type( k, m ) );
+            out.insert( std::make_pair( k, m ) );
         }
 
         map.swap( out );

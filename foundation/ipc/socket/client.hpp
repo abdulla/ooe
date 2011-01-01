@@ -18,8 +18,8 @@ template< typename >
 class OOE_VISIBLE client
 {
 public:
-    typedef shared_array< u8 > array_type;
-    typedef tuple< array_type, bool > map_tuple;
+    typedef shared_array< u8 > byte_array;
+    typedef tuple< byte_array, bool > map_tuple;
     typedef std::map< u64, map_tuple > map_type;
     typedef map_type::iterator iterator;
     typedef result_base< void > result_type;
@@ -27,7 +27,7 @@ public:
     client( const address& );
     ~client( void );
 
-    array_type wait( result_type& );
+    byte_array wait( result_type& );
     void erase( const iterator& );
     iterator insert( void );
 

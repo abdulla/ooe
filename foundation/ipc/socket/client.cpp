@@ -56,7 +56,7 @@ client::~client( void )
     thread.join();
 }
 
-client::array_type client::wait( result_type& result )
+client::byte_array client::wait( result_type& result )
 {
     map_tuple tuple;
 
@@ -93,7 +93,7 @@ void client::erase( const iterator& i )
 client::iterator client::insert( void )
 {
     lock lock( mutex );
-    return map.insert( map.end(), map_type::value_type( ++out, map_tuple() ) );
+    return map.insert( map.end(), std::make_pair( ++out, map_tuple() ) );
 }
 
 u8* client::get( void ) const
@@ -149,7 +149,7 @@ void* client::main( void* )
                 delete[] allocator.release();
             else
                 // result exists, store data within map
-                i->second = map_tuple( allocator.release(), error == error::none );
+                i->second = map_tuple( byte_array( allocator.release() ), error == error::none );
         }
 
         // notify any waiting results

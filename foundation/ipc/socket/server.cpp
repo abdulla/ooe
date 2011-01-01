@@ -109,7 +109,7 @@ void server::accept( void )
 
     lock lock( mutex );
     list.push_front( servlet_list::value_type() );
-    list.front() = new servlet( list.begin(), socket, switchboard, *this );
+    list.front() = servlet_ptr( new servlet( list.begin(), socket, switchboard, *this ) );
 }
 
 void server::erase( servlet_iterator iterator )
@@ -124,7 +124,7 @@ void server::relink( ooe::socket& incoming )
 
     lock lock( mutex );
     list.push_front( servlet_list::value_type() );
-    list.front() = new servlet( list.begin(), socket, switchboard, *this );
+    list.front() = servlet_ptr( new servlet( list.begin(), socket, switchboard, *this ) );
 }
 
 void server::migrate( ooe::socket& outgoing )

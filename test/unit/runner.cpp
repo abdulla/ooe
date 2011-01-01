@@ -244,7 +244,7 @@ runner::const_iterator runner::end( void ) const
 
 void runner::insert( const std::string& name, group_base& group )
 {
-    map.insert( map_type::value_type( name, &group ) );
+    map.insert( std::make_pair( name, &group ) );
 }
 
 bool runner::run( time_t timeout, bool no_stdout, bool no_fork ) const

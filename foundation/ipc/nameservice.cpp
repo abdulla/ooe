@@ -95,7 +95,7 @@ void nameservice::upgrade( const list_type& names )
         set.insert( name );
 
         std::pair< map_type::iterator, bool > pair =
-            map.insert( map_type::value_type( names[ i ], index ) );
+            map.insert( std::make_pair( names[ i ], index ) );
         switchboard::tuple_type tuple( 0, 0 );
 
         if ( pair.second )
@@ -171,7 +171,7 @@ void nameservice::insert_direct( const std::string& name, const std::string& typ
     vector_type::iterator i = vector.begin();
     std::advance( i, index - index_adjust );
     vector.insert( i, doc_ );
-    map.insert( map_type::value_type( tuple_type( name, type ), index ) );
+    map.insert( std::make_pair( tuple_type( name, type ), index ) );
 }
 
 void nameservice::insert_direct( const std::string& name, const std::string& type, const c8* doc_,

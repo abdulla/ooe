@@ -260,7 +260,7 @@ void make_tile( const descriptor& desc, thread_pool& pool, const std::string& ro
     pages.reserve( pages_per_row );
 
     for ( u32 i = 0; i != pages_per_row; ++i )
-        pages.push_back( new image( page_size, page_size, format ) );
+        pages.push_back( image_ptr( new image( page_size, page_size, format ) ) );
 
     // split
     for ( u32 i = 0, row = 0; reader->decode_row() || row; ++i, row = i % page_size )
@@ -282,7 +282,7 @@ void make_tile( const descriptor& desc, thread_pool& pool, const std::string& ro
     u32 height_limit = ceiling< u32 >( reader->height, page_size );
     u32 w = width_limit;
     u32 h = height_limit;
-    reader = 0;
+    reader_ptr().swap( reader );
     page_vector().swap( pages );
 
     // resample

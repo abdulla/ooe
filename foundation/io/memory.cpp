@@ -11,7 +11,7 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-//--- memory_id ----------------------------------------------------------------
+//--- memory_id ------------------------------------------------------------------------------------
 memory_id::memory_id( s32 fd, u8 flags, up_t offset, up_t size_ )
     : size( size_ ), area( mmap( 0, size, flags, MAP_SHARED, fd, offset ) )
 {
@@ -25,7 +25,7 @@ memory_id::~memory_id( void )
         OOE_CONSOLE( "memory: " << "Unable to unmap memory: " << error::number( errno ) );
 }
 
-//--- memory -------------------------------------------------------------------
+//--- memory ---------------------------------------------------------------------------------------
 memory::memory( const descriptor& desc, u8 flags )
     : internal( new memory_id( desc.get(), flags, 0, desc.size() ) )
 {

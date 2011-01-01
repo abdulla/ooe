@@ -65,7 +65,7 @@ s32 load( state* state )
     std::string path;
     to< std::string >::call( stack, path, 1 );
 
-    source_ptr source = new ooe::source( path );
+    source_ptr source( new ooe::source( path ) );
     const module& module = source->get();
     const interface::vector_type& names = module.names();
     const facade::local::vector_type& local = static_cast< const facade::local* >

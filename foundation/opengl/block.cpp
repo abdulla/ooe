@@ -32,7 +32,7 @@ s32 find( s32 id, location_map& locations, const std::string& name, function_typ
     if ( location == -1 )
         throw error::runtime( "opengl::block: " ) << "Variable \"" << name << "\" does not exist";
 
-    locations.insert( location_map::value_type( name, location ) );
+    locations.insert( std::make_pair( name, location ) );
     return location;
 }
 
@@ -183,13 +183,13 @@ void block::input( const std::string& name, const mat4* data, u32 size )
 void block::input( const std::string& name, const texture_ptr& texture )
 {
     s32 location = find( program, locations, name, GetUniformLocation );
-    textures[ location ] = texture_tuple( texture, 0 );
+    textures[ location ] = texture_tuple( texture, texture_array_ptr() );
 }
 
 void block::input( const std::string& name, const texture_array_ptr& texture_array )
 {
     s32 location = find( program, locations, name, GetUniformLocation );
-    textures[ location ] = texture_tuple( 0, texture_array );
+    textures[ location ] = texture_tuple( texture_ptr(), texture_array );
 }
 
 void block::

@@ -60,7 +60,7 @@ PyObject* load( PyObject*, PyObject* string )
     std::string path;
     as< std::string >::call( string, path );
 
-    source_ptr source = new ooe::source( path );
+    source_ptr source( new ooe::source( path ) );
     const module& module = source->get();
     const interface::vector_type& names = module.names();
     const module::vector_type& docs = module.docs();

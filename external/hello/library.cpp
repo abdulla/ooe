@@ -10,66 +10,66 @@
 #include "component/registry/local.hpp"
 #include "component/registry/remote.hpp"
 
-namespace
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+class print
 {
-    using namespace ooe;
-
-    class print
+public:
+    print( const std::string& value_ )
+        : value( value_ )
     {
-    public:
-        print( const std::string& value_ )
-            : value( value_ )
-        {
-        }
-
-        ~print( void )
-        {
-            std::cout << value << '\n';
-        }
-
-        void say( void )
-        {
-            std::cout << this << " said: " << value << '\n';
-        }
-
-    private:
-        std::string value;
-    };
-
-    void hello( void )
-    {
-        std::cout << "hello library\n";
     }
 
-    tuple< bool, f32 > gauntlet( bool b, f32 f )
+    ~print( void )
     {
-        return make_tuple( b, f );
+        std::cout << value << '\n';
     }
 
-    bool* mismatch( void )
+    void say( void )
     {
-        return 0;
+        std::cout << this << " said: " << value << '\n';
     }
 
-    typedef std::map< std::string, up_t > map_type;
-    map_type stdmap( const map_type& map )
-    {
-        for ( map_type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
-            std::cout << "key: " << i->first << ", value: " << i->second << '\n';
+private:
+    std::string value;
+};
 
-        return map;
-    }
-
-    typedef std::set< std::string > set_type;
-    set_type stdset( const set_type& set )
-    {
-        for ( set_type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
-            std::cout << "key: " << *i << '\n';
-
-        return set;
-    }
+void hello( void )
+{
+    std::cout << "hello library\n";
 }
 
+tuple< bool, f32 > gauntlet( bool b, f32 f )
+{
+    return make_tuple( b, f );
+}
+
+bool* mismatch( void )
+{
+    return 0;
+}
+
+typedef std::map< std::string, up_t > map_type;
+map_type stdmap( const map_type& map )
+{
+    for ( map_type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
+        std::cout << "key: " << i->first << ", value: " << i->second << '\n';
+
+    return map;
+}
+
+typedef std::set< std::string > set_type;
+set_type stdset( const set_type& set )
+{
+    for ( set_type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
+        std::cout << "key: " << *i << '\n';
+
+    return set;
+}
+
+OOE_NAMESPACE_END( ( ooe ) )
+
+//--- module_open ----------------------------------------------------------------------------------
 extern "C" ooe::module OOE_VISIBLE module_open( void )
 {
     module module;

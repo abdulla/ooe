@@ -296,7 +296,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( jpeg ) )
 //--- jpeg -----------------------------------------------------------------------------------------
 reader_ptr open( const descriptor& desc )
 {
-    return new jpeg_reader( desc );
+    return reader_ptr( new jpeg_reader( desc ) );
 }
 
 image decode( const descriptor& desc )

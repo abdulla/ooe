@@ -7,26 +7,27 @@
 #include "foundation/utility/noncopyable.hpp"
 #include "foundation/visual/view_forward.hpp"
 
-namespace ooe
+OOE_NAMESPACE_BEGIN( ( ooe ) )
+
+struct event_queue;
+
+//--- view_data ------------------------------------------------------------------------------------
+class view_data
+    : private noncopyable, public platform::view_data
 {
-    struct event_queue;
+protected:
+    view_data( const event_queue&, u16, u16, bool );
+    ~view_data( void );
+};
 
-//--- view_data ----------------------------------------------------------------
-    class view_data
-        : private noncopyable, public platform::view_data
-    {
-    protected:
-        view_data( const event_queue&, u16, u16, bool );
-        ~view_data( void );
-    };
+//--- view -----------------------------------------------------------------------------------------
+struct OOE_VISIBLE view
+    : public view_data, private platform::view
+{
+    view( const event_queue&, u16, u16, bool );
+    ~view( void );
+};
 
-//--- view ---------------------------------------------------------------------
-    struct OOE_VISIBLE view
-        : public view_data, private platform::view
-    {
-        view( const event_queue&, u16, u16, bool );
-        ~view( void );
-    };
-}
+OOE_NAMESPACE_END( ( ooe ) )
 
 #endif  // OOE_FOUNDATION_VISUAL_VIEW_HPP

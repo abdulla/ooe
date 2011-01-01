@@ -113,7 +113,7 @@ void insert_page( page_cache::page_map& pages, const page_cache::cache_list::ite
             return;
     }
 
-    pages.insert( pair.first, page_cache::page_map::value_type( i->_1._0, i ) );
+    pages.insert( pair.first, std::make_pair( i->_1._0, i ) );
 }
 
 void erase_page( page_cache::page_map& pages, const page_cache::cache_list::iterator& i )
