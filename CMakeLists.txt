@@ -163,6 +163,9 @@ ooe_executable( hello_server external/hello/server )
 target_link_libraries( hello_server executable ipc )
 set_target_properties( hello_server PROPERTIES OUTPUT_NAME hello )
 
+ooe_executable( memoryrpc_client external/memoryrpc/client )
+target_link_libraries( memoryrpc_client executable ipc )
+
 ooe_executable( memoryrpc_input external/memoryrpc/input )
 target_link_libraries( memoryrpc_input executable ipc )
 
