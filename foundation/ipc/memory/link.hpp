@@ -23,7 +23,7 @@ public:
     ooe::socket accept( void ) const;
 
 private:
-    mutable std::string path;
+    std::string path;
     ooe::listen listen;
 };
 
