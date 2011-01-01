@@ -66,7 +66,7 @@ v8::Handle< v8::Value > load( const v8::Arguments& arguments )
     std::string path;
     to< std::string >::call( arguments[ 0 ], path );
 
-    source_ptr source = new ooe::source( path );
+    source_ptr source( new ooe::source( path ) );
     const module& module = source->get();
     const interface::vector_type& names = module.names();
     const facade::local::vector_type& local = static_cast< const facade::local* >

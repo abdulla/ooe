@@ -105,7 +105,7 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 {
     typedef task< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > t;
     typedef typename t::partial_type p;
-    task_ptr task = new t( p( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ) );
+    task_ptr task( new t( p( function BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, a ) ) ) );
     pool.insert( task );
     return task;
 }

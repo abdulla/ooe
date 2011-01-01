@@ -226,7 +226,7 @@ reader_ptr open( const descriptor& desc )
     png_read_state state( desc );
     png_header header( state );
     png_metadata metadata( state, header );
-    return new png_reader( metadata, state );
+    return reader_ptr( new png_reader( metadata, state ) );
 }
 
 image decode( const descriptor& desc )

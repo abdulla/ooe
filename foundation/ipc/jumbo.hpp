@@ -36,7 +36,7 @@ public:
     void operator ()( const type& value )
     {
         up_t size = stream_size< type >::call( value );
-        memory = new shared_memory( unique_name(), shared_memory::create, size );
+        memory = memory_ptr( new shared_memory( unique_name(), shared_memory::create, size ) );
         stream_write< type >::call( memory->as< u8 >(), value );
     }
 
@@ -51,7 +51,8 @@ public:
     }
 
 private:
-    shared_ptr< shared_memory > memory;
+    typedef shared_ptr< shared_memory > memory_ptr;
+    memory_ptr memory;
 };
 
 //--- is_jumbo -------------------------------------------------------------------------------------

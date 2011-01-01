@@ -183,13 +183,13 @@ void block::input( const std::string& name, const mat4* data, u32 size )
 void block::input( const std::string& name, const texture_ptr& texture )
 {
     s32 location = find( program, locations, name, GetUniformLocation );
-    textures[ location ] = texture_tuple( texture, 0 );
+    textures[ location ] = texture_tuple( texture, texture_array_ptr() );
 }
 
 void block::input( const std::string& name, const texture_array_ptr& texture_array )
 {
     s32 location = find( program, locations, name, GetUniformLocation );
-    textures[ location ] = texture_tuple( 0, texture_array );
+    textures[ location ] = texture_tuple( texture_ptr(), texture_array );
 }
 
 void block::

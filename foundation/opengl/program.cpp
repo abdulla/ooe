@@ -59,12 +59,12 @@ program::~program( void )
 
 block_ptr program::block( const buffer_ptr& buffer ) const
 {
-    return new opengl::block( id, buffer );
+    return block_ptr( new opengl::block( id, buffer ) );
 }
 
 frame_ptr program::frame( u32 width, u32 height ) const
 {
-    return new opengl::frame( id, width, height );
+    return frame_ptr( new opengl::frame( id, width, height ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

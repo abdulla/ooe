@@ -395,9 +395,9 @@ texture_ptr device::
     verify_texture( pyramid.width, pyramid.height, texture_size_limit );
 
     if ( is_compressed( pyramid.format ) )
-        return new compressed_texture( pyramid, filter, generate_mipmap );
+        return texture_ptr( new compressed_texture( pyramid, filter, generate_mipmap ) );
     else
-        return new uncompressed_texture( pyramid, filter, generate_mipmap );
+        return texture_ptr( new uncompressed_texture( pyramid, filter, generate_mipmap ) );
 }
 
 texture_array_ptr device::texture_array( const image_metadata& metadata, u32 depth ) const
@@ -409,39 +409,39 @@ texture_array_ptr device::texture_array( const image_metadata& metadata, u32 dep
             "Array size " << depth << " > array size limit " << array_size_limit;
 
     if ( is_compressed( metadata.format ) )
-        return new compressed_texture_array( metadata, depth );
+        return texture_array_ptr( new compressed_texture_array( metadata, depth ) );
     else
-        return new uncompressed_texture_array( metadata, depth );
+        return texture_array_ptr( new uncompressed_texture_array( metadata, depth ) );
 }
 
 buffer_ptr device::buffer( up_t size, buffer::type format, buffer::usage_type usage ) const
 {
-    return new opengl::buffer( size, format, usage );
+    return buffer_ptr( new opengl::buffer( size, format, usage ) );
 }
 
 target_ptr device::target( const image_metadata& metadata ) const
 {
-    return new opengl::target( metadata );
+    return target_ptr( new opengl::target( metadata ) );
 }
 
 shader_ptr device::shader( const std::string& source, shader::type type ) const
 {
-    return new opengl::shader( source, type );
+    return shader_ptr( new opengl::shader( source, type ) );
 }
 
 program_ptr device::program( const shader_vector& vector ) const
 {
-    return new opengl::program( vector );
+    return program_ptr( new opengl::program( vector ) );
 }
 
 frame_ptr device::default_frame( u32 width, u32 height ) const
 {
-    return new opengl::default_frame( width, height );
+    return frame_ptr( new opengl::default_frame( width, height ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )
 
 extern "C" device_ptr OOE_VISIBLE device_open( const view_data& view, bool sync )
 {
-    return new opengl::device( view, sync );
+    return device_ptr( new opengl::device( view, sync ) );
 }

@@ -10,27 +10,27 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- deallocate_ptr -------------------------------------------------------------------------------
 template< typename type >
-    void deallocate_ptr( type* value )
+    void deallocate_ptr( const void* value )
 {
-    delete value;
+    delete static_cast< const type* >( value );
 }
 
 //--- deallocate_array -----------------------------------------------------------------------------
 template< typename type >
-    void deallocate_array( type* value )
+    void deallocate_array( const void* value )
 {
-    delete[] value;
+    delete[] static_cast< const type* >( value );
 }
 
 //--- deallocate_free ------------------------------------------------------------------------------
 template< typename type >
-    void deallocate_free( type* value )
+    void deallocate_free( const void* value )
 {
-    free( value );
+    free( const_cast< void* >( value ) );
 }
 
 //--- scoped_base ----------------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ) >
+template< typename type, void ( * function )( const void* ) >
     class scoped_base
     : private noncopyable
 {
@@ -73,7 +73,7 @@ public:
 protected:
     type* value;
 
-    scoped_base( type* value_ )
+    explicit scoped_base( type* value_ )
         : value( value_ )
     {
     }
@@ -85,7 +85,7 @@ protected:
 };
 
 //--- scoped_dereference ---------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ) >
+template< typename type, void ( * function )( const void* ) >
     class scoped_dereference
     : public scoped_base< type, function >
 {
@@ -96,18 +96,18 @@ public:
     }
 
 protected:
-    scoped_dereference( type* value_ )
+    explicit scoped_dereference( type* value_ )
         : scoped_base< type, function >( value_ )
     {
     }
 };
 
-template< void ( * function )( void* ) >
+template< void ( * function )( const void* ) >
     class scoped_dereference< void, function >
     : public scoped_base< void, function >
 {
 protected:
-    scoped_dereference( void* value_ )
+    explicit scoped_dereference( void* value_ )
         : scoped_base< void, function >( value_ )
     {
     }
@@ -118,7 +118,7 @@ template< typename type >
     struct scoped_ptr
     : public scoped_dereference< type, deallocate_ptr< type > >
 {
-    scoped_ptr( type* value_ )
+    explicit scoped_ptr( type* value_ )
         : scoped_dereference< type, deallocate_ptr< type > >( value_ )
     {
     }
@@ -129,7 +129,7 @@ template< typename type >
     struct scoped_array
     : public scoped_dereference< type, deallocate_array< type > >
 {
-    scoped_array( type* value_ )
+    explicit scoped_array( type* value_ )
         : scoped_dereference< type, deallocate_array< type > >( value_ )
     {
     }
@@ -140,18 +140,18 @@ template< typename type >
     struct scoped_free
     : public scoped_dereference< type, deallocate_free< type > >
 {
-    scoped_free( type* value_ )
+    explicit scoped_free( type* value_ )
         : scoped_dereference< type, deallocate_free< type > >( value_ )
     {
     }
 };
 
 //--- shared_data ----------------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename use_t >
+template< typename type, void ( * function )( const void* ), typename use_t >
     class shared_data
 {
 public:
-    shared_data( type* value_ )
+    explicit shared_data( type* value_ )
         : use_count( 1 ), value( value_ )
     {
     }
@@ -186,7 +186,7 @@ private:
 };
 
 //--- shared_base ----------------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename use_t >
+template< typename type, void ( * function )( const void* ), typename use_t >
     class shared_base
 {
 public:
@@ -241,7 +241,7 @@ protected:
     typedef shared_data< type, function, use_t > data_type;
     data_type* data;
 
-    shared_base( type* value )
+    explicit shared_base( type* value )
         : data( new data_type( value ) )
     {
     }
@@ -253,7 +253,7 @@ protected:
 };
 
 //--- shared_dereference ---------------------------------------------------------------------------
-template< typename type, void ( * function )( type* ), typename use_t >
+template< typename type, void ( * function )( const void* ), typename use_t >
     class shared_dereference
     : public shared_base< type, function, use_t >
 {
@@ -264,18 +264,18 @@ public:
     }
 
 protected:
-    shared_dereference( type* value )
+    explicit shared_dereference( type* value )
         : shared_base< type, function, use_t >( value )
     {
     }
 };
 
-template< void ( * function )( void* ), typename use_t >
+template< void ( * function )( const void* ), typename use_t >
     class shared_dereference< void, function, use_t >
     : public shared_base< void, function, use_t >
 {
 protected:
-    shared_dereference( void* value )
+    explicit shared_dereference( void* value )
         : shared_base< void, function, use_t >( value )
     {
     }
@@ -286,7 +286,7 @@ template< typename type >
     struct shared_ptr
     : public shared_dereference< type, deallocate_ptr< type >, unsigned >
 {
-    shared_ptr( type* value = 0 )
+    explicit shared_ptr( type* value = 0 )
         : shared_dereference< type, deallocate_ptr< type >, unsigned >( value )
     {
     }
@@ -297,7 +297,7 @@ template< typename type >
     struct shared_array
     : public shared_dereference< type, deallocate_array< type >, unsigned >
 {
-    shared_array( type* value = 0 )
+    explicit shared_array( type* value = 0 )
         : shared_dereference< type, deallocate_array< type >, unsigned >( value )
     {
     }
@@ -308,7 +308,7 @@ template< typename type >
     struct shared_free
     : public shared_dereference< type, deallocate_free< type >, unsigned >
 {
-    shared_free( type* value = 0 )
+    explicit shared_free( type* value = 0 )
         : shared_dereference< type, deallocate_free< type >, unsigned >( value )
     {
     }
@@ -367,8 +367,8 @@ public:
     typedef opaque_data::function_type function_type;
 
     template< typename t >
-        opaque_ptr( t* value )
-        : data( new opaque_data( value, opaque_delete< t > ) )
+        explicit opaque_ptr( t* value )
+        : data( new opaque_data( value, deallocate_ptr< t > ) )
     {
     }
 
@@ -426,12 +426,6 @@ public:
 
 private:
     opaque_data* data;
-
-    template< typename t >
-        friend void opaque_delete( const void* value )
-    {
-        delete static_cast< const t* >( value );
-    }
 };
 
 OOE_NAMESPACE_END( ( ooe ) )

@@ -219,7 +219,8 @@ void frame::output( const std::string& name, const texture_ptr& generic_texture 
 {
     const opengl::texture& texture = dynamic_cast< const opengl::texture& >( *generic_texture );
     s32 location = find( program, locations, name );
-    frame_output( id, location, attachment_tuple( generic_texture, 0 ), attachments, state );
+    attachment_tuple tuple( generic_texture, target_ptr() );
+    frame_output( id, location, tuple, attachments, state );
 
     FramebufferTexture2D
         ( DRAW_FRAMEBUFFER, COLOR_ATTACHMENT0 + location, TEXTURE_2D, texture.id, 0 );
@@ -229,7 +230,8 @@ void frame::output( const std::string& name, const target_ptr& generic_target )
 {
     const opengl::target& target = dynamic_cast< const opengl::target& >( *generic_target );
     s32 location = find( program, locations, name );
-    frame_output( id, location, attachment_tuple( 0, generic_target ), attachments, state );
+    attachment_tuple tuple( texture_ptr(), generic_target );
+    frame_output( id, location, tuple, attachments, state );
 
     FramebufferRenderbuffer
         ( DRAW_FRAMEBUFFER, COLOR_ATTACHMENT0 + location, RENDERBUFFER, target.id );

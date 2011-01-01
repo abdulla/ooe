@@ -43,7 +43,7 @@ public:
         if ( base->state == base_type::done )
             return base->value;
 
-        client::array_type array;
+        client::byte_array array;
 
         if ( base->state == base_type::wait )
             array = base->client.wait( *base );
@@ -76,7 +76,7 @@ public:
         if ( base->state == base_type::done )
             return;
 
-        client::array_type array;
+        client::byte_array array;
 
         if ( base->state == base_type::wait )
             array = base->client.wait( *base );

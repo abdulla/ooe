@@ -100,7 +100,7 @@ map_ptr buffer::map( access_type access ) const
 {
     BindBuffer( target, id );
     void* data = MapBuffer( target, buffer_access( access ) );
-    return new opengl::map( data, size, target );
+    return map_ptr( new opengl::map( data, size, target ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( opengl ) )

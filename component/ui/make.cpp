@@ -21,21 +21,21 @@ box make_box( const property_tree& pt )
 }
 
 //--- make_aux -------------------------------------------------------------------------------------
-colour_node* make_aux( const property_tree& pt, const node_map& map )
+opaque_ptr make_aux( const property_tree& pt, const node_map& map )
 {
     colour colour = make_colour( pt, 0 );
     boost::optional< std::string > node = pt.get_optional< std::string >( "node" );
     boost::optional< const property_tree& > data = pt.get_child_optional( "data" );
 
     if ( !node || !data )
-        return new colour_node( colour, 0 );
+        return opaque_ptr( new colour_node( colour, 0 ) );
 
     node_map::const_iterator i = map.find( *node );
 
     if ( i == map.end() )
         throw error::runtime( "make_tree: " ) << "Unknown node \"" << *node << '\"';
 
-    return new colour_node( colour, i->second( *data ) );
+    return opaque_ptr( new colour_node( colour, i->second( *data ) ) );
 }
 
 //--- load_tree ------------------------------------------------------------------------------------

@@ -70,16 +70,16 @@ public:
     pointer allocate( size_type size, std::allocator< void >::const_pointer = 0 )
     {
         reserve = memory;
-        memory = new shared_memory( unique_name(), shared_memory::create, size );
+        memory = memory_ptr( new shared_memory( unique_name(), shared_memory::create, size ) );
         return memory->as< type >();
     }
 
     void deallocate( pointer p, size_type )
     {
         if ( memory && p == memory->as< type >() )
-            memory = 0;
+            memory_ptr().swap( memory );
         else if ( reserve && p == reserve->as< type >() )
-            reserve = 0;
+            memory_ptr().swap( reserve );
         else
             throw error::runtime( "ipc::allocator: " ) << "Invalid pointer " << p;
     }
@@ -95,9 +95,11 @@ public:
     }
 
 private:
+    typedef shared_ptr< shared_memory > memory_ptr;
+
     size_type used;
-    shared_ptr< shared_memory > memory;
-    shared_ptr< shared_memory > reserve;
+    memory_ptr memory;
+    memory_ptr reserve;
 };
 
 template< typename type >
