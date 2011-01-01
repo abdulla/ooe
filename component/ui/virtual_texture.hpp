@@ -63,7 +63,8 @@ public:
 
 private:
     typedef std::map< key_type, cache_list::iterator > cache_map;
-    typedef tuple< key_type, bool, atom_ptr< image > > pending_type;
+    typedef atom_ptr< image > image_ptr;
+    typedef tuple< key_type, bool, image_ptr > pending_type;
     typedef tbb::concurrent_queue< pending_type > pending_queue;
 
     thread_pool& pool;
