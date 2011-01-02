@@ -9,3 +9,7 @@ add a way to replay responses
 look at a linux-specific way to accelerate IPC
     - sys_process_vm_read() and sys_process_vm_write(): http://lwn.net/Articles/405346
     - directed yield with yield_to(): http://lwn.net/Articles/419961
+
+use spinlock placed in server transport's private data for client connection
+    - this avoids the deadlocks that can occur from using a named semaphore, if careful
+    - can write a pid of connecting process in, which can be checked for existance
