@@ -54,8 +54,8 @@ public:
     link_client( const std::string&, transport& );
     ~link_client( void );
 
-    operator bool( void ) const;
     void shutdown( void );
+    operator bool( void ) const;
 
 private:
     ooe::connect connect;

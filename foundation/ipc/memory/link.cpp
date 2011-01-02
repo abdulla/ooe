@@ -9,6 +9,16 @@
 #include "foundation/ipc/memory/link.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
+
+void shutdown( ooe::socket& socket, atom< bool >& state )
+{
+    if ( state.exchange( false ) )
+        socket.shutdown( socket::write );
+}
+
+OOE_ANONYMOUS_END( ( ooe ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- link_listen ----------------------------------------------------------------------------------
@@ -36,19 +46,14 @@ link_server::link_server( const ooe::socket& socket_, link_t link_, server& serv
 
 link_server::~link_server( void )
 {
-    if ( !state.exchange( false ) )
-        return;
-
-    pair._1.shutdown( socket::write );
+    shutdown( pair._1, state );
     thread.join();
 }
 
 void link_server::migrate( ooe::socket& migrate_socket )
 {
     migrate_socket.send( socket );
-
-    if ( state.exchange( false ) )
-        pair._1.shutdown( socket::write );
+    shutdown( pair._1, state );
 }
 
 void* link_server::main( void* pointer )
@@ -75,19 +80,18 @@ link_client::link_client( const std::string& name, transport& transport )
 
 link_client::~link_client( void )
 {
-    shutdown();
+    ::shutdown( pair._1, state );
     thread.join();
+}
+
+void link_client::shutdown( void )
+{
+    ::shutdown( pair._1, state );
 }
 
 link_client::operator bool( void ) const
 {
     return state;
-}
-
-void link_client::shutdown( void )
-{
-    if ( state.exchange( false ) )
-        pair._1.shutdown( socket::write );
 }
 
 void* link_client::main( void* pointer )
