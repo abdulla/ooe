@@ -25,7 +25,6 @@ protected:
 
     friend class condition;
     friend class lock;
-    friend class try_lock;
 };
 
 //--- condition ------------------------------------------------------------------------------------
