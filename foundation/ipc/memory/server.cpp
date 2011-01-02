@@ -84,7 +84,7 @@ up_t ipc_unlink( const any& any, io_buffer& buffer, pool& )
     link_t link;
     stream_read< link_t >::call( buffer.get(), link );
 
-    static_cast< server* >( any.pointer )->unlink( link, true );
+    static_cast< server* >( any.pointer )->unlink( link );
     return 0;
 }
 
@@ -119,13 +119,12 @@ servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchbo
 
 void servlet::join( void )
 {
-    if ( state.exchange( false ) )
-    {
-        // wake servlet and indicate that it should call null and exit
-        stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
-        transport.wake_wait();
-    }
+    if ( !state.exchange( false ) )
+        return;
 
+    // wake servlet and indicate that it should call null and exit
+    stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
+    transport.wake_wait();
     thread.join();
 }
 
@@ -134,7 +133,7 @@ void servlet::migrate( socket& socket, server& server )
     transport.migrate( socket );
     link_server->migrate( socket );
     state.exchange( false );
-    server.unlink( link, false );
+    server.unlink( link );
 }
 
 void servlet::check( const void* address )
@@ -226,23 +225,21 @@ link_t server::link( pid_t pid, time_t time )
     return id;
 }
 
-void server::unlink( link_t id, bool join )
+void server::unlink( link_t id )
 {
-    servlet_map::iterator i;
-
     {
         read_lock read_lock( read_write );
-        i = map.find( id );
+        servlet_map::iterator i = map.find( id );
 
         if ( i == map.end() )
             throw error::runtime( "ipc::memory::server: " ) <<
                 "Servlet " << id << " does not exist";
-        else if ( join )
-            i->second->join();
+
+        i->second->join();
     }
 
     write_lock write_lock( read_write );
-    map.erase( i );
+    map.erase( id );
 }
 
 servlet_ptr server::find( link_t id ) const

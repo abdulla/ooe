@@ -46,7 +46,10 @@ link_server::link_server( const ooe::socket& socket_, link_t link_, server& serv
 
 link_server::~link_server( void )
 {
-    shutdown( pair._1, state );
+    if ( !state.exchange( false ) )
+        return;
+
+    pair._1.shutdown( socket::write );
     thread.join();
 }
 
@@ -66,7 +69,7 @@ void* link_server::main( void* pointer )
     poll.wait();
 
     if ( state.exchange( false ) )
-        server.unlink( link, true );
+        server.unlink( link );
 
     return 0;
 }

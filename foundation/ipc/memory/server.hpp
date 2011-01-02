@@ -54,7 +54,7 @@ public:
     std::string name( void ) const;
 
     link_t link( pid_t, time_t );
-    void unlink( link_t, bool );
+    void unlink( link_t );
     servlet_ptr find( link_t ) const;
 
     void migrate( ooe::socket& ) OOE_VISIBLE;
