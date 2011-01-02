@@ -9,13 +9,8 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-void* startup( void* pointer )
-{
-    thread::tuple_type& tuple = *static_cast< thread::tuple_type* >( pointer );
-    platform::thread_name( tuple._0 );
-    OOE_PRINT( "thread \"" << tuple._0 << "\"", return tuple._1( tuple._2 ) );
-    return 0;
-}
+typedef tuple< std::string, thread::function_type, void* > datum_tuple;
+typedef scoped_ptr< datum_tuple > datum_ptr;
 
 std::string thread_name( pthread_t pthread )
 {
@@ -29,6 +24,18 @@ std::string thread_name( pthread_t pthread )
     }
 
     return name;
+}
+
+void* startup( void* pointer )
+{
+    datum_ptr datum( static_cast< datum_tuple* >( pointer ) );
+    platform::thread_name( datum->_0 );
+    datum->_0 = std::string();
+
+    OOE_PRINT( "thread \"" << thread_name( pthread_self() ) << "\"",
+        return datum->_1( datum->_2 ) );
+
+    return 0;
 }
 
 void specify( pthread_key_t key, const void* value )
@@ -45,18 +52,21 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- thread ---------------------------------------------------------------------------------------
 thread::thread( void )
-    : pthread( pthread_self() ), tuple( thread_name( pthread ), function_type(), 0 ), joined( true )
+    : pthread( pthread_self() ), joined( true )
 {
 }
 
 thread::thread( const std::string& name_, const function_type& function, void* data )
-    : pthread(), tuple( name_, function, data ), joined( false )
+    : pthread(), joined( false )
 {
-    s32 status = pthread_create( &pthread, 0, startup, &tuple );
+    datum_ptr datum( new datum_tuple( name_, function, data ) );
+    s32 status = pthread_create( &pthread, 0, startup, datum );
 
     if ( status )
-        throw error::runtime( "thread \"" ) << tuple._0 << "\": "
+        throw error::runtime( "thread \"" ) << name() << "\": "
             "Unable to create thread: " << error::number( status );
+
+    datum.release();
 }
 
 thread::~thread( void )
@@ -67,13 +77,13 @@ thread::~thread( void )
     s32 status = pthread_detach( pthread );
 
     if ( status && status != ESRCH )
-        OOE_CONSOLE( "thread \"" << tuple._0 << "\": "
+        OOE_CONSOLE( "thread \"" << name() << "\": "
             "Unable to destroy thread: " << error::number( status ) );
 }
 
 std::string thread::name( void ) const
 {
-    return tuple._0;
+    return thread_name( pthread );
 }
 
 bool thread::operator ==( const thread& compare ) const
@@ -90,7 +100,7 @@ void* thread::join( void )
     s32 status = pthread_join( pthread, &pointer );
 
     if ( status && status != ESRCH )
-        throw error::runtime( "thread \"" ) << tuple._0 << "\": "
+        throw error::runtime( "thread \"" ) << name() << "\": "
             "Unable to join thread: " << error::number( status );
 
     joined = true;

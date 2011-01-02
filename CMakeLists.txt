@@ -178,11 +178,11 @@ target_link_libraries( memoryrpc_output executable ipc )
 ooe_executable( memoryrpc_server external/memoryrpc/server )
 target_link_libraries( memoryrpc_server executable ipc )
 
-ooe_executable( pool_bench external/pool_bench )
-target_link_libraries( pool_bench executable parallel )
-
 ooe_executable( monitor external/monitor )
 target_link_libraries( monitor executable image visual )
+
+ooe_executable( pool_bench external/pool_bench )
+target_link_libraries( pool_bench executable parallel )
 
 ooe_executable( socketrpc_input external/socketrpc/input )
 target_link_libraries( socketrpc_input executable ipc )
@@ -195,3 +195,9 @@ target_link_libraries( socketrpc_output executable ipc )
 
 ooe_executable( socketrpc_server external/socketrpc/server )
 target_link_libraries( socketrpc_server executable ipc )
+
+ooe_executable( transport_notify external/transport/notify )
+target_link_libraries( transport_notify executable ipc )
+
+ooe_executable( transport_wait external/transport/wait )
+target_link_libraries( transport_wait executable ipc )

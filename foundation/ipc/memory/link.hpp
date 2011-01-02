@@ -23,7 +23,7 @@ public:
     ooe::socket accept( void ) const;
 
 private:
-    mutable std::string path;
+    std::string path;
     ooe::listen listen;
 };
 
@@ -31,13 +31,6 @@ private:
 class link_server
 {
 public:
-    enum type
-    {
-        idle,
-        work,
-        move
-    };
-
     link_server( const ooe::socket&, link_t, server& );
     ~link_server( void );
 
@@ -48,7 +41,7 @@ private:
     socket_pair pair;
 
     const link_t link;
-    atom< type > state;
+    atom< bool > state;
     ooe::thread thread;
 
     void* main( void* );
@@ -61,10 +54,13 @@ public:
     link_client( const std::string&, transport& );
     ~link_client( void );
 
+    void shutdown( void );
     operator bool( void ) const;
 
 private:
     ooe::connect connect;
+    socket_pair pair;
+
     atom< bool > state;
     ooe::thread thread;
 

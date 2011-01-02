@@ -2,18 +2,11 @@
 
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
-#include "foundation/ipc/memory/transport.hpp"
-#include "foundation/utility/error.hpp"
+#include "foundation/ipc/memory/transport_private.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-//--- control --------------------------------------------------------------------------------------
-struct control
-{
-    u8 private_data[ ipc::memory::transport::private_size ];
-};
-
-OOE_STATIC_ASSERT( executable::static_page_size > sizeof( control ) );
+OOE_STATIC_ASSERT( executable::static_page_size > sizeof( ipc::memory::control ) );
 
 //--- receive_name ---------------------------------------------------------------------------------
 inline std::string receive_name( socket& socket )
@@ -26,7 +19,7 @@ inline std::string receive_name( socket& socket )
     std::string name( size, 0 );
 
     if ( socket.receive( &name[ 0 ], size ) != size )
-        throw error::runtime( "ipc::memroy::transport: " ) << "Unable to receive name";
+        throw error::runtime( "ipc::memory::transport: " ) << "Unable to receive name";
 
     return name;
 }
@@ -69,6 +62,9 @@ transport::transport( const std::string& name_, type mode )
 {
     ooe::memory::region region( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, region );
+
+    if ( mode == create )
+        new( memory.get() ) control;
 }
 
 transport::transport( ooe::socket& socket )
@@ -87,25 +83,22 @@ transport::~transport( void )
 
 void transport::wait( wait_type function, const void* pointer )
 {
-    in.down();
-    function( pointer );
-    out.up();
+    memory.as< memory::control >()->wait( in, out, function, pointer );
 }
 
 void transport::notify( void )
 {
-    in.up();
-    out.down();
+    memory.as< memory::control >()->notify( in, out );
 }
 
 void transport::wake_wait( void )
 {
-    in.up();
+    memory.as< memory::control >()->wake_wait( in );
 }
 
 void transport::wake_notify( void )
 {
-    out.up();
+    memory.as< memory::control >()->wake_notify( out );
 }
 
 u8* transport::get( void ) const

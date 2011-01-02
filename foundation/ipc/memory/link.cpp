@@ -9,6 +9,16 @@
 #include "foundation/ipc/memory/link.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
+
+void shutdown( ooe::socket& socket, atom< bool >& state )
+{
+    if ( state.exchange( false ) )
+        socket.shutdown( socket::write );
+}
+
+OOE_ANONYMOUS_END( ( ooe ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- link_listen ----------------------------------------------------------------------------------
@@ -29,29 +39,24 @@ socket link_listen::accept( void ) const
 
 //--- link_server ----------------------------------------------------------------------------------
 link_server::link_server( const ooe::socket& socket_, link_t link_, server& server )
-    : socket( socket_ ), pair( make_pair() ), link( link_ ), state( work ),
+    : socket( socket_ ), pair( make_pair() ), link( link_ ), state( true ),
     thread( "link_server", make_function( *this, &link_server::main ), &server )
 {
 }
 
 link_server::~link_server( void )
 {
-    if ( state == idle )
+    if ( !state.exchange( false ) )
         return;
-    else if ( state == work )
-    {
-        state.exchange( idle );
-        socket.shutdown( socket::read );
-    }
 
+    pair._1.shutdown( socket::write );
     thread.join();
 }
 
 void link_server::migrate( ooe::socket& migrate_socket )
 {
-    state.exchange( move );
     migrate_socket.send( socket );
-    pair._1.shutdown( socket::write );
+    shutdown( pair._1, state );
 }
 
 void* link_server::main( void* pointer )
@@ -63,29 +68,28 @@ void* link_server::main( void* pointer )
     poll.insert( pair._0 );
     poll.wait();
 
-    if ( state != work )
-        return 0;
+    if ( state.exchange( false ) )
+        server.unlink( link );
 
-    state.exchange( idle );
-    server.unlink( link, true );
     return 0;
 }
 
 //--- link_client ----------------------------------------------------------------------------------
 link_client::link_client( const std::string& name, transport& transport )
-    : connect( local_address( local_name( name ) ) ), state( true ),
+    : connect( local_address( local_name( name ) ) ), pair( make_pair() ), state( true ),
     thread( "link_client", make_function( *this, &link_client::main ), &transport )
 {
 }
 
 link_client::~link_client( void )
 {
-    if ( !state )
-        return;
-
-    state.exchange( false );
-    connect.shutdown( socket::read );
+    ::shutdown( pair._1, state );
     thread.join();
+}
+
+void link_client::shutdown( void )
+{
+    ::shutdown( pair._1, state );
 }
 
 link_client::operator bool( void ) const
@@ -99,15 +103,15 @@ void* link_client::main( void* pointer )
 
     poll poll;
     poll.insert( connect );
+    poll.insert( pair._0 );
     poll.wait();
 
-    if ( !state )
+    if ( !state.exchange( false ) )
         return 0;
 
     // wake for result, indicating that an error in the link has occurred
     stream_write< bool_t, error_t, const c8* >::call( transport.get(), true, error::link, "" );
     transport.wake_notify();
-    state.exchange( false );
     return 0;
 }
 

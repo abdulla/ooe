@@ -2,26 +2,25 @@
 
 #include "foundation/executable/environment.hpp"
 #include "foundation/io/socket.hpp"
-#include "foundation/ipc/memory/transport.hpp"
+#include "foundation/ipc/memory/transport_private.hpp"
 #include "foundation/parallel/lock.hpp"
-#include "foundation/utility/miscellany.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 
-//--- control --------------------------------------------------------------------------------------
-struct control
+//--- control_io -----------------------------------------------------------------------------------
+struct control_io
+    : public control
 {
-    u8 private_data[ transport::private_size ];
     ooe::semaphore in;
     ooe::semaphore out;
 
-    control( void )
-        : private_data(), in( 0 ), out( 0 )
+    control_io( void )
+        : control(), in( 0 ), out( 0 )
     {
     }
 };
 
-OOE_STATIC_ASSERT( executable::static_page_size > sizeof( control ) );
+OOE_STATIC_ASSERT( executable::static_page_size > sizeof( control_io ) );
 
 OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 
@@ -46,7 +45,7 @@ transport::transport( const std::string& name_, type mode )
     memory.protect( ooe::memory::none, region );
 
     if ( created )
-        new( memory.get() ) control;
+        new( memory.get() ) control_io;
 }
 
 transport::transport( ooe::socket& socket )
@@ -59,42 +58,41 @@ transport::transport( ooe::socket& socket )
 transport::~transport( void )
 {
     if ( created )
-        memory.as< control >()->~control();
+        memory.as< control_io >()->~control_io();
 }
 
 void transport::wait( wait_type function, const void* pointer )
 {
-    ::control& control = *memory.as< ::control >();
-    control.in.down();
-    function( pointer );
-    control.out.up();
+    control_io& control = *memory.as< control_io >();
+    control.wait( control.in, control.out, function, pointer );
 }
 
 void transport::notify( void )
 {
-    ::control& control = *memory.as< ::control >();
-    control.in.up();
-    control.out.down();
+    control_io& control = *memory.as< control_io >();
+    control.notify( control.in, control.out );
 }
 
 void transport::wake_wait( void )
 {
-    memory.as< control >()->in.up();
+    control_io& control = *memory.as< control_io >();
+    control.wake_wait( control.in );
 }
 
 void transport::wake_notify( void )
 {
-    memory.as< control >()->out.up();
+    control_io& control = *memory.as< control_io >();
+    control.wake_notify( control.out );
 }
 
 u8* transport::get( void ) const
 {
-    return memory.as< u8 >() + sizeof( control );
+    return memory.as< u8 >() + sizeof( control_io );
 }
 
 up_t transport::size( void ) const
 {
-    return memory.size() - sizeof( control ) - executable::static_page_size;
+    return memory.size() - sizeof( control_io ) - executable::static_page_size;
 }
 
 void transport::migrate( ooe::socket& socket )

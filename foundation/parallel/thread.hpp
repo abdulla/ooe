@@ -20,7 +20,6 @@ class OOE_VISIBLE thread
 {
 public:
     typedef function< void* ( void* ) > function_type;
-    typedef ooe::tuple< const std::string, const function_type, void* > tuple_type;
 
     thread( void );
     thread( const std::string&, const function_type&, void* );
@@ -35,7 +34,6 @@ public:
 
 private:
     pthread_t pthread;
-    tuple_type tuple;
     bool joined;
 };
 

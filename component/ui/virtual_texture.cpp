@@ -177,8 +177,8 @@ up_t page_cache::pending( void ) const
 
 void page_cache::read( virtual_texture& texture, pyramid_index index, bool locked )
 {
-    atom_ptr< ooe::image > image;
-    OOE_PRINT( "page_cache", image = new ooe::image( texture.source.read( index ) ) );
+    image_ptr image;
+    OOE_PRINT( "page_cache", image = image_ptr( new ooe::image( texture.source.read( index ) ) ) );
     queue.push( pending_type( key_type( &texture, index ), locked, image ) );
 }
 

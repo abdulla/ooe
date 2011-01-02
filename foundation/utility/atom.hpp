@@ -129,7 +129,7 @@ template< typename type >
     struct atom_ptr
     : public shared_dereference< type, deallocate_ptr< type >, atom< unsigned > >
 {
-    atom_ptr( type* value = 0 )
+    explicit atom_ptr( type* value = 0 )
         : shared_dereference< type, deallocate_ptr< type >, atom< unsigned > >( value )
     {
     }
@@ -140,7 +140,7 @@ template< typename type >
     struct atom_array
     : public shared_dereference< type, deallocate_array< type >, atom< unsigned > >
 {
-    atom_array( type* value = 0 )
+    explicit atom_array( type* value = 0 )
         : shared_dereference< type, deallocate_array< type >, atom< unsigned > >( value )
     {
     }
@@ -151,7 +151,7 @@ template< typename type >
     struct atom_free
     : public shared_dereference< type, deallocate_free< type >, atom< unsigned > >
 {
-    atom_free( type* value = 0 )
+    explicit atom_free( type* value = 0 )
         : shared_dereference< type, deallocate_free< type >, atom< unsigned > >( value )
     {
     }

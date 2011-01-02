@@ -6,6 +6,7 @@
 #include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/switchboard.hpp"
 #include "foundation/ipc/memory/link.hpp"
+#include "foundation/parallel/lock.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
@@ -17,16 +18,19 @@ public:
     servlet( ooe::socket&, link_t, const ipc::switchboard&, server& );
 
     void join( void );
-    void migrate( ooe::socket&, semaphore&, server& );
+    void migrate( ooe::socket&, server& );
     void check( const void* );
 
 private:
+    typedef scoped_ptr< const memory::link_listen > link_listen_ptr;
+    typedef scoped_ptr< memory::link_server > link_server_ptr;
+
     memory::transport transport;
     const link_t link;
     const ipc::switchboard& switchboard;
 
-    scoped_ptr< const memory::link_listen > link_listen;
-    scoped_ptr< memory::link_server > link_server;
+    link_listen_ptr link_listen;
+    link_server_ptr link_server;
 
     shared_allocator allocator;
     io_buffer buffer;
@@ -36,6 +40,8 @@ private:
 
     void* main( void* );
 };
+
+typedef atom_ptr< servlet > servlet_ptr;
 
 //--- server ---------------------------------------------------------------------------------------
 class server
@@ -48,21 +54,22 @@ public:
     std::string name( void ) const;
 
     link_t link( pid_t, time_t );
-    void unlink( link_t, bool );
-    atom_ptr< servlet > find( link_t ) const;
+    void unlink( link_t );
+    servlet_ptr find( link_t ) const;
 
     void migrate( ooe::socket& ) OOE_VISIBLE;
     void relink( ooe::socket& ) OOE_VISIBLE;
 
 private:
-    typedef std::map< link_t, atom_ptr< servlet > > servlet_map;
+    typedef std::map< link_t, servlet_ptr > servlet_map;
 
-    mutable ipc::semaphore semaphore;
+    ipc::semaphore semaphore;
     memory::transport transport;
     const switchboard& external;
     switchboard internal;
 
-    link_t seed;
+    atom< link_t > seed;
+    mutable ooe::read_write read_write;
     servlet_map map;
 };
 

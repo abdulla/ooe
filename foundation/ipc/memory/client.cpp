@@ -59,11 +59,12 @@ client::client( const std::string& name )
 
 client::~client( void )
 {
-    if ( link_client )
-    {
-        client_data& data = *static_cast< client_data* >( transport->private_data() );
-        OOE_PRINT( "ipc::memory::client", ipc_disconnect( data.name, data.link ) );
-    }
+    if ( !*link_client )
+        return;
+
+    link_client->shutdown();
+    client_data& data = *static_cast< client_data* >( transport->private_data() );
+    OOE_PRINT( "ipc::memory::client", ipc_disconnect( data.name, data.link ) );
 }
 
 client::operator memory::transport&( void )
