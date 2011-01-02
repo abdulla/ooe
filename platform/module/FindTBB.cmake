@@ -1,7 +1,5 @@
 find_path( TBB_INCLUDE_DIRS tbb/tbb.h )
-find_library( TBB_LIBRARY tbb )
-find_library( TBBMALLOC_LIBRARY tbbmalloc )
-set( TBB_LIBRARIES ${TBB_LIBRARY} ${TBBMALLOC_LIBRARY} )
+find_library( TBB_LIBRARIES tbb )
 mark_as_advanced( TBB_LIBRARIES TBB_INCLUDE_DIRS )
 
 include( FindPackageHandleStandardArgs )
