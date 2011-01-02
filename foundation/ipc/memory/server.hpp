@@ -22,12 +22,15 @@ public:
     void check( const void* );
 
 private:
+    typedef scoped_ptr< const memory::link_listen > link_listen_ptr;
+    typedef scoped_ptr< memory::link_server > link_server_ptr;
+
     memory::transport transport;
     const link_t link;
     const ipc::switchboard& switchboard;
 
-    scoped_ptr< const memory::link_listen > link_listen;
-    scoped_ptr< memory::link_server > link_server;
+    link_listen_ptr link_listen;
+    link_server_ptr link_server;
 
     shared_allocator allocator;
     io_buffer buffer;
@@ -66,7 +69,7 @@ private:
     switchboard internal;
 
     atom< link_t > seed;
-    mutable ooe::mutex mutex;
+    mutable ooe::read_write read_write;
     servlet_map map;
 };
 

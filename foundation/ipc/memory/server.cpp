@@ -119,10 +119,13 @@ servlet::servlet( socket& socket, link_t link_, const ipc::switchboard& switchbo
 
 void servlet::join( void )
 {
-    // wake for arguments, indicating that the servlet should call null and exit
-    state.exchange( false );
-    stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
-    transport.wake_wait();
+    if ( state.exchange( false ) )
+    {
+        // wake servlet and indicate that it should call null and exit
+        stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
+        transport.wake_wait();
+    }
+
     thread.join();
 }
 
@@ -146,13 +149,12 @@ void servlet::check( const void* address )
 void* servlet::main( void* pointer )
 {
     memory::server& server = *static_cast< memory::server* >( pointer );
-    servlet_ptr guard = server.find( link );
+    servlet_ptr ptr( server.find( link ) );
 
     if ( link_listen )
     {
         const socket& socket = link_listen->accept();
-        scoped_ptr< memory::link_server >
-            ( new memory::link_server( socket, link, server ) ).swap( link_server );
+        link_server_ptr( new memory::link_server( socket, link, server ) ).swap( link_server );
         delete link_listen.release();
         transport.unlink();
     }
@@ -170,7 +172,7 @@ void* servlet::main( void* pointer )
 //--- server ---------------------------------------------------------------------------------------
 server::server( const std::string& name_, const switchboard& external_ )
     : semaphore( name_, semaphore::create ), transport( name_, transport::create ),
-    external( external_ ), internal(), seed(), mutex(), map()
+    external( external_ ), internal(), seed(), read_write(), map()
 {
     if ( name_.size() + 1 > sizeof( client_data ) - sizeof( link_t ) )
         throw error::runtime( "ipc::memory::server: " ) << '"' << name_ << "\" is too long";
@@ -210,7 +212,7 @@ bool server::decode( void )
     tuple_type tuple( internal, allocator, buffer, 0 );
     transport.wait( ipc_decode, &tuple );
 
-    lock lock( mutex );
+    read_lock lock( read_write );
     return !map.empty();
 }
 
@@ -219,27 +221,33 @@ link_t server::link( pid_t pid, time_t time )
     link_t id = seed++;
     std::string link_name = ipc::link_name( pid, time, id );
 
-    lock lock( mutex );
+    write_lock lock( read_write );
     map.insert( map.end(), std::make_pair( id, new servlet( link_name, id, external, *this ) ) );
     return id;
 }
 
 void server::unlink( link_t id, bool join )
 {
-    lock lock( mutex );
-    servlet_map::iterator i = map.find( id );
+    servlet_map::iterator i;
 
-    if ( i == map.end() )
-        throw error::runtime( "ipc::memory::server: " ) << "Servlet " << id << " does not exist";
-    else if ( join )
-        i->second->join();
+    {
+        read_lock read_lock( read_write );
+        i = map.find( id );
 
+        if ( i == map.end() )
+            throw error::runtime( "ipc::memory::server: " ) <<
+                "Servlet " << id << " does not exist";
+        else if ( join )
+            i->second->join();
+    }
+
+    write_lock write_lock( read_write );
     map.erase( i );
 }
 
 servlet_ptr server::find( link_t id ) const
 {
-    lock lock( mutex );
+    read_lock lock( read_write );
     servlet_map::const_iterator i = map.find( id );
 
     if ( i == map.end() )
@@ -257,7 +265,7 @@ void server::relink( socket& socket )
 {
     link_t id = seed++;
 
-    lock lock( mutex );
+    write_lock lock( read_write );
     map.insert( map.end(), std::make_pair( id, new servlet( socket, id, external, *this ) ) );
 }
 
