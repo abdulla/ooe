@@ -23,8 +23,7 @@ template< typename type >
 }
 
 //--- deallocate_free ------------------------------------------------------------------------------
-template< typename type >
-    void deallocate_free( const void* value )
+inline void deallocate_free( const void* value )
 {
     free( const_cast< void* >( value ) );
 }
@@ -138,10 +137,10 @@ template< typename type >
 //--- scoped_free ----------------------------------------------------------------------------------
 template< typename type >
     struct scoped_free
-    : public scoped_dereference< type, deallocate_free< type > >
+    : public scoped_dereference< type, deallocate_free >
 {
     explicit scoped_free( type* value_ )
-        : scoped_dereference< type, deallocate_free< type > >( value_ )
+        : scoped_dereference< type, deallocate_free >( value_ )
     {
     }
 };
@@ -306,10 +305,10 @@ template< typename type >
 //--- shared_free ----------------------------------------------------------------------------------
 template< typename type >
     struct shared_free
-    : public shared_dereference< type, deallocate_free< type >, unsigned >
+    : public shared_dereference< type, deallocate_free, unsigned >
 {
     explicit shared_free( type* value = 0 )
-        : shared_dereference< type, deallocate_free< type >, unsigned >( value )
+        : shared_dereference< type, deallocate_free, unsigned >( value )
     {
     }
 };

@@ -149,10 +149,10 @@ template< typename type >
 //--- atom_free ------------------------------------------------------------------------------------
 template< typename type >
     struct atom_free
-    : public shared_dereference< type, deallocate_free< type >, atom< unsigned > >
+    : public shared_dereference< type, deallocate_free, atom< unsigned > >
 {
     explicit atom_free( type* value = 0 )
-        : shared_dereference< type, deallocate_free< type >, atom< unsigned > >( value )
+        : shared_dereference< type, deallocate_free, atom< unsigned > >( value )
     {
     }
 };
