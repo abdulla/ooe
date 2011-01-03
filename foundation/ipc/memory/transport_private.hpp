@@ -10,61 +10,75 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
+enum lock_type
+{
+    unlocked,
+    locked,
+    sleeping
+};
+
+typedef atom< lock_type > lock_atom;
+
+template< typename t >
+    void spin_up( t& semaphore, lock_atom& spinlock, lock_atom& set )
+{
+    if ( set.exchange( locked ) != unlocked )
+        throw error::runtime( "control: " ) << "Invalid lock state";
+
+    if ( spinlock.compare_exchange( locked, unlocked ) == locked )
+        thread::yield();
+    else if ( spinlock.compare_exchange( sleeping, unlocked ) == sleeping )
+        semaphore.up();
+    else
+        throw error::runtime( "control: " ) << "Invalid lock state";
+}
+
+template< typename t >
+    void spin_down( t& semaphore, lock_atom& spinlock )
+{
+    for ( u8 i = 1 << 4; i && spinlock == locked; --i )
+        thread::yield();
+
+    if ( spinlock.compare_exchange( locked, sleeping ) == locked )
+        semaphore.down();
+}
+
 struct control
 {
-    enum lock_type
-    {
-        unlocked,
-        locked,
-        sleeping
-    };
-
     u8 private_data[ transport::private_size ];
-    atom< lock_type > lock;
+    lock_atom in_lock;
+    lock_atom out_lock;
 
     control( void )
-        : private_data(), lock( unlocked )
+        : private_data(), in_lock( locked ), out_lock( unlocked )
     {
     }
 
     template< typename t >
         void wait( t& in, t& out, transport::wait_type function, const void* pointer )
     {
-        in.down();
+        spin_down( in, in_lock );
         function( pointer );
-        wake_notify( out );
+        spin_up( out, out_lock, in_lock );
     }
 
     template< typename t >
         void notify( t& in, t& out )
     {
-        wake_wait( in );
-
-        for ( u8 i = 1 << 4; i && lock == locked; --i )
-            thread::yield();
-
-        if ( lock.compare_exchange( locked, sleeping ) == locked )
-            out.down();
+        spin_up( in, in_lock, out_lock );
+        spin_down( out, out_lock );
     }
 
     template< typename t >
         void wake_wait( t& in )
     {
-        if ( lock.exchange( locked ) != unlocked )
-            throw error::runtime( "control: " ) << "Invalid lock state";
-
-        in.up();
+        spin_up( in, in_lock, out_lock );
     }
 
     template< typename t >
         void wake_notify( t& out )
     {
-        if ( lock.compare_exchange( locked, unlocked ) == locked )
-            thread::yield();
-        else if ( lock.compare_exchange( sleeping, unlocked ) == sleeping )
-            out.up();
-        else
-            throw error::runtime( "control: " ) << "Invalid lock state";
+        spin_up( out, out_lock, in_lock );
     }
 };
 
