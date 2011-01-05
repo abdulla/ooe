@@ -29,17 +29,18 @@ inline std::string demangle( const std::string& mangled )
 }
 
 //--- stack_trace ----------------------------------------------------------------------------------
-inline std::string stack_trace( void )
+template< u32 begin >
+    std::string stack_trace( void )
 {
-    const u32 size = 10;
+    const u32 size = 10 + begin;
     void* address[ size ];
     s32 used = backtrace( address, size );
     Dl_info info;
     std::string string;
 
-    for ( s32 i = 0; i != used; ++i )
+    for ( s32 i = begin; i < used; ++i )
     {
-        string << '\n' << i << ": " << ptr( address[ i ] );
+        string << '\n' << i - begin << ": " << ptr( address[ i ] );
 
         if ( dladdr( address[ i ], &info ) && info.dli_sname )
             string << ' ' << demangle( info.dli_sname );
@@ -58,7 +59,7 @@ class OOE_VISIBLE runtime
 {
 public:
     runtime( const std::string& what_string_ )
-        : exception(), what_string( what_string_ ), where_string( stack_trace() )
+        : exception(), what_string( what_string_ ), where_string( stack_trace< 2 >() )
     {
     }
 
