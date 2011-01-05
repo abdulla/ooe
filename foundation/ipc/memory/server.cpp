@@ -80,6 +80,27 @@ up_t ipc_unlink( const any& any, io_buffer& buffer, pool& )
     return 0;
 }
 
+//--- set_transport --------------------------------------------------------------------------------
+void set_transport
+    ( ooe::mutex& mutex, ipc::memory::transport*& transport, ipc::memory::transport* value )
+{
+    lock lock( mutex );
+    transport = value;
+}
+
+//--- wake_transport -------------------------------------------------------------------------------
+void wake_transport( ooe::mutex& mutex, ipc::memory::transport*& transport )
+{
+    lock lock( mutex );
+
+    if ( !transport )
+        return;
+
+    // wake servlet and indicate that it should call null and exit
+    stream_write< bool_t, index_t >::call( transport->get(), true, 0 );
+    transport->wake_wait();
+}
+
 OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
@@ -87,7 +108,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- servlet --------------------------------------------------------------------------------------
 servlet::servlet( link_t link_, const ipc::switchboard& switchboard_, const ooe::socket& socket_,
     server& server )
-    : link( link_ ), switchboard( switchboard_ ), socket( socket_ ), transport_ptr( 0 ),
+    : link( link_ ), switchboard( switchboard_ ), socket( socket_ ), mutex(), transport_ptr( 0 ),
     state( true ), thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
 }
@@ -95,14 +116,7 @@ servlet::servlet( link_t link_, const ipc::switchboard& switchboard_, const ooe:
 servlet::~servlet( void )
 {
     state.exchange( false );
-
-    if ( transport_ptr )
-    {
-        // wake servlet and indicate that it should call null and exit
-        stream_write< bool_t, index_t >::call( transport_ptr->get(), true, 0 );
-        transport_ptr->wake_wait();
-    }
-
+    wake_transport( mutex, transport_ptr );
     thread.join();
 }
 
@@ -116,12 +130,12 @@ void* servlet::main( void* pointer )
     io_buffer buffer( transport.get(), transport.size(), allocator );
     pool pool;
     tuple_type tuple( switchboard, allocator, buffer, &pool );
-    transport_ptr.exchange( &transport );
+    set_transport( mutex, transport_ptr, &transport );
 
     while ( OOE_LIKELY( state ) )
         transport.wait( ipc_decode, &tuple );
 
-    transport_ptr.exchange( 0 );
+    set_transport( mutex, transport_ptr, 0 );
     return 0;
 }
 

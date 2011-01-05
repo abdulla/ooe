@@ -24,7 +24,8 @@ private:
     const ipc::switchboard& switchboard;
     ooe::socket socket;
 
-    atom< transport* > transport_ptr;
+    ooe::mutex mutex;
+    transport* transport_ptr;
     atom< bool > state;
     ooe::thread thread;
 
