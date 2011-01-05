@@ -94,29 +94,34 @@ servlet::servlet( link_t link_, const ipc::switchboard& switchboard_, const ooe:
 
 servlet::~servlet( void )
 {
-    // wake servlet and indicate that it should call null and exit
     state.exchange( false );
-    stream_write< bool_t, index_t >::call( transport_ptr->get(), true, 0 );
-    transport_ptr->wake_wait();
+
+    if ( transport_ptr )
+    {
+        // wake servlet and indicate that it should call null and exit
+        stream_write< bool_t, index_t >::call( transport_ptr->get(), true, 0 );
+        transport_ptr->wake_wait();
+    }
+
     thread.join();
 }
 
 void* servlet::main( void* pointer )
 {
     server& server = *static_cast< memory::server* >( pointer );
-
     transport transport( socket );
     link_server link_server( socket, link, server );
-    transport_ptr.exchange( &transport );
 
     shared_allocator allocator;
     io_buffer buffer( transport.get(), transport.size(), allocator );
     pool pool;
     tuple_type tuple( switchboard, allocator, buffer, &pool );
+    transport_ptr.exchange( &transport );
 
     while ( OOE_LIKELY( state ) )
         transport.wait( ipc_decode, &tuple );
 
+    transport_ptr.exchange( 0 );
     return 0;
 }
 
