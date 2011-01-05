@@ -35,30 +35,9 @@ struct OOE_VISIBLE shared_memory
 
     shared_memory( const std::string&, type = open, up_t = 0 );
     shared_memory( const ooe::descriptor& );
-    ~shared_memory( void );
 
     using memory::get;
     using memory::size;
-};
-
-//--- locked_memory --------------------------------------------------------------------------------
-struct OOE_VISIBLE locked_memory
-    : public shared_memory
-{
-    locked_memory( const std::string&, type = open, up_t = 0 );
-    ~locked_memory( void );
-};
-
-//--- memory_lock ----------------------------------------------------------------------------------
-class OOE_VISIBLE memory_lock
-    : private noncopyable
-{
-public:
-    memory_lock( shared_memory& );
-    ~memory_lock( void );
-
-private:
-    shared_memory& memory;
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )

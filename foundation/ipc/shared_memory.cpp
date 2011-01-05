@@ -86,40 +86,4 @@ shared_memory::shared_memory( const ooe::descriptor& desc )
 {
 }
 
-shared_memory::~shared_memory( void )
-{
-}
-
-//--- locked_memory --------------------------------------------------------------------------------
-locked_memory::locked_memory( const std::string& shm_name, type mode, up_t size_ )
-    : shared_memory( shm_name, mode, size_ )
-{
-    if ( mlock( get(), size() ) )
-        throw error::runtime( "ipc::locked_memory: " ) <<
-            "Unable to lock shared memory \"" << shm_name << "\": " << error::number( errno );
-}
-
-locked_memory::~locked_memory( void )
-{
-    if ( munlock( get(), size() ) )
-        OOE_CONSOLE( "ipc::locked_memory: " <<
-            "Unable to unlock shared memory \"" << name() << "\": " << error::number( errno ) );
-}
-
-//--- memory_lock ----------------------------------------------------------------------------------
-memory_lock::memory_lock( shared_memory& memory_ )
-    : memory( memory_ )
-{
-    if ( mlock( memory.get(), memory.size() ) )
-        throw error::runtime( "ipc::memory_lock: " ) << "Unable to lock shared memory \"" <<
-            memory.name() << "\": " << error::number( errno );
-}
-
-memory_lock::~memory_lock( void )
-{
-    if ( munlock( memory.get(), memory.size() ) )
-        OOE_CONSOLE( "ipc::memory_lock: " << "Unable to unlock shared memory \"" <<
-            memory.name() << "\": " << error::number( errno ) );
-}
-
 OOE_NAMESPACE_END( ( ooe )( ipc ) )
