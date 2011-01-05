@@ -108,7 +108,7 @@ public:
 
         if ( fork->is_child() )
         {
-            OOE_IGNORE( start_server( name ) );
+            OOE_PRINT( "memory rpc server", start_server( name ) );
             fork_io::exit( true );
         }
     }
