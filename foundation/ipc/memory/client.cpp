@@ -34,11 +34,12 @@ socket ipc_socket( const std::string& server_name, link_t& link, transport& tran
 {
     std::string client_name = transport.name();
     std::string name = local_name( client_name );
+
     listen listen( ( local_address( name ) ) );
     link = ipc_connect( server_name, client_name );
-
     socket socket = listen.accept();
     erase( name );
+
     transport.send( socket );
     transport.unlink();
     return socket;
