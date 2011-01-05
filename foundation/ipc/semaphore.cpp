@@ -92,11 +92,6 @@ void semaphore::unlink( void )
     }
 }
 
-void semaphore::set( bool value )
-{
-    unlinkable = value;
-}
-
 //--- semaphore_lock -------------------------------------------------------------------------------
 semaphore_lock::semaphore_lock( ipc::semaphore& semaphore_ )
     : semaphore( semaphore_ )

@@ -28,7 +28,7 @@ void signal_handler( s32 code, siginfo_t* info, void* )
     case SIGABRT:
     case SIGFPE:
         description = strsignal( code );
-        trace = stack_trace();
+        trace = stack_trace< 2 >();
         OOE_CONSOLE( "executable: " << "Caught signal " << code << " at " << info->si_addr <<
             ": " << description << "\n\nStack trace:\n" << trace );
         std::exit( EXIT_FAILURE );

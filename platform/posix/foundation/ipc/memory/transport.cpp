@@ -1,7 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/environment.hpp"
-#include "foundation/io/socket.hpp"
 #include "foundation/ipc/memory/transport_private.hpp"
 #include "foundation/parallel/lock.hpp"
 
@@ -34,22 +33,23 @@ transport::transport( bool created_ )
 
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
+
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- transport ------------------------------------------------------------------------------------
-transport::transport( const std::string& name_, type mode )
-    : platform::ipc::memory::transport( mode == create ),
-    memory( name_, shared_memory::type( mode ), executable::static_page_size * 2 )
+transport::transport( const std::string& name_ )
+    : platform::ipc::memory::transport( true ),
+    memory( name_, shared_memory::create, executable::static_page_size * 2 )
 {
     ooe::memory::region region( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, region );
 
-    if ( created )
-        new( memory.get() ) control_io;
+    memory.unlink();
+    new( memory.get() ) control_io;
 }
 
 transport::transport( ooe::socket& socket )
-    : platform::ipc::memory::transport( true ), memory( std::string(), socket.receive() )
+    : platform::ipc::memory::transport( false ), memory( socket.receive() )
 {
     ooe::memory::region region( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, region );
@@ -95,10 +95,9 @@ up_t transport::size( void ) const
     return memory.size() - sizeof( control_io ) - executable::static_page_size;
 }
 
-void transport::migrate( ooe::socket& socket )
+void transport::send( ooe::socket& socket )
 {
     socket.send( memory );
-    created = false;
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

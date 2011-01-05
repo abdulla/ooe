@@ -24,16 +24,12 @@ class servlet
 {
 public:
     servlet( servlet_iterator, ooe::socket&, const ipc::switchboard&, server& );
-
     void join( void );
-    void migrate( ooe::socket& );
 
 private:
     servlet_iterator iterator;
     ooe::socket socket;
     const ipc::switchboard& switchboard;
-
-    bool state;
     ooe::thread thread;
 
     void* main( void* );
@@ -48,9 +44,6 @@ public:
 
     void accept( void );
     void erase( servlet_iterator ) OOE_HIDDEN;
-
-    void relink( ooe::socket& );
-    void migrate( ooe::socket& );
 
 private:
     ooe::listen listen;

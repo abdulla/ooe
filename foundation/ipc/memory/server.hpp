@@ -10,30 +10,21 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
+class server;
+
 //--- servlet --------------------------------------------------------------------------------------
 class servlet
 {
 public:
-    servlet( const std::string&, link_t, const ipc::switchboard&, server& );
-    servlet( ooe::socket&, link_t, const ipc::switchboard&, server& );
-
-    void join( void );
-    void migrate( ooe::socket&, server& );
-    void check( const void* );
+    servlet( link_t, const ipc::switchboard&, const ooe::socket&, server& );
+    ~servlet( void );
 
 private:
-    typedef scoped_ptr< const memory::link_listen > link_listen_ptr;
-    typedef scoped_ptr< memory::link_server > link_server_ptr;
-
-    memory::transport transport;
     const link_t link;
     const ipc::switchboard& switchboard;
-
-    link_listen_ptr link_listen;
-    link_server_ptr link_server;
-
-    shared_allocator allocator;
-    io_buffer buffer;
+    ooe::socket socket;
+    ooe::mutex mutex;
+    transport* transport_ptr;
 
     atom< bool > state;
     ooe::thread thread;
@@ -44,32 +35,27 @@ private:
 typedef atom_ptr< servlet > servlet_ptr;
 
 //--- server ---------------------------------------------------------------------------------------
-class server
+class OOE_VISIBLE server
 {
 public:
-    server( const std::string&, const switchboard& ) OOE_VISIBLE;
-    ~server( void ) OOE_VISIBLE;
+    server( const std::string&, const switchboard& );
+    ~server( void );
 
-    bool decode( void ) OOE_VISIBLE;
-    std::string name( void ) const;
+    bool decode( void );
 
-    link_t link( pid_t, time_t );
-    void unlink( link_t );
-    servlet_ptr find( link_t ) const;
-
-    void migrate( ooe::socket& ) OOE_VISIBLE;
-    void relink( ooe::socket& ) OOE_VISIBLE;
+    link_t link( const std::string& ) OOE_HIDDEN;
+    void unlink( link_t ) OOE_HIDDEN;
 
 private:
     typedef std::map< link_t, servlet_ptr > servlet_map;
 
-    ipc::semaphore semaphore;
+    ooe::listen listen;
     memory::transport transport;
     const switchboard& external;
     switchboard internal;
 
     atom< link_t > seed;
-    mutable ooe::read_write read_write;
+    ooe::mutex mutex;
     servlet_map map;
 };
 

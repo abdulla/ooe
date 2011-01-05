@@ -30,8 +30,6 @@ public:
     std::string name( void ) const;
     void unlink( void );
 
-    void set( bool ) OOE_HIDDEN;
-
 private:
     std::string name_;
     bool unlinkable;

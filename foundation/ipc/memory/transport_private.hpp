@@ -45,12 +45,11 @@ template< typename t >
 
 struct control
 {
-    u8 private_data[ transport::private_size ];
     lock_atom in_lock;
     lock_atom out_lock;
 
     control( void )
-        : private_data(), in_lock( locked ), out_lock( unlocked )
+        : in_lock( locked ), out_lock( unlocked )
     {
     }
 
