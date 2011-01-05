@@ -5,13 +5,15 @@
 #include "external/memoryrpc/utility.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/executable/timer.hpp"
+#include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-    ipc::memory::transport transport( "/ooe", ipc::memory::transport::open );
+    connect connect( local_address( ipc::local_name( "/ooe-transport" ) ) );
+    ipc::memory::transport transport( connect );
     timer timer;
 
     for ( up_t i = 0; i != iteration_limit; ++i )
