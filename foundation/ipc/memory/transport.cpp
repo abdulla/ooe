@@ -6,11 +6,6 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- transport ------------------------------------------------------------------------------------
-void* transport::private_data( void ) const
-{
-    return memory.get();
-}
-
 std::string transport::name( void ) const
 {
     return memory.name();

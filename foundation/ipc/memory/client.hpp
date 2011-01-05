@@ -17,18 +17,10 @@ public:
     operator memory::transport&( void );
 
 private:
-    typedef scoped_ptr< memory::transport > transport_ptr;
-    typedef scoped_ptr< memory::link_client > link_ptr;
-
-    transport_ptr transport;
-    link_ptr link_client;
-};
-
-//--- client_data ----------------------------------------------------------------------------------
-struct OOE_PACKED client_data
-{
+    const std::string name;
     link_t link;
-    c8 name[ transport::private_size - sizeof( link_t ) ];
+    memory::transport transport;
+    memory::link_client link_client;
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

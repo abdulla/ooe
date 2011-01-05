@@ -19,7 +19,7 @@ protected:
     ooe::ipc::semaphore in;
     ooe::ipc::semaphore out;
 
-    transport( const std::string&, bool );
+    transport( const std::string& );
     transport( ooe::socket& );
 };
 

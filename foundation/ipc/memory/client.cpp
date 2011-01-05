@@ -2,34 +2,46 @@
 
 #include <iostream>
 
-#include "foundation/executable/timer.hpp"
+#include "foundation/io/directory.hpp"
 #include "foundation/ipc/name.hpp"
-#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- ipc_connect ----------------------------------------------------------------------------------
-link_t ipc_connect( const std::string& name, pid_t pid, time_t time )
+link_t ipc_connect( const std::string& server_name, const std::string& client_name )
 {
-    transport transport( name, transport::open );
-    ipc::semaphore semaphore( name, ipc::semaphore::open );
-    ipc::semaphore_lock lock( semaphore );
+    connect connect( local_address( local_name( server_name ) ) );
+    transport transport( connect );
 
-    rpc< link_t ( pid_t, time_t ) > link( transport, 1 );
-    return link( pid, time );
+    rpc< link_t ( const std::string& ) > link( transport, 1 );
+    return link( client_name );
 }
 
 //--- ipc_disconnect -------------------------------------------------------------------------------
-void ipc_disconnect( const std::string& name, link_t link )
+void ipc_disconnect( const std::string& server_name, link_t link )
 {
-    transport transport( name, ipc::memory::transport::open );
-    ipc::semaphore semaphore( name, ipc::semaphore::open );
-    ipc::semaphore_lock lock( semaphore );
+    connect connect( local_address( local_name( server_name ) ) );
+    transport transport( connect );
 
     rpc< void ( link_t ) > unlink( transport, 2 );
     unlink( link );
+}
+
+//--- ipc_socket -----------------------------------------------------------------------------------
+socket ipc_socket( const std::string& server_name, link_t& link, transport& transport )
+{
+    std::string client_name = transport.name();
+    std::string name = local_name( client_name );
+    listen listen( ( local_address( name ) ) );
+    link = ipc_connect( server_name, client_name );
+
+    socket socket = listen.accept();
+    erase( name );
+    transport.send( socket );
+    transport.unlink();
+    return socket;
 }
 
 OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
@@ -37,39 +49,24 @@ OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- client ---------------------------------------------------------------------------------------
-client::client( const std::string& name )
-    : transport( 0 ), link_client( 0 )
+client::client( const std::string& name_ )
+    : name( name_ ), link(), transport( ipc::unique_name() ),
+    link_client( ipc_socket( name, link, transport ), transport )
 {
-    if ( name.size() + 1 > sizeof( client_data ) - sizeof( link_t ) )
-        throw error::runtime( "ipc::memory::client: " ) << '"' << name << "\" is too long";
-
-    pid_t pid = getpid();
-    time_t time = timer::epoch()._0;
-    link_t link = ipc_connect( name, pid, time );
-    std::string link_name = ipc::link_name( pid, time, link );
-
-    transport_ptr( new memory::transport( link_name, transport::open ) ).swap( transport );
-    link_ptr( new memory::link_client( link_name, *transport ) ).swap( link_client );
-
-    // set client data, used for migration
-    client_data& data = *static_cast< client_data* >( transport->private_data() );
-    data.link = link;
-    std::memcpy( data.name, name.c_str(), name.size() + 1 );
 }
 
 client::~client( void )
 {
-    if ( !*link_client )
+    if ( !link_client )
         return;
 
-    link_client->shutdown();
-    client_data& data = *static_cast< client_data* >( transport->private_data() );
-    OOE_PRINT( "ipc::memory::client", ipc_disconnect( data.name, data.link ) );
+    link_client.shutdown();
+    OOE_PRINT( "ipc::memory::client", ipc_disconnect( name, link ) );
 }
 
 client::operator memory::transport&( void )
 {
-    return *transport;
+    return transport;
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )
