@@ -12,12 +12,6 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-struct control_message
-    : public cmsghdr
-{
-    s32 fd;
-};
-
 s32 family( internet_query::type type )
 {
     switch ( type )
@@ -110,47 +104,50 @@ descriptor socket::receive( void )
 {
     msghdr message;
     iovec vector;
-    control_message payload;
+    u8 buffer[ CMSG_SPACE( sizeof( s32 ) ) ];
 
     memset( &message, 0, sizeof( message ) );
     message.msg_iov = &vector;
     message.msg_iovlen = 1;
-    message.msg_control = &payload;
-    message.msg_controllen = sizeof( payload );
+    message.msg_control = buffer;
+    message.msg_controllen = sizeof( buffer );
 
     u8 dummy;
     vector.iov_base = &dummy;
     vector.iov_len = 1;
 
+    cmsghdr& control = *CMSG_FIRSTHDR( &message );
+
     if ( recvmsg( get(), &message, MSG_WAITALL ) == -1 )
         throw error::io( "socket: " ) << "Unable to receive descriptor: " << error::number( errno );
-    else if ( payload.cmsg_type != SCM_RIGHTS )
-        throw error::io( "socket: " ) << "Received unknown type: " << payload.cmsg_type;
+    else if ( control.cmsg_type != SCM_RIGHTS )
+        throw error::io( "socket: " ) << "Received unknown type: " << control.cmsg_type;
 
-    return descriptor( payload.fd );
+    return descriptor( *reinterpret_cast< s32* >( CMSG_DATA( &control ) ) );
 }
 
 void socket::send( const ooe::descriptor& desc )
 {
     msghdr message;
     iovec vector;
-    control_message payload;
+    u8 buffer[ CMSG_SPACE( sizeof( s32 ) ) ];
 
     memset( &message, 0, sizeof( message ) );
     message.msg_iov = &vector;
     message.msg_iovlen = 1;
-    message.msg_control = &payload;
-    message.msg_controllen = sizeof( payload );
+    message.msg_control = buffer;
+    message.msg_controllen = sizeof( buffer );
 
-    u8 dummy = 0;
+    u8 dummy;
     vector.iov_base = &dummy;
     vector.iov_len = 1;
 
-    memset( &payload, 0, sizeof( payload ) );
-    payload.cmsg_level = SOL_SOCKET;
-    payload.cmsg_type = SCM_RIGHTS;
-    payload.cmsg_len = sizeof( payload );
-    payload.fd = desc.get();
+    cmsghdr& control = *CMSG_FIRSTHDR( &message );
+    control.cmsg_len = CMSG_LEN( sizeof( s32 ) );
+    control.cmsg_level = SOL_SOCKET;
+    control.cmsg_type = SCM_RIGHTS;
+
+    *reinterpret_cast< s32* >( CMSG_DATA( &control ) ) = desc.get();
 
     if ( sendmsg( get(), &message, 0 ) == -1 )
         throw error::io( "socket: " ) << "Unable to send descriptor: " << error::number( errno );
