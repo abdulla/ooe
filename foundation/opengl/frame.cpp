@@ -188,7 +188,7 @@ frame::frame( u32 program_, u32 width_, u32 height_ )
     : id(), program( program_ ), width( width_ ), height( height_ ), state( none ), depth(),
     attachments(), locations()
 {
-    GenFramebuffers( 1, const_cast< u32* >( &id ) );
+    GenFramebuffers( 1, &id );
 }
 
 frame::~frame( void )

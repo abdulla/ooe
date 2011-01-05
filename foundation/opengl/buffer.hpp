@@ -21,7 +21,7 @@ private:
 struct buffer
     : public ooe::buffer
 {
-    const u32 id;
+    u32 id;
     const u32 target;
     const up_t size;
 

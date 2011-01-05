@@ -47,7 +47,7 @@ public:
     typedef std::map< s32, attachment_tuple > attachment_map;
     typedef std::map< std::string, s32 > location_map;
 
-    const u32 id;
+    u32 id;
     const u32 program;
     const u32 width;
     const u32 height;

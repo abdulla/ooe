@@ -10,7 +10,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 struct target
     : public ooe::target
 {
-    const u32 id;
+    u32 id;
     const u32 width;
     const u32 height;
 

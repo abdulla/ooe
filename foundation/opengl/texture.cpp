@@ -186,7 +186,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 texture_id::texture_id( void )
     : id()
 {
-    GenTextures( 1, const_cast< u32* >( &id ) );
+    GenTextures( 1, &id );
 }
 
 texture_id::~texture_id( void )
@@ -199,8 +199,8 @@ compressed_id::compressed_id( const image_metadata& metadata )
     : internal(), size()
 {
     compressed_tuple tuple = compressed_format( metadata );
-    const_cast< u32& >( internal ) = tuple._0;
-    const_cast< u32& >( size ) = tuple._1;
+    internal = tuple._0;
+    size = tuple._1;
 }
 
 //--- uncompressed_id ------------------------------------------------------------------------------
@@ -208,8 +208,8 @@ uncompressed_id::uncompressed_id( image_format::type format )
     : external(), data_type()
 {
     uncompressed_tuple tuple = uncompressed_format( format );
-    const_cast< u32& >( external ) = tuple._1;
-    const_cast< u32& >( data_type ) = tuple._2;
+    external = tuple._1;
+    data_type = tuple._2;
 }
 
 //--- texture --------------------------------------------------------------------------------------

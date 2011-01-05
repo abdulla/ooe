@@ -85,7 +85,7 @@ map::~map( void )
 buffer::buffer( up_t size_, type format, usage_type usage )
     : id(), target( buffer_target( format ) ), size( size_ )
 {
-    GenBuffers( 1, const_cast< u32* >( &id ) );
+    GenBuffers( 1, &id );
 
     BindBuffer( target, id );
     BufferData( target, size, 0, buffer_usage( usage ) );

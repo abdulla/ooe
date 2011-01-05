@@ -55,7 +55,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 target::target( const image_metadata& metadata )
     : id(), width( metadata.width ), height( metadata.height )
 {
-    GenRenderbuffers( 1, const_cast< u32* >( &id ) );
+    GenRenderbuffers( 1, &id );
 
     BindRenderbuffer( RENDERBUFFER, id );
     RenderbufferStorage

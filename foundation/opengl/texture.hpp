@@ -11,7 +11,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 class texture_id
 {
 public:
-    const u32 id;
+    u32 id;
 
 protected:
     texture_id( void );
@@ -22,8 +22,8 @@ protected:
 class compressed_id
 {
 protected:
-    const u32 internal;
-    const u32 size;
+    u32 internal;
+    u32 size;
 
     compressed_id( const image_metadata& );
 };
@@ -32,8 +32,8 @@ protected:
 class uncompressed_id
 {
 protected:
-    const u32 external;
-    const u32 data_type;
+    u32 external;
+    u32 data_type;
 
     uncompressed_id( image_format::type );
 };

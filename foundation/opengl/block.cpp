@@ -102,7 +102,7 @@ block::block( u32 program_, const buffer_ptr& index_ )
     : id(), program( program_ ), index( check( index_ ) ), rebuild( true ), uniforms(), textures(),
     buffers(), iterators(), locations()
 {
-    GenVertexArrays( 1, const_cast< u32* >( &id ) );
+    GenVertexArrays( 1, &id );
 }
 
 block::~block( void )

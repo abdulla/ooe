@@ -25,7 +25,7 @@ public:
     typedef std::multimap< buffer_ptr, buffer_tuple > buffer_map;
     typedef std::map< std::string, s32 > location_map;
 
-    const u32 id;
+    u32 id;
     const u32 program;
     const buffer_ptr index;
     bool rebuild;
