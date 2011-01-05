@@ -80,8 +80,9 @@ shared_memory::shared_memory( const std::string& shm_name, type mode, up_t size_
 {
 }
 
-shared_memory::shared_memory( const std::string& shm_name, const ooe::descriptor& desc )
-    : shared_memory_base( shm_name, false ), descriptor( desc ), memory( *this, memory::read_write )
+shared_memory::shared_memory( const ooe::descriptor& desc )
+    : shared_memory_base( std::string(), false ), descriptor( desc ),
+    memory( *this, memory::read_write )
 {
 }
 
