@@ -27,10 +27,8 @@ public:
 
     u8* get( void ) const;
     up_t size( void ) const;
-    std::string name( void ) const;
     bool in_canary( const void* ) const;
 
-    void unlink( void );
     void send( ooe::socket& );
 
 private:

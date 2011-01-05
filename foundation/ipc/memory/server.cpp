@@ -11,12 +11,12 @@ typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool* > t
 //--- ipc_address ----------------------------------------------------------------------------------
 address ipc_address( const std::string& server_name )
 {
-    std::string name = local_name( server_name );
+    std::string local_name = ipc::local_name( server_name );
 
-    if ( exists( name ) )
-        erase( name );
+    if ( exists( local_name ) )
+        erase( local_name );
 
-    return local_address( name );
+    return local_address( local_name );
 }
 
 //--- ipc_decode -----------------------------------------------------------------------------------
@@ -152,11 +152,6 @@ server::server( const std::string& name_, const switchboard& external_ )
 
 server::~server( void )
 {
-}
-
-std::string server::name( void ) const
-{
-    return transport.name();
 }
 
 bool server::decode( void )

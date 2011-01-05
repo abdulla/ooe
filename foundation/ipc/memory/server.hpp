@@ -35,17 +35,16 @@ private:
 typedef atom_ptr< servlet > servlet_ptr;
 
 //--- server ---------------------------------------------------------------------------------------
-class server
+class OOE_VISIBLE server
 {
 public:
-    server( const std::string&, const switchboard& ) OOE_VISIBLE;
-    ~server( void ) OOE_VISIBLE;
+    server( const std::string&, const switchboard& );
+    ~server( void );
 
-    bool decode( void ) OOE_VISIBLE;
-    std::string name( void ) const;
+    bool decode( void );
 
-    link_t link( const std::string& );
-    void unlink( link_t );
+    link_t link( const std::string& ) OOE_HIDDEN;
+    void unlink( link_t ) OOE_HIDDEN;
 
 private:
     typedef std::map< link_t, servlet_ptr > servlet_map;

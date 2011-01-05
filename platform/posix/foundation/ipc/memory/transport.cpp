@@ -44,6 +44,7 @@ transport::transport( const std::string& name_ )
     ooe::memory::region region( executable::static_page_size, executable::static_page_size );
     memory.protect( ooe::memory::none, region );
 
+    memory.unlink();
     new( memory.get() ) control_io;
 }
 

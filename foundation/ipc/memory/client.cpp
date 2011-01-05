@@ -30,21 +30,21 @@ void ipc_disconnect( const std::string& server_name, link_t link )
 }
 
 //--- ipc_socket -----------------------------------------------------------------------------------
-socket ipc_socket( const std::string& server_name, link_t& link, transport& transport )
+socket ipc_socket
+    ( const std::string& server_name, std::string& client_name, link_t& link, transport& transport )
 {
-    std::string client_name = transport.name();
-    std::string name = local_name( client_name );
+    std::string local_name = ipc::local_name( client_name );
 
-    if ( exists( name ) )
-        erase( name );
+    if ( exists( local_name ) )
+        erase( local_name );
 
-    listen listen( ( local_address( name ) ) );
+    listen listen( ( local_address( local_name ) ) );
     link = ipc_connect( server_name, client_name );
-    socket socket = listen.accept();
-    erase( name );
+    client_name = std::string();
+    erase( local_name );
 
+    socket socket = listen.accept();
     transport.send( socket );
-    transport.unlink();
     return socket;
 }
 
@@ -53,9 +53,10 @@ OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- client ---------------------------------------------------------------------------------------
-client::client( const std::string& name_ )
-    : name( name_ ), link(), transport( ipc::unique_name() ),
-    link_client( ipc_socket( name, link, transport ), transport )
+client::client( const std::string& server_name_ )
+    : server_name( server_name_ ), client_name( ipc::unique_name() ), link(),
+    transport( client_name ),
+    link_client( ipc_socket( server_name, client_name, link, transport ), transport )
 {
 }
 
@@ -65,7 +66,7 @@ client::~client( void )
         return;
 
     link_client.shutdown();
-    OOE_PRINT( "ipc::memory::client", ipc_disconnect( name, link ) );
+    OOE_PRINT( "ipc::memory::client", ipc_disconnect( server_name, link ) );
 }
 
 client::operator memory::transport&( void )

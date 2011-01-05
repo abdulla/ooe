@@ -17,7 +17,8 @@ public:
     operator memory::transport&( void );
 
 private:
-    const std::string name;
+    const std::string server_name;
+    std::string client_name;
     link_t link;
     memory::transport transport;
     memory::link_client link_client;
