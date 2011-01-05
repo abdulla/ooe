@@ -142,12 +142,16 @@ void* servlet::main( void* pointer )
 //--- server ---------------------------------------------------------------------------------------
 server::server( const std::string& name_, const switchboard& external_ )
     : listen( ipc_address( name_ ) ), transport( name_ ), external( external_ ),
-    internal(), seed(), read_write(), map()
+    internal(), seed(), mutex(), map()
 {
     if ( internal.insert_direct( ipc_link, this ) != 1 )
         throw error::runtime( "ipc::memory::server: " ) << "\"link\" not at index 1";
     else if ( internal.insert_direct( ipc_unlink, this ) != 2 )
         throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
+}
+
+server::~server( void )
+{
 }
 
 std::string server::name( void ) const
@@ -165,7 +169,7 @@ bool server::decode( void )
     tuple_type tuple( internal, allocator, buffer, 0 );
     transport.wait( ipc_decode, &tuple );
 
-    read_lock lock( read_write );
+    lock lock( mutex );
     return !map.empty();
 }
 
@@ -174,14 +178,14 @@ link_t server::link( const std::string& client_name )
     connect connect( local_address( local_name( client_name ) ) );
     link_t id = seed++;
 
-    write_lock lock( read_write );
+    lock lock( mutex );
     map.insert( map.end(), std::make_pair( id, new servlet( id, external, connect, *this ) ) );
     return id;
 }
 
 void server::unlink( link_t id )
 {
-    write_lock write_lock( read_write );
+    lock lock( mutex );
     map.erase( id );
 }
 

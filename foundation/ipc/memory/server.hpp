@@ -23,9 +23,9 @@ private:
     const link_t link;
     const ipc::switchboard& switchboard;
     ooe::socket socket;
-
     ooe::mutex mutex;
     transport* transport_ptr;
+
     atom< bool > state;
     ooe::thread thread;
 
@@ -39,6 +39,7 @@ class server
 {
 public:
     server( const std::string&, const switchboard& ) OOE_VISIBLE;
+    ~server( void ) OOE_VISIBLE;
 
     bool decode( void ) OOE_VISIBLE;
     std::string name( void ) const;
@@ -55,7 +56,7 @@ private:
     switchboard internal;
 
     atom< link_t > seed;
-    mutable ooe::read_write read_write;
+    ooe::mutex mutex;
     servlet_map map;
 };
 
