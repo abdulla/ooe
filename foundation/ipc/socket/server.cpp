@@ -28,8 +28,8 @@ OOE_ANONYMOUS_END( ( ooe )( ipc )( socket ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( socket ) )
 
 //--- servlet --------------------------------------------------------------------------------------
-servlet::servlet( servlet_iterator iterator_, ooe::socket& socket_,
-    const ipc::switchboard& switchboard_, server& server )
+servlet::servlet( const ooe::socket& socket_, const ipc::switchboard& switchboard_,
+    servlet_iterator iterator_, server& server )
     : iterator( iterator_ ), socket( socket_ ), switchboard( switchboard_ ),
     thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
@@ -100,7 +100,7 @@ void server::accept( void )
 
     lock lock( mutex );
     list.push_front( servlet_list::value_type() );
-    list.front() = servlet_ptr( new servlet( list.begin(), socket, switchboard, *this ) );
+    list.front() = servlet_ptr( new servlet( socket, switchboard, list.begin(), *this ) );
 }
 
 void server::erase( servlet_iterator iterator )

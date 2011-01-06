@@ -23,13 +23,14 @@ typedef std::list< servlet_ptr >::iterator servlet_iterator;
 class servlet
 {
 public:
-    servlet( servlet_iterator, ooe::socket&, const ipc::switchboard&, server& );
+    servlet( const ooe::socket&, const ipc::switchboard&, servlet_iterator, server& );
     void join( void );
 
 private:
     servlet_iterator iterator;
     ooe::socket socket;
     const ipc::switchboard& switchboard;
+
     ooe::thread thread;
 
     void* main( void* );

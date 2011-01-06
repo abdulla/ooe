@@ -4,6 +4,7 @@
 
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/nameservice.hpp"
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
@@ -33,13 +34,13 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     ipc::nameservice nameservice;
     nameservice.insert( "hello", hello, "A function that prints 'hello server'" );
 
-    ipc::memory::server server( "/ooe.hello", nameservice );
+    ipc::memory::server server( ipc::server_name( "ooe.hello" ), nameservice );
 
     if ( up_name )
         ipc::barrier_notify( up_name );
 
     while ( !executable::has_signal() )
-        server.decode();
+        server.accept();
 
     return true;
 }

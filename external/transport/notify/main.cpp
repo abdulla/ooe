@@ -12,7 +12,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-    connect connect( local_address( ipc::local_name( "/ooe-transport" ) ) );
+    connect connect( local_address( ipc::local_name( "ooe-transport" ) ) );
     ipc::memory::transport transport( connect );
     timer timer;
 

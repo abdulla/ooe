@@ -1,7 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/program.hpp"
-#include "foundation/io/directory.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 
@@ -13,14 +12,9 @@ void call_wait( const void* )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-    std::string name = ipc::local_name( "/ooe-transport" );
-
-    if ( exists( name ) )
-        erase( name );
-
-    listen listen( ( local_address( name ) ) );
+    listen listen( local_address( ipc::server_name( "ooe-transport" ) ) );
     socket socket = listen.accept();
-    ipc::memory::transport transport( "/ooe-transport" );
+    ipc::memory::transport transport( ipc::unique_name() );
     transport.send( socket );
 
     while ( !executable::has_signal() )

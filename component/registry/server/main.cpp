@@ -8,6 +8,7 @@
 #include "component/registry/registry.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/switchboard.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
@@ -51,7 +52,7 @@ std::string surrogate( const std::string& path, bool public_server )
 //--- load_server ----------------------------------------------------------------------------------
 interface::vector_type load_server( const std::string& path )
 {
-    ipc::memory::client client( path );
+    ipc::memory::client client( ipc::local_name( path ) );
     return ipc::memory::list( client )();
 }
 
@@ -207,13 +208,13 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
     else if ( switchboard.insert( list_all ) != 4 )
         throw error::runtime( "registry: " ) << "\"list_all\" not at index 4";
 
-    ipc::memory::server server( "/ooe.registry", switchboard );
+    ipc::memory::server server( ipc::server_name( "ooe.registry" ), switchboard );
 
     if ( up_name )
         ipc::barrier_notify( up_name );
 
     while ( !executable::has_signal() )
-        server.decode();
+        server.accept();
 
     return true;
 }

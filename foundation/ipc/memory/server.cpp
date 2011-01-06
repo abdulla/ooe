@@ -1,23 +1,10 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "foundation/io/directory.hpp"
-#include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 
-typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool* > tuple_type;
-
-//--- ipc_address ----------------------------------------------------------------------------------
-address ipc_address( const std::string& server_name )
-{
-    std::string local_name = ipc::local_name( server_name );
-
-    if ( exists( local_name ) )
-        erase( local_name );
-
-    return local_address( local_name );
-}
+typedef tuple< const switchboard&, shared_allocator&, io_buffer&, ipc::pool& > tuple_type;
 
 //--- ipc_decode -----------------------------------------------------------------------------------
 void ipc_decode( const void* pointer )
@@ -44,7 +31,7 @@ void ipc_decode( const void* pointer )
         buffer.external();
     }
 
-    switchboard::size_type size = tuple._0.execute( index, buffer, *tuple._3 );
+    switchboard::size_type size = tuple._0.execute( index, buffer, tuple._3 );
 
     buffer.preserve( 0 );
     internal = buffer.is_internal();
@@ -60,63 +47,24 @@ void ipc_decode( const void* pointer )
             call( data, internal, error, allocator.name() );
 }
 
-//--- ipc_link -------------------------------------------------------------------------------------
-up_t ipc_link( const any& any, io_buffer& buffer, pool& pool )
-{
-    std::string client_name;
-    stream_read< std::string >::call( buffer.get(), client_name );
-
-    link_t link = static_cast< server* >( any.pointer )->link( client_name );
-    return return_write< link_t >( buffer, pool, link );
-}
-
-//--- ipc_unlink -----------------------------------------------------------------------------------
-up_t ipc_unlink( const any& any, io_buffer& buffer, pool& )
-{
-    link_t link;
-    stream_read< link_t >::call( buffer.get(), link );
-
-    static_cast< server* >( any.pointer )->unlink( link );
-    return 0;
-}
-
-//--- set_transport --------------------------------------------------------------------------------
-void set_transport
-    ( ooe::mutex& mutex, ipc::memory::transport*& transport, ipc::memory::transport* value )
-{
-    lock lock( mutex );
-    transport = value;
-}
-
-//--- wake_transport -------------------------------------------------------------------------------
-void wake_transport( ooe::mutex& mutex, ipc::memory::transport*& transport )
-{
-    lock lock( mutex );
-
-    if ( !transport )
-        return;
-
-    // wake servlet and indicate that it should call null and exit
-    stream_write< bool_t, index_t >::call( transport->get(), true, 0 );
-    transport->wake_wait();
-}
-
 OOE_ANONYMOUS_END( ( ooe )( ipc )( memory ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- servlet --------------------------------------------------------------------------------------
-servlet::servlet( link_t link_, const ipc::switchboard& switchboard_, const ooe::socket& socket_,
-    server& server )
-    : link( link_ ), switchboard( switchboard_ ), socket( socket_ ), mutex(), transport_ptr( 0 ),
-    state( true ), thread( "servlet", make_function( *this, &servlet::main ), &server )
+servlet::servlet( const ooe::socket& socket_, const ipc::switchboard& switchboard_,
+    servlet_iterator iterator_, server& server )
+    : socket( socket_ ), switchboard( switchboard_ ), iterator( iterator_ ), state( true ),
+    thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
 }
 
 servlet::~servlet( void )
 {
-    state.exchange( false );
-    wake_transport( mutex, transport_ptr );
+    if ( !state.exchange( false ) )
+        return;
+
+    socket.shutdown( socket::read );
     thread.join();
 }
 
@@ -124,64 +72,42 @@ void* servlet::main( void* pointer )
 {
     server& server = *static_cast< memory::server* >( pointer );
     transport transport( socket );
-    link_server link_server( socket, link, server );
+    link_server link_server( socket, iterator, server, state, transport );
 
     shared_allocator allocator;
     io_buffer buffer( transport.get(), transport.size(), allocator );
     pool pool;
-    tuple_type tuple( switchboard, allocator, buffer, &pool );
-    set_transport( mutex, transport_ptr, &transport );
+    tuple_type tuple( switchboard, allocator, buffer, pool );
 
     while ( OOE_LIKELY( state ) )
         transport.wait( ipc_decode, &tuple );
 
-    set_transport( mutex, transport_ptr, 0 );
     return 0;
 }
 
 //--- server ---------------------------------------------------------------------------------------
-server::server( const std::string& name_, const switchboard& external_ )
-    : listen( ipc_address( name_ ) ), transport( name_ ), external( external_ ),
-    internal(), seed(), mutex(), map()
+server::server( const local_address& address, const ipc::switchboard& switchboard_ )
+    : listen( address ), switchboard( switchboard_ ), mutex(), list()
 {
-    if ( internal.insert_direct( ipc_link, this ) != 1 )
-        throw error::runtime( "ipc::memory::server: " ) << "\"link\" not at index 1";
-    else if ( internal.insert_direct( ipc_unlink, this ) != 2 )
-        throw error::runtime( "ipc::memory::server: " ) << "\"unlink\" not at index 2";
 }
 
 server::~server( void )
 {
 }
 
-bool server::decode( void )
+void server::accept( void )
 {
     socket socket = listen.accept();
-    transport.send( socket );
-
-    shared_allocator allocator;
-    io_buffer buffer( transport.get(), transport.size(), allocator );
-    tuple_type tuple( internal, allocator, buffer, 0 );
-    transport.wait( ipc_decode, &tuple );
 
     lock lock( mutex );
-    return !map.empty();
+    list.push_front( servlet_ptr() );
+    list.front() = servlet_ptr( new servlet( socket, switchboard, list.begin(), *this ) );
 }
 
-link_t server::link( const std::string& client_name )
-{
-    connect connect( local_address( local_name( client_name ) ) );
-    link_t id = seed++;
-
-    lock lock( mutex );
-    map.insert( map.end(), std::make_pair( id, new servlet( id, external, connect, *this ) ) );
-    return id;
-}
-
-void server::unlink( link_t id )
+void server::erase( servlet_iterator iterator )
 {
     lock lock( mutex );
-    map.erase( id );
+    list.erase( iterator );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

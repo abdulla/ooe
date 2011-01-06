@@ -12,7 +12,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-    ipc::memory::client client( "/ooe" );
+    ipc::memory::client client( ipc::local_name( "ooe" ) );
     ipc::memory::call< void ( void ) > call( client, "call_noop" );
 
     timer timer;

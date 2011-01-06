@@ -11,15 +11,10 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 class OOE_VISIBLE client
 {
 public:
-    client( const std::string& );
-    ~client( void );
-
+    client( const local_address& );
     operator memory::transport&( void );
 
 private:
-    const std::string server_name;
-    std::string client_name;
-    link_t link;
     memory::transport transport;
     memory::link_client link_client;
 };

@@ -29,9 +29,8 @@ public:
         : path_( executable::path()._0 ), fork( 0 )
     {
         start_server();
-        std::string module_path = path_ + "../lib/libhello.so";
         registry registry;
-        registry.insert( registry::library, module_path );
+        registry.insert( registry::library, path_ + "../lib/libhello.so" );
     }
 
     ~setup( void )
@@ -123,7 +122,7 @@ template<>
     interface.insert< void ( void ) >( "hello" );
 
     registry registry;
-    remote remote( registry.surrogate( path ) );
+    remote remote( ipc::local_name( registry.surrogate( path ) ) );
     remote.find< void ( void ) >( "hello" )();
     OOE_CHECK( "remote.supports( interface )", remote.supports( interface ) );
 
@@ -148,8 +147,8 @@ template<>
     }
 
     registry registry;
-    registry.insert( registry::server, "/ooe.hello" );
-    remote remote( "/ooe.hello" );
+    registry.insert( registry::server, "ooe.hello" );
+    remote remote( ipc::local_name( "ooe.hello" ) );
     remote.find< void ( void ) >( "hello" )();
 }
 

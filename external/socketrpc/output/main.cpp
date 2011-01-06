@@ -14,8 +14,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
 {
     up_t size = parse( argc, argv );
 
-    std::string local_name = ipc::local_name( "ooe" );
-    ipc::socket::client client( ( local_address( local_name ) ) );
+    ipc::socket::client client( local_address( ipc::local_name( "ooe" ) ) );
     ipc::socket::call< void ( up_t ) > set( client, "set_output" );
     ipc::socket::find find( client );
     ipc::socket::call< const c8* ( void ) > call( client, "call_output" );

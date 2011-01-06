@@ -8,6 +8,7 @@
 #include "component/registry/remote.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/ipc/nameservice.hpp"
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
@@ -80,13 +81,14 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     ipc::nameservice nameservice;
     load_nameservice( nameservice, library.find< ooe::module ( void ) >( "module_open" )() );
 
-    ipc::memory::server server( surrogate_path, nameservice );
+    ipc::memory::server server( ipc::server_name( surrogate_path ), nameservice );
     ipc::barrier_notify( std::string( surrogate_path ) + ".b" );
 
     if ( public_server )
         thread( "insert", registry_insert, surrogate_path );
 
-    while ( !executable::has_signal() && ( public_server || server.decode() ) ) {}
+    while ( !executable::has_signal() )
+        server.accept();
 
     return true;
 }

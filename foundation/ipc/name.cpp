@@ -2,6 +2,7 @@
 
 #include <paths.h>
 
+#include "foundation/io/directory.hpp"
 #include "foundation/ipc/name.hpp"
 #include "foundation/utility/atom.hpp"
 #include "foundation/utility/convert.hpp"
@@ -15,15 +16,19 @@ OOE_ANONYMOUS_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
 //--- ipc ------------------------------------------------------------------------------------------
-std::string link_name( pid_t pid, time_t time, link_t link )
-{
-    std::string name( "/ooe." );
-    return name << hex( pid ) << 't' << hex( time ) << 'l' << hex( link );
-}
-
 std::string local_name( const std::string& name )
 {
     return _PATH_TMP + name + ".local";
+}
+
+std::string server_name( const std::string& name )
+{
+    std::string local_name = ipc::local_name( name );
+
+    if ( exists( local_name ) )
+        erase( local_name );
+
+    return local_name;
 }
 
 std::string unique_name( void )

@@ -1,13 +1,14 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/program.hpp"
+#include "foundation/ipc/name.hpp"
 #include "foundation/ipc/memory/client.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-    ipc::memory::client client( "/ooe" );
+    ipc::memory::client client( ipc::local_name( "ooe" ) );
     return true;
 }
 
