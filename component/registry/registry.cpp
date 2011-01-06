@@ -6,7 +6,7 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 registry::registry( void )
-    : client( "/ooe.registry" )
+    : client( ipc::local_name( "ooe.registry" ) )
 {
 }
 

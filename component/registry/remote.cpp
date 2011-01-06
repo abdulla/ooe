@@ -24,8 +24,8 @@ OOE_NAMESPACE_END( ( ooe )( facade ) )
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- remote ---------------------------------------------------------------------------------------
-remote::remote( const std::string& path )
-    : client( path )
+remote::remote( const local_address& address )
+    : client( address )
 {
 }
 

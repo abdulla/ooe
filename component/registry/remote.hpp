@@ -48,7 +48,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 class remote
 {
 public:
-    remote( const std::string& ) OOE_VISIBLE;
+    remote( const local_address& ) OOE_VISIBLE;
     bool supports( const interface& ) const OOE_VISIBLE;
     std::string doc( const std::string&, const std::string& ) const OOE_VISIBLE;
 
