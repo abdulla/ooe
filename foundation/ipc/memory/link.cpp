@@ -14,6 +14,11 @@ link_server::link_server( const ooe::socket& socket_, servlet_iterator iterator_
 {
 }
 
+link_server::~link_server( void )
+{
+    thread.join();
+}
+
 void* link_server::main( void* pointer )
 {
     memory::transport& transport = *static_cast< memory::transport* >( pointer );
@@ -22,10 +27,9 @@ void* link_server::main( void* pointer )
     poll.insert( socket );
     poll.wait();
 
-    if ( !state.exchange( false ) )
-        return 0;
+    if ( state.exchange( false ) )
+        server.erase( iterator );
 
-    server.erase( iterator );
     // wake servlet and indicate that it should call null and exit
     stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
     transport.wake_wait();

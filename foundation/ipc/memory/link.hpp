@@ -24,6 +24,7 @@ class link_server
 {
 public:
     link_server( const ooe::socket&, servlet_iterator, server&, atom< bool >&, transport& );
+    ~link_server( void );
 
 private:
     ooe::socket socket;
