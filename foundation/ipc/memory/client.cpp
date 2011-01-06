@@ -24,6 +24,10 @@ client::client( const local_address& address )
     platform::ipc::memory::client_construct( transport );
 }
 
+client::~client( void )
+{
+}
+
 client::operator memory::transport&( void )
 {
     return transport;

@@ -86,4 +86,8 @@ shared_memory::shared_memory( const ooe::descriptor& desc )
 {
 }
 
+shared_memory::~shared_memory( void )
+{
+}
+
 OOE_NAMESPACE_END( ( ooe )( ipc ) )

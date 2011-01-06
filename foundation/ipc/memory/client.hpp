@@ -12,6 +12,8 @@ class OOE_VISIBLE client
 {
 public:
     client( const local_address& );
+    ~client( void );
+
     operator memory::transport&( void );
 
 private:

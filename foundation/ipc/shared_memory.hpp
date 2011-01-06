@@ -35,6 +35,7 @@ struct OOE_VISIBLE shared_memory
 
     shared_memory( const std::string&, type = open, up_t = 0 );
     shared_memory( const ooe::descriptor& );
+    ~shared_memory( void );
 
     using memory::get;
     using memory::size;
