@@ -1,7 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/program.hpp"
-#include "foundation/io/directory.hpp"
 #include "foundation/ipc/nameservice.hpp"
 #include "foundation/ipc/socket/server.hpp"
 
@@ -35,12 +34,7 @@ bool launch( const std::string&, const std::string&, s32, c8** )
     nameservice.insert( "call_output", call_output );
     nameservice.insert( "call_input", call_input );
 
-    std::string local_name = ipc::local_name( "ooe" );
-
-    if ( exists( local_name ) )
-        erase( local_name );
-
-    ipc::socket::server server( local_address( local_name ), nameservice );
+    ipc::socket::server server( local_address( ipc::server_name( "ooe" ) ), nameservice );
 
     while ( !executable::has_signal() )
         server.accept();

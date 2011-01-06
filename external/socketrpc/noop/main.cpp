@@ -12,8 +12,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-    std::string local_name = ipc::local_name( "ooe" );
-    ipc::socket::client client( ( local_address( local_name ) ) );
+    ipc::socket::client client( local_address( ipc::local_name( "ooe" ) ) );
     ipc::socket::call< void ( void ) > call( client, "call_noop" );
 
     timer timer;
