@@ -3,6 +3,8 @@
 #ifndef OOE_FOUNDATION_IPC_MEMORY_LINK_HPP
 #define OOE_FOUNDATION_IPC_MEMORY_LINK_HPP
 
+#include <list>
+
 #include "foundation/ipc/fundamental.hpp"
 #include "foundation/ipc/memory/transport.hpp"
 #include "foundation/parallel/thread.hpp"
@@ -10,21 +12,26 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
+class servlet;
 class server;
+
+typedef shared_ptr< servlet > servlet_ptr;
+typedef std::list< servlet_ptr > servlet_list;
+typedef std::list< servlet_ptr >::iterator servlet_iterator;
 
 //--- link_server ----------------------------------------------------------------------------------
 class link_server
 {
 public:
-    link_server( const ooe::socket&, link_t, server& );
-    ~link_server( void );
+    link_server( const ooe::socket&, servlet_iterator, server&, atom< bool >&, transport& );
 
 private:
-    socket_pair pair;
     ooe::socket socket;
 
-    const link_t link;
-    atom< bool > state;
+    const servlet_iterator iterator;
+    memory::server& server;
+
+    atom< bool >& state;
     ooe::thread thread;
 
     void* main( void* );
@@ -37,11 +44,9 @@ public:
     link_client( const ooe::socket&, transport& );
     ~link_client( void );
 
-    void shutdown( void );
     operator bool( void ) const;
 
 private:
-    socket_pair pair;
     ooe::socket socket;
 
     atom< bool > state;

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "foundation/ipc/io_buffer.hpp"
+#include "foundation/ipc/fundamental.hpp"
 #include "foundation/ipc/pool.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )

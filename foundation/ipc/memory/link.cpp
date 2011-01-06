@@ -7,53 +7,44 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- link_server ----------------------------------------------------------------------------------
-link_server::link_server( const ooe::socket& socket_, link_t link_, server& server )
-    : pair( make_pair() ), socket( socket_ ), link( link_ ), state( true ),
-    thread( "link_server", make_function( *this, &link_server::main ), &server )
+link_server::link_server( const ooe::socket& socket_, servlet_iterator iterator_,
+    memory::server& server_, atom< bool >& state_, transport& transport )
+    : socket( socket_ ), iterator( iterator_ ), server( server_ ), state( state_ ),
+    thread( "link_server", make_function( *this, &link_server::main ), &transport )
 {
-}
-
-link_server::~link_server( void )
-{
-    if ( !state.exchange( false ) )
-        return;
-
-    pair._1.shutdown( socket::write );
-    thread.join();
 }
 
 void* link_server::main( void* pointer )
 {
-    memory::server& server = *static_cast< memory::server* >( pointer );
+    memory::transport& transport = *static_cast< memory::transport* >( pointer );
 
     poll poll;
     poll.insert( socket );
-    poll.insert( pair._0 );
     poll.wait();
 
-    if ( state.exchange( false ) )
-        server.unlink( link );
+    if ( !state.exchange( false ) )
+        return 0;
 
+    server.erase( iterator );
+    // wake servlet and indicate that it should call null and exit
+    stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
+    transport.wake_wait();
     return 0;
 }
 
 //--- link_client ----------------------------------------------------------------------------------
 link_client::link_client( const ooe::socket& socket_, transport& transport )
-    : pair( make_pair() ), socket( socket_ ), state( true ),
+    : socket( socket_ ), state( true ),
     thread( "link_client", make_function( *this, &link_client::main ), &transport )
 {
 }
 
 link_client::~link_client( void )
 {
-    shutdown();
-    thread.join();
-}
-
-void link_client::shutdown( void )
-{
     if ( state.exchange( false ) )
-        pair._1.shutdown( socket::write );
+        socket.shutdown( socket::read );
+
+    thread.join();
 }
 
 link_client::operator bool( void ) const
@@ -67,7 +58,6 @@ void* link_client::main( void* pointer )
 
     poll poll;
     poll.insert( socket );
-    poll.insert( pair._0 );
     poll.wait();
 
     if ( !state.exchange( false ) )

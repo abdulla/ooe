@@ -7,7 +7,6 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
-typedef pid_t link_t;
 typedef u32 index_t;
 typedef u32 bool_t;
 typedef u32 error_t;
