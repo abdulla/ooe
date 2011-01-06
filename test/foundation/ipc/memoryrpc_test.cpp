@@ -5,6 +5,7 @@
 #include "foundation/ipc/container.hpp"
 #include "foundation/ipc/jumbo.hpp"
 #include "foundation/ipc/nameservice.hpp"
+#include "foundation/ipc/semaphore.hpp"
 #include "foundation/ipc/memory/client.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
@@ -129,11 +130,11 @@ private:
         nameservice.insert( "ipcvector_test", ipcvector_test );
         nameservice.insert( "jumbo_test", jumbo_test );
 
-        ipc::memory::server server( "/ooe.test.memory-rpc", nameservice );
+        ipc::memory::server server( ipc::server_name( "ooe.test.memory-rpc" ), nameservice );
         ipc::barrier_notify( name );
 
         while ( !executable::has_signal() )
-            server.decode();
+            server.accept();
     }
 };
 
@@ -142,7 +143,7 @@ class data
 {
 public:
     data( void )
-        : client( "/ooe.test.memory-rpc" )
+        : client( ipc::local_name( "ooe.test.memory-rpc" ) )
     {
     }
 
