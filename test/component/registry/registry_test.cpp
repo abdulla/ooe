@@ -39,7 +39,7 @@ public:
 
         if ( fork_killall.is_child() )
         {
-            OOE_IGNORE( fork_io::execute( "/usr/bin/killall", "registry", NULL ) );
+            OOE_IGNORE( fork_io::execute( "/usr/bin/killall", "surrogate", NULL ) );
             fork_io::exit( true );
         }
     }
