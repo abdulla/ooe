@@ -9,3 +9,7 @@ add a way to replay responses
 look at a linux-specific way to accelerate IPC
     - sys_process_vm_read() and sys_process_vm_write(): http://lwn.net/Articles/405346
     - directed yield with yield_to(): http://lwn.net/Articles/419961
+
+externalise server socket in IPC, so that surrogates can poll for HUP
+    - sockets are handed directly to server::accept() as an argument
+    - sockets can be polled for HUP, allowing surrogates to shutdown on client disconnection

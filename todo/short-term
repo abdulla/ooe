@@ -1,7 +1,5 @@
 - quad-tree based combine_source
 
-- ipc transport should use a hybrid spinlock and semaphore, like a glibc mutex (spin 10x, sleep)
-
 - modify font and font_source to operatate on glyph indices
 - make text_layout glyph object containing glyph indices, then use that for input() and (new) load()
 - use first_char/next_char to map from character to glyph, and store in font_source metric

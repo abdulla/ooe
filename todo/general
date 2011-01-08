@@ -1,9 +1,3 @@
 replace math with eigen2
     - uses expression templates like blitz++ but is sse optimised
     - other option is to roll my own, considering my limited needs, it is a possibility
-
-use harfbuzz for text layout - or - use pango and render to bitmap
-    - possibly stick with freetype for fonts and use harfbuzz for text layout
-    - look at how qt and pango use harfbuzz
-    - could use pango and cairo backend to render text, similar to what clutter does
-    - http://library.gnome.org/devel/pango/unstable/pango-Cairo-Rendering.html
