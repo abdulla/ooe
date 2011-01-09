@@ -12,7 +12,7 @@ void call_wait( const void* )
 
 bool launch( const std::string&, const std::string&, s32, c8** )
 {
-    listen listen( local_address( ipc::server_name( "ooe-transport" ) ) );
+    listen listen( ipc::server_address( "ooe.transport" ) );
     socket socket = listen.accept();
     ipc::memory::transport transport( ipc::unique_name() );
     transport.send( socket );

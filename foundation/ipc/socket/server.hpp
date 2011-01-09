@@ -40,14 +40,13 @@ private:
 class OOE_VISIBLE server
 {
 public:
-    server( const address&, const ipc::switchboard& );
+    server( const ipc::switchboard& );
     ~server( void );
 
-    void accept( void );
+    void insert( const ooe::socket& );
     void erase( servlet_iterator ) OOE_HIDDEN;
 
 private:
-    ooe::listen listen;
     const ipc::switchboard& switchboard;
 
     ooe::mutex mutex;

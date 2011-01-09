@@ -208,13 +208,14 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
     else if ( switchboard.insert( list_all ) != 4 )
         throw error::runtime( "registry: " ) << "\"list_all\" not at index 4";
 
-    ipc::memory::server server( ipc::server_name( "ooe.registry" ), switchboard );
+    ipc::memory::server server( switchboard );
+    listen listen( ipc::server_address( "ooe.registry" ) );
 
     if ( up_name )
         ipc::barrier_notify( up_name );
 
     while ( !executable::has_signal() )
-        server.accept();
+        server.insert( listen.accept() );
 
     return true;
 }

@@ -83,8 +83,8 @@ void* servlet::main( void* pointer )
 }
 
 //--- server ---------------------------------------------------------------------------------------
-server::server( const address& address, const ipc::switchboard& switchboard_ )
-    : listen( address ), switchboard( switchboard_ ), mutex(), list()
+server::server( const ipc::switchboard& switchboard_ )
+    : switchboard( switchboard_ ), mutex(), list()
 {
 }
 
@@ -94,10 +94,8 @@ server::~server( void )
         ( *i )->join();
 }
 
-void server::accept( void )
+void server::insert( const ooe::socket& socket )
 {
-    ooe::socket socket = listen.accept();
-
     lock lock( mutex );
     list.push_front( servlet_list::value_type() );
     list.front() = servlet_ptr( new servlet( socket, switchboard, list.begin(), *this ) );

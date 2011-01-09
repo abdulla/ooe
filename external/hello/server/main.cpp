@@ -34,13 +34,14 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     ipc::nameservice nameservice;
     nameservice.insert( "hello", hello, "A function that prints 'hello server'" );
 
-    ipc::memory::server server( ipc::server_name( "ooe.hello" ), nameservice );
+    ipc::memory::server server( nameservice );
+    listen listen( ipc::server_address( "ooe.hello" ) );
 
     if ( up_name )
         ipc::barrier_notify( up_name );
 
     while ( !executable::has_signal() )
-        server.accept();
+        server.insert( listen.accept() );
 
     return true;
 }

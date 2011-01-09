@@ -34,10 +34,11 @@ bool launch( const std::string&, const std::string&, s32, c8** )
     nameservice.insert( "call_output", call_output );
     nameservice.insert( "call_input", call_input );
 
-    ipc::memory::server server( ipc::server_name( "ooe" ), nameservice );
+    ipc::memory::server server( nameservice );
+    listen listen( ipc::server_address( "ooe" ) );
 
     while ( !executable::has_signal() )
-        server.accept();
+        server.insert( listen.accept() );
 
     return true;
 }
