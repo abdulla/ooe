@@ -16,12 +16,18 @@ OOE_ANONYMOUS_END( ( ooe ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc ) )
 
 //--- ipc ------------------------------------------------------------------------------------------
+std::string unique_name( void )
+{
+    std::string name( "/ooe." );
+    return name << hex( getpid() ) << 'u' << hex( seed++ );
+}
+
 std::string local_name( const std::string& name )
 {
     return _PATH_TMP + name + ".local";
 }
 
-std::string server_name( const std::string& name )
+local_address server_address( const std::string& name )
 {
     std::string local_name = ipc::local_name( name );
 
@@ -29,12 +35,6 @@ std::string server_name( const std::string& name )
         erase( local_name );
 
     return local_name;
-}
-
-std::string unique_name( void )
-{
-    std::string name( "/ooe." );
-    return name << hex( getpid() ) << 'u' << hex( seed++ );
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc ) )

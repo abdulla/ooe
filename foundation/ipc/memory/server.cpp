@@ -86,8 +86,8 @@ void* servlet::main( void* pointer )
 }
 
 //--- server ---------------------------------------------------------------------------------------
-server::server( const local_address& address, const ipc::switchboard& switchboard_ )
-    : listen( address ), switchboard( switchboard_ ), mutex(), list()
+server::server( const ipc::switchboard& switchboard_ )
+    : switchboard( switchboard_ ), mutex(), list()
 {
 }
 
@@ -95,10 +95,8 @@ server::~server( void )
 {
 }
 
-void server::accept( void )
+void server::insert( const socket& socket )
 {
-    socket socket = listen.accept();
-
     lock lock( mutex );
     list.push_front( servlet_ptr() );
     list.front() = servlet_ptr( new servlet( socket, switchboard, list.begin(), *this ) );

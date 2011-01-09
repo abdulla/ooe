@@ -130,11 +130,12 @@ private:
         nameservice.insert( "ipcvector_test", ipcvector_test );
         nameservice.insert( "jumbo_test", jumbo_test );
 
-        ipc::memory::server server( ipc::server_name( "ooe.test.memory-rpc" ), nameservice );
+        ipc::memory::server server( nameservice );
+        listen listen( ipc::server_address( "ooe.test.memory-rpc" ) );
         ipc::barrier_notify( name );
 
         while ( !executable::has_signal() )
-            server.accept();
+            server.insert( listen.accept() );
     }
 };
 

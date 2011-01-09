@@ -33,17 +33,6 @@ public:
         registry.insert( registry::library, path_ + "../lib/libhello.so" );
     }
 
-    ~setup( void )
-    {
-        fork_io fork_killall;
-
-        if ( fork_killall.is_child() )
-        {
-            OOE_IGNORE( fork_io::execute( "/usr/bin/killall", "surrogate", NULL ) );
-            fork_io::exit( true );
-        }
-    }
-
     std::string path() const
     {
         return path_;

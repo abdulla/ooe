@@ -31,14 +31,13 @@ private:
 class OOE_VISIBLE server
 {
 public:
-    server( const local_address&, const ipc::switchboard& );
+    server( const ipc::switchboard& );
     ~server( void );
 
-    void accept( void );
+    void insert( const socket& );
     void erase( servlet_iterator ) OOE_HIDDEN;
 
 private:
-    ooe::listen listen;
     const ipc::switchboard& switchboard;
 
     ooe::mutex mutex;
