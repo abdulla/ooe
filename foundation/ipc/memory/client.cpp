@@ -19,7 +19,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- client ---------------------------------------------------------------------------------------
 client::client( const local_address& address )
-    : transport( ipc::unique_name() ), link_client( ipc_connect( address, transport ), transport )
+    : transport( ipc::unique_name() ), link( ipc_connect( address, transport ), transport )
 {
     platform::ipc::memory::client_construct( transport );
 }

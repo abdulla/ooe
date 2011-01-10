@@ -16,12 +16,14 @@ public:
     servlet( const ooe::socket&, const ipc::switchboard&, servlet_iterator, server& );
     ~servlet( void );
 
+    void detach( void );
+
 private:
     ooe::socket socket;
     const ipc::switchboard& switchboard;
     const servlet_iterator iterator;
 
-    atom< bool > state;
+    bool detached;
     ooe::thread thread;
 
     void* main( void* );

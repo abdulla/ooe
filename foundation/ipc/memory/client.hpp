@@ -18,7 +18,7 @@ public:
 
 private:
     memory::transport transport;
-    memory::link_client link_client;
+    memory::link_client link;
 };
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

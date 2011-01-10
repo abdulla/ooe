@@ -23,8 +23,10 @@ typedef std::list< servlet_ptr >::iterator servlet_iterator;
 class link_server
 {
 public:
-    link_server( const ooe::socket&, servlet_iterator, server&, atom< bool >&, transport& );
+    link_server( const ooe::socket&, servlet_iterator, server&, transport& );
     ~link_server( void );
+
+    operator bool( void ) const;
 
 private:
     ooe::socket socket;
@@ -32,7 +34,7 @@ private:
     const servlet_iterator iterator;
     memory::server& server;
 
-    atom< bool >& state;
+    atom< bool > state;
     ooe::thread thread;
 
     void* main( void* );

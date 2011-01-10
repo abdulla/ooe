@@ -8,8 +8,8 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- link_server ----------------------------------------------------------------------------------
 link_server::link_server( const ooe::socket& socket_, servlet_iterator iterator_,
-    memory::server& server_, atom< bool >& state_, transport& transport )
-    : socket( socket_ ), iterator( iterator_ ), server( server_ ), state( state_ ),
+    memory::server& server_, transport& transport )
+    : socket( socket_ ), iterator( iterator_ ), server( server_ ), state( true ),
     thread( "link_server", make_function( *this, &link_server::main ), &transport )
 {
 }
@@ -17,6 +17,11 @@ link_server::link_server( const ooe::socket& socket_, servlet_iterator iterator_
 link_server::~link_server( void )
 {
     thread.join();
+}
+
+link_server::operator bool( void ) const
+{
+    return state;
 }
 
 void* link_server::main( void* pointer )
