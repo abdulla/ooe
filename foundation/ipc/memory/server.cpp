@@ -54,32 +54,37 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- servlet --------------------------------------------------------------------------------------
 servlet::servlet( const ooe::socket& socket_, const ipc::switchboard& switchboard_,
     servlet_iterator iterator_, server& server )
-    : socket( socket_ ), switchboard( switchboard_ ), iterator( iterator_ ), state( true ),
+    : socket( socket_ ), switchboard( switchboard_ ), iterator( iterator_ ), detached( false ),
     thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
 }
 
 servlet::~servlet( void )
 {
-    if ( !state.exchange( false ) )
+    if ( detached )
         return;
 
     socket.shutdown( socket::read );
     thread.join();
 }
 
+void servlet::detach( void )
+{
+    detached = true;
+}
+
 void* servlet::main( void* pointer )
 {
     server& server = *static_cast< memory::server* >( pointer );
     transport transport( socket );
-    link_server link_server( socket, iterator, server, state, transport );
+    link_server link( socket, iterator, server, transport );
 
     shared_allocator allocator;
     io_buffer buffer( transport.get(), transport.size(), allocator );
     pool pool;
     tuple_type tuple( switchboard, allocator, buffer, pool );
 
-    while ( OOE_LIKELY( state ) )
+    while ( OOE_LIKELY( link ) )
         transport.wait( ipc_decode, &tuple );
 
     return 0;
@@ -104,6 +109,7 @@ void server::insert( const socket& socket )
 
 void server::erase( servlet_iterator iterator )
 {
+    ( *iterator )->detach();
     lock lock( mutex );
     list.erase( iterator );
 }
