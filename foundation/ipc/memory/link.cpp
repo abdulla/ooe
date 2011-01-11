@@ -19,10 +19,8 @@ link_server::operator bool( void ) const
     return state;
 }
 
-void* link_server::main( void* pointer )
+void link_server::main( void* pointer )
 {
-    memory::transport& transport = *static_cast< memory::transport* >( pointer );
-
     poll poll;
     poll.insert( socket );
     poll.wait();
@@ -31,9 +29,9 @@ void* link_server::main( void* pointer )
         server.erase( iterator );
 
     // wake servlet and indicate that it should call null and exit
+    memory::transport& transport = *static_cast< memory::transport* >( pointer );
     stream_write< bool_t, index_t >::call( transport.get(), true, 0 );
     transport.wake_wait();
-    return 0;
 }
 
 //--- link_client ----------------------------------------------------------------------------------
@@ -54,21 +52,19 @@ link_client::operator bool( void ) const
     return state;
 }
 
-void* link_client::main( void* pointer )
+void link_client::main( void* pointer )
 {
-    memory::transport& transport = *static_cast< memory::transport* >( pointer );
-
     poll poll;
     poll.insert( socket );
     poll.wait();
 
     if ( !state.exchange( false ) )
-        return 0;
+        return;
 
     // wake client and indicate that an error in the link has occurred
+    memory::transport& transport = *static_cast< memory::transport* >( pointer );
     stream_write< bool_t, error_t, const c8* >::call( transport.get(), true, error::link, "" );
     transport.wake_notify();
-    return 0;
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( memory ) )

@@ -58,7 +58,7 @@ void sight::status( const descriptor&, poll::type type )
         state.exchange( false );
 }
 
-void* sight::main( void* )
+void sight::main( void* )
 {
     descriptor desc( "/dev/video0", descriptor::read_write );
 
@@ -153,7 +153,6 @@ void* sight::main( void* )
     }
 
     control( desc, VIDIOC_STREAMOFF, &buf_type );
-    return 0;
 }
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )

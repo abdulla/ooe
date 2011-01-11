@@ -19,7 +19,7 @@ class OOE_VISIBLE thread
     : private noncopyable
 {
 public:
-    typedef function< void* ( void* ) > function_type;
+    typedef function< void ( void* ) > function_type;
 
     thread( void );
     thread( const std::string&, const function_type&, void* );

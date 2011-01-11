@@ -109,7 +109,7 @@ void client::write( const u8* data, up_t size_ )
         throw error::runtime( "ipc::socket::client: " ) << "Unable to write " << size_ << " bytes";
 }
 
-void* client::main( void* )
+void client::main( void* )
 {
     scoped< void ( u64&, ooe::mutex&, ooe::condition& ) >
         scoped( error_set, notify, mutex, condition );
@@ -153,8 +153,6 @@ void* client::main( void* )
         if ( do_notify )
             condition.notify_one();
     }
-
-    return 0;
 }
 
 OOE_NAMESPACE_END( ( ooe )( ipc )( socket ) )

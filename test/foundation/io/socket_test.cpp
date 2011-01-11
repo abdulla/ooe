@@ -42,10 +42,9 @@ public:
         return poll._1;
     }
 
-    void* shutdown( void* )
+    void shutdown( void* )
     {
         poll._1.shutdown( socket::read );
-        return 0;
     }
 
 private:

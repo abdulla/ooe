@@ -51,7 +51,7 @@ private:
     tbb::concurrent_queue< task_ptr > queue;
     ooe::thread thread;
 
-    void* main( void* pointer )
+    void main( void* pointer )
     {
         thread_pool& pool = *static_cast< thread_pool* >( pointer );
 
@@ -70,8 +70,6 @@ private:
             if ( !loads )
                 semaphore.down();
         }
-
-        return 0;
     }
 };
 
