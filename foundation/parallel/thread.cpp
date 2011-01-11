@@ -52,12 +52,12 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- thread ---------------------------------------------------------------------------------------
 thread::thread( void )
-    : pthread( pthread_self() ), joined( true )
+    : pthread( pthread_self() ), detached( true )
 {
 }
 
 thread::thread( const std::string& name_, const function_type& function, void* data )
-    : pthread(), joined( false )
+    : pthread(), detached( false )
 {
     datum_ptr datum( new datum_tuple( name_, function, data ) );
     s32 status = pthread_create( &pthread, 0, startup, datum );
@@ -71,19 +71,14 @@ thread::thread( const std::string& name_, const function_type& function, void* d
 
 thread::~thread( void )
 {
-    if ( joined )
+    if ( detached )
         return;
 
-    s32 status = pthread_detach( pthread );
+    s32 status = pthread_join( pthread, 0 );
 
-    if ( status && status != ESRCH )
+    if ( status )
         OOE_CONSOLE( "thread \"" << name() << "\": "
-            "Unable to destroy thread: " << error::number( status ) );
-}
-
-std::string thread::name( void ) const
-{
-    return thread_name( pthread );
+            "Unable to join thread: " << error::number( status ) );
 }
 
 bool thread::operator ==( const thread& compare ) const
@@ -91,25 +86,33 @@ bool thread::operator ==( const thread& compare ) const
     return pthread_equal( pthread, compare.pthread );
 }
 
-void* thread::join( void )
+std::string thread::name( void ) const
 {
-    if ( joined )
-        return 0;
-
-    void* pointer = 0;
-    s32 status = pthread_join( pthread, &pointer );
-
-    if ( status && status != ESRCH )
-        throw error::runtime( "thread \"" ) << name() << "\": "
-            "Unable to join thread: " << error::number( status );
-
-    joined = true;
-    return pointer;
+    return thread_name( pthread );
 }
 
-void thread::exit( void* pointer )
+bool thread::is_detached( void ) const
 {
-    pthread_exit( pointer );
+    return detached;
+}
+
+void thread::detach( void )
+{
+    if ( detached )
+        return;
+
+    s32 status = pthread_detach( pthread );
+
+    if ( status )
+        throw error::runtime( "thread \"" ) << name() << "\": "
+            "Unable to detach thread: " << error::number( status );
+
+    detached = true;
+}
+
+void thread::exit( void )
+{
+    pthread_exit( 0 );
 }
 
 //--- tls_base -------------------------------------------------------------------------------------

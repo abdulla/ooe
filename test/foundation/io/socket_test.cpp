@@ -81,14 +81,11 @@ template<>
 {
     std::cerr << "poll on shutdown\n";
 
-    socket poll_socket( setup.get() );
-    thread thread( "shutdown", make_function( setup, &setup::shutdown ), 0 );
-
     poll poll;
-    poll.insert( poll_socket );
-    poll.wait();
+    poll.insert( setup.get() );
 
-    thread.join();
+    thread thread( "shutdown", make_function( setup, &setup::shutdown ), 0 );
+    poll.wait();
 }
 
 template<>

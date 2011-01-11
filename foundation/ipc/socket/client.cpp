@@ -43,17 +43,14 @@ client::client( const address& address )
 
 client::~client( void )
 {
-    if ( notify != ~u64( 0 ) )
-    {
-        if ( in != out )
-            // call null function to flush pending calls
-            rpc< void ( void ) >( *this, 0 )()();
+    if ( notify == ~u64( 0 ) )
+        return;
+    else if ( in != out )
+        // call null function to flush pending calls
+        rpc< void ( void ) >( *this, 0 )()();
 
-        // shutdown socket to stop reader thread
-        connect.shutdown( ooe::socket::read_write );
-    }
-
-    thread.join();
+    // shutdown socket to stop reader thread
+    connect.shutdown( ooe::socket::read_write );
 }
 
 client::byte_array client::wait( result_type& result )

@@ -25,16 +25,17 @@ public:
     thread( const std::string&, const function_type&, void* );
     ~thread( void );
 
-    std::string name( void ) const;
     bool operator ==( const thread& ) const;
-    void* join( void );
+    std::string name( void ) const;
+    bool is_detached( void ) const;
+    void detach( void );
 
     static void yield( void );
-    static void exit( void* ) OOE_NORETURN;
+    static void exit( void ) OOE_NORETURN;
 
 private:
     pthread_t pthread;
-    bool joined;
+    bool detached;
 };
 
 inline bool operator !=( const thread& x, const thread& y )

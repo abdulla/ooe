@@ -24,7 +24,9 @@ class servlet
 {
 public:
     servlet( const ooe::socket&, const ipc::switchboard&, servlet_iterator, server& );
-    void join( void );
+    ~servlet( void );
+
+    void detach( void );
 
 private:
     servlet_iterator iterator;

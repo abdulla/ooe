@@ -23,7 +23,6 @@ private:
     const ipc::switchboard& switchboard;
     const servlet_iterator iterator;
 
-    bool detached;
     ooe::thread thread;
 
     void* main( void* );
