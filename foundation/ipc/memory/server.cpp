@@ -70,7 +70,7 @@ void servlet::detach( void )
     thread.detach();
 }
 
-void* servlet::main( void* pointer )
+void servlet::main( void* pointer )
 {
     server& server = *static_cast< memory::server* >( pointer );
     transport transport( socket );
@@ -83,8 +83,6 @@ void* servlet::main( void* pointer )
 
     while ( OOE_LIKELY( link ) )
         transport.wait( ipc_decode, &tuple );
-
-    return 0;
 }
 
 //--- server ---------------------------------------------------------------------------------------

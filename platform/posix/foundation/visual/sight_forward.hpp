@@ -26,7 +26,7 @@ private:
     ooe::thread thread;
 
     void status( const descriptor&, poll::type );
-    void* main( void* );
+    void main( void* );
 };
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )

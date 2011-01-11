@@ -35,10 +35,9 @@ void load_nameservice( ipc::nameservice& nameservice, const module& module )
 }
 
 //--- registry_insert ------------------------------------------------------------------------------
-void* registry_insert( void* surrogate_path )
+void registry_insert( void* surrogate_path )
 {
     registry().insert( registry::server, static_cast< const c8* >( surrogate_path ) );
-    return 0;
 }
 
 //--- poll_function --------------------------------------------------------------------------------

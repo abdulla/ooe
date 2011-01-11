@@ -32,9 +32,7 @@ void* startup( void* pointer )
     platform::thread_name( datum->_0 );
     datum->_0 = std::string();
 
-    OOE_PRINT( "thread \"" << thread_name( pthread_self() ) << "\"",
-        return datum->_1( datum->_2 ) );
-
+    OOE_PRINT( "thread \"" << thread_name( pthread_self() ) << "\"", datum->_1( datum->_2 ) );
     return 0;
 }
 

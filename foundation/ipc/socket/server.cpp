@@ -46,7 +46,7 @@ void servlet::detach( void )
     thread.detach();
 }
 
-void* servlet::main( void* pointer )
+void servlet::main( void* pointer )
 {
     u8 data[ executable::static_page_size ];
     heap_allocator allocator;
@@ -84,7 +84,6 @@ void* servlet::main( void* pointer )
     }
 
     static_cast< server* >( pointer )->erase( iterator );
-    return 0;
 }
 
 //--- server ---------------------------------------------------------------------------------------
