@@ -20,11 +20,10 @@ public:
     {
     }
 
-    void stop( void )
+    ~thread_unit( void )
     {
         state.exchange( false );
         semaphore.up();
-        thread.join();
     }
 
     void enqueue( const task_ptr& task )
@@ -80,17 +79,14 @@ private:
 thread_pool::thread_pool( const std::string& name )
     : index( 0 ), vector()
 {
-    for ( up_t i = 0, end = executable::cpu_cores(); i != end; ++i )
+    up_t cpu_cores = executable::cpu_cores();
+    vector.reserve( cpu_cores );
+
+    for ( up_t i = 0; i != cpu_cores; ++i )
     {
         std::string unit_name = name + ' ';
         vector.push_back( opaque_ptr( new thread_unit( unit_name << i, *this ) ) );
     }
-}
-
-thread_pool::~thread_pool( void )
-{
-    for ( vector_type::iterator i = vector.begin(), end = vector.end(); i != end; ++i )
-        i->as< thread_unit >()->stop();
 }
 
 void thread_pool::insert( const task_ptr& task )

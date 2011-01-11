@@ -54,23 +54,20 @@ OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 //--- servlet --------------------------------------------------------------------------------------
 servlet::servlet( const ooe::socket& socket_, const ipc::switchboard& switchboard_,
     servlet_iterator iterator_, server& server )
-    : socket( socket_ ), switchboard( switchboard_ ), iterator( iterator_ ), detached( false ),
+    : socket( socket_ ), switchboard( switchboard_ ), iterator( iterator_ ),
     thread( "servlet", make_function( *this, &servlet::main ), &server )
 {
 }
 
 servlet::~servlet( void )
 {
-    if ( detached )
-        return;
-
-    socket.shutdown( socket::read );
-    thread.join();
+    if ( !thread.is_detached() )
+        socket.shutdown( socket::read );
 }
 
 void servlet::detach( void )
 {
-    detached = true;
+    thread.detach();
 }
 
 void* servlet::main( void* pointer )

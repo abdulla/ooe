@@ -35,10 +35,15 @@ servlet::servlet( const ooe::socket& socket_, const ipc::switchboard& switchboar
 {
 }
 
-void servlet::join( void )
+servlet::~servlet( void )
 {
-    socket.shutdown( ooe::socket::read_write );
-    thread.join();
+    if ( !thread.is_detached() )
+        socket.shutdown( ooe::socket::read_write );
+}
+
+void servlet::detach( void )
+{
+    thread.detach();
 }
 
 void* servlet::main( void* pointer )
@@ -90,19 +95,18 @@ server::server( const ipc::switchboard& switchboard_ )
 
 server::~server( void )
 {
-    for ( servlet_list::iterator i = list.begin(), end = list.end(); i != end; ++i )
-        ( *i )->join();
 }
 
 void server::insert( const ooe::socket& socket )
 {
     lock lock( mutex );
-    list.push_front( servlet_list::value_type() );
+    list.push_front( servlet_ptr() );
     list.front() = servlet_ptr( new servlet( socket, switchboard, list.begin(), *this ) );
 }
 
 void server::erase( servlet_iterator iterator )
 {
+    ( *iterator )->detach();
     lock lock( mutex );
     list.erase( iterator );
 }

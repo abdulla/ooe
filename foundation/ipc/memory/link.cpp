@@ -14,11 +14,6 @@ link_server::link_server( const ooe::socket& socket_, servlet_iterator iterator_
 {
 }
 
-link_server::~link_server( void )
-{
-    thread.join();
-}
-
 link_server::operator bool( void ) const
 {
     return state;
@@ -52,8 +47,6 @@ link_client::~link_client( void )
 {
     if ( state.exchange( false ) )
         socket.shutdown( socket::read );
-
-    thread.join();
 }
 
 link_client::operator bool( void ) const

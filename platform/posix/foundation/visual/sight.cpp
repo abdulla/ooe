@@ -50,7 +50,6 @@ sight::sight( const call_type& call_, u16 width_, u16 height_ )
 sight::~sight( void )
 {
     state.exchange( false );
-    thread.join();
 }
 
 void sight::status( const descriptor&, poll::type type )

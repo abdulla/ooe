@@ -72,7 +72,6 @@ class OOE_VISIBLE thread_pool
 {
 public:
     thread_pool( const std::string& );
-    ~thread_pool( void );
 
     void insert( const task_ptr& );
     bool snoop( task_ptr& ) OOE_HIDDEN;
