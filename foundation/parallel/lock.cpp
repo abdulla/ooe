@@ -4,17 +4,6 @@
 
 #include "foundation/parallel/lock.hpp"
 #include "foundation/utility/error.hpp"
-#include "foundation/utility/scoped.hpp"
-
-OOE_ANONYMOUS_BEGIN( ( ooe ) )
-
-#ifdef __OPTIMIZE__
-const ooe::s32 mutex_type = PTHREAD_MUTEX_NORMAL;
-#else
-const ooe::s32 mutex_type = PTHREAD_MUTEX_ERRORCHECK;
-#endif
-
-OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -22,21 +11,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 mutex::mutex( void )
     : pthread_mutex()
 {
-    pthread_mutexattr_t attributes;
-    s32 status = pthread_mutexattr_init( &attributes );
-
-    if ( status )
-        throw error::runtime( "mutex: " ) <<
-            "Unable to create mutex attributes: " << error::number( status );
-
-    scoped< int ( pthread_mutexattr_t* ) > scoped( pthread_mutexattr_destroy, &attributes );
-    status = pthread_mutexattr_settype( &attributes, mutex_type );
-
-    if ( status )
-        throw error::runtime( "mutex: " ) <<
-            "Unable to set mutex type: " << error::number( status );
-
-    status = pthread_mutex_init( &pthread_mutex, &attributes );
+    s32 status = pthread_mutex_init( &pthread_mutex, 0 );
 
     if ( status )
         throw error::runtime( "mutex: " ) << "Unable to create mutex: " << error::number( status );
