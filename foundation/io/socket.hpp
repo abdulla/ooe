@@ -26,16 +26,18 @@ struct OOE_VISIBLE socket
         read_write
     };
 
+    typedef tuple< uid_t, gid_t > peer_tuple;
+
     socket( const ooe::descriptor& );
 
     up_t receive( void*, up_t );
     up_t send( const void*, up_t );
 
-    void shutdown( shutdown_type );
-    void option( u32, u32 );
-
     ooe::descriptor receive( void );
     void send( const ooe::descriptor& );
+
+    void shutdown( shutdown_type );
+    peer_tuple peer_id( void ) const;
 };
 
 //--- make_pair ------------------------------------------------------------------------------------

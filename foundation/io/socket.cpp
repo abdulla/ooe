@@ -68,38 +68,6 @@ up_t socket::send( const void* buffer, up_t bytes )
     return sent;
 }
 
-void socket::shutdown( shutdown_type type_ )
-{
-    s32 how;
-
-    switch ( type_ )
-    {
-    case read:
-        how = SHUT_RD;
-        break;
-
-    case write:
-        how = SHUT_WR;
-        break;
-
-    case read_write:
-        how = SHUT_RDWR;
-        break;
-
-    default:
-        throw error::io( "socket: " ) << "Unknown shutdown type: " << type_;
-    };
-
-    if ( ::shutdown( get(), how ) && errno != ENOTCONN )
-        throw error::io( "socket: " ) << "Unable to shutdown: " << error::number( errno );
-}
-
-void socket::option( u32 key, u32 value )
-{
-    if ( setsockopt( get(), SOL_SOCKET, key, &value, sizeof( u32 ) ) )
-        throw error::io( "socket: " ) << "Unable to set option: " << error::number( errno );
-}
-
 descriptor socket::receive( void )
 {
     msghdr message;
@@ -151,6 +119,32 @@ void socket::send( const ooe::descriptor& desc )
 
     if ( sendmsg( get(), &message, 0 ) == -1 )
         throw error::io( "socket: " ) << "Unable to send descriptor: " << error::number( errno );
+}
+
+void socket::shutdown( shutdown_type type_ )
+{
+    s32 how;
+
+    switch ( type_ )
+    {
+    case read:
+        how = SHUT_RD;
+        break;
+
+    case write:
+        how = SHUT_WR;
+        break;
+
+    case read_write:
+        how = SHUT_RDWR;
+        break;
+
+    default:
+        throw error::io( "socket: " ) << "Unknown shutdown type: " << type_;
+    };
+
+    if ( ::shutdown( get(), how ) )
+        throw error::io( "socket: " ) << "Unable to shutdown: " << error::number( errno );
 }
 
 //--- make_pair ------------------------------------------------------------------------------------
