@@ -9,7 +9,7 @@
     #define OOE_NORETURN                    __attribute__( ( __noreturn__ ) )
     #define OOE_NONNULL                     __attribute__( ( __nonnull__ ) )
     #define OOE_SENTINEL                    __attribute__( ( __sentinel__ ) )
-    #define OOE_WARNUNUSED                  __attribute__( ( __warn_unused_result__ ) )
+    #define OOE_WARNRESULT                  __attribute__( ( __warn_unused_result__ ) )
     #define OOE_PURE                        __attribute__( ( __pure__ ) )
     #define OOE_CONST                       __attribute__( ( __const__ ) )
     #define OOE_PACKED                      __attribute__( ( __packed__ ) )
@@ -18,15 +18,13 @@
     #define OOE_HIDDEN                      __attribute__( ( __visibility__( "hidden" ) ) )
     #define OOE_LIKELY( boolean )           __builtin_expect( ( boolean ), 1 )
     #define OOE_UNLIKELY( boolean )         __builtin_expect( ( boolean ), 0 )
-    #define OOE_PREFETCH_READ( address )    __builtin_prefetch( ( address ), 0, 0 )
-    #define OOE_PREFETCH_WRITE( address )   __builtin_prefetch( ( address ), 1, 0 )
 #else
     #define OOE_INLINE
     #define OOE_NOINLINE
     #define OOE_NORETURN
     #define OOE_NONNULL
     #define OOE_SENTINEL
-    #define OOE_WARNUNUSED
+    #define OOE_WARNRESULT
     #define OOE_PURE
     #define OOE_CONST
     #define OOE_PACKED
@@ -35,7 +33,6 @@
     #define OOE_HIDDEN
     #define OOE_LIKELY( boolean )
     #define OOE_UNLIKELY( boolean )
-    #define OOE_PREFETCH( address )
 #endif
 
 #define OOE_FOURCC( a, b, c, d ) ( a + ( b << 8 ) + ( c << 16 ) + ( d << 24 ) )
