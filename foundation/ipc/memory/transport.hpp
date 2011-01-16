@@ -27,7 +27,7 @@ public:
 
     u8* get( void ) const;
     up_t size( void ) const;
-    bool in_canary( const void* ) const;
+    bool in_guard( const void* ) const;
 
     void send( ooe::socket& );
 

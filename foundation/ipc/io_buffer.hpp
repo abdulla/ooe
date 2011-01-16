@@ -103,7 +103,7 @@ public:
         return memory->name();
     }
 
-    bool in_canary( const void* pointer ) const
+    bool in_guard( const void* pointer ) const
     {
         const u8* end = memory->as< u8 >() + memory->size();
         const u8* begin = end - executable::static_page_size;
