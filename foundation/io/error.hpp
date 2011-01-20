@@ -10,7 +10,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( error ) )
 struct OOE_VISIBLE io
     : virtual public runtime
 {
-    io( const c8* string_ )
+    io( const std::string& string_ )
         : runtime( "io: " )
     {
         *this << string_;

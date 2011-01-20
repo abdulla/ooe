@@ -74,7 +74,7 @@ descriptor socket::receive( void )
     iovec vector;
     u8 buffer[ CMSG_SPACE( sizeof( s32 ) ) ];
 
-    memset( &message, 0, sizeof( message ) );
+    std::memset( &message, 0, sizeof( message ) );
     message.msg_iov = &vector;
     message.msg_iovlen = 1;
     message.msg_control = buffer;
@@ -100,7 +100,7 @@ void socket::send( const ooe::descriptor& desc )
     iovec vector;
     u8 buffer[ CMSG_SPACE( sizeof( s32 ) ) ];
 
-    memset( &message, 0, sizeof( message ) );
+    std::memset( &message, 0, sizeof( message ) );
     message.msg_iov = &vector;
     message.msg_iovlen = 1;
     message.msg_control = buffer;
@@ -239,7 +239,7 @@ internet_query::internet_query( const std::string& host, const std::string& serv
     : head()
 {
     addrinfo hint;
-    memset( &hint, 0, sizeof( hint ) );
+    std::memset( &hint, 0, sizeof( hint ) );
     hint.ai_family = family( flag );
     hint.ai_socktype = SOCK_STREAM;
 
