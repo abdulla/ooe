@@ -11,12 +11,10 @@
 #include <dlfcn.h>
 #include <execinfo.h>
 
-// forward declare string conversion functions
-#include "foundation/utility/string.hpp"
-
 #include "foundation/utility/convert.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/pointer.hpp"
+#include "foundation/utility/string.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -32,7 +30,7 @@ inline std::string demangle( const std::string& mangled )
 template< u32 begin >
     std::string stack_trace( void )
 {
-    const u32 size = 10 + begin;
+    const u32 size = 32;
     void* address[ size ];
     s32 used = backtrace( address, size );
     Dl_info info;
