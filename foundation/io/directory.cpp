@@ -74,14 +74,7 @@ directory::iterator directory::end( void ) const
 //--- exists ---------------------------------------------------------------------------------------
 bool exists( const std::string& path )
 {
-    struct stat status;
-
-    if ( !stat( path.c_str(), &status ) )
-        return true;
-    else if ( errno == ENOENT )
-        return false;
-    else
-        throw error::io( "exists: " ) << "Unable to stat: " << error::number( errno );
+    return !access( path.c_str(), F_OK );
 }
 
 //--- erase ----------------------------------------------------------------------------------------

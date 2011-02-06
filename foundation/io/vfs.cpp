@@ -1,7 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <sys/stat.h>
-
+#include "foundation/io/directory.hpp"
 #include "foundation/io/error.hpp"
 #include "foundation/io/vfs.hpp"
 
@@ -22,9 +21,7 @@ std::string crimp_slashes( const std::string& string )
 
 bool lru( const std::string& path, vfs::list_type& list, vfs::list_type::iterator& i )
 {
-    struct stat status;
-
-    if ( stat( path.c_str(), &status ) )
+    if ( !exists( path.c_str() ) )
         return false;
 
     list.splice( list.begin(), list, i );

@@ -13,9 +13,9 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-void statistics( s32 fd, struct stat& status )
+void status( s32 fd, struct stat& stat )
 {
-    if ( fstat( fd, &status ) )
+    if ( fstat( fd, &stat ) )
         throw error::io( "descriptor: " ) << "Unable to stat: " << error::number( errno );
 }
 
@@ -98,10 +98,10 @@ s32 descriptor::get( void ) const
 
 descriptor::node_type descriptor::type( void ) const
 {
-    struct stat status;
-    statistics( get(), status );
+    struct stat stat;
+    status( get(), stat );
 
-    switch ( status.st_mode & S_IFMT )
+    switch ( stat.st_mode & S_IFMT )
     {
     case S_IFDIR:
         return directory;
@@ -131,9 +131,9 @@ descriptor::node_type descriptor::type( void ) const
 
 up_t descriptor::size( void ) const
 {
-    struct stat status;
-    statistics( get(), status );
-    return static_cast< up_t >( status.st_size );
+    struct stat stat;
+    status( get(), stat );
+    return static_cast< up_t >( stat.st_size );
 }
 
 void descriptor::resize( up_t length )
