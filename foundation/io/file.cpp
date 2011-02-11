@@ -30,12 +30,6 @@ file::file( const descriptor& desc )
 {
 }
 
-void file::sync( void ) const
-{
-    if ( fsync( get() ) )
-        throw error::io( "file: " ) << "File could not be synced: " << error::number( errno );
-}
-
 up_t file::read( void* buffer, up_t bytes )
 {
     sp_t read_ = ::read( get(), buffer, bytes );
