@@ -50,13 +50,10 @@ public:
     descriptor( const std::string&, u8 = read );
     ~descriptor( void );
 
+    s32 get( void ) const;
     node_type type( void ) const;
     up_t size( void ) const;
-
     void resize( up_t );
-    up_t splice( const ooe::descriptor&, up_t );
-
-    s32 get( void ) const;
 
 private:
     shared_ptr< const descriptor_id > id;
