@@ -31,9 +31,8 @@ void png_write( png_struct* png, u8* buffer, up_t size )
     static_cast< ooe::file* >( png_get_io_ptr( png ) )->write( buffer, size );
 }
 
-void png_sync( png_struct* png )
+void png_sync( png_struct* )
 {
-    static_cast< ooe::file* >( png_get_io_ptr( png ) )->sync();
 }
 
 image_format::type png_image_format( u8 format )
