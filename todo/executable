@@ -1,0 +1,3 @@
+create separate spawn() function based on posix_spawn()
+    - remove fork_io::execute()
+    - posix_spawn() is a lot faster than fork() + exec(): https://github.com/rtomayko/posix-spawn

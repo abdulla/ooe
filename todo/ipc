@@ -1,3 +1,8 @@
+add back the ability to recover from guard page access
+    - throw from the signal handler, which will then unwind and shutdown the servlet thread
+    - can be generically implemented if -fnon-call-exceptions is used on mac os
+    - this is required to create a hardened storage server
+
 asynchronous rpc wrapper
     - have a similar set up to socket, have a background thread pumping across the transport
     - have an async_client, wraps a client with background thread
@@ -6,6 +11,6 @@ asynchronous rpc wrapper
 add a way to replay responses
     - this could be used for unit testing
 
-look at a linux-specific way to accelerate IPC
+look at a linux-specific way to accelerate ipc
     - sys_process_vm_read() and sys_process_vm_write(): http://lwn.net/Articles/405346
     - directed yield with yield_to(): http://lwn.net/Articles/419961
