@@ -85,7 +85,7 @@ function( ooe_executable NAME )
     ooe_glob( SOURCES ${ARGN} )
     add_executable( ${NAME} ${SOURCES} )
     set_target_properties( ${NAME} PROPERTIES BUILD_WITH_INSTALL_RPATH ON
-        INSTALL_RPATH \${ORIGIN}/../lib COMPILE_FLAGS -fPIE LINK_FLAGS "-Wl,-pie -fPIE" )
+        INSTALL_RPATH \${ORIGIN}/../lib COMPILE_FLAGS -fPIE LINK_FLAGS "-pie -fPIE" )
     ooe_properties( ${NAME} )
 endfunction()
 
