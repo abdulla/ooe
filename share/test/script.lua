@@ -14,7 +14,7 @@ function printer( name )
         end
     end
 
-    self.value = self.construct( name )
+    self.value = self.reconstruct( name )
     self.said = function( self )
         self.say( self.value )
     end

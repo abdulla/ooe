@@ -59,20 +59,18 @@ public:
         void insert( const std::string& name, type function, const c8* doc = 0,
         typename enable_if< is_function_pointer< type > >::type* = 0 )
     {
-        typedef typename remove_pointer< type >::type function_type;
-        up_t i = module.insert( name, typeid( function_type ).name(), doc );
+        up_t i = module.insert( name, typeid( type ).name(), doc );
         local.as< facade::local >()->insert( i, function );
-        BOOST_PP_REPEAT( LIMIT, BUILDER_INSERT, function_type )
+        BOOST_PP_REPEAT( LIMIT, BUILDER_INSERT, type )
     }
 
     template< typename type >
         void insert( const std::string& name, type member, const c8* doc = 0,
         typename enable_if< is_member_function_pointer< type > >::type* = 0 )
     {
-        typedef typename function_of< type >::type signature_type;
-        up_t i = module.insert( name, typeid( signature_type ).name(), doc );
+        up_t i = module.insert( name, typeid( type ).name(), doc );
         local.as< facade::local >()->insert( i, member );
-        BOOST_PP_REPEAT( LIMIT, BUILDER_INSERT, signature_type )
+        BOOST_PP_REPEAT( LIMIT, BUILDER_INSERT, type )
     }
 
 private:

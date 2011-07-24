@@ -20,18 +20,36 @@ public:
     {
     }
 
-    ~print( void )
+    virtual ~print( void )
     {
         std::cout << value << '\n';
     }
 
-    void say( void )
+    virtual void say( void ) const
     {
-        std::cout << this << " said: " << value << '\n';
+        std::cout << "print " << this << " said: " << value << '\n';
     }
 
-private:
+protected:
     std::string value;
+};
+
+struct reprint
+    : public print
+{
+    reprint( const std::string& value_ )
+        : print( value_ )
+    {
+    }
+
+    virtual ~reprint( void )
+    {
+    }
+
+    virtual void say( void ) const
+    {
+        std::cout << "reprint " << this << " said: " << value << '\n';
+    }
 };
 
 void hello( void )
@@ -79,6 +97,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
     builder.insert( "construct", construct< print, const std::string& >, "Constructs a 'print'." );
     builder.insert( "destruct", destruct< print >, "Destructs a 'print'." );
     builder.insert( "say", &print::say, "Calls the 'say' member function on a 'print'." );
+    builder.insert( "reconstruct", construct< reprint, const std::string& > );
     builder.insert( "gauntlet", gauntlet );
     builder.insert( "mismatch", mismatch );
     builder.insert( "stdmap", stdmap );

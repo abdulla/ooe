@@ -22,9 +22,9 @@ void component_setup( stack ) OOE_VISIBLE;
 void throw_exception( state*, const c8*, const c8* ) OOE_VISIBLE;
 
 //--- verify_arguments -----------------------------------------------------------------------------
-inline stack verify_arguments( state* state, u32 size )
+inline stack verify_arguments( state* state_, u32 size )
 {
-    stack stack( state );
+    stack stack( state_ );
     u32 stack_size = stack.size();
 
     if ( stack_size < size )
@@ -38,23 +38,23 @@ inline stack verify_arguments( state* state, u32 size )
 template< typename type >
     struct invoke
 {
-    static s32 call( state* state )
+    static s32 call( state* state_ )
     {
         try
         {
-            return type::call( state );
+            return type::call( state_ );
         }
         catch ( error::runtime& error )
         {
-            throw_exception( state, error.what(), error.where() );
+            throw_exception( state_, error.what(), error.where() );
         }
         catch ( std::exception& error )
         {
-            throw_exception( state, error.what(), "\nNo stack trace available" );
+            throw_exception( state_, error.what(), "\nNo stack trace available" );
         }
         catch ( ... )
         {
-            throw_exception( state, "An unknown exception was thrown",
+            throw_exception( state_, "An unknown exception was thrown",
                 "\nNo stack trace available" );
         }
 
@@ -122,9 +122,9 @@ OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
 template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
     struct invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 {
-    static s32 call( state* state )
+    static s32 call( state* state_ )
     {
-        stack stack = verify_arguments( state, LIMIT );
+        stack stack = verify_arguments( state_, LIMIT );
 
         dual_function< void ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
         to< void ( * )( void ) >::call( stack, function.in, upvalue( 1 ) );
@@ -139,9 +139,9 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     struct invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 {
-    static s32 call( state* state )
+    static s32 call( state* state_ )
     {
-        stack stack = verify_arguments( state, LIMIT );
+        stack stack = verify_arguments( state_, LIMIT );
 
         dual_function< r ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
         to< void ( * )( void ) >::call( stack, function.in, upvalue( 1 ) );
@@ -159,9 +159,9 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
     struct invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 {
-    static s32 call( state* state )
+    static s32 call( state* state_ )
     {
-        stack stack = verify_arguments( state, LIMIT );
+        stack stack = verify_arguments( state_, LIMIT );
 
         dual_member< void ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
         to< void ( any::* )( void ) >::call( stack, member.in, upvalue( 1 ) );
@@ -178,9 +178,9 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
 template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     struct invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 {
-    static s32 call( state* state )
+    static s32 call( state* state_ )
     {
-        stack stack = verify_arguments( state, LIMIT );
+        stack stack = verify_arguments( state_, LIMIT );
 
         dual_member< r ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
         to< void ( any::* )( void ) >::call( stack, member.in, upvalue( 1 ) );
