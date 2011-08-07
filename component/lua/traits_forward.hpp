@@ -13,7 +13,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
 template< typename >
     void meta_check( stack&, s32 );
 
-inline void meta_apply( stack&, s32, component::throw_type, cfunction = 0 );
+inline void meta_apply( stack&, component::throw_type, cfunction = 0 );
 inline void type_check( stack&, s32, type::id );
 
 //--- destroy --------------------------------------------------------------------------------------
@@ -21,7 +21,8 @@ template< typename t >
     s32 destroy( state* state_ )
 {
     stack stack( state_ );
-    delete *static_cast< t** >( stack.to_userdata( 1 ) );
+    // TODO: reenable this once a fix is found
+    // delete *static_cast< t** >( stack.to_userdata( 1 ) );
     return 0;
 }
 
@@ -157,7 +158,7 @@ template< typename t >
     static void call( stack& stack, typename call_traits< t >::param_type pointer )
     {
         new( stack.new_userdata( sizeof( void* ) ) ) typename no_ref< t >::type( pointer );
-        meta_apply( stack, -1, component::meta_throw< typename no_qual< t >::type > );
+        meta_apply( stack, component::meta_throw< typename no_qual< t >::type > );
     }
 };
 
@@ -168,7 +169,8 @@ template< typename t >
     static void call( stack& stack, typename call_traits< t >::reference class_, s32 index )
     {
         typedef typename no_ref< t >::type type;
-        meta_check< type >( stack, index );
+        typedef typename remove_member_const< type >::type meta_type;
+        meta_check< meta_type >( stack, index );
         class_ = **static_cast< type** >( stack.to_userdata( index ) );
     }
 };
@@ -179,8 +181,9 @@ template< typename t >
     static void call( stack& stack, typename call_traits< t >::param_type class_ )
     {
         typedef typename no_ref< t >::type type;
+        typedef typename remove_member_const< type >::type meta_type;
         new( stack.new_userdata( sizeof( void* ) ) ) type*( new type( class_ ) );
-        meta_apply( stack, -1, component::meta_throw< type >, destroy< type > );
+        meta_apply( stack, component::meta_throw< meta_type >, destroy< type > );
     }
 };
 
@@ -201,7 +204,7 @@ template< typename t >
     {
         typedef typename no_ref< t >::type::value_type type;
         new( stack.new_userdata( sizeof( void* ) ) ) type*( construct );
-        meta_apply( stack, -1, component::meta_throw< type >, destroy< type > );
+        meta_apply( stack, component::meta_throw< type >, destroy< type > );
     }
 };
 
@@ -288,12 +291,12 @@ template< typename t >
         return;
 
     stack.where();
-    throw error::lua( stack ) << "bad argument at index " << index << " (" <<
-        demangle( typeid( t ).name() ) << " expected)";
+    throw error::lua( stack ) << "Bad argument at index " << index << ", \"" <<
+        demangle( typeid( t ).name() ) << "\" expected";
 }
 
 //--- meta_apply -----------------------------------------------------------------------------------
-inline void meta_apply( stack& stack, s32 index, component::throw_type function, cfunction gc )
+inline void meta_apply( stack& stack, component::throw_type function, cfunction gc )
 {
     stack.create_table( 1, gc ? 1 : 0 );
 
@@ -307,7 +310,7 @@ inline void meta_apply( stack& stack, s32 index, component::throw_type function,
         stack.raw_set( -3 );
     }
 
-    stack.set_metatable( index - 1 );
+    stack.set_metatable( -2 );
 }
 
 //--- type_check -----------------------------------------------------------------------------------
@@ -319,8 +322,8 @@ inline void type_check( stack& stack, s32 index, type::id id )
         return;
 
     stack.where();
-    throw error::lua( stack ) << "bad argument at index " << index << " (" <<
-        stack.type_name( id ) << " expected, got " << stack.type_name( type ) << ')';
+    throw error::lua( stack ) << "Bad argument at index " << index << ", \"" <<
+        stack.type_name( id ) << "\" expected, got \"" << stack.type_name( type ) << '\"';
 }
 
 OOE_NAMESPACE_END( ( ooe )( lua ) )
