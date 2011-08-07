@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "component/lua/traits.hpp"
-#include "foundation/utility/miscellany.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
 
