@@ -106,10 +106,11 @@ void socket::send( const ooe::descriptor& desc )
     message.msg_control = buffer;
     message.msg_controllen = sizeof( buffer );
 
-    u8 dummy;
+    u8 dummy = 0;
     vector.iov_base = &dummy;
     vector.iov_len = 1;
 
+    std::memset( buffer, 0, sizeof( buffer ) );
     cmsghdr& control = *CMSG_FIRSTHDR( &message );
     control.cmsg_len = CMSG_LEN( sizeof( s32 ) );
     control.cmsg_level = SOL_SOCKET;
