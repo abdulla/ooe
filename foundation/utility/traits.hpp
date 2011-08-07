@@ -9,8 +9,7 @@
     #include <tr1/type_traits>
     #include <boost/type_traits/function_traits.hpp>
 
-    #define OOE_IS_EMPTY( type )            traits::is_empty< type >
-    #define OOE_STATIC_ASSERT( boolean )    BOOST_STATIC_ASSERT( boolean )
+    #define OOE_IS_EMPTY( type ) traits::is_empty< type >
 
     namespace traits = std::tr1;
 #else
@@ -21,8 +20,7 @@
 
     #include <boost/type_traits.hpp>
 
-    #define OOE_IS_EMPTY( type )            false_type
-    #define OOE_STATIC_ASSERT( boolean )    typedef bool BOOST_JOIN( STATIC_ASSERT, __LINE__ )
+    #define OOE_IS_EMPTY( type ) false_type
 
     namespace traits = boost;
 #endif
@@ -33,6 +31,8 @@
 
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/preprocessor.hpp"
+
+#define OOE_STATIC_ASSERT( boolean ) BOOST_STATIC_ASSERT( boolean )
 
 OOE_NAMESPACE_BEGIN( ( std ) )
 
@@ -128,6 +128,13 @@ template< typename t >
 {
 };
 
+//--- remove_member_const --------------------------------------------------------------------------
+template< typename t >
+    struct remove_member_const
+{
+    typedef t type;
+};
+
 //--- remove_member --------------------------------------------------------------------------------
 template< typename t >
     struct remove_member
@@ -140,6 +147,10 @@ template< typename t, typename r >
 {
     typedef r type;
 };
+
+//--- function_of ----------------------------------------------------------------------------------
+template< typename >
+    struct function_of;
 
 //--- remove_callable ------------------------------------------------------------------------------
 template< typename t >
@@ -304,6 +315,13 @@ OOE_NAMESPACE_END( ( ooe ) )
 
     #define LIMIT BOOST_PP_ITERATION()
 
+//--- remove_member_const --------------------------------------------------------------------------
+template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
+    struct remove_member_const< r ( t::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) const >
+{
+    typedef r ( t::* type )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
+};
+
 //--- remove_member --------------------------------------------------------------------------------
 template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     struct remove_member< r ( t::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) const >
@@ -312,9 +330,6 @@ template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename 
 };
 
 //--- function_of ----------------------------------------------------------------------------------
-template< typename >
-    struct function_of;
-
 template< typename t, typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     struct function_of< r ( t::* )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 {
