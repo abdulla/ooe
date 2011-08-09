@@ -6,6 +6,7 @@
 #include <v8.h>
 
 #include "foundation/io/descriptor.hpp"
+#include "component/registry/traits.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 
@@ -31,7 +32,7 @@ private:
 };
 
 //--- object_instance ------------------------------------------------------------------------------
-v8::Handle< v8::Object > make_object( void*, const std::type_info& ) OOE_VISIBLE;
+v8::Handle< v8::Object > make_object( void*, component::throw_type ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe )( javascript ) )
 

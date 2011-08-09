@@ -3,6 +3,7 @@
 #include "component/javascript/error.hpp"
 #include "component/javascript/vm.hpp"
 #include "foundation/io/memory.hpp"
+#include "foundation/utility/miscellany.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
@@ -112,11 +113,11 @@ void vm::setup( function_type function )
         throw error::javascript( try_catch );
 }
 
-v8::Handle< v8::Object > make_object( void* pointer, const std::type_info& type_info )
+v8::Handle< v8::Object > make_object( void* pointer, component::throw_type function )
 {
     v8::Handle< v8::Object > object = ( *object_template )->NewInstance();
     object->SetPointerInInternalField( 0, pointer );
-    object->SetPointerInInternalField( 1, const_cast< std::type_info* >( &type_info ) );
+    object->SetPointerInInternalField( 1, ptr_cast( function ) );
     return object;
 }
 

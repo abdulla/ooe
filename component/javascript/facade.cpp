@@ -24,7 +24,7 @@ template< v8::InvocationCallback function >
 
     static v8::Handle< v8::Value > call( const v8::Arguments& arguments )
     {
-        return invoke< defer >::call( arguments );
+        return invoke< defer >( arguments );
     }
 };
 
@@ -80,17 +80,8 @@ v8::Handle< v8::Value > load( const v8::Arguments& arguments )
     {
         v8::Handle< v8::Value > key =
             from< std::string >::call( names[ i ]._0 + '/' + names[ i ]._1 );
-        v8::Handle< v8::Value > data;
-
-        if ( names[ i ]._1[ 0 ] == 'F' )
-            data = from< void ( * )( void ) >::call( local[ i ].function );
-        else if ( names[ i ]._1[ 0 ] == 'M' )
-            data = from< void ( any::* )( void ) >::call( local[ i ].member );
-        else
-            throw error::runtime( "javascript::load: " ) << "Function \"" << names[ i ]._0 <<
-                "\" of type \"" << names[ i ]._1 << "\" has unknown pointer";
-
-        object->Set( key, v8::FunctionTemplate::New( javascript[ i ], data )->GetFunction() );
+        v8::Handle< v8::Value > data = javascript[ i ]._0( local[ i ] );
+        object->Set( key, v8::FunctionTemplate::New( javascript[ i ]._1, data )->GetFunction() );
     }
 
     object->Set( from< const c8* >::call( "" ), from< source_ptr >::call( source ) );
@@ -117,7 +108,7 @@ v8::Handle< v8::Value > doc( const v8::Arguments& arguments )
         throw error::runtime( "javascript::doc: " ) << "Function \"" << value << "\" has no type";
 
     const c8* documentation = source->get().doc( value.substr( 0, i ), value.substr( i + 1 ) );
-    return from< const c8* >::call( documentation ); 
+    return from< const c8* >::call( documentation );
 }
 
 v8::Handle< v8::Value > print( const v8::Arguments& arguments )
@@ -145,11 +136,11 @@ const javascript::vector_type& javascript::get( void ) const
     return vector;
 }
 
-void javascript::insert( up_t index, v8::InvocationCallback call )
+void javascript::insert( up_t index, ooe::javascript::push_type push, v8::InvocationCallback call )
 {
     vector_type::iterator i = vector.begin();
     std::advance( i, index );
-    vector.insert( i, call );
+    vector.insert( i, make_tuple( push, call ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( facade ) )
