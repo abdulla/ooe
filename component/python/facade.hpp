@@ -11,6 +11,8 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
+typedef object ( * from_type )( any );
+
 template< typename >
     struct invoke_function;
 
@@ -32,30 +34,34 @@ inline void verify_arguments( PyObject* arguments, s32 size )
 
 //--- invoke ---------------------------------------------------------------------------------------
 template< typename type >
-    struct invoke
+    PyObject* invoke( PyObject* self, PyObject* arguments )
 {
-    static PyObject* call( PyObject* self, PyObject* arguments )
+    try
     {
-        try
-        {
-            return type::call( self, arguments );
-        }
-        catch ( error::runtime& error )
-        {
-            throw_exception( error.what(), error.where() );
-        }
-        catch ( std::exception& error )
-        {
-            throw_exception( error.what(), "\nNo stack trace available" );
-        }
-        catch ( ... )
-        {
-            throw_exception( "An unknown exception was thrown", "\nNo stack trace available" );
-        }
-
-        return 0;
+        return type::call( self, arguments );
     }
-};
+    catch ( error::runtime& error )
+    {
+        throw_exception( error.what(), error.where() );
+    }
+    catch ( std::exception& error )
+    {
+        throw_exception( error.what(), "\nNo stack trace available" );
+    }
+    catch ( ... )
+    {
+        throw_exception( "An unknown exception was thrown", "\nNo stack trace available" );
+    }
+
+    return 0;
+}
+
+//--- from_invoke ----------------------------------------------------------------------------------
+template< typename type, typename object, object ( any::* member ) >
+    python::object from_invoke( any any )
+{
+    return from< type >::call( reinterpret_cast< type >( any.*member ) );
+}
 
 OOE_NAMESPACE_END( ( ooe )( python ) )
 
@@ -65,18 +71,19 @@ OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 class python
 {
 public:
-    typedef std::vector< PyMethodDef > vector_type;
+    typedef tuple< ooe::python::from_type, PyMethodDef > tuple_type;
+    typedef std::vector< tuple_type > vector_type;
 
     const vector_type& get( void ) const OOE_VISIBLE;
-    void insert( up_t, PyCFunction ) OOE_VISIBLE;
+    void insert( up_t, ooe::python::from_type, PyCFunction ) OOE_VISIBLE;
 
     template< typename type >
         void insert( up_t index,
         typename enable_if< is_function_pointer< type > >::type* = 0 )
     {
         typedef typename remove_pointer< type >::type function_type;
-        typedef ooe::python::invoke< ooe::python::invoke_function< function_type > > invoke_type;
-        insert( index, invoke_type::call );
+        insert( index, ooe::python::from_invoke< type, any::function_type, &any::function >,
+            ooe::python::invoke< ooe::python::invoke_function< function_type > > );
     }
 
     template< typename type >
@@ -85,9 +92,8 @@ public:
     {
         typedef typename member_of< type >::type object_type;
         typedef typename remove_member< type >::type member_type;
-        typedef ooe::python::invoke< ooe::python::invoke_member< object_type, member_type > >
-            invoke_type;
-        insert( index, invoke_type::call );
+        insert( index, ooe::python::from_invoke< type, any::member_type, &any::member >,
+            ooe::python::invoke< ooe::python::invoke_member< object_type, member_type > > );
     }
 
 private:
@@ -122,11 +128,11 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
     {
         verify_arguments( arguments, LIMIT );
 
-        dual_function< void ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
-        as< void ( * )( void ) >::call( self, function.in );
+        void ( * function )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
+        as< void ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call( self, function );
 
         BOOST_PP_REPEAT( LIMIT, AS, ~ )
-        function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+        function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
         Py_RETURN_NONE;
     }
 };
@@ -138,11 +144,11 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     {
         verify_arguments( arguments, LIMIT );
 
-        dual_function< r ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) > function;
-        as< void ( * )( void ) >::call( self, function.in );
+        r ( * function )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
+        as< r ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call( self, function );
 
         BOOST_PP_REPEAT( LIMIT, AS, ~ )
-        r value = function.out( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
+        r value = function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
         return from< r >::call( value );
     }
 };
@@ -156,13 +162,13 @@ template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
     {
         verify_arguments( arguments, LIMIT );
 
-        dual_member< void ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
-        as< void ( any::* )( void ) >::call( self, member.in );
+        void ( t0::* member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
+        as< void ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >::call( self, member );
 
         t0* a0;
         as< t0* >::call( PyTuple_GET_ITEM( arguments, 0 ), a0 );
         BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, AS, ~ )
-        ( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+        ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
         Py_RETURN_NONE;
     }
 };
@@ -174,13 +180,13 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     {
         verify_arguments( arguments, LIMIT );
 
-        dual_member< r ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) > member;
-        as< void ( any::* )( void ) >::call( self, member.in );
+        r ( t0::* member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
+        as< r ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >::call( self, member );
 
         t0* a0;
         as< t0* >::call( PyTuple_GET_ITEM( arguments, 0 ), a0 );
         BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, AS, ~ )
-        r value = ( a0->*member.out )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
+        r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
         return from< r >::call( value );
     }
 };

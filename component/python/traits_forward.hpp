@@ -14,32 +14,29 @@ exception_tuple get_exception( void );
 
 //--- make_capsule ---------------------------------------------------------------------------------
 inline PyObject* make_capsule
-    ( void* pointer, const std::type_info& type, PyCapsule_Destructor gc = 0 )
+    ( void* pointer, component::throw_type function, PyCapsule_Destructor gc = 0 )
 {
     PyObject* object = valid( PyCapsule_New( pointer, 0, gc ) );
 
-    if ( PyCapsule_SetContext( object, const_cast< std::type_info* >( &type ) ) )
+    if ( PyCapsule_SetContext( object, ptr_cast( function ) ) )
         throw error::python() << "Unable to set context of capsule";
 
     return object;
 }
 
 //--- get_pointer ----------------------------------------------------------------------------------
-inline void* get_pointer( PyObject* object, const std::type_info& type_x )
+template< typename t >
+    void* get_pointer( PyObject* object )
 {
     if ( !PyCapsule_CheckExact( object ) )
         throw error::python() << "Object is not a capsule";
 
-    void* type_info = PyCapsule_GetContext( object );
+    component::throw_type function =
+        ptr_cast< component::throw_type >( PyCapsule_GetContext( object ) );
 
-    if ( !type_info )
-        throw error::python() << "Object does not contain type information";
-
-    const std::type_info& type_y = *static_cast< std::type_info* >( type_info );
-
-    if ( type_x != type_y )
-        throw error::python() << "Types do not match, \"" << demangle( type_x.name() ) <<
-            "\" != \"" << demangle( type_y.name() ) << '\"';
+    if ( !component::meta_catch< t >( function ) )
+        throw error::python() <<
+            "Bad argument, \"" << demangle( typeid( t ).name() ) << "\" expected";
 
     return PyCapsule_GetPointer( object, 0 );
 }
@@ -230,8 +227,8 @@ template< typename t >
 {
     static void call( PyObject* object, typename call_traits< t >::reference pointer )
     {
-        pointer = ptr_cast< typename no_ref< t >::type >
-            ( get_pointer( object, typeid( typename no_qual< t >::type ) ) );
+        typedef typename no_ref< t >::type type;
+        pointer = ptr_cast< type >( get_pointer< typename no_qual< t >::type >( object ) );
     }
 };
 
@@ -240,7 +237,8 @@ template< typename t >
 {
     static PyObject* call( typename call_traits< t >::param_type pointer )
     {
-        return make_capsule( ptr_cast( pointer ), typeid( typename no_qual< t >::type ) );
+        component::throw_type function = component::meta_throw< typename no_qual< t >::type >;
+        return make_capsule( ptr_cast( pointer ), function );
     }
 };
 
@@ -251,7 +249,8 @@ template< typename t >
     static void call( PyObject* object, typename call_traits< t >::reference class_ )
     {
         typedef typename no_ref< t >::type type;
-        class_ = *ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
+        typedef typename remove_member_const< type >::type meta_type;
+        class_ = *ptr_cast< type* >( get_pointer< meta_type >( object ) );
     }
 };
 
@@ -261,7 +260,9 @@ template< typename t >
     static PyObject* call( typename call_traits< t >::param_type class_ )
     {
         typedef typename no_ref< t >::type type;
-        return make_capsule( new type( class_ ), typeid( type ), destroy< type > );
+        typedef typename remove_member_const< type >::type meta_type;
+        component::throw_type function = component::meta_throw< meta_type >;
+        return make_capsule( new type( class_ ), function, destroy< type > );
     }
 };
 
@@ -281,7 +282,7 @@ template< typename t >
     static PyObject* call( typename call_traits< t >::param_type construct )
     {
         typedef typename t::value_type type;
-        return make_capsule( construct, typeid( type ), destroy< type > );
+        return make_capsule( construct, component::meta_throw< type >, destroy< type > );
     }
 };
 
@@ -292,7 +293,7 @@ template< typename t >
     static void call( PyObject* object, typename call_traits< t >::reference destruct )
     {
         typedef typename t::value_type type;
-        destruct = ptr_cast< type* >( get_pointer( object, typeid( type ) ) );
+        destruct = ptr_cast< type* >( get_pointer< type >( object ) );
 
         if (PyCapsule_SetDestructor( object, 0 ) )
             throw error::python() << "Unable to set destructor of capsule";

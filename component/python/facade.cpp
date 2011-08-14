@@ -22,7 +22,7 @@ template< PyCFunction function >
 
     static PyObject* call( PyObject* self, PyObject* arguments )
     {
-        return invoke< defer >::call( self, arguments );
+        return invoke< defer >( self, arguments );
     }
 };
 
@@ -73,21 +73,12 @@ PyObject* load( PyObject*, PyObject* string )
 
     for ( up_t i = 0, end = names.size(); i != end; ++i )
     {
-        object data;
-
-        if ( names[ i ]._1[ 0 ] == 'F' )
-            data = from< void ( * )( void ) >::call( local[ i ].function );
-        else if ( names[ i ]._1[ 0 ] == 'M' )
-            data = from< void ( any::* )( void ) >::call( local[ i ].member );
-        else
-            throw error::runtime( "python::load: " ) << "Function \"" << names[ i ]._0 <<
-                "\" of type \"" << names[ i ]._1 << "\" has unknown pointer";
-
-        PyMethodDef* method = const_cast< PyMethodDef* >( &python[ i ] );
+        PyMethodDef* method = const_cast< PyMethodDef* >( &python[ i ]._1 );
         method->ml_name = names[ i ]._0.c_str();
         method->ml_doc = docs[ i ];
 
         std::string key = names[ i ]._0 + '/' + names[ i ]._1;
+        object data = python[ i ]._0( local[ i ] );
         object value = valid( PyCFunction_New( method, data ) );
         PyDict_SetItemString( dictionary, key.c_str(), value );
     }
@@ -135,13 +126,13 @@ const python::vector_type& python::get( void ) const
     return vector;
 }
 
-void python::insert( up_t index, PyCFunction call )
+void python::insert( up_t index, ooe::python::from_type from, PyCFunction call )
 {
     vector_type::iterator i = vector.begin();
     std::advance( i, index );
 
     PyMethodDef method = { "", call, METH_VARARGS, 0 };
-    vector.insert( i, method );
+    vector.insert( i, make_tuple( from, method ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( facade ) )
