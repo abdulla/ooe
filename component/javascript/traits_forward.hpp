@@ -175,7 +175,7 @@ template< typename t >
 
         if ( !component::meta_catch< type >( function ) )
             throw error::javascript() <<
-                "Bad argument \"" << demangle( typeid( type ).name() ) << "\" expected";
+                "Bad argument, \"" << demangle( typeid( type ).name() ) << "\" expected";
 
         pointer =
             ptr_cast< typename no_ref< t >::type >( object->GetPointerFromInternalField( 0 ) );

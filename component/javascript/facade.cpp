@@ -136,11 +136,11 @@ const javascript::vector_type& javascript::get( void ) const
     return vector;
 }
 
-void javascript::insert( up_t index, ooe::javascript::push_type push, v8::InvocationCallback call )
+void javascript::insert( up_t index, ooe::javascript::from_type from, v8::InvocationCallback call )
 {
     vector_type::iterator i = vector.begin();
     std::advance( i, index );
-    vector.insert( i, make_tuple( push, call ) );
+    vector.insert( i, make_tuple( from, call ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( facade ) )

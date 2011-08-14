@@ -11,7 +11,7 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
 
-typedef v8::Handle< v8::Value > ( * push_type )( any );
+typedef v8::Handle< v8::Value > ( * from_type )( any );
 
 template< typename >
     struct invoke_function;
@@ -58,9 +58,9 @@ template< typename type >
     return v8::Undefined();
 }
 
-//--- push_invoke ----------------------------------------------------------------------------------
+//--- from_invoke ----------------------------------------------------------------------------------
 template< typename type, typename object, object ( any::* member ) >
-    v8::Handle< v8::Value > push_invoke( any any )
+    v8::Handle< v8::Value > from_invoke( any any )
 {
     return from< type >::call( reinterpret_cast< type >( any.*member ) );
 }
@@ -73,18 +73,18 @@ OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 class javascript
 {
 public:
-    typedef tuple< ooe::javascript::push_type, v8::InvocationCallback > tuple_type;
+    typedef tuple< ooe::javascript::from_type, v8::InvocationCallback > tuple_type;
     typedef std::vector< tuple_type > vector_type;
 
     const vector_type& get( void ) const OOE_VISIBLE;
-    void insert( up_t, ooe::javascript::push_type, v8::InvocationCallback ) OOE_VISIBLE;
+    void insert( up_t, ooe::javascript::from_type, v8::InvocationCallback ) OOE_VISIBLE;
 
     template< typename type >
         void insert( up_t index,
         typename enable_if< is_function_pointer< type > >::type* = 0 )
     {
         typedef typename remove_pointer< type >::type function_type;
-        insert( index, ooe::javascript::push_invoke< type, any::function_type, &any::function >,
+        insert( index, ooe::javascript::from_invoke< type, any::function_type, &any::function >,
             ooe::javascript::invoke< ooe::javascript::invoke_function< function_type > > );
     }
 
@@ -94,7 +94,7 @@ public:
     {
         typedef typename member_of< type >::type object_type;
         typedef typename remove_member< type >::type member_type;
-        insert( index, ooe::javascript::push_invoke< type, any::member_type, &any::member >,
+        insert( index, ooe::javascript::from_invoke< type, any::member_type, &any::member >,
             ooe::javascript::invoke< ooe::javascript::invoke_member< object_type, member_type > > );
     }
 
