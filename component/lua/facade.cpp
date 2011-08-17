@@ -73,9 +73,10 @@ s32 load( state* state )
     const facade::lua::vector_type& lua = static_cast< const facade::lua* >
         ( module.find( typeid( facade::lua ).name() ) )->get();
 
-    stack.create_table();
+    up_t end = names.size();
+    stack.create_table( 1, end );
 
-    for ( up_t i = 0, end = names.size(); i != end; ++i )
+    for ( up_t i = 0; i != end; ++i )
     {
         push< std::string >::call( stack, names[ i ]._0 + '/' + names[ i ]._1 );
         lua[ i ]._0( stack, local[ i ] );
