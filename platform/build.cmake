@@ -25,7 +25,7 @@ endif()
 if( CMAKE_BUILD_TYPE STREQUAL "DEBUG" )
     unset( CMAKE_C_FLAGS_DEBUG CACHE )
     unset( CMAKE_CXX_FLAGS_DEBUG CACHE )
-    add_definitions( -O0 -g2 -fno-inline -fstack-protector-all -D_FORTIFY_SOURCE=2 )
+    add_definitions( -O0 -g2 -fno-inline -fstack-check -fstack-protector-all -D_FORTIFY_SOURCE=2 )
 elseif( CMAKE_BUILD_TYPE STREQUAL "RELEASE" )
     unset( CMAKE_C_FLAGS_RELEASE CACHE )
     unset( CMAKE_CXX_FLAGS_RELEASE CACHE )
@@ -36,10 +36,10 @@ else()
         "Project ${PROJECT_NAME} does not support build type ${CMAKE_BUILD_TYPE}." )
 endif()
 
-add_definitions( -pipe -ansi -pedantic-errors -fno-enforce-eh-specs -fuse-cxa-atexit
+add_definitions( -pipe -ansi -std=c++98 -pedantic-errors -fno-enforce-eh-specs -fuse-cxa-atexit
     -funit-at-a-time -fstrict-aliasing -mfpmath=sse )
 
-add_definitions( -Wall -Wextra -Werror -Wshadow -Wfloat-equal -Wnon-virtual-dtor -Wcast-align
+add_definitions( -Wall -Wextra -Wfatal-errors -Wshadow -Wfloat-equal -Wnon-virtual-dtor -Wcast-align
     -Woverloaded-virtual -Wreorder -Wpointer-arith -Wwrite-strings -Wno-long-long -Wformat=2
     -Wstrict-aliasing -Wmissing-include-dirs -Wswitch-default -Wlarger-than-4096 -Wundef )
 
