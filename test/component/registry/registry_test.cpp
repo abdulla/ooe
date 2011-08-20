@@ -65,9 +65,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-template<>
-template<>
-    void fixture_type::test< 0 >( setup& )
+OOE_TEST void fixture_type::test< 0 >( setup& )
 {
     std::cerr << "search registry for an interface and list all modules\n";
 
@@ -81,9 +79,7 @@ template<>
     OOE_CHECK( "vector.size()", vector.size() );
 }
 
-template<>
-template<>
-    void fixture_type::test< 1 >( setup& setup )
+OOE_TEST void fixture_type::test< 1 >( setup& setup )
 {
     std::cerr << "load module in-process\n";
 
@@ -99,9 +95,7 @@ template<>
     std::cout << "local-doc( hello ): " << local.doc< void ( * )( void ) >( "hello" ) << '\n';
 }
 
-template<>
-template<>
-    void fixture_type::test< 2 >( setup& setup )
+OOE_TEST void fixture_type::test< 2 >( setup& setup )
 {
     std::cerr << "load module as surrogate\n";
 
@@ -118,9 +112,7 @@ template<>
     std::cout << "remote-doc( hello ): " << remote.doc< void ( void ) >( "hello" ) << '\n';
 }
 
-template<>
-template<>
-    void fixture_type::test< 3 >( setup& setup )
+OOE_TEST void fixture_type::test< 3 >( setup& setup )
 {
     std::cerr << "insert and load module as server\n";
 
@@ -141,9 +133,7 @@ template<>
     remote.find< void ( void ) >( "hello" )();
 }
 
-template<>
-template<>
-    void fixture_type::test< 4 >( setup& setup )
+OOE_TEST void fixture_type::test< 4 >( setup& setup )
 {
     std::cerr << "load module in lua\n";
 
@@ -158,9 +148,7 @@ template<>
         "Lua VM size: " << vm.size() << " bytes\n";
 }
 
-template<>
-template<>
-    void fixture_type::test< 5 >( setup& setup )
+OOE_TEST void fixture_type::test< 5 >( setup& setup )
 {
     std::cerr << "load module in javascript\n";
 
@@ -175,9 +163,7 @@ template<>
         "JavaScript VM size: " << vm.size() << " bytes\n";
 }
 
-template<>
-template<>
-    void fixture_type::test< 6 >( setup& setup )
+OOE_TEST void fixture_type::test< 6 >( setup& setup )
 {
     std::cerr << "load module in python\n";
 

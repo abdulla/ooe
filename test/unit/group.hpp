@@ -11,6 +11,12 @@
 #include "foundation/utility/tuple.hpp"
 #include "test/unit/runner.hpp"
 
+#if defined( __GNUC__ ) && !defined( __clang__ )
+    #define OOE_TEST template<> template<>
+#else
+    #define OOE_TEST template<>
+#endif
+
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 template< typename, up_t >

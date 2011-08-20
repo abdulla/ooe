@@ -16,9 +16,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-template<>
-template<>
-    void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
     std::cerr << "is_bit_round\n";
 
@@ -35,9 +33,7 @@ template<>
     }
 }
 
-template<>
-template<>
-    void fixture_type::test< 1 >( anonymous_t& )
+OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 {
     std::cerr << "bit_round_up\n";
 
@@ -50,9 +46,7 @@ template<>
     }
 }
 
-template<>
-template<>
-    void fixture_type::test< 2 >( anonymous_t& )
+OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 {
     std::cerr << "bit_round_down\n";
 
