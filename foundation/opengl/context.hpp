@@ -8,7 +8,7 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
-struct view_data;
+class view_data;
 
 platform::context_type context_construct( const view_data& ) OOE_VISIBLE;
 void context_destruct( const view_data&, platform::context_type ) OOE_VISIBLE;
