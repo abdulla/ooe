@@ -9,7 +9,7 @@
 #include "foundation/utility/arithmetic.hpp"
 #include "foundation/utility/error.hpp"
 
-#ifdef __GNUC__
+#if defined( __GNUC__ ) || defined( __clang__ )
     #define OOE_ALIGN( size ) __attribute__( ( __aligned__( size ) ) )
 #else
     #define OOE_ALIGN( size )
