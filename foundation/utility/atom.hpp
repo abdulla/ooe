@@ -20,7 +20,8 @@ public:
 
     operator type( void ) const
     {
-        return static_cast< const volatile type >( atomic );
+        const volatile int& value = atomic;
+        return static_cast< type >( value );
     }
 
     type operator ++( void )
