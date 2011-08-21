@@ -70,7 +70,9 @@ template< typename t >
 template< typename t >
     bool meta_catch( throw_type function )
 {
-    if ( function == &meta_throw< t > )
+    throw_type compare = meta_throw< t >;
+
+    if ( function == compare )
         return true;
 
     try
