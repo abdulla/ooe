@@ -108,14 +108,13 @@ public:
 
         if ( fork->is_child() )
         {
-            OOE_IGNORE( start_server( name ) );
+            OOE_PRINT( "socket rpc server", start_server( name ) );
             fork_io::exit( true );
         }
     }
 
 private:
     typedef scoped_ptr< scoped_fork > fork_ptr;
-
     fork_ptr fork;
 
     void start_server( const std::string& name ) const
