@@ -39,7 +39,7 @@ endif()
 add_definitions( -std=c++98 -march=native -pedantic-errors -pipe -fstrict-aliasing -funit-at-a-time
     -fuse-cxa-atexit )
 
-add_definitions( -Wall -Wcast-align -Wextra -Wfatal-errors -Wfloat-equal -Wformat=2
+add_definitions( -Wall -Wcast-align -Werror -Wextra -Wfatal-errors -Wfloat-equal -Wformat=2
     -Wmissing-include-dirs -Wno-long-long -Wnon-virtual-dtor -Woverloaded-virtual -Wpointer-arith
     -Wreorder -Wshadow -Wstrict-aliasing -Wswitch-default -Wundef -Wwrite-strings )
 
