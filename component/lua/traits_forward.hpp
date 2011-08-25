@@ -10,10 +10,12 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( lua ) )
 
-template< typename >
-    void meta_check( stack&, s32 );
+template< typename t >
+    t* meta_get( stack&, s32 );
 
-inline void meta_apply( stack&, component::throw_type, cfunction = 0 );
+template< typename t >
+    void meta_set( stack&, t*, cfunction = 0 );
+
 inline void type_check( stack&, s32, type::id );
 
 //--- destroy --------------------------------------------------------------------------------------
@@ -21,8 +23,9 @@ template< typename t >
     s32 destroy( state* state_ )
 {
     stack stack( state_ );
-    // TODO: reenable this once a fix is found
-    // delete *static_cast< t** >( stack.to_userdata( 1 ) );
+    stack.get_metatable( 1 );
+    stack.raw_geti( -1, 1 );
+    delete ptr_cast< t* >( stack.to_userdata( -1 ) );
     return 0;
 }
 
@@ -147,8 +150,7 @@ template< typename t >
 {
     static void call( stack& stack, typename call_traits< t >::reference pointer, s32 index )
     {
-        meta_check< typename no_qual< t >::type >( stack, index );
-        pointer = *static_cast< typename no_ref< t >::type* >( stack.to_userdata( index ) );
+        pointer = meta_get< typename no_qual< t >::type >( stack, index );
     }
 };
 
@@ -157,8 +159,7 @@ template< typename t >
 {
     static void call( stack& stack, typename call_traits< t >::param_type pointer )
     {
-        new( stack.new_userdata( sizeof( void* ) ) ) typename no_ref< t >::type( pointer );
-        meta_apply( stack, component::meta_throw< typename no_qual< t >::type > );
+        meta_set< typename no_qual< t >::type >( stack, pointer );
     }
 };
 
@@ -168,10 +169,7 @@ template< typename t >
 {
     static void call( stack& stack, typename call_traits< t >::reference class_, s32 index )
     {
-        typedef typename no_ref< t >::type type;
-        typedef typename remove_member_const< type >::type meta_type;
-        meta_check< meta_type >( stack, index );
-        class_ = **static_cast< type** >( stack.to_userdata( index ) );
+        class_ = *meta_get< typename no_ref< t >::type >( stack, index );
     }
 };
 
@@ -181,9 +179,7 @@ template< typename t >
     static void call( stack& stack, typename call_traits< t >::param_type class_ )
     {
         typedef typename no_ref< t >::type type;
-        typedef typename remove_member_const< type >::type meta_type;
-        new( stack.new_userdata( sizeof( void* ) ) ) type*( new type( class_ ) );
-        meta_apply( stack, component::meta_throw< meta_type >, destroy< type > );
+        meta_set< type >( stack, new type( class_ ), destroy< type > );
     }
 };
 
@@ -203,8 +199,7 @@ template< typename t >
     static void call( stack& stack, typename call_traits< t >::param_type construct )
     {
         typedef typename no_ref< t >::type::value_type type;
-        new( stack.new_userdata( sizeof( void* ) ) ) type*( construct );
-        meta_apply( stack, component::meta_throw< type >, destroy< type > );
+        meta_set< type >( stack, construct, destroy< type > );
     }
 };
 
@@ -214,10 +209,7 @@ template< typename t >
 {
     static void call( stack& stack, typename call_traits< t >::reference destruct, s32 index )
     {
-        typedef typename no_ref< t >::type::value_type type;
-        meta_check< type >( stack, index );
-
-        destruct = *static_cast< type** >( stack.to_userdata( index ) );
+        destruct = meta_get< typename no_ref< t >::type::value_type >( stack, index );
         stack.push_nil();
         stack.set_metatable( index );
     }
@@ -274,35 +266,51 @@ template< typename t >
     }
 };
 
-//--- meta_check -----------------------------------------------------------------------------------
+//--- meta_get -------------------------------------------------------------------------------------
 template< typename t >
-    void meta_check( stack& stack, s32 index )
+    t* meta_get( stack& stack, s32 index )
 {
     type_check( stack, index, lua::type::userdata );
     stack.get_metatable( index );
-    type_check( stack, -1, lua::type::table );
-    stack.raw_geti( -1, 1 );
-    type_check( stack, -1, lua::type::lightuserdata );
 
-    component::throw_type function = ptr_cast< component::throw_type >( stack.to_userdata( -1 ) );
+    // throw function = metatable[ 2 ]
+    stack.raw_geti( -1, 2 );
+    component::throw_type tf = ptr_cast< component::throw_type >( stack.to_userdata( -1 ) );
+    stack.pop( 1 );
+
+    if ( !component::meta_catch< typename remove_member_const< t >::type >( tf ) )
+    {
+        stack.pop( 1 );
+        stack.where();
+        throw error::lua( stack ) << "Bad argument at index " << index << ", \"" <<
+            demangle( typeid( t ).name() ) << "\" expected";
+    }
+
+    // pointer = metatable[ 1 ]
+    stack.raw_geti( -1, 1 );
+    t* pointer = ptr_cast< t* >( stack.to_userdata( -1 ) );
     stack.pop( 2 );
 
-    if ( component::meta_catch< t >( function ) )
-        return;
-
-    stack.where();
-    throw error::lua( stack ) << "Bad argument at index " << index << ", \"" <<
-        demangle( typeid( t ).name() ) << "\" expected";
+    return pointer;
 }
 
-//--- meta_apply -----------------------------------------------------------------------------------
-inline void meta_apply( stack& stack, component::throw_type function, cfunction gc )
+//--- meta_set -------------------------------------------------------------------------------------
+template< typename t >
+    void meta_set( stack& stack, t* pointer, cfunction gc )
 {
-    stack.create_table( 1, gc ? 1 : 0 );
+    stack.new_userdata( 0 );
+    stack.create_table( 2, gc != 0 );
 
-    stack.push_lightuserdata( ptr_cast( function ) );
+    // metatable[ 1 ] = pointer
+    stack.push_lightuserdata( ptr_cast( pointer ) );
     stack.raw_seti( -2, 1 );
 
+    // metatable[ 2 ] = throw function
+    component::throw_type tf = component::meta_throw< typename remove_member_const< t >::type >;
+    stack.push_lightuserdata( ptr_cast( tf ) );
+    stack.raw_seti( -2, 2 );
+
+    // metatable[ "__gc" ] = gc function
     if ( gc )
     {
         push< const c8* >::call( stack, "__gc" );
