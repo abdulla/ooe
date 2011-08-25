@@ -14,11 +14,9 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     for ( s32 i = 1; i < argc; ++i )
     {
         const c8* name = std::strrchr( argv[ i ], '/' );
+        name = name ? name + 1 : argv[ i ];
 
-        if ( !name )
-            continue;
-
-        vm.load( name + 1, descriptor( argv[ i ] ) );
+        vm.load( name, descriptor( argv[ i ] ) );
     }
 
     return true;
