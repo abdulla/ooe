@@ -36,7 +36,7 @@ else()
         "Project ${PROJECT_NAME} does not support build type ${CMAKE_BUILD_TYPE}." )
 endif()
 
-add_definitions( -std=c++98 -march=native -pedantic-errors -pipe -fstrict-aliasing -funit-at-a-time
+add_definitions( -std=c++98 -pedantic-errors -pipe -fstrict-aliasing -funit-at-a-time
     -fuse-cxa-atexit )
 
 add_definitions( -Wall -Wcast-align -Werror -Wextra -Wfatal-errors -Wfloat-equal -Wformat=2
@@ -70,38 +70,31 @@ macro( ooe_glob NAME )
         list( APPEND PLATFORM_MM_SOURCES ${SOURCES} )
     endforeach()
 
+    set_source_files_properties( ${PLATFORM_MM_SOURCES} PROPERTIES LANGUAGE C )
     set( ${NAME} ${CPP_SOURCES} ${PLATFORM_CPP_SOURCES} ${PLATFORM_MM_SOURCES} )
 endmacro()
-
-function( ooe_properties NAME )
-    set_target_properties( ${NAME} PROPERTIES LINK_INTERFACE_LIBRARIES "" )
-endfunction()
 
 function( ooe_executable NAME )
     ooe_glob( SOURCES ${ARGN} )
     add_executable( ${NAME} ${SOURCES} )
     set_target_properties(
         ${NAME} PROPERTIES BUILD_WITH_INSTALL_RPATH ON INSTALL_RPATH \${ORIGIN}/../lib )
-    ooe_properties( ${NAME} )
 endfunction()
 
 function( ooe_library NAME )
     ooe_glob( SOURCES ${ARGN} )
     add_library( ${NAME} ${SOURCES} )
     set_target_properties( ${NAME} PROPERTIES BUILD_WITH_INSTALL_RPATH ON INSTALL_NAME_DIR @rpath )
-    ooe_properties( ${NAME} )
 endfunction()
 
 function( ooe_module NAME )
     ooe_glob( SOURCES ${ARGN} )
     add_library( ${NAME} MODULE ${SOURCES} )
-    ooe_properties( ${NAME} )
 endfunction()
 
 function( ooe_static NAME )
     ooe_glob( SOURCES ${ARGN} )
     add_library( ${NAME} STATIC ${SOURCES} )
-    ooe_properties( ${NAME} )
 endfunction()
 
 function( ooe_files SOURCE TARGET )
