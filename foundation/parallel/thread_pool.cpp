@@ -51,13 +51,13 @@ private:
     tbb::concurrent_queue< task_ptr > queue;
     ooe::thread thread;
 
-    void main( void* pointer )
+    void main( void* /*pointer*/ )
     {
-        thread_pool& pool = *static_cast< thread_pool* >( pointer );
+        //thread_pool& pool = *static_cast< thread_pool* >( pointer );
 
         while ( state )
         {
-            for ( task_ptr task; dequeue( task ) || pool.snoop( task ); )
+            for ( task_ptr task; dequeue( task ) /*|| pool.snoop( task )*/; )
             {
                 task->state.exchange( task_base::error );
                 OOE_PRINT( "thread_pool \"" << thread.name() << "\"",
