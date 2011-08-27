@@ -11,6 +11,8 @@
 #include "foundation/utility/tuple.hpp"
 #include "test/unit/runner.hpp"
 
+#define OOE_TEST template<> template<>
+
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 template< typename, up_t >

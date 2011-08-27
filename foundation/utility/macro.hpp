@@ -3,7 +3,7 @@
 #ifndef OOE_FOUNDATION_UTILITY_MACRO_HPP
 #define OOE_FOUNDATION_UTILITY_MACRO_HPP
 
-#ifdef __GNUC__
+#if defined( __GNUC__ ) || defined( __clang__ )
     #define OOE_INLINE                      __attribute__( ( __always_inline__ ) )
     #define OOE_NOINLINE                    __attribute__( ( __noinline__ ) )
     #define OOE_NORETURN                    __attribute__( ( __noreturn__ ) )

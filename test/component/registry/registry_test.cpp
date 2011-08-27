@@ -22,6 +22,21 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef scoped_ptr< scoped_fork > fork_ptr;
 
+//--- data -----------------------------------------------------------------------------------------
+void spawn( const std::string& executable, const std::string& script )
+{
+    fork_io fork;
+
+    if ( fork.is_child() )
+    {
+        OOE_PRINT( "spawn", fork_io::execute( executable, script.c_str(), NULL ) );
+        fork_io::exit( false );
+    }
+
+    OOE_CHECK( "fork.wait() == success", fork.wait() == fork_io::success );
+}
+
+//--- setup ----------------------------------------------------------------------------------------
 class setup
 {
 public:
@@ -51,8 +66,9 @@ private:
         if ( fork->is_child() )
         {
             executable::null_fd( STDOUT_FILENO );
-            OOE_IGNORE( fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL ) );
-            fork_io::exit( true );
+            OOE_PRINT( "registry",
+                fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL ) );
+            fork_io::exit( false );
         }
     }
 };
@@ -65,9 +81,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-template<>
-template<>
-    void fixture_type::test< 0 >( setup& )
+OOE_TEST void fixture_type::test< 0 >( setup& )
 {
     std::cerr << "search registry for an interface and list all modules\n";
 
@@ -81,9 +95,7 @@ template<>
     OOE_CHECK( "vector.size()", vector.size() );
 }
 
-template<>
-template<>
-    void fixture_type::test< 1 >( setup& setup )
+OOE_TEST void fixture_type::test< 1 >( setup& setup )
 {
     std::cerr << "load module in-process\n";
 
@@ -99,9 +111,7 @@ template<>
     std::cout << "local-doc( hello ): " << local.doc< void ( * )( void ) >( "hello" ) << '\n';
 }
 
-template<>
-template<>
-    void fixture_type::test< 2 >( setup& setup )
+OOE_TEST void fixture_type::test< 2 >( setup& setup )
 {
     std::cerr << "load module as surrogate\n";
 
@@ -118,9 +128,7 @@ template<>
     std::cout << "remote-doc( hello ): " << remote.doc< void ( void ) >( "hello" ) << '\n';
 }
 
-template<>
-template<>
-    void fixture_type::test< 3 >( setup& setup )
+OOE_TEST void fixture_type::test< 3 >( setup& setup )
 {
     std::cerr << "insert and load module as server\n";
 
@@ -132,7 +140,10 @@ template<>
         fork_ptr( new scoped_fork ).swap( fork );
 
         if ( fork->is_child() )
+        {
             fork_io::execute( setup.path() + "hello", "-u", name.c_str(), NULL );
+            fork_io::exit( true );
+        }
     }
 
     registry registry;
@@ -141,53 +152,31 @@ template<>
     remote.find< void ( void ) >( "hello" )();
 }
 
-template<>
-template<>
-    void fixture_type::test< 4 >( setup& setup )
+OOE_TEST void fixture_type::test< 4 >( setup& setup )
 {
     std::cerr << "load module in lua\n";
 
-    lua::vm vm;
-    vm.setup( lua::component_setup );
-
-    std::string path = setup.path() + "../share/test/script.lua";
-    vm.load( "hello/script.lua", path );
-
-    std::cout <<
-        "Lua version: " << vm.version() << "\n"
-        "Lua VM size: " << vm.size() << " bytes\n";
+    std::string executable = setup.path() + "lua_host";
+    std::string script = setup.path() + "../share/test/script.lua";
+    spawn( executable, script );
 }
 
-template<>
-template<>
-    void fixture_type::test< 5 >( setup& setup )
+OOE_TEST void fixture_type::test< 5 >( setup& setup )
 {
     std::cerr << "load module in javascript\n";
 
-    javascript::vm vm;
-    vm.setup( javascript::component_setup );
-
-    std::string path = setup.path() + "../share/test/script.js";
-    vm.load( "hello/script.js", path );
-
-    std::cout <<
-        "JavaScript version: " << vm.version() << "\n"
-        "JavaScript VM size: " << vm.size() << " bytes\n";
+    std::string executable = setup.path() + "javascript_host";
+    std::string script = setup.path() + "../share/test/script.js";
+    spawn( executable, script );
 }
 
-template<>
-template<>
-    void fixture_type::test< 6 >( setup& setup )
+OOE_TEST void fixture_type::test< 6 >( setup& setup )
 {
     std::cerr << "load module in python\n";
 
-    python::vm vm;
-    vm.setup( python::component_setup );
-
-    std::string path = setup.path() + "../share/test/script.py";
-    vm.load( "hello/script.py", path );
-
-    std::cout << "Python version: " << vm.version() << '\n';
+    std::string executable = setup.path() + "python_host";
+    std::string script = setup.path() + "../share/test/script.py";
+    spawn( executable, script );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

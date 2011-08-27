@@ -366,8 +366,8 @@ public:
     typedef opaque_data::function_type function_type;
 
     template< typename t >
-        explicit opaque_ptr( t* value )
-        : data( new opaque_data( value, deallocate_ptr< t > ) )
+        explicit opaque_ptr( t* value, function_type function = deallocate_ptr< t > )
+        : data( new opaque_data( value, function ) )
     {
     }
 

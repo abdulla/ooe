@@ -119,8 +119,8 @@ void client::main( void* )
     ipc::pool pool;
 
     u8 header[ sizeof( length_t ) + sizeof( index_t ) ];
-    length_t length;
-    error_t error;
+    length_t length = 0;
+    error_t error = 0;
     up_t preserve = stream_size< length_t, error_t >::call( length, error );
 
     while ( true )

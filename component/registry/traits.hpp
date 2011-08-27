@@ -8,14 +8,16 @@
 
 OOE_NAMESPACE_BEGIN( ( ooe )( component ) )
 
-//--- is_boolean -----------------------------------------------------------------------------------
+typedef void ( * throw_type )( void );
+
+//--- traits: is_boolean ---------------------------------------------------------------------------
 template< typename t >
     struct is_boolean
     : public is_like< t, bool >
 {
 };
 
-//--- is_integral ----------------------------------------------------------------------------------
+//--- traits: is_integral --------------------------------------------------------------------------
 template< typename t >
     struct is_integral
 {
@@ -24,7 +26,7 @@ template< typename t >
         ooe::is_integral< typename no_ref< t >::type >::value;
 };
 
-//--- is_floating_point ----------------------------------------------------------------------------
+//--- traits: is_floating_point --------------------------------------------------------------------
 template< typename t >
     struct is_floating_point
     : public ooe::is_floating_point< typename no_ref< t >::type >
@@ -55,6 +57,38 @@ template< typename t >
         ooe::is_class< typename no_ref< t >::type >::value ||
         is_union< typename no_ref< t >::type >::value );
 };
+
+//--- meta_throw -----------------------------------------------------------------------------------
+template< typename t >
+    void meta_throw( void )
+{
+    typedef t* pointer;
+    throw pointer();
+}
+
+//--- meta_catch -----------------------------------------------------------------------------------
+template< typename t >
+    bool meta_catch( throw_type function )
+{
+    throw_type compare = meta_throw< t >;
+
+    if ( function == compare )
+        return true;
+
+    try
+    {
+        function();
+    }
+    catch ( t* )
+    {
+        return true;
+    }
+    catch ( ... )
+    {
+    }
+
+    return false;
+}
 
 OOE_NAMESPACE_END( ( ooe )( component ) )
 

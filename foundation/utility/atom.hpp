@@ -20,7 +20,8 @@ public:
 
     operator type( void ) const
     {
-        return static_cast< const volatile type& >( atomic );
+        const volatile int& value = atomic;
+        return static_cast< type >( value );
     }
 
     type operator ++( void )
@@ -64,27 +65,27 @@ public:
     }
 
 private:
-    type atomic;
+    int atomic;
 
 #if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
     type fetch_and_add( type value )
     {
-        return __sync_fetch_and_add( &atomic, value );
+        return static_cast< type >( __sync_fetch_and_add( &atomic, value ) );
     }
 
     type add_and_fetch( type value )
     {
-        return __sync_add_and_fetch( &atomic, value );
+        return static_cast< type >( __sync_add_and_fetch( &atomic, value ) );
     }
 
     type test_and_set( type value )
     {
-        return __sync_lock_test_and_set( &atomic, value );
+        return static_cast< type >( __sync_lock_test_and_set( &atomic, value ) );
     }
 
     type compare_and_swap( type compare, type value )
     {
-        return __sync_val_compare_and_swap( &atomic, compare, value );
+        return static_cast< type >( __sync_val_compare_and_swap( &atomic, compare, value ) );
     }
 #endif
 };

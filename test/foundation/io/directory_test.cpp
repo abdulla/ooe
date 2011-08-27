@@ -13,9 +13,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-template<>
-template<>
-    void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
     std::cerr << "iterate through a directory\n";
 

@@ -22,7 +22,7 @@ template< cfunction function >
 
     static s32 call( state* state )
     {
-        return invoke< defer >::call( state );
+        return invoke< defer >( state );
     }
 };
 
@@ -73,24 +73,14 @@ s32 load( state* state )
     const facade::lua::vector_type& lua = static_cast< const facade::lua* >
         ( module.find( typeid( facade::lua ).name() ) )->get();
 
-    stack.create_table();
+    up_t end = names.size();
+    stack.create_table( 1, end );
 
-    for ( up_t i = 0, end = names.size(); i != end; ++i )
+    for ( up_t i = 0; i != end; ++i )
     {
         push< std::string >::call( stack, names[ i ]._0 + '/' + names[ i ]._1 );
-
-        if ( names[ i ]._1[ 0 ] == 'F' )
-            push< void ( * )( void ) >::call( stack, local[ i ].function );
-        else if ( names[ i ]._1[ 0 ] == 'M' )
-            push< void ( any::* )( void ) >::call( stack, local[ i ].member );
-        else
-        {
-            stack.pop( 2 );
-            throw error::runtime( "lua::load: " ) << "Function \"" << names[ i ]._0 <<
-                "\" of type \"" << names[ i ]._1 << "\" has unknown pointer";
-        }
-
-        stack.push_cclosure( lua[ i ], 1 );
+        lua[ i ]._0( stack, local[ i ] );
+        stack.push_cclosure( lua[ i ]._1, 1 );
         stack.raw_set( -3 );
     }
 
@@ -131,11 +121,11 @@ const lua::vector_type& lua::get( void ) const
     return vector;
 }
 
-void lua::insert( up_t index, ooe::lua::cfunction call )
+void lua::insert( up_t index, ooe::lua::push_type push, ooe::lua::cfunction call )
 {
     vector_type::iterator i = vector.begin();
     std::advance( i, index );
-    vector.insert( i, call );
+    vector.insert( i, make_tuple( push, call ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( facade ) )
@@ -172,12 +162,12 @@ void component_setup( stack stack )
 }
 
 //--- throw_exception ------------------------------------------------------------------------------
-void throw_exception( state* state, const c8* what, const c8* where )
+void throw_exception( state* state_, const c8* what, const c8* where )
 {
     std::string string;
     string << what << "\n\nStack trace:" << where;
 
-    stack stack( state );
+    stack stack( state_ );
     push< std::string >::call( stack, string );
     stack.error();
 }

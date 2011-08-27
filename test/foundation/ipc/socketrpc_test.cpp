@@ -108,14 +108,13 @@ public:
 
         if ( fork->is_child() )
         {
-            OOE_IGNORE( start_server( name ) );
+            OOE_PRINT( "socket rpc server", start_server( name ) );
             fork_io::exit( true );
         }
     }
 
 private:
     typedef scoped_ptr< scoped_fork > fork_ptr;
-
     fork_ptr fork;
 
     void start_server( const std::string& name ) const
@@ -160,9 +159,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-template<>
-template<>
-    void fixture_type::test< 0 >( setup& )
+OOE_TEST void fixture_type::test< 0 >( setup& )
 {
     std::cerr << "test basic primitives\n";
 
@@ -200,9 +197,7 @@ template<>
     print_destruct( p );
 }
 
-template<>
-template<>
-    void fixture_type::test< 1 >( setup& )
+OOE_TEST void fixture_type::test< 1 >( setup& )
 {
     std::cerr << "test std::vector, ipc::vector, and ipc::jumbo\n";
 
@@ -227,9 +222,7 @@ template<>
     ipc::socket::call< jumbo_type ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo )();
 }
 
-template<>
-template<>
-    void fixture_type::test< 2 >( setup& )
+OOE_TEST void fixture_type::test< 2 >( setup& )
 {
     std::cerr << "test class member function and garbage collector\n";
 
@@ -244,9 +237,7 @@ template<>
     std::cout << "print::get = " << print_get( p )() << '\n';
 }
 
-template<>
-template<>
-    void fixture_type::test< 3 >( setup& )
+OOE_TEST void fixture_type::test< 3 >( setup& )
 {
     std::cerr << "test exceptions\n";
 

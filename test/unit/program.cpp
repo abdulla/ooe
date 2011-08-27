@@ -84,3 +84,9 @@ s32 launch( s32 argc, c8** argv )
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
+
+//--- main -----------------------------------------------------------------------------------------
+extern "C" ooe::s32 main( ooe::s32 argc, ooe::c8** argv/*, ooe::c8** envp*/ )
+{
+    return ooe::unit::launch( argc, argv );
+}

@@ -5,6 +5,16 @@
 #include "foundation/io/memory.hpp"
 #include "foundation/utility/scoped.hpp"
 
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
+
+std::string load_script( const descriptor& desc )
+{
+    memory memory( desc );
+    return std::string( memory.as< c8 >(), memory.size() );
+}
+
+OOE_ANONYMOUS_END( ( ooe ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
 //--- vm -------------------------------------------------------------------------------------------
@@ -30,13 +40,7 @@ vm::~vm( void )
 
 void vm::load( const std::string& name, const descriptor& desc )
 {
-    std::string script;
-
-    {
-        memory memory( desc );
-        script = std::string( memory.as< c8 >(), memory.size() );
-    }
-
+    std::string script = load_script( desc );
     object result = PyRun_String( script.c_str(), Py_file_input, globals, globals );
 
     if ( result )

@@ -105,9 +105,9 @@ void stack::raw_geti( s32 index, u32 array_index )
     lua_rawgeti( state, index, array_index );
 }
 
-void stack::create_table( u32 array_size, u32 table_size )
+void stack::create_table( u32 array_size, u32 map_size )
 {
-    lua_createtable( state, array_size, table_size );
+    lua_createtable( state, array_size, map_size );
 }
 
 void* stack::new_userdata( up_t size_ )

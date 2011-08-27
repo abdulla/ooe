@@ -5,7 +5,6 @@
 
 #include "component/javascript/error.hpp"
 #include "component/javascript/vm.hpp"
-#include "component/registry/traits.hpp"
 #include "foundation/utility/miscellany.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( javascript ) )
@@ -16,7 +15,7 @@ template< typename t >
 {
     v8::Object* object = v8::Object::Cast( *value );
 
-    if ( !object->InternalFieldCount() )
+    if ( object->InternalFieldCount() != 2 )
         throw error::javascript() << "Object has no internal fields";
 
     delete ptr_cast< t* >( object->GetPointerFromInternalField( 0 ) );
@@ -170,17 +169,13 @@ template< typename t >
         if ( object->InternalFieldCount() != 2 )
             throw error::javascript() << "Object does not have required internal fields";
 
-        void* type_info = object->GetPointerFromInternalField( 1 );
+        typedef typename no_qual< t >::type type;
+        component::throw_type function =
+            ptr_cast< component::throw_type >( object->GetPointerFromInternalField( 1 ) );
 
-        if ( !type_info )
-            throw error::javascript() << "Object does not contain type information";
-
-        const std::type_info& type_x = typeid( typename no_qual< t >::type );
-        const std::type_info& type_y = *static_cast< std::type_info* >( type_info );
-
-        if ( type_x != type_y )
-            throw error::javascript() << "Types do not match, \"" << demangle( type_x.name() ) <<
-                "\" != \"" << demangle( type_y.name() ) << '\"';
+        if ( !component::meta_catch< type >( function ) )
+            throw error::javascript() <<
+                "Bad argument, \"" << demangle( typeid( type ).name() ) << "\" expected";
 
         pointer =
             ptr_cast< typename no_ref< t >::type >( object->GetPointerFromInternalField( 0 ) );
@@ -192,7 +187,8 @@ template< typename t >
 {
     static v8::Handle< v8::Value > call( typename call_traits< t >::param_type pointer )
     {
-        return make_object( ptr_cast( pointer ), typeid( typename no_qual< t >::type ) );
+        component::throw_type function = component::meta_throw< typename no_qual< t >::type >;
+        return make_object( ptr_cast( pointer ), function );
     }
 };
 
@@ -203,10 +199,11 @@ template< typename t >
     static void call( const v8::Handle< v8::Value >& value,
         typename call_traits< t >::reference class_ )
     {
-        typedef typename no_ref< t >::type* pointer;
-        pointer p;
-        to< pointer >::call( value, p );
-        class_ = *p;
+        typedef typename no_ref< t >::type type;
+        typedef typename remove_member_const< type >::type meta_type;
+        meta_type* pointer;
+        to< meta_type* >::call( value, pointer );
+        class_ = *( type* )pointer;
     }
 };
 
@@ -216,7 +213,8 @@ template< typename t >
     static v8::Handle< v8::Value > call( typename call_traits< t >::param_type class_ )
     {
         typedef typename no_ref< t >::type type;
-        return from< construct_ptr< type > >::call( new type( class_ ) );
+        typedef typename remove_member_const< type >::type meta_type;
+        return from< construct_ptr< meta_type > >::call( ( meta_type* )new type( class_ ) );
     }
 };
 
@@ -236,8 +234,9 @@ template< typename t >
     static v8::Handle< v8::Value > call( typename call_traits< t >::param_type construct )
     {
         typedef typename t::value_type type;
+        component::throw_type function = component::meta_throw< type >;
         v8::Persistent< v8::Object > object =
-            v8::Persistent< v8::Object >::New( make_object( construct, typeid( type ) ) );
+            v8::Persistent< v8::Object >::New( make_object( construct, function ) );
         object.MakeWeak( 0, destroy< type > );
         return object;
     }

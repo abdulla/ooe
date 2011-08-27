@@ -12,7 +12,7 @@ class printer:
             if type( v ) is BuiltinFunctionType:
                 setattr( self, k[ : k.find( '/' ) ], v )
 
-        self.value = self.construct( name )
+        self.value = self.reconstruct( name )
 
     def said( self ):
         self.say( self.value )

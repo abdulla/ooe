@@ -51,7 +51,7 @@ target_link_libraries( image io ${JPEGTURBO_LIBRARIES} ${OPENEXR_LIBRARIES} ${OP
     ${PNG_LIBRARIES} ${SQUISH_LIBRARIES} )
 
 ooe_library( io foundation/io )
-target_link_libraries( io ${ZLIB_LIBRARIES} )
+target_link_libraries( io executable ${ZLIB_LIBRARIES} )
 
 ooe_library( ipc foundation/ipc foundation/ipc/memory foundation/ipc/socket )
 target_link_libraries( ipc io parallel )
@@ -59,23 +59,23 @@ target_link_libraries( ipc io parallel )
 ooe_library( math foundation/math )
 
 ooe_module( opengl foundation/opengl )
-target_link_libraries( opengl ${OPENGL_gl_LIBRARY} )
+target_link_libraries( opengl visual ${OPENGL_gl_LIBRARY} )
 
 ooe_library( parallel foundation/parallel )
-target_link_libraries( parallel ${CMAKE_THREAD_LIBS_INIT} ${TBB_LIBRARIES} )
+target_link_libraries( parallel executable ${CMAKE_THREAD_LIBS_INIT} ${TBB_LIBRARIES} )
 
 ooe_library( visual foundation/visual )
 target_link_libraries( visual image parallel ${FREETYPE_LIBRARIES} ${VISUAL_LIBRARIES} )
 
 ### component: library #############################################################################
 ooe_library( javascript component/javascript )
-target_link_libraries( javascript io ${V8_LIBRARIES} )
+target_link_libraries( javascript io registry ${V8_LIBRARIES} )
 
 ooe_library( lua component/lua )
-target_link_libraries( lua io ${LUA_LIBRARIES} )
+target_link_libraries( lua io registry ${LUA_LIBRARIES} )
 
 ooe_library( python component/python )
-target_link_libraries( python io ${PYTHON_LIBRARIES} )
+target_link_libraries( python io registry ${PYTHON_LIBRARIES} )
 
 ooe_library( registry component/registry )
 target_link_libraries( registry ipc )

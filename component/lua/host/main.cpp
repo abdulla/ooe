@@ -14,12 +14,10 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     for ( s32 i = 1; i < argc; ++i )
     {
         const c8* name = std::strrchr( argv[ i ], '/' );
-
-        if ( !name )
-            continue;
+        name = name ? name + 1 : argv[ i ];
 
         std::string file;
-        file << '@' << name + 1;
+        file << '@' << name;
         vm.load( file, descriptor( argv[ i ] ) );
     }
 

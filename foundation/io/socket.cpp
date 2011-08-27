@@ -12,6 +12,8 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
+typedef u8 message_buffer[ 24 ];
+
 s32 family( internet_query::type type )
 {
     switch ( type )
@@ -72,13 +74,17 @@ descriptor socket::receive( void )
 {
     msghdr message;
     iovec vector;
-    u8 buffer[ CMSG_SPACE( sizeof( s32 ) ) ];
+    message_buffer buffer;
 
     std::memset( &message, 0, sizeof( message ) );
     message.msg_iov = &vector;
     message.msg_iovlen = 1;
     message.msg_control = buffer;
-    message.msg_controllen = sizeof( buffer );
+    message.msg_controllen = CMSG_SPACE( sizeof( s32 ) );
+
+    if ( message.msg_controllen > sizeof( buffer ) )
+        throw error::io( "socket: " ) <<
+            "message size " << message.msg_controllen << " > buffer size " << sizeof( buffer );
 
     u8 dummy;
     vector.iov_base = &dummy;
@@ -98,18 +104,23 @@ void socket::send( const ooe::descriptor& desc )
 {
     msghdr message;
     iovec vector;
-    u8 buffer[ CMSG_SPACE( sizeof( s32 ) ) ];
+    message_buffer buffer;
 
     std::memset( &message, 0, sizeof( message ) );
     message.msg_iov = &vector;
     message.msg_iovlen = 1;
     message.msg_control = buffer;
-    message.msg_controllen = sizeof( buffer );
+    message.msg_controllen = CMSG_SPACE( sizeof( s32 ) );
 
-    u8 dummy;
+    if ( message.msg_controllen > sizeof( buffer ) )
+        throw error::io( "socket: " ) <<
+            "message size " << message.msg_controllen << " > buffer size " << sizeof( buffer );
+
+    u8 dummy = 0;
     vector.iov_base = &dummy;
     vector.iov_len = 1;
 
+    std::memset( buffer, 0, sizeof( buffer ) );
     cmsghdr& control = *CMSG_FIRSTHDR( &message );
     control.cmsg_len = CMSG_LEN( sizeof( s32 ) );
     control.cmsg_level = SOL_SOCKET;

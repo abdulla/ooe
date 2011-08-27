@@ -15,7 +15,7 @@ function printer( name )
             this[ i.substr( 0, i.indexOf( '/' ) ) ] = value;
     }
 
-    this.value = this.construct( name );
+    this.value = this.reconstruct( name );
     this.said = function()
     {
         this.say( this.value );

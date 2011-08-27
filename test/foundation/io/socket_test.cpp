@@ -60,9 +60,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-template<>
-template<>
-    void fixture_type::test< 0 >( setup& setup )
+OOE_TEST void fixture_type::test< 0 >( setup& setup )
 {
     std::cerr << "send/receive descriptor\n";
 
@@ -74,9 +72,7 @@ template<>
     OOE_CHECK( "value == 0xdeadbeef", value == 0xdeadbeef );
 }
 
-template<>
-template<>
-    void fixture_type::test< 1 >( setup& setup )
+OOE_TEST void fixture_type::test< 1 >( setup& setup )
 {
     std::cerr << "poll on shutdown\n";
 
@@ -87,9 +83,7 @@ template<>
     poll.wait();
 }
 
-template<>
-template<>
-    void fixture_type::test< 2 >( setup& )
+OOE_TEST void fixture_type::test< 2 >( setup& )
 {
     std::cerr << "internet query for localhost\n";
 

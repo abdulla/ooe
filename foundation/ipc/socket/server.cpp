@@ -54,8 +54,8 @@ void servlet::main( void* pointer )
     ipc::pool pool;
 
     u8 header[ sizeof( length_t ) + sizeof( index_t ) ];
-    length_t length;
-    index_t index;
+    length_t length = 0;
+    index_t index = 0;
     up_t preserve = stream_size< length_t, index_t >::call( length, index );
 
     while ( true )
