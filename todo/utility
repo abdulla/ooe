@@ -4,3 +4,8 @@ add little-endian, big-endian types, which can automatically translate
 
 consider removing operator type*() from pointer
     - this would ensure that pointer could not be accidentally abused
+
+create lazy_ptr and relative_ptr
+    - lazy_ptr will create the object on first access (and is atomic in creation)
+    - relative_ptr for memory mapped objects
+    - relative_ptr has two parts, a base pointer and a relative offset
