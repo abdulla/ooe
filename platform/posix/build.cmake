@@ -8,8 +8,6 @@ find_library( RT_LIBRARY rt )
 set( EXECUTABLE_LIBRARIES ${DL_LIBRARY} ${RT_LIBRARY} )
 
 find_package( V4L REQUIRED )
-include_directories( ${V4L_INCLUDE_DIR} )
-
 find_package( X11 REQUIRED )
-include_directories( ${X11_Xrandr_INCLUDE_PATH} )
+include_directories( ${V4L_INCLUDE_DIR} ${X11_Xrandr_INCLUDE_PATH} )
 set( VISUAL_LIBRARIES ${V4L_LIBRARIES} ${X11_Xrandr_LIB} )
