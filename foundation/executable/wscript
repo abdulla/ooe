@@ -1,0 +1,21 @@
+import sys
+import waflib
+
+def build( context ):
+    config = platform( context )
+    context(
+        features = 'cxx cxxshlib',
+        source = 'environment.cpp fork_io.cpp library.cpp program.cpp timer.cpp ' + config.source,
+        target = 'executable',
+        framework = config.framework )
+
+def platform( context ):
+    config = waflib.ConfigSet.ConfigSet()
+
+    if sys.platform.startswith( 'darwin' ):
+        config.source = 'darwin/program.mm darwin/timer.cpp'
+        config.framework = 'AppKit'
+    elif sys.platform.startswith( 'linux' ):
+        config.source = 'linux/program.cpp linux/timer.cpp'
+
+    return config

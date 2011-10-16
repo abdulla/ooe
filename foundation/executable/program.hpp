@@ -5,11 +5,12 @@
 
 #include <csignal>
 
-#include "foundation/executable/program_forward.hpp"
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/tuple.hpp"
+
+#include BOOST_PP_STRINGIZE( foundation/executable/OOE_PLATFORM/program_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
 
