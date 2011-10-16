@@ -1,0 +1,22 @@
+import sys
+import waflib
+
+def build( context ):
+    config = platform( context )
+    context(
+        features = 'cxx cxxshlib',
+        lib = 'z',
+        source = 'archive.cpp descriptor.cpp directory.cpp file.cpp memory.cpp poll.cpp ' +
+            'socket.cpp vfs.cpp ' + config.source,
+        target = 'io',
+        use = 'executable' )
+
+def platform( context ):
+    config = waflib.ConfigSet.ConfigSet()
+
+    if sys.platform.startswith( 'darwin' ):
+        config.source = 'darwin/directory.cpp darwin/file.cpp darwin/socket.cpp'
+    elif sys.platform.startswith( 'linux' ):
+        config.source = 'linux/directory.cpp linux/file.cpp linux/socket.cpp'
+
+    return config

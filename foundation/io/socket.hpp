@@ -5,8 +5,9 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 
-#include "foundation/io/socket_forward.hpp"
 #include "foundation/utility/tuple.hpp"
+
+#include BOOST_PP_STRINGIZE( foundation/io/OOE_PLATFORM/socket_forward.hpp )
 
 struct sockaddr;
 struct addrinfo;

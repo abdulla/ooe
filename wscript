@@ -34,7 +34,6 @@ def options( context ):
         help = 'Configures a release build' )
 
 def configure( context ):
-    print( type( context.env ) )
     context.load( 'compiler_c compiler_cxx' )
     context.env.CXXFLAGS = [ '-std=c++98', '-pedantic-errors', '-pipe', '-fstrict-aliasing',
         '-funit-at-a-time', '-fuse-cxa-atexit',
