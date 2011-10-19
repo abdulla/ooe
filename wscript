@@ -69,5 +69,5 @@ def platform( context ):
         context.fatal( 'Unknown platform: ' + sys.platform )
 
 @waflib.TaskGen.extension( '.mm' )
-def objc( task_gen, node ):
+def mm_hook( task_gen, node ):
     return task_gen.create_compiled_task( 'c', node )

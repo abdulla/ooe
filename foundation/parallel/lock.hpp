@@ -5,8 +5,10 @@
 
 #include <pthread.h>
 
-#include "foundation/parallel/lock_forward.hpp"
 #include "foundation/utility/noncopyable.hpp"
+#include "foundation/utility/preprocessor.hpp"
+
+#include BOOST_PP_STRINGIZE( foundation/parallel/OOE_PLATFORM/lock_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

@@ -5,12 +5,13 @@
 
 #include <pthread.h>
 
-#include "foundation/parallel/thread_forward.hpp"
 #include "foundation/utility/function.hpp"
 #include "foundation/utility/macro.hpp"
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/noncopyable.hpp"
 #include "foundation/utility/tuple.hpp"
+
+#include BOOST_PP_STRINGIZE( foundation/parallel/OOE_PLATFORM/thread_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

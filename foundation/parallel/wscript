@@ -1,0 +1,20 @@
+import sys
+import waflib
+
+def build( context ):
+    config = platform( context )
+    context(
+        features = 'cxx cxxshlib',
+        source = 'lock.cpp thread.cpp thread_pool.cpp ' + config.source,
+        target = 'parallel',
+        use = 'executable' )
+
+def platform( context ):
+    config = waflib.ConfigSet.ConfigSet()
+
+    if sys.platform.startswith( 'darwin' ):
+        config.source = 'darwin/lock.cpp darwin/thread.cpp'
+    elif sys.platform.startswith( 'linux' ):
+        config.source = 'linux/lock.cpp linux/thread.cpp'
+
+    return config
