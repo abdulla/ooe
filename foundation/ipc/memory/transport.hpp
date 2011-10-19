@@ -5,7 +5,8 @@
 
 #include "foundation/io/socket.hpp"
 #include "foundation/ipc/shared_memory.hpp"
-#include "foundation/ipc/memory/transport_forward.hpp"
+
+#include BOOST_PP_STRINGIZE( foundation/ipc/memory/OOE_PLATFORM/transport_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 

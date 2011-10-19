@@ -1,7 +1,8 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/ipc/memory/client.hpp"
-#include "foundation/ipc/memory/client_private.hpp"
+
+#include BOOST_PP_STRINGIZE( foundation/ipc/memory/OOE_PLATFORM/client_private.hpp )
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 

@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_PLATFORM_POSIX_FOUNDATION_IPC_MEMORY_CLIENT_PRIVATE_HPP
-#define OOE_PLATFORM_POSIX_FOUNDATION_IPC_MEMORY_CLIENT_PRIVATE_HPP
+#ifndef OOE_FOUNDATION_IPC_MEMORY_LINUX_CLIENT_PRIVATE_HPP
+#define OOE_FOUNDATION_IPC_MEMORY_LINUX_CLIENT_PRIVATE_HPP
 
 #include "foundation/ipc/name.hpp"
 
@@ -13,4 +13,4 @@ void client_construct( ooe::ipc::memory::transport& )
 
 OOE_NAMESPACE_END( ( ooe )( platform )( ipc )( memory ) )
 
-#endif  // OOE_PLATFORM_POSIX_FOUNDATION_IPC_MEMORY_CLIENT_PRIVATE_HPP
+#endif  // OOE_FOUNDATION_IPC_MEMORY_LINUX_CLIENT_PRIVATE_HPP
