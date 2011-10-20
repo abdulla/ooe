@@ -3,8 +3,10 @@
 #ifndef OOE_FOUNDATION_OPENGL_SYMBOL_HPP
 #define OOE_FOUNDATION_OPENGL_SYMBOL_HPP
 
-#include "foundation/opengl/symbol_forward.hpp"
 #include "foundation/utility/fundamental.hpp"
+#include "foundation/utility/macro.hpp"
+
+#include OOE_PATH( foundation/opengl, symbol_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 

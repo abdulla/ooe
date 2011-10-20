@@ -3,8 +3,9 @@
 #ifndef OOE_FOUNDATION_OPENGL_CONTEXT_HPP
 #define OOE_FOUNDATION_OPENGL_CONTEXT_HPP
 
-#include "foundation/opengl/context_forward.hpp"
 #include "foundation/utility/macro.hpp"
+
+#include OOE_PATH( foundation/opengl, context_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

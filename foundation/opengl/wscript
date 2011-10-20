@@ -1,0 +1,25 @@
+import sys
+import waflib
+
+def build( context ):
+    config = platform( context )
+    context(
+        features = 'cxx cxxshlib',
+        framework = config.framework,
+        lib = config.lib,
+        source = 'block.cpp buffer.cpp device.cpp frame.cpp program.cpp shader.cpp symbol.cpp ' +
+            'target.cpp texture.cpp ' + config.source,
+        target = 'opengl',
+        use = 'visual' )
+
+def platform( context ):
+    config = waflib.ConfigSet.ConfigSet()
+
+    if sys.platform.startswith( 'darwin' ):
+        config.framework = 'AppKit OpenGL'
+        config.source = 'darwin/context.mm'
+    elif sys.platform.startswith( 'linux' ):
+        config.lib = 'GL'
+        config.source = 'linux/context.cpp'
+
+    return config
