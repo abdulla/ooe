@@ -1,0 +1,22 @@
+import sys
+import waflib
+
+def build( context ):
+    config = platform( context )
+    context(
+        features = 'cxx cxxshlib',
+        includes = config.includes,
+        lib = 'Half Iex IlmImf IlmThread jpeg openjpeg png squish z',
+        libpath = config.libpath,
+        source = 'dds.cpp exr.cpp image.cpp jpeg.cpp jpeg2000.cpp png.cpp',
+        target = 'image',
+        use = 'io' )
+
+def platform( context ):
+    config = waflib.ConfigSet.ConfigSet()
+
+    if sys.platform.startswith( 'darwin' ):
+        config.includes = '/sw/lib/libjpeg-turbo/include /sw/include/OpenEXR'
+        config.libpath = '/sw/lib/libjpeg-turbo/lib'
+
+    return config

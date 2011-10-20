@@ -10,7 +10,7 @@ def build( context ):
         lib = 'freetype',
         source = 'font.cpp graphics.cpp ' + config.source,
         target = 'visual',
-        use = 'io' )
+        use = 'image' )
 
 def platform( context ):
     config = waflib.ConfigSet.ConfigSet()
