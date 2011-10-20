@@ -5,9 +5,9 @@ def build( context ):
     config = platform( context )
     context(
         features = 'cxx cxxshlib',
+        framework = config.framework,
         source = 'environment.cpp fork_io.cpp library.cpp program.cpp timer.cpp ' + config.source,
-        target = 'executable',
-        framework = config.framework )
+        target = 'executable' )
 
 def platform( context ):
     config = waflib.ConfigSet.ConfigSet()

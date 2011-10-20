@@ -3,10 +3,10 @@
 #ifndef OOE_FOUNDATION_UTILITY_POINTER_HPP
 #define OOE_FOUNDATION_UTILITY_POINTER_HPP
 
+#include "foundation/utility/macro.hpp"
 #include "foundation/utility/noncopyable.hpp"
-#include "foundation/utility/preprocessor.hpp"
 
-#include BOOST_PP_STRINGIZE( foundation/utility/OOE_PLATFORM/pointer_forward.hpp )
+#include OOE_PATH( foundation/utility, pointer_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

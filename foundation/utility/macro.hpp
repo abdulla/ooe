@@ -36,6 +36,10 @@
 #endif
 
 #define OOE_FOURCC( a, b, c, d ) ( a + ( b << 8 ) + ( c << 16 ) + ( d << 24 ) )
+#define OOE_EXPAND_END( text ) #text
+#define OOE_EXPAND( text ) OOE_EXPAND_END( text )
+#define OOE_PATH( path, file ) OOE_EXPAND( path/OOE_PLATFORM/file )
+
 
 #define OOE_CONSOLE( statement )\
 do\

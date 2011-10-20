@@ -4,9 +4,8 @@
 #define OOE_FOUNDATION_EXECUTABLE_ENVIRONMENT_HPP
 
 #include "foundation/utility/macro.hpp"
-#include "foundation/utility/preprocessor.hpp"
 
-#include BOOST_PP_STRINGIZE( foundation/executable/OOE_PLATFORM/environment_forward.hpp )
+#include OOE_PATH( foundation/executable, environment_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
 

@@ -2,7 +2,7 @@
 
 #include "foundation/ipc/memory/client.hpp"
 
-#include BOOST_PP_STRINGIZE( foundation/ipc/memory/OOE_PLATFORM/client_private.hpp )
+#include OOE_PATH( foundation/ipc/memory, client_private.hpp )
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( ipc )( memory ) )
 

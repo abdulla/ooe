@@ -10,7 +10,7 @@
 #include "foundation/utility/string.hpp"
 #include "foundation/utility/tuple.hpp"
 
-#include BOOST_PP_STRINGIZE( foundation/executable/OOE_PLATFORM/program_forward.hpp )
+#include OOE_PATH( foundation/executable, program_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
 

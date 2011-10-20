@@ -1,0 +1,25 @@
+import sys
+import waflib
+
+def build( context ):
+    config = platform( context )
+    context(
+        features = 'cxx cxxshlib',
+        framework = config.framework,
+        includes = config.includes,
+        lib = 'freetype',
+        source = 'font.cpp graphics.cpp ' + config.source,
+        target = 'visual',
+        use = 'io' )
+
+def platform( context ):
+    config = waflib.ConfigSet.ConfigSet()
+
+    if sys.platform.startswith( 'darwin' ):
+        config.includes = '/sw/include/freetype2'
+        config.source = 'darwin/event_queue.mm darwin/sight.mm darwin/view.mm'
+        config.framework = 'AppKit CoreVideo QTKit'
+    elif sys.platform.startswith( 'linux' ):
+        config.source = 'linux/event_queue.cpp linux/sight.cpp linux/view.cpp'
+
+    return config

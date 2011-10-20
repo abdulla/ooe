@@ -5,7 +5,7 @@
 
 #include "foundation/utility/error.hpp"
 
-#include BOOST_PP_STRINGIZE( foundation/ipc/OOE_PLATFORM/error_forward.hpp )
+#include OOE_PATH( foundation/ipc, error_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( error ) )
 

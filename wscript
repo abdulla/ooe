@@ -61,6 +61,7 @@ def platform( context ):
     if sys.platform.startswith( 'darwin' ):
         context.env.DEFINES.append( 'OOE_PLATFORM=darwin' )
         context.env.INCLUDES.append( '/sw/include' )
+        context.env.LIBPATH = '/sw/lib'
         context.env.RPATH = '@executable_path/../lib'
     elif sys.platform.startswith( 'linux' ):
         context.env.DEFINES.append( 'OOE_PLATFORM=linux' )

@@ -4,7 +4,8 @@
 #define OOE_FOUNDATION_VISUAL_EVENT_QUEUE_HPP
 
 #include "foundation/executable/timer.hpp"
-#include "foundation/visual/event_queue_forward.hpp"
+
+#include OOE_PATH( foundation/visual, event_queue_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 

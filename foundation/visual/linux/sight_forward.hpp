@@ -1,7 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#ifndef OOE_PLATFORM_POSIX_FOUNDATION_VISUAL_SIGHT_FORWARD_HPP
-#define OOE_PLATFORM_POSIX_FOUNDATION_VISUAL_SIGHT_FORWARD_HPP
+#ifndef OOE_FOUNDATION_VISUAL_LINUX_SIGHT_FORWARD_HPP
+#define OOE_FOUNDATION_VISUAL_LINUX_SIGHT_FORWARD_HPP
 
 #include "foundation/io/poll.hpp"
 #include "foundation/parallel/thread.hpp"
@@ -31,4 +31,4 @@ private:
 
 OOE_NAMESPACE_END( ( ooe )( platform ) )
 
-#endif  // OOE_PLATFORM_POSIX_FOUNDATION_VISUAL_SIGHT_FORWARD_HPP
+#endif  // OOE_FOUNDATION_VISUAL_LINUX_SIGHT_FORWARD_HPP

@@ -5,7 +5,8 @@
 
 #include "foundation/image/image.hpp"
 #include "foundation/utility/noncopyable.hpp"
-#include "foundation/visual/sight_forward.hpp"
+
+#include OOE_PATH( foundation/visual, sight_forward.hpp )
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
