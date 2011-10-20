@@ -1,0 +1,5 @@
+def build( context ):
+    context(
+        features = 'cxx cxxshlib',
+        source = 'camera.cpp geometry.cpp math.cpp',
+        target = 'math' )
