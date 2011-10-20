@@ -1,0 +1,2 @@
+def build( context ):
+    context.recurse( 'lua python registry' )

@@ -3,7 +3,7 @@
 #ifndef OOE_COMPONENT_PYTHON_HEADER_HPP
 #define OOE_COMPONENT_PYTHON_HEADER_HPP
 
-#include <python3.1/Python.h>
+#include <python3.2m/Python.h>
 
 #undef isalnum
 #undef isalpha

@@ -1,0 +1,6 @@
+def build( context ):
+    context(
+        features = 'cxx cxxshlib',
+        source = 'interface.cpp local.cpp module.cpp registry.cpp remote.cpp',
+        target = 'registry',
+        use = 'ipc' )

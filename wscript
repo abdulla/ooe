@@ -51,7 +51,7 @@ def configure( context ):
     platform( context )
 
 def build( context ):
-    context.recurse( 'foundation' )
+    context.recurse( 'component foundation' )
     # context.recurse( 'component external foundation test' )
 
 def platform( context ):

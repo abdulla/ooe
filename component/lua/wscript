@@ -1,0 +1,7 @@
+def build( context ):
+    context(
+        features = 'cxx cxxshlib',
+        lib = 'lua',
+        source = 'facade.cpp stack.cpp vm.cpp',
+        target = 'lua',
+        use = 'registry' )
