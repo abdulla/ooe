@@ -1,5 +1,2 @@
-def recurse( context ):
-    context.recurse( 'executable image io ipc math opengl parallel visual' )
-
 def build( context ):
-    recurse( context )
+    context.recurse( 'executable image io ipc math opengl parallel visual' )

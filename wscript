@@ -10,10 +10,6 @@ preproc.strict_quotes = 1
 top = '.'
 out = '/' + os.readlink( '/tmp' ) + '/ooe'
 
-def recurse( context ):
-    context.recurse( 'foundation' )
-    # context.recurse( 'component external foundation test' )
-
 def options( context ):
     context.load( 'compiler_c compiler_cxx' )
     group = context.add_option_group( 'OOE Build Options' )
@@ -55,7 +51,8 @@ def configure( context ):
     platform( context )
 
 def build( context ):
-    recurse( context )
+    context.recurse( 'foundation' )
+    # context.recurse( 'component external foundation test' )
 
 def platform( context ):
     if sys.platform.startswith( 'darwin' ):
