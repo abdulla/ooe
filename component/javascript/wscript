@@ -1,0 +1,6 @@
+def build( context ):
+    context.shlib(
+        lib = 'v8',
+        source = 'facade.cpp vm.cpp',
+        target = 'javascript',
+        use = 'registry' )

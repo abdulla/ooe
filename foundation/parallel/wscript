@@ -3,8 +3,7 @@ import waflib
 
 def build( context ):
     config = platform( context )
-    context(
-        features = 'cxx cxxshlib',
+    context.shlib(
         source = 'lock.cpp thread.cpp thread_pool.cpp ' + config.source,
         target = 'parallel',
         use = 'executable' )

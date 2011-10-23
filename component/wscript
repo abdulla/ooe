@@ -1,2 +1,2 @@
 def build( context ):
-    context.recurse( 'lua python registry' )
+    context.recurse( 'lua python javascript registry' )

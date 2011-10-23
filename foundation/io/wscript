@@ -3,8 +3,7 @@ import waflib
 
 def build( context ):
     config = platform( context )
-    context(
-        features = 'cxx cxxshlib',
+    context.shlib(
         lib = 'z',
         source = 'archive.cpp descriptor.cpp directory.cpp file.cpp memory.cpp poll.cpp ' +
             'socket.cpp vfs.cpp ' + config.source,

@@ -1,6 +1,5 @@
 def build( context ):
-    context(
-        features = 'cxx cxxshlib',
+    context.shlib(
         lib = 'lua',
         source = 'facade.cpp stack.cpp vm.cpp',
         target = 'lua',

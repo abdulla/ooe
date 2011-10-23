@@ -3,8 +3,7 @@ import waflib
 
 def build( context ):
     config = platform( context )
-    context(
-        features = 'cxx cxxshlib',
+    context.shlib(
         lib = 'python3.2m',
         libpath = config.libpath,
         source = 'facade.cpp vm.cpp',

@@ -3,8 +3,7 @@ import waflib
 
 def build( context ):
     config = platform( context )
-    context(
-        features = 'cxx cxxshlib',
+    context.shlib(
         framework = config.framework,
         includes = config.includes,
         lib = 'freetype',

@@ -3,8 +3,7 @@ import waflib
 
 def build( context ):
     config = platform( context )
-    context(
-        features = 'cxx cxxshlib',
+    context.shlib(
         framework = config.framework,
         lib = config.lib,
         source = 'block.cpp buffer.cpp device.cpp frame.cpp program.cpp shader.cpp symbol.cpp ' +
