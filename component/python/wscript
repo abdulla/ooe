@@ -1,19 +1,10 @@
-import sys
-import waflib
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
-    config = platform( context )
+    platform = context.env.platform
     context.shlib(
-        lib = 'python3.2m',
-        libpath = config.libpath,
+        lib = platform.python.lib,
+        libpath = platform.python.libpath,
         source = 'facade.cpp vm.cpp',
         target = 'python',
         use = 'registry' )
-
-def platform( context ):
-    config = waflib.ConfigSet.ConfigSet()
-
-    if sys.platform.startswith( 'darwin' ):
-        config.libpath = '/sw/lib/python3.2/config-3.2m'
-
-    return config

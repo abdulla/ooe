@@ -1,4 +1,5 @@
-### Copyright (C) 2010 Abdulla Kamar. All rights reserved. ###
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
 from types import BuiltinFunctionType
 
 #--- query registry --------------------------------------------------------------------------------

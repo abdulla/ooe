@@ -1,24 +1,17 @@
-import sys
-import waflib
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
-    config = platform( context )
+    platform = context.env.platform
     context.shlib(
-        framework = config.framework,
-        lib = config.lib,
+        framework = platform.opengl.framework,
+        lib = platform.opengl.lib,
         source = 'block.cpp buffer.cpp device.cpp frame.cpp program.cpp shader.cpp symbol.cpp ' +
-            'target.cpp texture.cpp ' + config.source,
+            'target.cpp texture.cpp ' + source( platform.name ),
         target = 'opengl',
         use = 'visual' )
 
-def platform( context ):
-    config = waflib.ConfigSet.ConfigSet()
-
-    if sys.platform.startswith( 'darwin' ):
-        config.framework = 'AppKit OpenGL'
-        config.source = 'darwin/context.mm'
-    elif sys.platform.startswith( 'linux' ):
-        config.lib = 'GL'
-        config.source = 'linux/context.cpp'
-
-    return config
+def source( name ):
+    if name == 'darwin':
+        return 'darwin/context.mm'
+    elif name == 'linux':
+        return 'linux/context.cpp'

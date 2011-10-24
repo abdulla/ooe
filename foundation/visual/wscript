@@ -1,24 +1,17 @@
-import sys
-import waflib
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
-    config = platform( context )
+    platform = context.env.platform
     context.shlib(
-        framework = config.framework,
-        includes = config.includes,
+        framework = platform.visual.framework,
+        includes = platform.visual.includes,
         lib = 'freetype',
-        source = 'font.cpp graphics.cpp ' + config.source,
+        source = 'font.cpp graphics.cpp ' + source( platform.name ),
         target = 'visual',
         use = 'image' )
 
-def platform( context ):
-    config = waflib.ConfigSet.ConfigSet()
-
-    if sys.platform.startswith( 'darwin' ):
-        config.includes = '/sw/include/freetype2'
-        config.source = 'darwin/event_queue.mm darwin/sight.mm darwin/view.mm'
-        config.framework = 'AppKit CoreVideo QTKit'
-    elif sys.platform.startswith( 'linux' ):
-        config.source = 'linux/event_queue.cpp linux/sight.cpp linux/view.cpp'
-
-    return config
+def source( name ):
+    if name == 'darwin':
+        return 'darwin/event_queue.mm darwin/sight.mm darwin/view.mm'
+    elif name == 'linux':
+        return 'linux/event_queue.cpp linux/sight.cpp linux/view.cpp'

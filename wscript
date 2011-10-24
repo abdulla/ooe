@@ -1,10 +1,11 @@
-#!/usr/bin/env python
-# encoding: utf-8
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 import os
 import preproc
 import sys
 import waflib
+
+import share.waf
 
 preproc.strict_quotes = 1
 top = '.'
@@ -30,41 +31,37 @@ def options( context ):
         help = 'Configures a release build' )
 
 def configure( context ):
+    platform, compiler = choose( context )
+
     context.load( 'compiler_c compiler_cxx' )
-    context.env.CXXFLAGS = [ '-std=c++98', '-pedantic-errors', '-pipe', '-fstrict-aliasing',
-        '-funit-at-a-time', '-fuse-cxa-atexit',
-
-        '-Wall', '-Wcast-align', '-Werror', '-Wextra', '-Wfatal-errors', '-Wfloat-equal',
-        '-Wformat=2', '-Wmissing-include-dirs', '-Wno-long-long', '-Wnon-virtual-dtor',
-        '-Woverloaded-virtual', '-Wpointer-arith', '-Wreorder', '-Wshadow', '-Wstrict-aliasing',
-        '-Wswitch-default', '-Wundef', '-Wwrite-strings' ]
-    context.env.DEFINES = []
-    context.env.INCLUDES = [ '#' ]
-
-    if context.options.debug:
-        context.env.DEFINES.append( '_FORTIFY_SOURCE=2' )
-        context.env.CXXFLAGS.extend( [ '-O0', '-g2', '-fno-inline', '-fstack-protector-all' ] )
-    else:
-        context.env.CXXFLAGS.extend( [ '-O3', '-g0', '-fomit-frame-pointer', '-ffast-math -ftracer'
-            '-fweb', '-fvisibility=hidden', '-fvisibility-inlines-hidden' ] )
-
-    platform( context )
+    context.env.CCFLAGS = compiler.flags
+    context.env.CXXFLAGS = compiler.flags
+    context.env.DEFINES = compiler.defines + platform.defines
+    context.env.INCLUDES = platform.includes + [ '#' ]
+    context.env.LIBPATH = platform.libpath
+    context.env.RPATH = platform.rpath
 
 def build( context ):
+    platform, _ = choose( context )
+
+    context.env.platform = platform
     context.recurse( 'component foundation' )
     # context.recurse( 'component external foundation test' )
 
-def platform( context ):
+def choose( context ):
     if sys.platform.startswith( 'darwin' ):
-        context.env.DEFINES.append( 'OOE_PLATFORM=darwin' )
-        context.env.INCLUDES.append( '/sw/include' )
-        context.env.LIBPATH = '/sw/lib'
-        context.env.RPATH = '@executable_path/../lib'
+        from share.waf.darwin import platform
+        from share.waf.gcc import compiler
     elif sys.platform.startswith( 'linux' ):
-        context.env.DEFINES.append( 'OOE_PLATFORM=linux' )
-        context.env.RPATH = '${ORIGIN}/../lib'
+        from share.waf.linux import platform
+        from share.waf.gcc import compiler
     else:
         context.fatal( 'Unknown platform: ' + sys.platform )
+
+    variant = compiler.debug if context.options.debug else compiler.release
+    compiler.flags.extend( variant.flags )
+    compiler.defines.extend( variant.defines )
+    return platform, compiler
 
 @waflib.TaskGen.extension( '.mm' )
 def mm_hook( task_gen, node ):

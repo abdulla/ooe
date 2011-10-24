@@ -1,21 +1,16 @@
-import sys
-import waflib
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
-    config = platform( context )
+    platform = context.env.platform
     context.shlib(
         source = 'name.cpp nameservice.cpp pool.cpp semaphore.cpp shared_memory.cpp ' +
             'switchboard.cpp memory/client.cpp memory/link.cpp memory/server.cpp ' +
-            'memory/transport.cpp socket/client.cpp socket/server.cpp ' + config.source,
+            'memory/transport.cpp socket/client.cpp socket/server.cpp ' + source( platform.name ),
         target = 'ipc',
         use = 'io parallel' )
 
-def platform( context ):
-    config = waflib.ConfigSet.ConfigSet()
-
-    if sys.platform.startswith( 'darwin' ):
-        config.source = 'memory/darwin/transport.cpp'
-    elif sys.platform.startswith( 'linux' ):
-        config.source = 'memory/linux/transport.cpp'
-
-    return config
+def source( name ):
+    if name == 'darwin':
+        return 'memory/darwin/transport.cpp'
+    elif name == 'linux':
+        return 'memory/linux/transport.cpp'
