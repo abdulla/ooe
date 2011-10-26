@@ -2,9 +2,16 @@
 
 def build( context ):
     platform = context.env.platform
+
     context.shlib(
         lib = platform.python.lib,
         libpath = platform.python.libpath,
+        linkflags = platform.shlib( 'python-link' ),
         source = 'facade.cpp vm.cpp',
-        target = 'python',
+        target = 'python-link',
         use = 'registry' )
+
+    context.program(
+        source = 'host/main.cpp',
+        target = 'host/python-host',
+        use = 'python-link' )

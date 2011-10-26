@@ -1,7 +1,25 @@
 ## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
+    platform = context.env.platform
+
     context.shlib(
+        linkflags = platform.shlib( 'registry' ),
         source = 'interface.cpp local.cpp module.cpp registry.cpp remote.cpp',
         target = 'registry',
         use = 'ipc' )
+
+    context.program(
+        source = 'server/main.cpp',
+        target = 'server/server',
+        use = 'registry' )
+
+    context.program(
+        source = 'surrogate/main.cpp',
+        target = 'surrogate/surrogate',
+        use = 'registry' )
+
+    context.program(
+        source = 'doc/main.cpp',
+        target = 'doc/doc',
+        use = 'registry' )

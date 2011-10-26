@@ -2,8 +2,10 @@
 
 def build( context ):
     platform = context.env.platform
+
     context.shlib(
         lib = 'z',
+        linkflags = platform.shlib( 'io' ),
         source = 'archive.cpp descriptor.cpp directory.cpp file.cpp memory.cpp poll.cpp ' +
             'socket.cpp vfs.cpp ' + source( platform.name ),
         target = 'io',

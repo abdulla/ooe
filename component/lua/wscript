@@ -1,8 +1,16 @@
 ## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
+    platform = context.env.platform
+
     context.shlib(
         lib = 'lua',
+        linkflags = platform.shlib( 'lua-link' ),
         source = 'facade.cpp stack.cpp vm.cpp',
-        target = 'lua',
+        target = 'lua-link',
         use = 'registry' )
+
+    context.program(
+        source = 'host/main.cpp',
+        target = 'host/lua-host',
+        use = 'lua-link' )

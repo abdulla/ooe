@@ -2,8 +2,10 @@
 
 def build( context ):
     platform = context.env.platform
+
     context.shlib(
         framework = platform.executable.framework,
+        linkflags = platform.shlib( 'executable' ),
         source = 'environment.cpp fork_io.cpp library.cpp program.cpp timer.cpp ' +
             source( platform.name ),
         target = 'executable' )

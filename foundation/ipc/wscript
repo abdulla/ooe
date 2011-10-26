@@ -2,7 +2,9 @@
 
 def build( context ):
     platform = context.env.platform
+
     context.shlib(
+        linkflags = platform.shlib( 'ipc' ),
         source = 'name.cpp nameservice.cpp pool.cpp semaphore.cpp shared_memory.cpp ' +
             'switchboard.cpp memory/client.cpp memory/link.cpp memory/server.cpp ' +
             'memory/transport.cpp socket/client.cpp socket/server.cpp ' + source( platform.name ),

@@ -6,6 +6,9 @@ class platform:
     libpath = []
     rpath = [ '${ORIGIN}/../lib' ]
 
+    def shlib( name ):
+        return ''
+
     class executable:
         framework = ''
 

@@ -2,9 +2,11 @@
 
 def build( context ):
     platform = context.env.platform
+
     context.shlib(
         framework = platform.opengl.framework,
         lib = platform.opengl.lib,
+        linkflags = platform.shlib( 'opengl' ),
         source = 'block.cpp buffer.cpp device.cpp frame.cpp program.cpp shader.cpp symbol.cpp ' +
             'target.cpp texture.cpp ' + source( platform.name ),
         target = 'opengl',

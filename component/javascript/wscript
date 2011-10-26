@@ -1,8 +1,16 @@
 ## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
+    platform = context.env.platform
+
     context.shlib(
         lib = 'v8',
+        linkflags = platform.shlib( 'javascript-link' ),
         source = 'facade.cpp vm.cpp',
-        target = 'javascript',
+        target = 'javascript-link',
         use = 'registry' )
+
+    context.program(
+        source = 'host/main.cpp',
+        target = 'host/javascript-host',
+        use = 'javascript-link' )

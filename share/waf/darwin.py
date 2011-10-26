@@ -6,6 +6,10 @@ class platform:
     libpath = [ '/sw/lib' ]
     rpath = [ '@executable_path/../lib' ]
 
+    @staticmethod
+    def shlib( name ):
+        return '-install_name @rpath/lib%s.dylib' % name
+
     class executable:
         framework = 'AppKit'
 

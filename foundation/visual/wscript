@@ -2,10 +2,12 @@
 
 def build( context ):
     platform = context.env.platform
+
     context.shlib(
         framework = platform.visual.framework,
         includes = platform.visual.includes,
         lib = 'freetype',
+        linkflags = platform.shlib( 'visual' ),
         source = 'font.cpp graphics.cpp ' + source( platform.name ),
         target = 'visual',
         use = 'image' )
