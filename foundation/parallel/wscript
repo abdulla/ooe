@@ -4,6 +4,7 @@ def build( context ):
     platform = context.env.platform
 
     context.shlib(
+        lib = 'tbb',
         linkflags = platform.shlib( 'parallel' ),
         source = 'lock.cpp thread.cpp thread_pool.cpp ' + source( platform.name ),
         target = 'parallel',

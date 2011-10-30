@@ -1,0 +1,7 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+def build( context ):
+    context.program(
+        source = 'main.cpp',
+        target = 'pool_bench',
+        use = 'parallel' )

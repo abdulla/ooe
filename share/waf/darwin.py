@@ -1,8 +1,12 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+import waflib
+
 class platform:
     name = 'darwin'
 
     defines = [ 'OOE_PLATFORM=darwin' ]
-    includes = [ '/sw/include' ]
+    flags = [ '-isystem', '/sw/include' ]
     libpath = [ '/sw/lib' ]
     rpath = [ '@executable_path/../lib' ]
 
@@ -14,8 +18,9 @@ class platform:
         framework = 'AppKit'
 
     class image:
-        includes = '/sw/lib/libjpeg-turbo/include /sw/include/OpenEXR'
+        includes = '/sw/lib/libjpeg-turbo/include'
         libpath = '/sw/lib/libjpeg-turbo/lib'
+        system_includes = '/sw/include/OpenEXR'
 
     class opengl:
         framework = 'AppKit OpenGL'
@@ -25,6 +30,13 @@ class platform:
         lib = 'python3.2m'
         libpath = '/sw/lib/python3.2/config-3.2m'
 
+    class ui:
+        system_includes = '/sw/include/utf8cpp'
+
     class visual:
         includes = '/sw/include/freetype2'
         framework = 'AppKit CoreVideo QTKit'
+
+@waflib.TaskGen.extension( '.mm' )
+def mm_hook( task_gen, node ):
+    return task_gen.create_compiled_task( 'c', node )

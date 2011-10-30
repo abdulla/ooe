@@ -34,10 +34,10 @@ def configure( context ):
     platform, compiler = choose( context )
 
     context.load( 'compiler_c compiler_cxx' )
-    context.env.CCFLAGS = compiler.flags
-    context.env.CXXFLAGS = compiler.flags
+    context.env.CFLAGS = compiler.flags + platform.flags
+    context.env.CXXFLAGS = context.env.CFLAGS
     context.env.DEFINES = compiler.defines + platform.defines
-    context.env.INCLUDES = platform.includes + [ '#' ]
+    context.env.INCLUDES = [ '#' ]
     context.env.LIBPATH = platform.libpath
     context.env.RPATH = platform.rpath
 
@@ -45,7 +45,7 @@ def build( context ):
     platform, _ = choose( context )
 
     context.env.platform = platform
-    context.recurse( 'component foundation' )
+    context.recurse( 'component external foundation' )
     # context.recurse( 'component external foundation test' )
 
 def choose( context ):
@@ -62,7 +62,3 @@ def choose( context ):
     compiler.flags.extend( variant.flags )
     compiler.defines.extend( variant.defines )
     return platform, compiler
-
-@waflib.TaskGen.extension( '.mm' )
-def mm_hook( task_gen, node ):
-    return task_gen.create_compiled_task( 'c', node )

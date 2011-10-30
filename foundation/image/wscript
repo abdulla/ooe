@@ -9,5 +9,6 @@ def build( context ):
         libpath = platform.image.libpath,
         linkflags = platform.shlib( 'image' ),
         source = 'dds.cpp exr.cpp image.cpp jpeg.cpp jpeg2000.cpp png.cpp',
+        system_includes = platform.image.system_includes,
         target = 'image',
         use = 'io' )

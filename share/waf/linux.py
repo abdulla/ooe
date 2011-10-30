@@ -1,11 +1,14 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
 class platform:
     name = 'linux'
 
     defines = [ 'OOE_PLATFORM=linux' ]
-    includes = []
+    flags = []
     libpath = []
     rpath = [ '${ORIGIN}/../lib' ]
 
+    @staticmethod
     def shlib( name ):
         return ''
 
@@ -13,8 +16,8 @@ class platform:
         framework = ''
 
     class image:
-        includes = ''
         libpath = ''
+        system_includes = ''
 
     class opengl:
         framework = ''
@@ -22,7 +25,10 @@ class platform:
 
     class python:
         lib = 'python3.2'
-        libpath = None
+        libpath = ''
+
+    class ui:
+        system_includes = ''
 
     class visual:
         includes = ''

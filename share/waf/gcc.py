@@ -1,3 +1,7 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+import waflib
+
 class compiler:
     defines = []
     flags = [ '-std=c++98', '-pedantic-errors', '-pipe', '-fstrict-aliasing',
@@ -16,3 +20,12 @@ class compiler:
         defines = []
         flags = [ '-O3', '-g0', '-fomit-frame-pointer', '-ffast-math', '-ftracer', '-fweb',
             '-fvisibility=hidden', '-fvisibility-inlines-hidden' ]
+
+@waflib.TaskGen.feature( 'c' )
+@waflib.TaskGen.feature( 'cxx' )
+@waflib.TaskGen.before( 'process_source' )
+def system_includes_hook( task_gen ):
+    for i in task_gen.to_list( getattr( task_gen, 'system_includes', [] ) ):
+        flags = [ '-isystem', i ]
+        task_gen.env.CFLAGS.extend( flags )
+        task_gen.env.CXXFLAGS.extend( flags )
