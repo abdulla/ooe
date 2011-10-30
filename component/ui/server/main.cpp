@@ -400,7 +400,7 @@ void draw_aux( device_ptr& device, const frame_ptr& frame, const box_tree::box_v
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
     // graphics library must be preloaded for linux
-    library library( root + "../lib/libopengl.so", library::global_lazy );
+    library library( root + "../lib/libopengl" + OOE_EXTENSION, library::global_lazy );
 
     event_queue queue;
     view view( queue, width, height, false );

@@ -5,7 +5,7 @@ import waflib
 class platform:
     name = 'darwin'
 
-    defines = [ 'OOE_PLATFORM=darwin' ]
+    defines = [ 'OOE_PLATFORM=darwin', 'OOE_EXTENSION=".dylib"' ]
     flags = [ '-isystem', '/sw/include' ]
     libpath = [ '/sw/lib' ]
     rpath = [ '@executable_path/../lib' ]

@@ -5,7 +5,7 @@ def build( context ):
 
     context.shlib(
         includes = platform.image.includes,
-        lib = 'Half Iex IlmImf IlmThread jpeg openjpeg png squish z',
+        lib = 'Half Iex IlmImf IlmThread openjpeg png squish turbojpeg z',
         libpath = platform.image.libpath,
         linkflags = platform.shlib( 'image' ),
         source = 'dds.cpp exr.cpp image.cpp jpeg.cpp jpeg2000.cpp png.cpp',

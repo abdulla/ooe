@@ -45,8 +45,15 @@ def build( context ):
     platform, _ = choose( context )
 
     context.env.platform = platform
-    context.recurse( 'component external foundation' )
-    # context.recurse( 'component external foundation test' )
+    context.add_post_fun( install )
+    context.recurse( 'component external foundation test' )
+
+def install( context ):
+    if context.cmd == 'install':
+        return
+
+    context.path.find_or_declare( 'log' ).mkdir()
+    context.symlink_as( '${PREFIX}/share', context.path.find_dir( 'share' ).abspath() )
 
 def choose( context ):
     if sys.platform.startswith( 'darwin' ):

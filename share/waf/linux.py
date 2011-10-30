@@ -3,7 +3,7 @@
 class platform:
     name = 'linux'
 
-    defines = [ 'OOE_PLATFORM=linux' ]
+    defines = [ 'OOE_PLATFORM=linux', 'OOE_EXTENSION=".so"' ]
     flags = []
     libpath = []
     rpath = [ '${ORIGIN}/../lib' ]
@@ -16,6 +16,7 @@ class platform:
         framework = ''
 
     class image:
+        includes = ''
         libpath = ''
         system_includes = ''
 

@@ -1,0 +1,10 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+def build( context ):
+    platform = context.env.platform
+
+    context.shlib(
+        linkflags = platform.shlib( 'unit' ),
+        source = 'group.cpp program.cpp runner.cpp',
+        target = 'unit',
+        use = 'io' )

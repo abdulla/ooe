@@ -5,7 +5,8 @@ import waflib
 class compiler:
     defines = []
     flags = [ '-std=c++98', '-pedantic-errors', '-pipe', '-fstrict-aliasing',
-        '-funit-at-a-time', '-fuse-cxa-atexit',
+        '-funit-at-a-time', '-fuse-cxa-atexit', '-fvisibility=hidden',
+        '-fvisibility-inlines-hidden',
 
         '-Wall', '-Wcast-align', '-Werror', '-Wextra', '-Wfatal-errors', '-Wfloat-equal',
         '-Wformat=2', '-Wmissing-include-dirs', '-Wno-long-long', '-Wnon-virtual-dtor',
@@ -18,8 +19,7 @@ class compiler:
 
     class release:
         defines = []
-        flags = [ '-O3', '-g0', '-fomit-frame-pointer', '-ffast-math', '-ftracer', '-fweb',
-            '-fvisibility=hidden', '-fvisibility-inlines-hidden' ]
+        flags = [ '-O3', '-g0', '-fomit-frame-pointer', '-ffast-math', '-ftracer', '-fweb' ]
 
 @waflib.TaskGen.feature( 'c' )
 @waflib.TaskGen.feature( 'cxx' )

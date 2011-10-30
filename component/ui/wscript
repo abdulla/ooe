@@ -7,4 +7,23 @@ def build( context ):
         source = 'box_tree.cpp convert_source.cpp font_source.cpp make.cpp null_source.cpp ' +
             'text_layout.cpp tile_source.cpp virtual_texture.cpp',
         system_includes = platform.ui.system_includes,
-        target = 'ui' )
+        target = 'ui',
+        use = 'math parallel visual' )
+
+    context.program(
+        lib = 'tbb',
+        source = 'retile/main.cpp',
+        target = 'retile/retile',
+        use = 'ui' )
+
+    context.program(
+        lib = 'tbb',
+        source = 'tile/main.cpp',
+        target = 'tile/tile',
+        use = 'ui' )
+
+    context.program(
+        lib = 'tbb',
+        source = 'server/main.cpp',
+        target = 'server/ui',
+        use = 'ui' )
