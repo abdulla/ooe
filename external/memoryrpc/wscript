@@ -5,25 +5,25 @@ def build( context ):
 
     context.program(
         source = 'client/main.cpp',
-        target = 'client/memoryrpc-client',
+        target = 'client/memoryrpc_client',
         use = 'ipc' )
 
     context.program(
         source = 'input/main.cpp',
-        target = 'input/memoryrpc-input',
+        target = 'input/memoryrpc_input',
         use = 'ipc' )
 
     context.program(
         source = 'noop/main.cpp',
-        target = 'noop/memoryrpc-noop',
+        target = 'noop/memoryrpc_noop',
         use = 'ipc' )
 
     context.program(
         source = 'output/main.cpp',
-        target = 'output/memoryrpc-output',
+        target = 'output/memoryrpc_output',
         use = 'ipc' )
 
     context.program(
         source = 'server/main.cpp',
-        target = 'server/memoryrpc-server',
+        target = 'server/memoryrpc_server',
         use = 'ipc' )

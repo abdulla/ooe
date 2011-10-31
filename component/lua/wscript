@@ -5,12 +5,12 @@ def build( context ):
 
     context.shlib(
         lib = 'lua',
-        linkflags = platform.shlib( 'lua-link' ),
+        linkflags = platform.shlib( 'lua_link' ),
         source = 'facade.cpp stack.cpp vm.cpp',
-        target = 'lua-link',
+        target = 'lua_link',
         use = 'registry' )
 
     context.program(
         source = 'host/main.cpp',
-        target = 'host/lua-host',
-        use = 'lua-link' )
+        target = 'host/lua_host',
+        use = 'lua_link' )

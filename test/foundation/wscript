@@ -1,4 +1,5 @@
 ## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
-    context.recurse( 'component foundation mock unit' )
+    pass
+    # context.recurse( 'image io ipc math opengl parallel utility' )

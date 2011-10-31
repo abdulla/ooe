@@ -3,5 +3,5 @@
 def build( context ):
     context.program(
         source = 'main.cpp',
-        target = 'pool-bench',
+        target = 'pool_bench',
         use = 'parallel' )

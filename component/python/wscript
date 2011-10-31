@@ -6,12 +6,12 @@ def build( context ):
     context.shlib(
         lib = platform.python.lib,
         libpath = platform.python.libpath,
-        linkflags = platform.shlib( 'python-link' ),
+        linkflags = platform.shlib( 'python_link' ),
         source = 'facade.cpp vm.cpp',
-        target = 'python-link',
+        target = 'python_link',
         use = 'registry' )
 
     context.program(
         source = 'host/main.cpp',
-        target = 'host/python-host',
-        use = 'python-link' )
+        target = 'host/python_host',
+        use = 'python_link' )

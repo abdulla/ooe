@@ -5,20 +5,20 @@ def build( context ):
 
     context.program(
         source = 'input/main.cpp',
-        target = 'input/socketrpc-input',
+        target = 'input/socketrpc_input',
         use = 'ipc' )
 
     context.program(
         source = 'noop/main.cpp',
-        target = 'noop/socketrpc-noop',
+        target = 'noop/socketrpc_noop',
         use = 'ipc' )
 
     context.program(
         source = 'output/main.cpp',
-        target = 'output/socketrpc-output',
+        target = 'output/socketrpc_output',
         use = 'ipc' )
 
     context.program(
         source = 'server/main.cpp',
-        target = 'server/socketrpc-server',
+        target = 'server/socketrpc_server',
         use = 'ipc' )
