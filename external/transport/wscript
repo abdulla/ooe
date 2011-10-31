@@ -1,0 +1,14 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+def build( context ):
+    platform = context.env.platform
+
+    context.program(
+        source = 'notify/main.cpp',
+        target = 'notify/transport-notify',
+        use = 'ipc' )
+
+    context.program(
+        source = 'wait/main.cpp',
+        target = 'wait/transport-wait',
+        use = 'ipc' )

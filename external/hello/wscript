@@ -1,0 +1,15 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+def build( context ):
+    platform = context.env.platform
+
+#   context.shlib(
+#       linkflags = platform.shlib( 'hello' ),
+#       source = 'library.cpp',
+#       target = 'hello',
+#       use = 'javascript-link lua-link python-link' )
+
+    context.program(
+        source = 'server/main.cpp',
+        target = 'server/hello',
+        use = 'registry' )

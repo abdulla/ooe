@@ -1,0 +1,24 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+def build( context ):
+    platform = context.env.platform
+
+    context.program(
+        source = 'input/main.cpp',
+        target = 'input/socketrpc-input',
+        use = 'ipc' )
+
+    context.program(
+        source = 'noop/main.cpp',
+        target = 'noop/socketrpc-noop',
+        use = 'ipc' )
+
+    context.program(
+        source = 'output/main.cpp',
+        target = 'output/socketrpc-output',
+        use = 'ipc' )
+
+    context.program(
+        source = 'server/main.cpp',
+        target = 'server/socketrpc-server',
+        use = 'ipc' )

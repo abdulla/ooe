@@ -1,0 +1,29 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+def build( context ):
+    platform = context.env.platform
+
+    context.program(
+        source = 'client/main.cpp',
+        target = 'client/memoryrpc-client',
+        use = 'ipc' )
+
+    context.program(
+        source = 'input/main.cpp',
+        target = 'input/memoryrpc-input',
+        use = 'ipc' )
+
+    context.program(
+        source = 'noop/main.cpp',
+        target = 'noop/memoryrpc-noop',
+        use = 'ipc' )
+
+    context.program(
+        source = 'output/main.cpp',
+        target = 'output/memoryrpc-output',
+        use = 'ipc' )
+
+    context.program(
+        source = 'server/main.cpp',
+        target = 'server/memoryrpc-server',
+        use = 'ipc' )
