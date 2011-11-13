@@ -115,7 +115,7 @@ OOE_TEST void fixture_type::test< 2 >( setup& setup )
 {
     std::cerr << "load module as surrogate\n";
 
-    std::string path = setup.path() + "../lib/libhello.so";
+    std::string path = setup.path() + "../lib/libhello" OOE_EXTENSION;
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
