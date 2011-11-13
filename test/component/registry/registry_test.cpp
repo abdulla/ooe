@@ -45,7 +45,7 @@ public:
     {
         start_server();
         registry registry;
-        registry.insert( registry::library, path_ + "../lib/libhello.so" );
+        registry.insert( registry::library, path_ + "../lib/libhello" OOE_EXTENSION );
     }
 
     std::string path() const
@@ -99,7 +99,7 @@ OOE_TEST void fixture_type::test< 1 >( setup& setup )
 {
     std::cerr << "load module in-process\n";
 
-    std::string path = setup.path() + "../lib/libhello.so";
+    std::string path = setup.path() + "../lib/libhello" OOE_EXTENSION;
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
