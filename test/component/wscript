@@ -1,5 +1,5 @@
 ## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
-    pass
     # context.recurse( 'registry ui' )
+    context.recurse( 'registry' )
