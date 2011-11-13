@@ -9,24 +9,24 @@ OOE_ANONYMOUS_BEGIN( ( ooe )( python ) )
 typedef std::vector< std::string > find_vector;
 typedef shared_ptr< ooe::source > source_ptr;
 
-template< PyCFunction function >
+template< cfunction function >
     struct embed
 {
     struct defer
     {
-        static PyObject* call( PyObject* self, PyObject* arguments )
+        static data* call( data* self, data* arguments )
         {
             return function( self, arguments );
         }
     };
 
-    static PyObject* call( PyObject* self, PyObject* arguments )
+    static data* call( data* self, data* arguments )
     {
         return invoke< defer >( self, arguments );
     }
 };
 
-PyObject* find( PyObject*, PyObject* list )
+data* find( data*, data* list )
 {
     find_vector input;
     as< find_vector >::call( list, input );
@@ -55,50 +55,48 @@ PyObject* find( PyObject*, PyObject* list )
     return from< find_vector >::call( output );
 }
 
-PyObject* load( PyObject*, PyObject* string )
+data* load( data*, data* string )
 {
     std::string path;
     as< std::string >::call( string, path );
 
     source_ptr source( new ooe::source( path ) );
-    const module& module = source->get();
+    const ooe::module& module = source->get();
     const interface::vector_type& names = module.names();
-    const module::vector_type& docs = module.docs();
+    const ooe::module::vector_type& docs = module.docs();
     const facade::local::vector_type& local = static_cast< const facade::local* >
         ( module.find( typeid( facade::local ).name() ) )->get();
     const facade::python::vector_type& python = static_cast< const facade::python* >
         ( module.find( typeid( facade::python ).name() ) )->get();
 
-    object dictionary = valid( PyDict_New() );
+    dictionary dictionary;
+    object object( dictionary );
 
     for ( up_t i = 0, end = names.size(); i != end; ++i )
     {
-        PyMethodDef* method = const_cast< PyMethodDef* >( &python[ i ]._1 );
-        method->ml_name = names[ i ]._0.c_str();
-        method->ml_doc = docs[ i ];
+        python::method& method = const_cast< python::method& >( python[ i ]._1 );
+        method.set( names[ i ]._0.c_str(), docs[ i ] );
 
-        std::string key = names[ i ]._0 + '/' + names[ i ]._1;
-        object data = python[ i ]._0( local[ i ] );
-        object value = valid( PyCFunction_New( method, data ) );
-        PyDict_SetItemString( dictionary, key.c_str(), value );
+        std::string name = names[ i ]._0 + '/' + names[ i ]._1;
+        python::string key( name.c_str(), name.size() );
+        python::object self = python[ i ]._0( local[ i ] );
+        python::function value( method, self );
+        dictionary.set( key, value );
     }
 
-    PyDict_SetItemString( dictionary, "", from< source_ptr >::call( source ) );
-    return dictionary.release();
+    dictionary.set( python::string( 0, 0 ), from< source_ptr >::call( source ) );
+    return object.release();
 }
 
-PyObject* doc( PyObject*, PyObject* arguments )
+data* doc( data*, data* arguments )
 {
-    verify_arguments( arguments, 2 );
-    PyObject* object = PyTuple_GET_ITEM( arguments, 0 );
-
-    if ( !PyDict_Check( object ) )
-        throw error::python() << "Object is not a map";
+    python::tuple tuple = verify_arguments( arguments, 2 );
+    dictionary dictionary( tuple.get( 0 ) );
 
     source_ptr source;
     std::string value;
-    as< source_ptr >::call( PyDict_GetItemString( object, "" ), source );
-    as< std::string >::call( PyTuple_GET_ITEM( arguments, 1 ), value );
+    as< source_ptr >::call( dictionary.get( string( 0, 0 ) ), source );
+    as< std::string >::call( tuple.get( 1 ), value );
 
     up_t i = value.find( '/' );
 
@@ -109,12 +107,9 @@ PyObject* doc( PyObject*, PyObject* arguments )
     return from< const c8* >::call( documentation );
 }
 
-PyMethodDef methods[] =
-{
-    { "find", embed< find >::call, METH_O, 0 },
-    { "load", embed< load >::call, METH_O, 0 },
-    { "doc", embed< doc >::call, METH_VARARGS, 0 }
-};
+method find_method( "find", embed< find >::call, method::single );
+method load_method( "load", embed< load >::call, method::single );
+method doc_method( "doc", embed< doc >::call, method::multiple );
 
 OOE_ANONYMOUS_END( ( ooe )( python ) )
 
@@ -126,12 +121,12 @@ const python::vector_type& python::get( void ) const
     return vector;
 }
 
-void python::insert( up_t index, ooe::python::from_type from, PyCFunction call )
+void python::insert( up_t index, ooe::python::from_type from, ooe::python::cfunction call )
 {
     vector_type::iterator i = vector.begin();
     std::advance( i, index );
 
-    PyMethodDef method = { "", call, METH_VARARGS, 0 };
+    ooe::python::method method( 0, call, ooe::python::method::multiple );
     vector.insert( i, make_tuple( from, method ) );
 }
 
@@ -140,41 +135,37 @@ OOE_NAMESPACE_END( ( ooe )( facade ) )
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
 //--- component_setup ------------------------------------------------------------------------------
-void component_setup( PyObject* globals )
+void component_setup( data* globals )
 {
-    object ooe = valid( PyModule_New( "ooe" ) );
-    Py_INCREF( Py_None );
-    PyModule_AddObject( ooe, "__file__", Py_None );
+    module ooe( "ooe", module::make );
+    ooe.add( "__file__", none() );
 
     //--- registry -------------------------------------------------------------
-    object registry = valid( PyModule_New( "component" ) );
-    Py_INCREF( Py_None );
-    PyModule_AddObject( registry, "__file__", Py_None );
+    module registry( "component", module::make );
+    registry.add( "__file__", none() );
 
-    PyModule_AddObject( registry, "find", valid( PyCFunction_New( methods + 0, 0 ) ) );
-    PyModule_AddObject( registry, "load", valid( PyCFunction_New( methods + 1, 0 ) ) );
-    PyModule_AddObject( registry, "doc", valid( PyCFunction_New( methods + 2, 0 ) ) );
+    registry.add( "find", function( find_method, 0 ) );
+    registry.add( "load", function( load_method, 0 ) );
+    registry.add( "doc", function( doc_method, 0 ) );
 
-    PyModule_AddObject( ooe, "component", registry.release() );
+    ooe.add( "component", registry );
 
     //--------------------------------------------------------------------------
 
-    PyDict_SetItemString( globals, "ooe", ooe );
+    dictionary( globals ).set( string( "ooe", 3 ), ooe );
 }
 
-//--- throw_exception ------------------------------------------------------------------------------
-void throw_exception( const c8* what, const c8* where )
+//--- verify_arguments -----------------------------------------------------------------------------
+tuple verify_arguments( data* arguments, s32 size )
 {
-    std::string string;
+    tuple tuple( arguments );
+    s32 argument_size = tuple.size();
 
-    if ( PyErr_Occurred() )
-    {
-        exception_tuple tuple = get_exception();
-        string << tuple._0 << "\n\nStack trace: " << tuple._1;
-    }
+    if ( argument_size < size )
+        throw error::python() << "Not enough arguments to function, " << size <<
+            " expected, got " << argument_size;
 
-    string << what << "\n\nStack trace: " << where;
-    PyErr_SetString( PyExc_RuntimeError, string.c_str() );
+    return tuple;
 }
 
 OOE_NAMESPACE_END( ( ooe )( python ) )

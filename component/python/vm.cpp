@@ -1,5 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <python3.2m/Python.h>
+
 #include "component/python/traits.hpp"
 #include "component/python/vm.hpp"
 #include "foundation/io/memory.hpp"
@@ -23,12 +25,9 @@ vm::vm( void )
 {
     Py_InitializeEx( 0 );
     scoped< void ( void ) > scoped( Py_Finalize );
-    PyObject* module = valid( PyImport_AddModule( "__main__" ) );
 
-    if ( !module )
-        throw error::python() << "Unable to import module \"__main__\"";
-
-    globals = PyModule_GetDict( module );
+    module module( "__main__", module::import );
+    globals = module.get();
     scoped.clear();
 }
 
@@ -48,7 +47,7 @@ void vm::load( const std::string& name, const descriptor& desc )
 
     exception_tuple tuple = get_exception();
     throw error::python() <<
-        "Unable to load \"" << name << "\": " << tuple._0 << "\nPython backtrace:\n" << tuple._1;
+        "Unable to load \"" << name << "\":\n" << tuple._0 << "\nPython backtrace:\n" << tuple._1;
 }
 
 void vm::collect( void )

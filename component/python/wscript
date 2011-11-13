@@ -7,7 +7,7 @@ def build( context ):
         lib = platform.python.lib,
         libpath = platform.python.libpath,
         linkflags = platform.shlib( 'python_link' ),
-        source = 'facade.cpp vm.cpp',
+        source = 'facade.cpp object.cpp vm.cpp',
         target = 'python_link',
         use = 'registry' )
 

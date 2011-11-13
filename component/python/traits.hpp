@@ -40,23 +40,19 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_sequence< t > >::type >
 {
-    static void call( PyObject* object, typename call_traits< t >::reference container )
+    static void call( data* data, typename call_traits< t >::reference container )
     {
-        if ( !PyList_Check( object ) )
-            throw error::python() << "Object is not a list";
-
         typedef typename no_ref< t >::type type;
-        up_t array_size = PyList_GET_SIZE( object );
+        list list( data );
+        up_t array_size = list.size();
 
         type out;
         reserve( out, array_size );
 
         for ( up_t i = 0; i != array_size; ++i )
         {
-            PyObject* item = PyList_GET_ITEM( object, i );
-
             typename type::value_type element;
-            as< typename type::value_type >::call( item, element );
+            as< typename type::value_type >::call( list.get( i ), element );
             out.push_back( element );
         }
 
@@ -67,15 +63,16 @@ template< typename t >
 template< typename t >
     struct from< t, typename enable_if< is_sequence< t > >::type >
 {
-    static PyObject* call( typename call_traits< t >::param_type container )
+    static data* call( typename call_traits< t >::param_type container )
     {
         typedef typename no_ref< t >::type type;
-        python::object object = valid( PyList_New( container.size() ) );
+        list list( container.size() );
+        object object( list );
         up_t index = 0;
 
         for ( typename type::const_iterator i = container.begin(), end = container.end();
             i != end; ++i, ++index )
-            PyList_SET_ITEM( object.get(), index, from< typename type::value_type >::call( *i ) );
+            list.set( index, from< typename type::value_type >::call( *i ) );
 
         return object.release();
     }
@@ -85,18 +82,16 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_set< t > >::type >
 {
-    static void call( PyObject* object, typename call_traits< t >::reference set )
+    static void call( data* data, typename call_traits< t >::reference set )
     {
-        if( !PySet_Check( object ) )
-            throw error::python() << "Object is not a set";
-
         typedef typename no_ref< t >::type type;
-        python::object iterator = valid( PyObject_GetIter( object ) );
-        python::object item;
+        python::set py_set( data );
+        iterator iterator = py_set.get();
+        object item;
 
         type out;
 
-        while ( ( item = PyIter_Next( iterator ) ) )
+        while ( ( item = iterator.next() ) )
         {
             typename type::key_type key;
             as< typename type::key_type >::call( item, key );
@@ -110,16 +105,14 @@ template< typename t >
 template< typename t >
     struct from< t, typename enable_if< is_set< t > >::type >
 {
-    static PyObject* call( typename call_traits< t >::param_type set )
+    static data* call( typename call_traits< t >::param_type set )
     {
         typedef typename no_ref< t >::type type;
-        python::object object = PySet_New( 0 );
+        python::set py_set;
+        object object( py_set );
 
         for ( typename type::const_iterator i = set.begin(), end = set.end(); i != end; ++i )
-        {
-            python::object key = from< typename type::key_type >::call( *i );
-            PySet_Add( object, key );
-        }
+            py_set.add( from< typename type::key_type >::call( *i ) );
 
         return object.release();
     }
@@ -129,25 +122,19 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_map< t > >::type >
 {
-    static void call( PyObject* object, typename call_traits< t >::reference map )
+    static void call( data* data, typename call_traits< t >::reference map )
     {
-        if ( !PyDict_Check( object ) )
-            throw error::python() << "Object is not a map";
-
-        sp_t i = 0;
-        PyObject* key;
-        PyObject* mapped;
-
         typedef typename no_ref< t >::type type;
+        dictionary dictionary( data );
         type out;
 
-        while ( PyDict_Next( object, &i, &key, &mapped ) )
+        for ( dictionary::tuple tuple( 0, 0, 0 ); dictionary.next( tuple ); )
         {
-            typename type::key_type k;
-            as< typename type::key_type >::call( key, k );
-            typename type::mapped_type m;
-            as< typename type::mapped_type >::call( mapped, m );
-            out.insert( std::make_pair( k, m ) );
+            typename type::key_type key;
+            as< typename type::key_type >::call( tuple._1, key );
+            typename type::mapped_type value;
+            as< typename type::mapped_type >::call( tuple._2, value );
+            out.insert( std::make_pair( key, value ) );
         }
 
         map.swap( out );
@@ -157,18 +144,17 @@ template< typename t >
 template< typename t >
     struct from< t, typename enable_if< is_map< t > >::type >
 {
-    static PyObject* call( typename call_traits< t >::param_type map )
+    static data* call( typename call_traits< t >::param_type map )
     {
         typedef typename no_ref< t >::type type;
-        python::object object = valid( PyDict_New() );
+        dictionary dictionary;
+        object object( dictionary );
 
         for ( typename type::const_iterator i = map.begin(), end = map.end(); i != end; ++i )
         {
             python::object key = from< typename type::key_type >::call( i->first );
             python::object value = from< typename type::mapped_type >::call( i->second );
-
-            if ( PyDict_SetItem( object, key, value ) )
-                throw error::python() << "Unable to set dictionary item";
+            dictionary.set( key, value );
         }
 
         return object.release();
@@ -179,33 +165,30 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_pair< t > >::type >
 {
-    static void call( PyObject* object, typename call_traits< t >::reference pair )
+    static void call( data* data, typename call_traits< t >::reference pair )
     {
-        if ( !PyTuple_Check( object ) )
-            throw error::python() << "Object is not a tuple";
-
-        up_t tuple_size = PyTuple_GET_SIZE( object );
+        tuple tuple( data );
+        up_t tuple_size = tuple.size();
 
         if ( tuple_size != 2 )
             throw error::python() << "Tuple is of size " << tuple_size << ", pair is of size 2";
 
         typedef typename no_ref< t >::type type;
-        as< typename type::first_type >::call( PyTuple_GET_ITEM( object, 0 ), pair.first );
-        as< typename type::second_type >::call( PyTuple_GET_ITEM( object, 1 ), pair.second );
+        as< typename type::first_type >::call( tuple.get( 0 ), pair.first );
+        as< typename type::second_type >::call( tuple.get( 1 ), pair.second );
     }
 };
 
 template< typename t >
     struct from< t, typename enable_if< is_pair< t > >::type >
 {
-    static PyObject* call( typename call_traits< t >::param_type pair )
+    static data* call( typename call_traits< t >::param_type pair )
     {
         typedef typename no_ref< t >::type type;
-        python::object object = valid( PyTuple_New( 2 ) );
-        PyTuple_SET_ITEM( object.get(), 0,
-            from< typename type::first_type >::call( pair.first ) );
-        PyTuple_SET_ITEM( object.get(), 1,
-            from< typename type::second_type >::call( pair.second ) );
+        tuple tuple( 2 );
+        object object( tuple );
+        tuple.set( 0, from< typename type::first_type >::call( pair.first ) );
+        tuple.set( 1, from< typename type::second_type >::call( pair.second ) );
         return object.release();
     }
 };
@@ -225,12 +208,10 @@ OOE_NAMESPACE_END( ( ooe )( python ) )
     #define LIMIT BOOST_PP_ITERATION()
 
     #define TUPLE_AS( z, n, d )\
-        as< typename tuple_element< n, t >::type >::\
-            call( PyTuple_GET_ITEM( object, n ), tuple._ ## n );
+        as< typename tuple_element< n, t >::type >::call( py_tuple.get( n ), tuple._ ## n );
 
     #define TUPLE_FROM( z, n, d )\
-        PyTuple_SET_ITEM( object.get(), n,\
-            ( from< typename tuple_element< n, t >::type >::call( tuple._ ## n ) ) );
+        py_tuple.set( n, from< typename tuple_element< n, t >::type >::call( tuple._ ## n ) );
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
@@ -238,16 +219,15 @@ OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 template< typename t >
     struct as< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-    static void call( PyObject* object,
+    static void call( data* data,
         typename call_traits< t >::reference BOOST_PP_EXPR_IF( LIMIT, tuple ) )
     {
-        if ( !PyTuple_Check( object ) )
-            throw error::python() << "Object is not a tuple";
-
-        up_t tuple_size = PyTuple_GET_SIZE( object );
+        python::tuple py_tuple( data );
+        up_t tuple_size = py_tuple.size();
 
         if ( tuple_size != LIMIT )
-            throw error::python() << "Tuple is of size " << tuple_size << ", require " << LIMIT;
+            throw error::python() <<
+                "Tuple is of size " << tuple_size << ", expected a size of " << LIMIT;
 
         BOOST_PP_REPEAT( LIMIT, TUPLE_AS, ~ )
     }
@@ -256,9 +236,10 @@ template< typename t >
 template< typename t >
     struct from< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-    static PyObject* call( typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, tuple ) )
+    static data* call( typename call_traits< t >::param_type BOOST_PP_EXPR_IF( LIMIT, tuple ) )
     {
-        python::object object = valid( PyTuple_New( LIMIT ) );
+        python::tuple py_tuple( LIMIT );
+        object object( py_tuple );
         BOOST_PP_REPEAT( LIMIT, TUPLE_FROM, ~ )
         return object.release();
     }

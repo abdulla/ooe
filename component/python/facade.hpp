@@ -19,22 +19,12 @@ template< typename >
 template< typename, typename >
     struct invoke_member;
 
-void component_setup( PyObject* ) OOE_VISIBLE;
-void throw_exception( const c8*, const c8* ) OOE_VISIBLE;
-
-//--- verify_arguments -----------------------------------------------------------------------------
-inline void verify_arguments( PyObject* arguments, s32 size )
-{
-    s32 argument_size = PyTuple_GET_SIZE( arguments );
-
-    if ( argument_size < size )
-        throw error::python() << "Not enough arguments to function, " << size <<
-            " expected, got " << argument_size;
-}
+void component_setup( data* ) OOE_VISIBLE;
+tuple verify_arguments( data*, s32 ) OOE_VISIBLE;
 
 //--- invoke ---------------------------------------------------------------------------------------
 template< typename type >
-    PyObject* invoke( PyObject* self, PyObject* arguments )
+    data* invoke( data* self, data* arguments )
 {
     try
     {
@@ -42,15 +32,15 @@ template< typename type >
     }
     catch ( error::runtime& error )
     {
-        throw_exception( error.what(), error.where() );
+        set_exception( error.what(), error.where() );
     }
     catch ( std::exception& error )
     {
-        throw_exception( error.what(), "\nNo stack trace available" );
+        set_exception( error.what(), "\nNo stack trace available" );
     }
     catch ( ... )
     {
-        throw_exception( "An unknown exception was thrown", "\nNo stack trace available" );
+        set_exception( "An unknown exception was thrown", "\nNo stack trace available" );
     }
 
     return 0;
@@ -71,11 +61,11 @@ OOE_NAMESPACE_BEGIN( ( ooe )( facade ) )
 class python
 {
 public:
-    typedef tuple< ooe::python::from_type, PyMethodDef > tuple_type;
+    typedef tuple< ooe::python::from_type, ooe::python::method > tuple_type;
     typedef std::vector< tuple_type > vector_type;
 
     const vector_type& get( void ) const OOE_VISIBLE;
-    void insert( up_t, ooe::python::from_type, PyCFunction ) OOE_VISIBLE;
+    void insert( up_t, ooe::python::from_type, ooe::python::cfunction ) OOE_VISIBLE;
 
     template< typename type >
         void insert( up_t index,
@@ -116,7 +106,7 @@ OOE_NAMESPACE_END( ( ooe )( facade ) )
 
     #define AS( z, n, _ )\
         typename no_ref< t ## n >::type a ## n;\
-        as< typename no_ref< t ## n >::type >::call( PyTuple_GET_ITEM( arguments, n ), a ## n );
+        as< typename no_ref< t ## n >::type >::call( tuple.get( n ), a ## n );
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
@@ -124,25 +114,25 @@ OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
     struct invoke_function< void ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 {
-    static PyObject* call( PyObject* self, PyObject* arguments )
+    static data* call( data* self, data* arguments )
     {
-        verify_arguments( arguments, LIMIT );
+        tuple tuple = verify_arguments( arguments, LIMIT );
 
         void ( * function )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
         as< void ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call( self, function );
 
         BOOST_PP_REPEAT( LIMIT, AS, ~ )
         function( BOOST_PP_ENUM_PARAMS( LIMIT, a ) );
-        Py_RETURN_NONE;
+        return none();
     }
 };
 
 template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     struct invoke_function< r ( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >
 {
-    static PyObject* call( PyObject* self, PyObject* arguments )
+    static data* call( data* self, data* arguments )
     {
-        verify_arguments( arguments, LIMIT );
+        tuple tuple = verify_arguments( arguments, LIMIT );
 
         r ( * function )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) );
         as< r ( * )( BOOST_PP_ENUM_PARAMS( LIMIT, t ) ) >::call( self, function );
@@ -158,33 +148,33 @@ template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
 template< BOOST_PP_ENUM_PARAMS( LIMIT, typename t ) >
     struct invoke_member< t0, void ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 {
-    static PyObject* call( PyObject* self, PyObject* arguments )
+    static data* call( data* self, data* arguments )
     {
-        verify_arguments( arguments, LIMIT );
+        tuple tuple = verify_arguments( arguments, LIMIT );
 
         void ( t0::* member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
         as< void ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >::call( self, member );
 
         t0* a0;
-        as< t0* >::call( PyTuple_GET_ITEM( arguments, 0 ), a0 );
+        as< t0* >::call( tuple.get( 0 ), a0 );
         BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, AS, ~ )
         ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
-        Py_RETURN_NONE;
+        return none();
     }
 };
 
 template< typename r BOOST_PP_ENUM_TRAILING_PARAMS( LIMIT, typename t ) >
     struct invoke_member< t0, r ( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >
 {
-    static PyObject* call( PyObject* self, PyObject* arguments )
+    static data* call( data* self, data* arguments )
     {
-        verify_arguments( arguments, LIMIT );
+        tuple tuple = verify_arguments( arguments, LIMIT );
 
         r ( t0::* member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) );
         as< r ( t0::* )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, t ) ) >::call( self, member );
 
         t0* a0;
-        as< t0* >::call( PyTuple_GET_ITEM( arguments, 0 ), a0 );
+        as< t0* >::call( tuple.get( 0 ), a0 );
         BOOST_PP_REPEAT_FROM_TO( 1, LIMIT, AS, ~ )
         r value = ( a0->*member )( BOOST_PP_ENUM_SHIFTED_PARAMS( LIMIT, a ) );
         return from< r >::call( value );

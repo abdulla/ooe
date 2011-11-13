@@ -3,7 +3,7 @@
 #ifndef OOE_COMPONENT_PYTHON_VM_HPP
 #define OOE_COMPONENT_PYTHON_VM_HPP
 
-#include "component/python/header.hpp"
+#include "component/python/object.hpp"
 #include "foundation/io/descriptor.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
@@ -12,7 +12,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 class OOE_VISIBLE vm
 {
 public:
-    typedef void ( * function_type )( PyObject* );
+    typedef void ( * function_type )( data* );
 
     vm( void );
     ~vm( void );
@@ -25,7 +25,7 @@ public:
     void setup( function_type );
 
 private:
-    PyObject* globals;
+    data* globals;
 };
 
 OOE_NAMESPACE_END( ( ooe )( python ) )
