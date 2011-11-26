@@ -28,7 +28,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     std::cerr << "test virtual texture and font source\n";
 
     std::string root = executable::path()._0;
-    library opengl_library( root + "../lib/libopengl.so", library::global_lazy );
+    library opengl_library( root + "../lib/libopengl" OOE_EXTENSION, library::global_lazy );
 
     event_queue queue;
     view view( queue, width, height, false );
