@@ -3,7 +3,6 @@
 #include <iostream>
 #include <set>
 
-#include "component/javascript/facade.hpp"
 #include "component/lua/facade.hpp"
 #include "component/python/facade.hpp"
 #include "component/registry/builder.hpp"
@@ -92,7 +91,7 @@ extern "C" ooe::module OOE_VISIBLE module_open( void )
 {
     module module;
 
-    builder< facade::remote, facade::lua, facade::javascript, facade::python > builder( module );
+    builder< facade::remote, facade::lua, facade::python > builder( module );
     builder.insert( "hello", hello, "A function that prints 'hello library'." );
     builder.insert( "construct", construct< print, const std::string& >, "Constructs a 'print'." );
     builder.insert( "destruct", destruct< print >, "Destructs a 'print'." );

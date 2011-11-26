@@ -1,7 +1,5 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include "component/javascript/facade.hpp"
-#include "component/javascript/vm.hpp"
 #include "component/lua/facade.hpp"
 #include "component/lua/vm.hpp"
 #include "component/python/facade.hpp"
@@ -73,7 +71,7 @@ private:
     }
 };
 
-typedef unit::group< setup, anonymous_t, 7 > group_type;
+typedef unit::group< setup, anonymous_t, 6 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "registry" );
 
@@ -162,15 +160,6 @@ OOE_TEST void fixture_type::test< 4 >( setup& setup )
 }
 
 OOE_TEST void fixture_type::test< 5 >( setup& setup )
-{
-    std::cerr << "load module in javascript\n";
-
-    std::string executable = setup.path() + "javascript_host";
-    std::string script = setup.path() + "../share/test/script.js";
-    spawn( executable, script );
-}
-
-OOE_TEST void fixture_type::test< 6 >( setup& setup )
 {
     std::cerr << "load module in python\n";
 
