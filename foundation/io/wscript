@@ -11,6 +11,11 @@ def build( context ):
         target = 'io',
         use = 'executable' )
 
+    context.program(
+        source = 'archive_test.cpp directory_test.cpp socket_test.cpp',
+        target = 'io_test',
+        use = 'parallel unit' )
+
 def source( name ):
     if name == 'darwin':
         return 'darwin/directory.cpp darwin/file.cpp darwin/socket.cpp'

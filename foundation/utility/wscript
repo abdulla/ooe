@@ -1,0 +1,7 @@
+## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
+
+def build( context ):
+    context.program(
+        source = 'binary_test.cpp pointer_test.cpp',
+        target = 'utility_test',
+        use = 'unit' )
