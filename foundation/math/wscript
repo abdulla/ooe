@@ -7,3 +7,8 @@ def build( context ):
         linkflags = platform.shlib( 'math' ),
         source = 'camera.cpp geometry.cpp math.cpp',
         target = 'math' )
+
+    context.program(
+        source = 'math_test.cpp',
+        target = 'math_test',
+        use = 'math unit' )
