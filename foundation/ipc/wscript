@@ -11,6 +11,11 @@ def build( context ):
         target = 'ipc',
         use = 'io parallel' )
 
+    context.program(
+        source = 'shared_memory_test.cpp upgrade_test.cpp memory/rpc_test.cpp socket/rpc_test.cpp',
+        target = 'ipc_test',
+        use = 'ipc unit' )
+
 def source( name ):
     if name == 'darwin':
         return 'memory/darwin/transport.cpp'
