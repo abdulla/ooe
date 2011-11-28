@@ -10,6 +10,11 @@ def build( context ):
         target = 'parallel',
         use = 'executable' )
 
+    context.program(
+        source = 'thread_pool_test.cpp',
+        target = 'parallel_test',
+        use = 'parallel unit' )
+
 def source( name ):
     if name == 'darwin':
         return 'darwin/lock.cpp darwin/thread.cpp'
