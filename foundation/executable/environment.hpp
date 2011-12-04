@@ -12,6 +12,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( executable ) )
 void yield( void ) OOE_VISIBLE;
 up_t cpu_cores( void ) OOE_VISIBLE;
 up_t page_size( void ) OOE_VISIBLE;
+up_t cache_line_size( void ) OOE_VISIBLE;
 
 OOE_NAMESPACE_END( ( ooe )( executable ) )
 

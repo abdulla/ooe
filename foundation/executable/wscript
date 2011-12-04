@@ -12,6 +12,6 @@ def build( context ):
 
 def source( name ):
     if name == 'darwin':
-        return 'darwin/program.mm darwin/timer.cpp'
+        return 'darwin/environment.cpp darwin/program.mm darwin/timer.cpp'
     elif name == 'linux':
-        return 'linux/program.cpp linux/timer.cpp'
+        return 'linux/environment.cpp linux/program.cpp linux/timer.cpp'
