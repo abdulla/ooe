@@ -1,9 +1,8 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <cstring>
 #include <iostream>
 #include <iterator>
-
-#include <cstring>
 
 #include "foundation/executable/program.hpp"
 #include "foundation/io/file.hpp"

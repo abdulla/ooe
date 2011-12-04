@@ -1,7 +1,6 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
 #include <algorithm>
-
 #include <cmath>
 
 #include "foundation/math/camera.hpp"

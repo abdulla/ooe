@@ -1,10 +1,9 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <list>
-
-#include <cstdlib>
 
 #include <fcntl.h>
 

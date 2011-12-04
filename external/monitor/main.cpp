@@ -1,8 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include <ctime>
+#include <iostream>
 
 #include <paths.h>
 #include <boost/lexical_cast.hpp>

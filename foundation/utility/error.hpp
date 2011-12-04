@@ -3,9 +3,8 @@
 #ifndef OOE_FOUNDATION_UTILITY_ERROR_HPP
 #define OOE_FOUNDATION_UTILITY_ERROR_HPP
 
-#include <exception>
-
 #include <cstring>
+#include <exception>
 
 #include <cxxabi.h>
 #include <dlfcn.h>

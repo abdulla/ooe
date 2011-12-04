@@ -1,8 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <vector>
-
 #include <cerrno>
+#include <vector>
 
 #include <libv4lconvert.h>
 #include <linux/videodev2.h>

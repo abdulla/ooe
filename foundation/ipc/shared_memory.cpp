@@ -1,8 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include <cerrno>
+#include <iostream>
 
 #include <fcntl.h>
 #include <sys/mman.h>

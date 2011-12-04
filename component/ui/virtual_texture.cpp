@@ -1,8 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include <cmath>
+#include <iostream>
 
 #include "component/ui/virtual_texture.hpp"
 #include "foundation/parallel/thread_pool.hpp"

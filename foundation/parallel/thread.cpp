@@ -1,8 +1,7 @@
 /* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
 
-#include <iostream>
-
 #include <cerrno>
+#include <iostream>
 
 #include "foundation/parallel/thread.hpp"
 #include "foundation/utility/error.hpp"
