@@ -3,7 +3,7 @@
 #ifndef OOE_EXTERNAL_MEMORYRPC_UTILITY_HPP
 #define OOE_EXTERNAL_MEMORYRPC_UTILITY_HPP
 
-#include <cstdlib>
+#include <boost/lexical_cast.hpp>
 
 #include "foundation/utility/error.hpp"
 
@@ -17,10 +17,9 @@ inline up_t parse( s32 argc, c8** argv )
     if ( argc < 2 )
         throw error::runtime( "parse: " ) << "Argument required, none given";
 
-    c8* end;
-    up_t value = std::strtoul( argv[ 1 ], &end, 10 );
+    up_t value = boost::lexical_cast< up_t >( argv[ 1 ] );
 
-    if ( *end || !value )
+    if ( !value )
         throw error::runtime( "parse: " ) << "Invalid argument, integer > 0 required";
 
     return value - 1;

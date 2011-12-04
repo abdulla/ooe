@@ -5,6 +5,7 @@
 #include <ctime>
 
 #include <paths.h>
+#include <boost/lexical_cast.hpp>
 
 #include "foundation/executable/program.hpp"
 #include "foundation/image/jpeg.hpp"
@@ -92,15 +93,15 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
             break;
 
         case 'h':
-            height = static_cast< u16 >( std::strtoul( optarg, 0, 10 ) );
+            height = boost::lexical_cast< u16 >( optarg );
             break;
 
         case 'p':
-            percent = clamp< up_t >( std::strtoul( optarg, 0, 10 ), 1, 99 );
+            percent = clamp< up_t >( boost::lexical_cast< up_t >( optarg ), 1, 99 );
             break;
 
         case 'w':
-            width = static_cast< u16 >( std::strtoul( optarg, 0, 10 ) );
+            width = boost::lexical_cast< u16 >( optarg );
             break;
 
         default:

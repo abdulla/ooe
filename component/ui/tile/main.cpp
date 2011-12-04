@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <cstdlib>
+#include <boost/lexical_cast.hpp>
 
 #include "component/ui/tile_source.hpp"
 #include "foundation/executable/program.hpp"
@@ -42,7 +42,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
             break;
 
         case 'p':
-            page_size = std::strtoul( optarg, 0, 10 );
+            page_size = boost::lexical_cast< u16 >( optarg );
             break;
 
         default:

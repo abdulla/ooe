@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <cstdlib>
+#include <boost/lexical_cast.hpp>
 
 #include "foundation/executable/program.hpp"
 #include "test/unit/program.hpp"
@@ -39,7 +39,7 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
             break;
 
         case 't':
-            timeout = std::strtoul( optarg, 0, 10 );
+            timeout = boost::lexical_cast< time_t >( optarg );
             break;
 
         default:
