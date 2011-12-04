@@ -32,32 +32,32 @@ file::file( const descriptor& desc )
 
 up_t file::read( void* buffer, up_t bytes )
 {
-    sp_t read_ = ::read( get(), buffer, bytes );
+    sp_t result = ::read( get(), buffer, bytes );
 
-    if ( read_ == -1 )
+    if ( result == -1 )
         throw error::io( "file: " ) << "Unable to read: " << error::number( errno );
 
-    return read_;
+    return result;
 }
 
 up_t file::write( const void* buffer, up_t bytes )
 {
-    sp_t wrote = ::write( get(), buffer, bytes );
+    sp_t result = ::write( get(), buffer, bytes );
 
-    if ( wrote == -1 )
+    if ( result == -1 )
         throw error::io( "file: " ) << "Unable to write: " << error::number( errno );
 
-    return wrote;
+    return result;
 }
 
 up_t file::tell( void ) const
 {
-    sp_t told = static_cast< s32 >( lseek( get(), 0, SEEK_CUR ) );
+    sp_t result = static_cast< s32 >( lseek( get(), 0, SEEK_CUR ) );
 
-    if ( told == -1 )
+    if ( result == -1 )
         throw error::io( "file: " ) << "Unable to tell: " << error::number( errno );
 
-    return told;
+    return result;
 }
 
 void file::seek( sp_t offset, seek_type point )
