@@ -23,3 +23,8 @@ def build( context ):
         source = 'surrogate/main.cpp',
         target = 'surrogate/surrogate',
         use = 'registry' )
+
+    context.program(
+        source = 'module_test.cpp registry_test.cpp',
+        target = 'registry_test',
+        use = 'registry unit' )
