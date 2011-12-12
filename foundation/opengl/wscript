@@ -12,6 +12,11 @@ def build( context ):
         target = 'opengl',
         use = 'visual' )
 
+    context.program(
+        source = 'frame_test.cpp texture_test.cpp',
+        target = 'opengl_test',
+        use = 'math unit visual' )
+
 def source( name ):
     if name == 'darwin':
         return 'darwin/context.mm'

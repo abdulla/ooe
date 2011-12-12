@@ -12,3 +12,8 @@ def build( context ):
         system_includes = platform.image.system_includes,
         target = 'image',
         use = 'io' )
+
+    context.program(
+        source = 'image_test.cpp',
+        target = 'image_test',
+        use = 'image unit' )
