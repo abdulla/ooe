@@ -1,8 +1,0 @@
-## Copyright (C) 2010 Abdulla Kamar. All rights reserved. ##
-
-def build( context ):
-    context.program(
-        lib = 'tbb',
-        source = 'virtual_texture_test.cpp',
-        target = 'ui_test',
-        use = 'ui unit' )

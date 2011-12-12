@@ -27,3 +27,9 @@ def build( context ):
         source = 'server/main.cpp',
         target = 'server/ui',
         use = 'ui' )
+
+    context.program(
+        lib = 'tbb',
+        source = 'virtual_texture_test.cpp',
+        target = 'ui_test',
+        use = 'ui unit' )
