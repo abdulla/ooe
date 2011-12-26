@@ -8,7 +8,7 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-typedef unit::group< anonymous_t, anonymous_t, 3 > group_type;
+typedef unit::group< anonymous_t, anonymous_t, 4 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "binary" );
 
@@ -57,6 +57,37 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 
         if ( i == base2 )
             base2 <<= 1;
+    }
+}
+
+OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
+{
+    std::cerr << "saturated_shift\n";
+
+    // shift single byte
+    for ( u16 i = 0; i != 32; ++i )
+    {
+        u32 x = saturated_shift( 1u, i );
+        OOE_CHECK( "saturated_shift( 1u, " << i << " ) == 1u << " << i, x == 1u << i );
+    }
+
+    for ( u16 i = 32; i != 64; ++i )
+    {
+        u32 x = saturated_shift( 1, i );
+        OOE_CHECK( "saturated_shift( 1u, " << i << " ) == 0xffffffff", x == 0xffffffff );
+    }
+
+    // shift multiple bytes
+    for ( u16 i = 0; i != 25; ++i )
+    {
+        u32 x = saturated_shift( 0xffu, i );
+        OOE_CHECK( "saturated_shift( 0xffu, " << i << " ) == 0xffu << " << i, x == 0xffu << i );
+    }
+
+    for ( u16 i = 25; i != 40; ++i )
+    {
+        u32 x = saturated_shift( 0xffu, i );
+        OOE_CHECK( "saturated_shift( 0xffu, " << i << " ) == 0xffffffff", x == 0xffffffff );
     }
 }
 

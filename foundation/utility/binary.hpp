@@ -54,10 +54,11 @@ template< typename t >
 
 //--- saturated_shift ------------------------------------------------------------------------------
 template< typename t >
-    t saturated_shift( t value )
+    t saturated_shift( t value, u8 shift )
 {
-    t mask = 1 << ( sizeof( t ) * 8 - 1 );
-    return value & mask ? ~t( 0 ) : value << 1;
+    u8 bits = sizeof( value ) * 8;
+    t mask = t( 1 ) << ( bits - shift );
+    return shift >= bits || ( shift && value & mask ) ? ~t( 0 ): value << shift;
 }
 
 //--- parity ---------------------------------------------------------------------------------------
