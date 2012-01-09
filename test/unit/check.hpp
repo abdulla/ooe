@@ -8,9 +8,9 @@ do\
 {\
     ooe::unit::fail();\
     std::cerr <<\
-        reason << "\n"\
+        "\n\n" << reason << "\n"\
         "\tFile \"" __FILE__ "\", Line " << __LINE__ << ":\n"\
-        "\t" detail "\n";\
+        "\t" detail;\
 }\
 while ( false )
 
