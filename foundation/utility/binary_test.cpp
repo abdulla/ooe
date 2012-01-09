@@ -18,7 +18,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "is_bit_round\n";
+    std::cerr << "is_bit_round";
 
     for ( u16 i = 0, base2 = 1; i != std::numeric_limits< u16 >::max(); ++i )
     {
@@ -35,7 +35,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 {
-    std::cerr << "bit_round_up\n";
+    std::cerr << "bit_round_up";
 
     for ( u16 i = 0, base2 = 1; i != std::numeric_limits< u16 >::max(); ++i )
     {
@@ -48,7 +48,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 {
-    std::cerr << "bit_round_down\n";
+    std::cerr << "bit_round_down";
 
     for ( u16 i = 0, base2 = 1; i != std::numeric_limits< u16 >::max(); ++i )
     {
@@ -62,7 +62,7 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
 {
-    std::cerr << "saturated_shift\n";
+    std::cerr << "saturated_shift";
 
     // shift single byte
     for ( u16 i = 0; i != 32; ++i )

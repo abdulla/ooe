@@ -45,20 +45,27 @@ inline u32 bit_count( u32 value )
     return value * 0x01010101 >> 24;
 }
 
-//--- bit_shift ------------------------------------------------------------------------------------
+//--- bit_slide ------------------------------------------------------------------------------------
 template< typename t >
-    t bit_shift( t value, s8 slide )
+    t bit_slide( t value, s8 slide )
 {
     return slide < 0 ? value >> -slide : value << slide;
 }
 
 //--- saturated_shift ------------------------------------------------------------------------------
 template< typename t >
-    t saturated_shift( t value, u8 shift )
+    t saturated_shift( t value, s8 shift )
 {
-    u8 bits = sizeof( value ) * 8;
+    s8 bits = sizeof( value ) * 8;
     t mask = t( 1 ) << ( bits - shift );
     return shift >= bits || ( shift && value & mask ) ? ~t( 0 ): value << shift;
+}
+
+//--- saturated_slide ------------------------------------------------------------------------------
+template< typename t >
+    t saturated_slide( t value, s8 slide )
+{
+    return slide < 0 ? value >> -slide : saturated_shift( value, slide );
 }
 
 //--- parity ---------------------------------------------------------------------------------------
