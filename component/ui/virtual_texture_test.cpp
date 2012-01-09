@@ -25,7 +25,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "test virtual texture and font source\n";
+    std::cerr << "virtual_texture and font_source";
 
     std::string root = executable::path()._0;
     library opengl_library( root + "../lib/libopengl" OOE_EXTENSION, library::global_lazy );
@@ -70,7 +70,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
             cache.write();
 
         frame->clear();
-        device->draw( block, frame, instances );
+        device->draw( block, instances, frame );
         device->swap();
 
         event event;

@@ -249,7 +249,7 @@ public:
     device( const ooe::view_data&, bool );
     virtual ~device( void );
 
-    virtual void draw( const block_ptr&, const frame_ptr&, u32 );
+    virtual void draw( const block_ptr&, u32, const frame_ptr& );
     virtual void swap( void );
 
     virtual void set( set_type, bool );
@@ -302,7 +302,7 @@ device::~device( void )
     context_destruct( view, context );
 }
 
-void device::draw( const block_ptr& generic_block, const frame_ptr& frame, u32 instances )
+void device::draw( const block_ptr& generic_block, u32 instances, const frame_ptr& frame )
 {
     if ( !instances )
         throw error::runtime( "opengl::device: " ) << "Number of instances must be > 0";

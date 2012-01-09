@@ -267,7 +267,7 @@ struct device
     };
 
     virtual ~device( void ) {}
-    virtual void draw( const block_ptr&, const frame_ptr&, u32 ) = 0;
+    virtual void draw( const block_ptr&, u32, const frame_ptr& ) = 0;
     virtual void swap( void ) = 0;
 
     virtual void set( set_type, bool ) = 0;

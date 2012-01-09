@@ -46,7 +46,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "test frame buffer\n";
+    std::cerr << "test frame buffer";
 
     std::string root = executable::path()._0;
     library library( root + "../lib/libopengl" OOE_EXTENSION, library::global_lazy );
@@ -80,15 +80,15 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     for ( s32 i = 0; i != 256; ++i )
     {
         frame->clear();
-        device->draw( block, frame, 1 );
+        device->draw( block, 1, frame );
 
         block->input( "depth", 1.f );
         block->input( "colour", 0.f, 1.f, 0.f );
-        device->draw( block, frame, 1 );
+        device->draw( block, 1, frame );
 
         block->input( "depth", 0.f );
         block->input( "colour", 1.f, 0.f, 0.f );
-        device->draw( block, frame, 1 );
+        device->draw( block, 1, frame );
 
         default_frame->write( frame );
         device->swap();

@@ -106,7 +106,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
         block->input( "index", i );
 
         frame->clear();
-        device->draw( block, frame, 1 );
+        device->draw( block, 1, frame );
         device->swap();
 
         event event;
