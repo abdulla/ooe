@@ -4,9 +4,8 @@ import waflib
 
 class compiler:
     defines = []
-    flags = [ '-std=c++98', '-pedantic-errors', '-pipe', '-fstrict-aliasing',
-        '-funit-at-a-time', '-fuse-cxa-atexit', '-fvisibility=hidden',
-        '-fvisibility-inlines-hidden',
+    flags = [ '-std=c++98', '-pedantic-errors', '-pipe', '-fstrict-aliasing', '-funit-at-a-time',
+        '-fuse-cxa-atexit', '-fvisibility=hidden', '-fvisibility-inlines-hidden',
 
         '-Wall', '-Wcast-align', '-Werror', '-Wextra', '-Wfatal-errors', '-Wfloat-equal',
         '-Wformat=2', '-Wmissing-include-dirs', '-Wno-long-long', '-Wnon-virtual-dtor',
@@ -15,7 +14,7 @@ class compiler:
 
     class debug:
         defines = [ '_FORTIFY_SOURCE=2' ]
-        flags = [ '-O0', '-g2', '-fno-inline', '-fstack-protector-all' ]
+        flags = [ '-O0', '-g2', '-fno-common', '-fno-inline', '-fstack-protector-all' ]
 
     class release:
         defines = []
