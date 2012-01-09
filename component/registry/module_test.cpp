@@ -21,7 +21,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "build module\n";
+    std::cerr << "build module";
 
     module module;
     builder< facade::remote > builder( module );

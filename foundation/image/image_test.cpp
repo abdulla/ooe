@@ -45,7 +45,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "uncompressed_image\n";
+    std::cerr << "uncompressed_image";
     ooe::image image( 16, 16, image_format::rgba_u8 );
 
     OOE_CHECK( "image.width == 16", image.width == 16 );
@@ -63,7 +63,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 {
-    std::cerr << "dxt\n";
+    std::cerr << "dxt";
     ooe::image image = make_image< u8 >( 255, 255, 255, image_format::rgba_u8 );
 
     ooe::image dxt1 = dxt::encode( image, image_format::rgba_dxt1 );
@@ -84,7 +84,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 {
-    std::cerr << "dds\n";
+    std::cerr << "dds";
     const c8 path[] = _PATH_TMP "ooe.test.dds";
 
     image_format::type format[] =
@@ -125,7 +125,7 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
 {
-    std::cerr << "jpeg\n";
+    std::cerr << "jpeg";
     const c8 path[] = _PATH_TMP "ooe.test.jpg";
 
     image input[] =
@@ -163,7 +163,7 @@ OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
 {
-    std::cerr << "jpeg2000\n";
+    std::cerr << "jpeg2000";
     const c8 path[] = _PATH_TMP "ooe.test.jp2";
 
     image input[] =
@@ -188,7 +188,7 @@ OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 5 >( anonymous_t& )
 {
-    std::cerr << "png\n";
+    std::cerr << "png";
     const c8 path[] = _PATH_TMP "ooe.test.png";
 
     image input[] =

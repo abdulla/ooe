@@ -19,7 +19,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "iterate through an archive\n";
+    std::cerr << "iterate through an archive";
 
     std::string path = executable::path()._0;
     archive archive( descriptor( path + "../share/test/archive.zip" ) );

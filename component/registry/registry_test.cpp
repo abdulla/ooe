@@ -81,7 +81,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( setup& )
 {
-    std::cerr << "search registry for an interface and list all modules\n";
+    std::cerr << "search registry for an interface and list all modules";
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
@@ -95,7 +95,7 @@ OOE_TEST void fixture_type::test< 0 >( setup& )
 
 OOE_TEST void fixture_type::test< 1 >( setup& setup )
 {
-    std::cerr << "load module in-process\n";
+    std::cerr << "load module in-process";
 
     std::string path = setup.path() + "../lib/libhello" OOE_EXTENSION;
 
@@ -111,7 +111,7 @@ OOE_TEST void fixture_type::test< 1 >( setup& setup )
 
 OOE_TEST void fixture_type::test< 2 >( setup& setup )
 {
-    std::cerr << "load module as surrogate\n";
+    std::cerr << "load module as surrogate";
 
     std::string path = setup.path() + "../lib/libhello" OOE_EXTENSION;
 
@@ -128,7 +128,7 @@ OOE_TEST void fixture_type::test< 2 >( setup& setup )
 
 OOE_TEST void fixture_type::test< 3 >( setup& setup )
 {
-    std::cerr << "insert and load module as server\n";
+    std::cerr << "insert and load module as server";
 
     fork_ptr fork( 0 );
 
@@ -152,7 +152,7 @@ OOE_TEST void fixture_type::test< 3 >( setup& setup )
 
 OOE_TEST void fixture_type::test< 4 >( setup& setup )
 {
-    std::cerr << "load module in lua\n";
+    std::cerr << "load module in lua";
 
     std::string executable = setup.path() + "lua_host";
     std::string script = setup.path() + "../share/test/script.lua";
@@ -161,7 +161,7 @@ OOE_TEST void fixture_type::test< 4 >( setup& setup )
 
 OOE_TEST void fixture_type::test< 5 >( setup& setup )
 {
-    std::cerr << "load module in python\n";
+    std::cerr << "load module in python";
 
     std::string executable = setup.path() + "python_host";
     std::string script = setup.path() + "../share/test/script.py";

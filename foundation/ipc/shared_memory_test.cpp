@@ -17,7 +17,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "mapping the same shared memory region twice\n";
+    std::cerr << "mapping the same shared memory region twice";
 
     const char path[] = "/ooe.test.shared-memory";
     ipc::shared_memory memory_1( path, ipc::shared_memory::create, executable::static_page_size );

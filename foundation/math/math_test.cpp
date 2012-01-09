@@ -16,7 +16,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "is_equal\n";
+    std::cerr << "is_equal";
 
     OOE_CHECK( "1 == 1", is_equal( 1, 1 ) );
     OOE_CHECK( "1 != 2", !is_equal( 1, 2 ) );
@@ -24,7 +24,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 {
-    std::cerr << "radian\n";
+    std::cerr << "radian";
 
     OOE_CHECK( "1 rad == pi", is_equal( radian( pi ), pi ) );
     OOE_CHECK( "180 deg == pi", is_equal( radian( degree( 180 ) ), pi ) );
@@ -32,7 +32,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 {
-    std::cerr << "degree\n";
+    std::cerr << "degree";
 
     OOE_CHECK( "180 deg == 180", is_equal( degree( 180 ), 180 ) );
     OOE_CHECK( "180 deg == pi", is_equal( degree( radian( pi ) ), 180 ) );
@@ -40,7 +40,7 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
 {
-    std::cerr << "vector< 3 >\n";
+    std::cerr << "vector< 3 >";
 
     vec3 v( 0, 1, 2 );
     OOE_CHECK( "v.x == 0", is_equal( v.x, 0 ) );
@@ -96,7 +96,7 @@ OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
 {
-    std::cerr << "matrix< 3 >\n";
+    std::cerr << "matrix< 3 >";
 
     mat4 n( 0, 1, 2, 9,
             3, 4, 5, 9,
@@ -186,7 +186,7 @@ OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 5 >( anonymous_t& )
 {
-    std::cerr << "matrix< 4 >\n";
+    std::cerr << "matrix< 4 >";
 
     mat3 n( 0, 1, 2,
             3, 4, 5,
@@ -293,7 +293,7 @@ OOE_TEST void fixture_type::test< 5 >( anonymous_t& )
 
 OOE_TEST void fixture_type::test< 6 >( anonymous_t& )
 {
-    std::cerr << "quaternion\n";
+    std::cerr << "quaternion";
 
     quat q( 0, 1, 2, 3 );
     OOE_CHECK( "q.x == 0", is_equal( q.x, 0 ) );

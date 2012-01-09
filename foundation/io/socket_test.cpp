@@ -62,7 +62,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( setup& setup )
 {
-    std::cerr << "send/receive descriptor\n";
+    std::cerr << "send/receive descriptor";
 
     u32 value;
     file file( setup.receive() );
@@ -74,7 +74,7 @@ OOE_TEST void fixture_type::test< 0 >( setup& setup )
 
 OOE_TEST void fixture_type::test< 1 >( setup& setup )
 {
-    std::cerr << "poll on shutdown\n";
+    std::cerr << "poll on shutdown";
 
     poll poll;
     poll.insert( setup.get() );
@@ -85,7 +85,7 @@ OOE_TEST void fixture_type::test< 1 >( setup& setup )
 
 OOE_TEST void fixture_type::test< 2 >( setup& )
 {
-    std::cerr << "internet query for localhost\n";
+    std::cerr << "internet query for localhost";
 
     internet_query query( "localhost", "http" );
     std::cout << "Number of addresses for \"localhost\": " <<

@@ -161,7 +161,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( setup& )
 {
-    std::cerr << "test basic primitives\n";
+    std::cerr << "test basic primitives";
 
     //--- list -------------------------------------------------------------------------------------
     typedef ipc::socket::list::result_type::return_type::const_iterator list_iterator;
@@ -199,7 +199,7 @@ OOE_TEST void fixture_type::test< 0 >( setup& )
 
 OOE_TEST void fixture_type::test< 1 >( setup& )
 {
-    std::cerr << "test std::vector, ipc::vector, and ipc::jumbo\n";
+    std::cerr << "test std::vector, ipc::vector, and ipc::jumbo";
 
     //--- std::vector ------------------------------------------------------------------------------
     std_vector svector( executable::static_page_size, '.' );
@@ -224,7 +224,7 @@ OOE_TEST void fixture_type::test< 1 >( setup& )
 
 OOE_TEST void fixture_type::test< 2 >( setup& )
 {
-    std::cerr << "test class member function and garbage collector\n";
+    std::cerr << "test class member function and garbage collector";
 
     ipc::socket::call< construct_ptr< print > ( const std::string& ) >
         print_construct( client, "print_construct" );
@@ -239,7 +239,7 @@ OOE_TEST void fixture_type::test< 2 >( setup& )
 
 OOE_TEST void fixture_type::test< 3 >( setup& )
 {
-    std::cerr << "test exceptions\n";
+    std::cerr << "test exceptions";
 
     ipc::socket::rpc< void ( void ) > out_of_range( client, ~u32( 0 ) );
     OOE_EXCEPT( "out-of-range index", error::runtime, out_of_range()() );

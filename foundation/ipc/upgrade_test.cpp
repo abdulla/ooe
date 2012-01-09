@@ -28,7 +28,7 @@ OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
 OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
-    std::cerr << "test nameservice upgrade\n";
+    std::cerr << "test nameservice upgrade";
 
     ipc::nameservice ns1;
     ns1.insert( "function_1", function_1, "doc 1" );
