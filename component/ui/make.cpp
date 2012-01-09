@@ -23,19 +23,18 @@ box make_box( const property_tree& pt )
 //--- make_aux -------------------------------------------------------------------------------------
 opaque_ptr make_aux( const property_tree& pt, const node_map& map )
 {
-    colour colour = make_colour( pt, 0 );
     boost::optional< std::string > node = pt.get_optional< std::string >( "node" );
     boost::optional< const property_tree& > data = pt.get_child_optional( "data" );
 
     if ( !node || !data )
-        return opaque_ptr( new colour_node( colour, 0 ) );
+        return opaque_ptr( static_cast< s32* >( 0 ) );
 
     node_map::const_iterator i = map.find( *node );
 
     if ( i == map.end() )
         throw error::runtime( "make_tree: " ) << "Unknown node \"" << *node << '\"';
 
-    return opaque_ptr( new colour_node( colour, i->second( *data ) ) );
+    return opaque_ptr( i->second( *data ) );
 }
 
 //--- load_tree ------------------------------------------------------------------------------------
@@ -44,7 +43,9 @@ void load_tree( const property_tree& pt, const node_map& node, box_tree& bt )
     for ( property_tree::const_iterator i = pt.begin(), end = pt.end(); i != end; ++i )
     {
         box box = make_box( i->second );
-        box_tree::iterator j = bt.insert( box, make_aux( i->second, node ) );
+        colour colour = make_colour( i->second );
+        opaque_ptr pointer = make_aux( i->second, node );
+        box_tree::iterator j = bt.insert( box, colour, pointer );
 
         if ( j == bt.end() )
             throw error::runtime( "read_tree: " ) << "Unable to insert box ( " << box.width <<
@@ -123,10 +124,10 @@ program_ptr make_program
 }
 
 //--- make_colour ----------------------------------------------------------------------------------
-colour make_colour( const property_tree& pt, u8 alpha )
+colour make_colour( const property_tree& pt )
 {
     boost::optional< const property_tree& > child = pt.get_child_optional( "colour" );
-    u8 rgba[] = { 0, 0, 0, alpha };
+    u8 rgba[] = { 0, 0, 0, 255 };
 
     if ( child )
     {
@@ -146,7 +147,7 @@ box_tree make_tree( const std::string& path, const node_map& node )
     property_tree pt;
     read_json( canonical_path( path ), pt );
 
-    box_tree bt( make_box( pt ), make_aux( pt, node ) );
+    box_tree bt( make_box( pt ), make_colour( pt ), make_aux( pt, node ) );
     load_tree( pt.get_child( "children" ), node, bt );
     return bt;
 }

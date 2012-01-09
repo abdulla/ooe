@@ -30,6 +30,6 @@ def build( context ):
 
     context.program(
         lib = 'tbb',
-        source = 'virtual_texture_test.cpp',
+        source = 'box_tree_test.cpp virtual_texture_test.cpp',
         target = 'ui_test',
         use = 'ui unit' )

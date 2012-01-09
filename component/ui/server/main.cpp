@@ -160,56 +160,67 @@ void process_events( event_queue& queue, vec3& move, pin_type& pin, epoch_t time
     }
 }
 
-//--- make_unit ------------------------------------------------------------------------------------
-box_unit make_unit( f32 value )
+//--- make_fixed -----------------------------------------------------------------------------------
+fx1664 make_fixed( f32 value )
 {
-    value = std::max( 0.f, value );
-    return box_unit( value, std::fmod( value, 1 ) );
+    return std::max( 0.f, value );
 }
 
-//--- make_input -----------------------------------------------------------------------------------
-u32 make_input( const device_ptr& device, block_ptr& block, const box_tree::box_vector& box,
-    const box_tree::aux_vector& aux, f32 x, f32 y )
+//--- draw_box -------------------------------------------------------------------------------------
+void draw_box( const device_ptr& device, block_ptr& block, const frame_ptr& frame,
+    const box_tree::data_vector& data, f32 x, f32 y, f32 z )
 {
-    u32 box_size = 0;
-
-    for ( box_tree::aux_vector::const_iterator j = aux.begin(), end = aux.end(); j != end; ++j )
-    {
-        if ( static_cast< colour_node* >( j->_4 )->colour.alpha )
-            ++box_size;
-    }
-
-    if ( !box_size )
-        return 0;
-
-    u8 point_size = 5 * sizeof( f32 ) + 4 * sizeof( u8 );
-    buffer_ptr point = device->buffer( point_size * box_size, buffer::point );
+    u8 point_size = 4 * sizeof( f32 ) + 4 * sizeof( u8 );
+    buffer_ptr point = device->buffer( point_size * data.size(), buffer::point );
     {
         map_ptr map = point->map( buffer::write );
-        void* data = map->data;
+        void* map_data = map->data;
 
-        for ( up_t i = box.size(), j = 0; i-- && j != box_size; )
+        for ( box_tree::data_vector::const_iterator i = data.begin(), end = data.end();
+            i != end; ++i )
         {
-            ooe::colour& colour = static_cast< colour_node* >( aux[ i ]._4 )->colour;
+            // scale + translate
+            std::memcpy( map_data, &i->_0, 4 * sizeof( f32 ) );
+            map_data = add< void >( map_data, 4 * sizeof( f32 ) );
 
-            if ( !colour.alpha )
-                continue;
-
-            std::memcpy( data, &box[ i ], 5 * sizeof( f32 ) );
-            data = add< void >( data, 5 * sizeof( f32 ) );
-            std::memcpy( data, &colour, 4 * sizeof( u8 ) );
-            data = add< void >( data, 4 * sizeof( u8 ) );
-
-            ++j;
+            // colour
+            std::memcpy( map_data, &i->_2, 4 * sizeof( u8 ) );
+            map_data = add< void >( map_data, 4 * sizeof( u8 ) );
         }
     }
 
     block->input( "view", x, y );
+    block->input( "depth", z );
     block->input( "scale", block::f32_2, true, point );
     block->input( "translate", block::f32_2, true, point );
-    block->input( "depth", block::f32_1, true, point );
     block->input( "colour", block::u8_4, true, point );
-    return box_size;
+    device->draw( block, data.size(), frame );
+}
+
+//--- draw_aux -------------------------------------------------------------------------------------
+void draw_aux( device_ptr& device, const frame_ptr& frame, const box_tree::data_vector& data,
+    f32 x, f32 y, f32 z )
+{
+    for ( box_tree::data_vector::const_iterator i = data.begin(), end = data.end(); i != end; ++i )
+    {
+        ooe::node* node = static_cast< ooe::node* >( i->_3 );
+
+        if ( !node )
+            continue;
+
+        node::block_tuple bt = node->block( i->_0, i->_1, z );
+        bt._0->input( "view", x, y );
+        bt._0->input( "depth", z );
+        device->draw( bt._0, bt._1, frame );
+    }
+}
+
+//--- draw_layer -----------------------------------------------------------------------------------
+void draw_layer( device_ptr& device, block_ptr& block, const frame_ptr& frame,
+    const box_tree::data_vector& data, f32 x, f32 y, f32 z )
+{
+    draw_box( device, block, frame, data, x, y, z );
+    draw_aux( device, frame, data, x, y, z );
 }
 
 //--- make_block -----------------------------------------------------------------------------------
@@ -237,7 +248,7 @@ public:
             text[ j ].x = i->second.get( "x", 0 );
             text[ j ].y = i->second.get( "y", 0 );
             text[ j ].level = i->second.get( "level", 5 );
-            text[ j ].colour = make_colour( i->second, 255 );
+            text[ j ].colour = make_colour( i->second );
         }
     }
 
@@ -245,18 +256,14 @@ public:
     {
     }
 
-    virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& aux )
+    virtual block_tuple block( const box_tree::data_tuple& box, const box_tree::data_tuple&, f32 z )
     {
         tuple._0->input( "translate", box._2, box._3 );
-        s8 box_level = -box._4;
 
-        if ( box_level == level )
+        if ( level == s8( -z ) )
             return tuple;
 
-        level = box_level;
-        colour& colour = static_cast< colour_node* >( aux._4 )->colour;
-        tuple._0->input( "depth", box._4 );
-        tuple._0->input( "background", colour.red, colour.green, colour.blue, colour.alpha );
+        level = -z;
         tuple._1 = layout.input( tuple._0, text, box._0, level );
         return tuple;
     }
@@ -314,7 +321,8 @@ public:
     {
     }
 
-    virtual block_tuple block( const box_tree::box_tuple& box, const box_tree::aux_tuple& aux )
+    virtual block_tuple block
+        ( const box_tree::data_tuple& box, const box_tree::data_tuple& aux, f32 )
     {
         u32 size = tile.size();
         u8 level_limit = log2f( size / tile.page_size() );
@@ -340,7 +348,6 @@ public:
 
         data->input( "scale", box._0, box._1 );
         data->input( "translate", box._2, box._3 );
-        data->input( "depth", box._4 );
         data->input( "texcoord", u, v );
         return make_tuple( data, 1 );
     }
@@ -379,23 +386,6 @@ private:
     page_cache& cache;
 };
 
-//--- draw_aux -------------------------------------------------------------------------------------
-void draw_aux( device_ptr& device, const frame_ptr& frame, const box_tree::box_vector& box,
-    const box_tree::aux_vector& aux, f32 x, f32 y )
-{
-    for ( up_t i = 0, end = box.size(); i != end; ++i )
-    {
-        ooe::node* node = static_cast< colour_node* >( aux[ i ]._4 )->node;
-
-        if ( !node )
-            continue;
-
-        node::block_tuple bt = node->block( box[ i ], aux[ i ] );
-        bt._0->input( "view", x, y );
-        device->draw( bt._0, frame, bt._1 );
-    }
-}
-
 //--- launch ---------------------------------------------------------------------------------------
 bool launch( const std::string& root, const std::string&, s32, c8** )
 {
@@ -419,7 +409,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     map[ "tile" ] = make_function( tile, &make_tile::operator () );
 
     // box rendering
-    box_tree tree = make_tree( root + "../share/json/ui_tree.json", map );
+    box_tree tree = make_tree( root + "../share/json/box_tree.json", map );
     program_ptr program =
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
 
@@ -431,23 +421,17 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
 
     while ( !executable::has_signal() )
     {
-        box_tree::view_tuple vt =
-            tree.view( width, height, make_unit( move.x ), make_unit( move.y ), move.z );
+        frame->clear();
+        f32 v_x = std::max( 0.f, -move.x * exp2f( move.z ) );
+        f32 v_y = std::max( 0.f, -move.y * exp2f( move.z ) );
+        box_tree::layer_vector layer =
+            tree.view( width, height, make_fixed( move.x ), make_fixed( move.y ), move.z );
 
-        if ( vt._0.size() )
-        {
-            frame->clear();
-            f32 v_x = std::max( 0.f, -move.x * exp2f( move.z ) );
-            f32 v_y = std::max( 0.f, -move.y * exp2f( move.z ) );
-            u32 instances = make_input( device, block, vt._0, vt._1, v_x, v_y );
+        for ( box_tree::layer_vector::const_iterator i = layer.begin(), end = layer.end();
+            i != end; ++i )
+            draw_layer( device, block, frame, *i, v_x, v_y, move.z );
 
-            if ( instances )
-                device->draw( block, frame, instances );
-
-            draw_aux( device, frame, vt._0, vt._1, v_x, v_y );
-            device->swap();
-        }
-
+        device->swap();
         epoch_t timeout( 3600, 0 );
 
         if ( cache.pending() )

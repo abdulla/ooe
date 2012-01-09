@@ -19,27 +19,14 @@ struct node
     typedef tuple< block_ptr, u32 > block_tuple;
 
     virtual ~node( void ) {}
-    virtual block_tuple block( const box_tree::box_tuple&, const box_tree::aux_tuple& ) = 0;
+    virtual block_tuple block( const box_tree::data_tuple&, const box_tree::data_tuple&, f32 ) = 0;
 };
 
-//--- colour_node ----------------------------------------------------------------------------------
-struct colour_node
-{
-    ooe::colour colour;
-    scoped_ptr< ooe::node > node;
-
-    colour_node( ooe::colour colour_, ooe::node* node_ )
-        : colour( colour_ ), node( node_ )
-    {
-    }
-};
-
-typedef tuple< colour, scoped_ptr< node > > node_tuple;
 typedef boost::property_tree::ptree property_tree;
 typedef std::map< std::string, function< node* ( const property_tree& ) > > node_map;
 
 program_ptr make_program( const device_ptr&, const std::string&, const std::string& );
-colour make_colour( const property_tree&, u8 );
+colour make_colour( const property_tree& );
 box_tree make_tree( const std::string&, const node_map& );
 
 OOE_NAMESPACE_END( ( ooe ) )
