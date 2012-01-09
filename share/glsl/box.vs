@@ -1,11 +1,11 @@
 uniform mat4 projection;
 uniform vec2 view;
+uniform float depth;
 attribute vec2 vertex;
 varying vec4 tint;
 
 attribute vec2 scale;
 attribute vec2 translate;
-attribute float depth;
 attribute vec4 colour;
 
 void main( void )
