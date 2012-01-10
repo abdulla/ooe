@@ -26,7 +26,7 @@ typedef boost::property_tree::ptree property_tree;
 typedef std::map< std::string, function< node* ( const property_tree& ) > > node_map;
 
 program_ptr make_program( const device_ptr&, const std::string&, const std::string& );
-colour make_colour( const property_tree& );
+colour make_colour( const property_tree&, u8 );
 box_tree make_tree( const std::string&, const node_map& );
 
 OOE_NAMESPACE_END( ( ooe ) )

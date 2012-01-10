@@ -43,7 +43,7 @@ void load_tree( const property_tree& pt, const node_map& node, box_tree& bt )
     for ( property_tree::const_iterator i = pt.begin(), end = pt.end(); i != end; ++i )
     {
         box box = make_box( i->second );
-        colour colour = make_colour( i->second );
+        colour colour = make_colour( i->second, 0 );
         opaque_ptr pointer = make_aux( i->second, node );
         box_tree::iterator j = bt.insert( box, colour, pointer );
 
@@ -124,10 +124,10 @@ program_ptr make_program
 }
 
 //--- make_colour ----------------------------------------------------------------------------------
-colour make_colour( const property_tree& pt )
+colour make_colour( const property_tree& pt, u8 alpha )
 {
     boost::optional< const property_tree& > child = pt.get_child_optional( "colour" );
-    u8 rgba[] = { 0, 0, 0, 255 };
+    u8 rgba[] = { 0, 0, 0, alpha };
 
     if ( child )
     {
@@ -147,7 +147,7 @@ box_tree make_tree( const std::string& path, const node_map& node )
     property_tree pt;
     read_json( canonical_path( path ), pt );
 
-    box_tree bt( make_box( pt ), make_colour( pt ), make_aux( pt, node ) );
+    box_tree bt( make_box( pt ), make_colour( pt, 0 ), make_aux( pt, node ) );
     load_tree( pt.get_child( "children" ), node, bt );
     return bt;
 }

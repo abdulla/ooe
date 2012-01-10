@@ -248,7 +248,7 @@ public:
             text[ j ].x = i->second.get( "x", 0 );
             text[ j ].y = i->second.get( "y", 0 );
             text[ j ].level = i->second.get( "level", 5 );
-            text[ j ].colour = make_colour( i->second );
+            text[ j ].colour = make_colour( i->second, 255 );
         }
     }
 
@@ -260,10 +260,10 @@ public:
     {
         tuple._0->input( "translate", box._2, box._3 );
 
-        if ( level == s8( -z ) )
+        if ( level == s8( z ) )
             return tuple;
 
-        level = -z;
+        level = z;
         tuple._1 = layout.input( tuple._0, text, box._0, level );
         return tuple;
     }
