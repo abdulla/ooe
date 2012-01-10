@@ -164,7 +164,7 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
             word.width = 0;
             state.last_point = 0;
             utf8::prior( j, text.data.begin() );
-            line = marker( next.i, j, data, 0 );
+            line = word = marker( next.i, j, data, 0 );
             continue;
         }
 
