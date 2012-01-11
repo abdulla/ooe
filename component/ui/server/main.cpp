@@ -168,7 +168,7 @@ fx1664 make_fixed( f32 value )
 
 //--- draw_box -------------------------------------------------------------------------------------
 void draw_box( const device_ptr& device, block_ptr& block, const frame_ptr& frame,
-    const box_tree::data_vector& data, f32 x, f32 y, f32 z )
+    const box_tree::data_vector& data, f32 x, f32 y, s8 z )
 {
     u8 point_size = 4 * sizeof( f32 ) + 4 * sizeof( u8 );
     buffer_ptr point = device->buffer( point_size * data.size(), buffer::point );
@@ -199,7 +199,7 @@ void draw_box( const device_ptr& device, block_ptr& block, const frame_ptr& fram
 
 //--- draw_aux -------------------------------------------------------------------------------------
 void draw_aux( device_ptr& device, const frame_ptr& frame, const box_tree::data_vector& data,
-    f32 x, f32 y, f32 z )
+    f32 x, f32 y, s8 z )
 {
     for ( box_tree::data_vector::const_iterator i = data.begin(), end = data.end(); i != end; ++i )
     {
@@ -217,7 +217,7 @@ void draw_aux( device_ptr& device, const frame_ptr& frame, const box_tree::data_
 
 //--- draw_layer -----------------------------------------------------------------------------------
 void draw_layer( device_ptr& device, block_ptr& block, const frame_ptr& frame,
-    const box_tree::data_vector& data, f32 x, f32 y, f32 z )
+    const box_tree::data_vector& data, f32 x, f32 y, s8 z )
 {
     draw_box( device, block, frame, data, x, y, z );
     draw_aux( device, frame, data, x, y, z );
@@ -256,14 +256,14 @@ public:
     {
     }
 
-    virtual block_tuple block( const box_tree::data_tuple& box, const box_tree::data_tuple&, f32 z )
+    virtual block_tuple block( const box_tree::data_tuple& box, const box_tree::data_tuple&, s8 z )
     {
         tuple._0->input( "translate", box._2, box._3 );
 
-        if ( level == s8( z ) )
+        if ( level == -z )
             return tuple;
 
-        level = z;
+        level = -z;
         tuple._1 = layout.input( tuple._0, text, box._0, level );
         return tuple;
     }
@@ -283,7 +283,7 @@ public:
         const buffer_ptr& point_, page_cache& cache )
         : program( make_program( device, root + "../share/glsl",
         root + "../share/json/text.effect" ) ), index( index_ ), point( point_ ), library(),
-        face( library, root + "../share/font/ubuntu-regular.ttf" ),
+        face( library, root + "../share/font/roboto-regular.ttf" ),
         source( face, 512, root + "../cache" ), layout( device, cache, source )
     {
     }
@@ -322,7 +322,7 @@ public:
     }
 
     virtual block_tuple block
-        ( const box_tree::data_tuple& box, const box_tree::data_tuple& aux, f32 )
+        ( const box_tree::data_tuple& box, const box_tree::data_tuple& aux, s8 )
     {
         u32 size = tile.size();
         u8 level_limit = log2f( size / tile.page_size() );
@@ -409,7 +409,7 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     map[ "tile" ] = make_function( tile, &make_tile::operator () );
 
     // box rendering
-    box_tree tree = make_tree( root + "../share/json/box_tree.json", map );
+    box_tree tree = make_tree( root + "../share/json/ui_tree.json", map );
     program_ptr program =
         make_program( device, root + "../share/glsl", root + "../share/json/box.effect" );
 
@@ -422,14 +422,14 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     while ( !executable::has_signal() )
     {
         frame->clear();
-        f32 v_x = std::max( 0.f, -move.x * exp2f( move.z ) );
-        f32 v_y = std::max( 0.f, -move.y * exp2f( move.z ) );
+        s16 v_z = move.z;
+        f32 v_y = std::max( 0.f, -move.y * exp2f( v_z ) );
+        f32 v_x = std::max( 0.f, -move.x * exp2f( v_z ) );
         box_tree::layer_vector layer =
-            tree.view( width, height, make_fixed( move.x ), make_fixed( move.y ), move.z );
+            tree.view( width, height, make_fixed( move.x ), make_fixed( move.y ), v_z );
 
-        for ( box_tree::layer_vector::const_iterator i = layer.begin(), end = layer.end();
-            i != end; ++i )
-            draw_layer( device, block, frame, *i, v_x, v_y, move.z );
+        for ( s32 i = 0, end = layer.size(); i != end; ++i )
+            draw_layer( device, block, frame, layer[ i ], v_x, v_y, i - v_z );
 
         device->swap();
         epoch_t timeout( 3600, 0 );
@@ -441,7 +441,6 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
         }
 
         process_events( queue, move, pin, timeout );
-        move.z = std::max( 0.f, move.z );
     }
 
     return true;

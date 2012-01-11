@@ -1,6 +1,6 @@
 uniform mat4 projection;
 uniform vec2 view;
-uniform float depth;
+uniform int depth;
 attribute vec2 vertex;
 varying vec4 tint;
 

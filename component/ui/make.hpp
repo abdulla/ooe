@@ -19,7 +19,7 @@ struct node
     typedef tuple< block_ptr, u32 > block_tuple;
 
     virtual ~node( void ) {}
-    virtual block_tuple block( const box_tree::data_tuple&, const box_tree::data_tuple&, f32 ) = 0;
+    virtual block_tuple block( const box_tree::data_tuple&, const box_tree::data_tuple&, s8 ) = 0;
 };
 
 typedef boost::property_tree::ptree property_tree;

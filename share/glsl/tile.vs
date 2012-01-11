@@ -2,7 +2,7 @@ uniform mat4 projection;
 uniform vec2 view;
 uniform vec2 scale;
 uniform vec2 translate;
-uniform float depth;
+uniform int depth;
 uniform vec2 texcoord;
 attribute vec2 vertex;
 varying vec2 coord;
