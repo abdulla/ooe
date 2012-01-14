@@ -138,6 +138,7 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
 
     for ( string_iterator j = next.j, j_end = text.data.end(); j != j_end; )
     {
+        string_iterator prior = j;
         u32 code_point = utf8::next( j, j_end );
 
         // word boundary
@@ -152,8 +153,8 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
         font_source::glyph_type glyph = source.glyph( code_point, level );
         f32 advance = glyph._0.advance * exp2f( shift );
 
-        // line boundary
-        if ( state.x + advance > width )
+        // line boundary (excluding glyphs wider than a line)
+        if ( state.x + advance > width && prior != line.j )
         {
             handle_space( '\n', text, state, limit.zoom );
 
@@ -163,7 +164,7 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
             // if the word is larger than the line width, break up the word
             word.width = 0;
             state.last_point = 0;
-            utf8::prior( j, text.data.begin() );
+            j = prior;
             line = word = marker( next.i, j, data, 0 );
             continue;
         }

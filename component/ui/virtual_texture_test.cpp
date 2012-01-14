@@ -12,8 +12,8 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-const f32 width = 640;
-const f32 height = 480;
+const f32 width = 200;
+const f32 height = 800;
 
 typedef unit::group< anonymous_t, anonymous_t, 1 > group_type;
 typedef group_type::fixture_type fixture_type;
@@ -35,7 +35,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     device_ptr device = opengl_library.find< device_open_type >( "device_open" )( view, true );
 
     font::library font_library;
-    font::face font_face( font_library, root + "../share/font/ubuntu-regular.ttf" );
+    font::face font_face( font_library, root + "../share/font/roboto-regular.ttf" );
     font_source font_source( font_face, 512, root + "../cache" );
 
     thread_pool pool( "pool" );
@@ -47,14 +47,21 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     frame_ptr frame = device->default_frame( width, height );
     const c8 data[] = "AVA V AVA AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz 0123456789";
 
-    text_vector text( 3 );
-    text[ 0 ].data = "test";
-    text[ 0 ].colour = colour( 255, 0, 0, 255 );
-    text[ 1 ].data = "test";
-    text[ 1 ].level = 6;
-    text[ 1 ].colour = colour( 0, 255, 0, 255 );
-    text[ 2 ].level = 5;
-    text[ 2 ].colour = colour( 255, 255, 255, 255 );
+    text_vector text( 5 );
+    text[ 0 ].data = "M";
+    text[ 0 ].colour = colour( 255, 255, 0, 255 );
+    text[ 0 ].level = 8;
+    text[ 1 ].data = "MM";
+    text[ 1 ].colour = colour( 127, 127, 255, 255 );
+    text[ 1 ].level = 7;
+    text[ 2 ].data = "test";
+    text[ 2 ].colour = colour( 255, 0, 0, 255 );
+    text[ 2 ].level = 4;
+    text[ 3 ].data = "test";
+    text[ 3 ].colour = colour( 0, 255, 0, 255 );
+    text[ 3 ].level = 5;
+    text[ 4 ].colour = colour( 255, 255, 255, 255 );
+    text[ 4 ].level = 4;
 
     block_ptr block = program->block( make_index( device ) );
     block->input( "vertex", block::f32_2, false, make_point( device ) );
@@ -63,7 +70,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 
     for ( const c8* i = data, * end = i + sizeof( data ); i != end; ++i )
     {
-        text[ 2 ].data = std::string( data, i + 1 );
+        text[ 4 ].data = std::string( data, i + 1 );
         u32 instances = layout.input( block, text, width, 0 );
 
         while ( cache.pending() )
