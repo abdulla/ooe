@@ -1,3 +1,5 @@
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
+
 vec3 vlookup( vsampler2D sampler, vec2 virtual )
 {
     vec2 dx = dFdx( virtual );

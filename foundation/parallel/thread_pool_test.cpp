@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/parallel/thread_pool.hpp"
 #include "test/unit/check.hpp"

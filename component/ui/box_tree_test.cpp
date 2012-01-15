@@ -1,4 +1,4 @@
-/* Copyright (C) 2011 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #include "component/ui/box_tree.hpp"
 #include "foundation/math/math.hpp"

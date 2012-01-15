@@ -1,3 +1,5 @@
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
+
 {
     "header": [ "virtual_texture.hs" ],
     "vertex": [ "tile.vs" ],

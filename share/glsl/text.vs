@@ -1,3 +1,5 @@
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
+
 uniform mat4 projection;
 uniform vec2 view;
 uniform vec2 translate;

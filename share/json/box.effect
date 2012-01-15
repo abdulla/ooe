@@ -1,3 +1,5 @@
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
+
 {
     "vertex": [ "box.vs" ],
     "fragment": [ "box.fs" ]

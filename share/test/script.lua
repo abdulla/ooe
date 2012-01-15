@@ -1,4 +1,4 @@
--- Copyright (C) 2010 Abdulla Kamar. All rights reserved. --
+-- Copyright (C) 2012 Abdulla Kamar. All rights reserved. --
 
 --- query registry ---------------------------------------------------------------------------------
 local result = ooe.component.find{ 'hello/FvvE' }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #ifndef OOE_FOUNDATION_OPENGL_TEXTURE_HPP
 #define OOE_FOUNDATION_OPENGL_TEXTURE_HPP

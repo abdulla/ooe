@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #ifndef OOE_COMPONENT_UI_TILE_SOURCE_HPP
 #define OOE_COMPONENT_UI_TILE_SOURCE_HPP

@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #include "component/ui/make.hpp"
 #include "component/ui/text_layout.hpp"

@@ -1,3 +1,5 @@
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
+
 #extension GL_EXT_gpu_shader4 : enable
 
 struct vsampler2D

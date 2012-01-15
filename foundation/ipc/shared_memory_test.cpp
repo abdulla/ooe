@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/executable/environment.hpp"
 #include "foundation/ipc/shared_memory.hpp"

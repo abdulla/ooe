@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Abdulla Kamar. All rights reserved. */
+/* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #ifndef OOE_EXTERNAL_MEMORYRPC_UTILITY_HPP
 #define OOE_EXTERNAL_MEMORYRPC_UTILITY_HPP
