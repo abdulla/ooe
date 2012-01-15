@@ -24,7 +24,7 @@ void quit( void ) OOE_VISIBLE;
 
 s32 copy_fd( s32 ) OOE_VISIBLE;
 void move_fd( s32, s32 ) OOE_VISIBLE;
-void null_fd( s32 ) OOE_VISIBLE;
+s32 null_fd( void ) OOE_VISIBLE;
 
 s32 launch( launch_type, s32, c8** ) OOE_VISIBLE;
 path_type path( void ) OOE_VISIBLE;

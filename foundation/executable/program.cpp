@@ -102,7 +102,7 @@ void move_fd( s32 source, s32 target )
             "Unable to close fd " << source << ": " << error::number( errno );
 }
 
-void null_fd( s32 fd )
+s32 null_fd( void )
 {
     s32 null = open( "/dev/null", O_RDWR );
 
@@ -110,7 +110,7 @@ void null_fd( s32 fd )
         throw error::runtime( "executable::null_fd: " ) <<
             "Unable to open /dev/null: " << error::number( errno );
 
-    move_fd( null, fd );
+    return null;
 }
 
 s32 launch( launch_type launch, s32 argc, c8** argv )

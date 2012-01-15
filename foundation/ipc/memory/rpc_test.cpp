@@ -105,7 +105,8 @@ public:
     {
         std::string name = ipc::unique_name();
         ipc::barrier_wait wait( name );
-        fork_ptr( new scoped_fork ).swap( fork );
+        io_triplet io( -1, executable::null_fd(), -1 );
+        fork_ptr( new scoped_fork( io ) ).swap( fork );
 
         if ( fork->is_child() )
         {
@@ -120,7 +121,6 @@ private:
 
     void start_server( const std::string& name ) const
     {
-        executable::null_fd( STDOUT_FILENO );
         ipc::nameservice nameservice;
         nameservice.insert( "print_construct", print_construct );
         nameservice.insert( "print_destruct", print_destruct );

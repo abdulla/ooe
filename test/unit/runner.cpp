@@ -30,7 +30,7 @@ bool run_test( const group_base::const_iterator& i, void* pointer, bool no_stdou
     try
     {
         if ( no_stdout )
-            executable::null_fd( STDOUT_FILENO );
+            executable::move_fd( executable::null_fd(), STDOUT_FILENO );
 
         test_status = true;
         ( *i )( pointer );

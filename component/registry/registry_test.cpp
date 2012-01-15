@@ -59,11 +59,11 @@ private:
     {
         std::string name = ipc::unique_name();
         ipc::barrier_wait wait( name );
-        fork_ptr( new scoped_fork ).swap( fork );
+        io_triplet io( -1, executable::null_fd(), -1 );
+        fork_ptr( new scoped_fork( io ) ).swap( fork );
 
         if ( fork->is_child() )
         {
-            executable::null_fd( STDOUT_FILENO );
             OOE_PRINT( "registry",
                 fork_io::execute( path_ + "registry", "-u", name.c_str(), NULL ) );
             fork_io::exit( false );
