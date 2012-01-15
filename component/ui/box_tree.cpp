@@ -56,7 +56,7 @@ void find_view( const box_tree& tree, box_tree::layer_vector& layer, f32 begin_x
         return;
 
     s16 slide = z - i;
-    box view( saturated_slide( width, -slide ), saturated_slide( height, -slide ),
+    box view( saturated_slide( width, -slide ) + 1, saturated_slide( height, -slide ) + 1,
         x.magnitude(), y.magnitude() );
     box box = tree.box();
     geometry::intersection result = includes( view, box );
