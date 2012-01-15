@@ -56,23 +56,24 @@ void find_view( const box_tree& tree, box_tree::layer_vector& layer, f32 begin_x
         return;
 
     s16 slide = z - i;
-    box view( saturated_slide( width, -slide ) + 1, saturated_slide( height, -slide ) + 1,
-        x.magnitude(), y.magnitude() );
+    u16 view_w = saturated_slide( width, -slide ) + 1;
+    u16 view_h = saturated_slide( height, -slide ) + 1;
+    box view( view_w ? view_w : 0xffff, view_h ? view_h : 0xffff, x.magnitude(), y.magnitude() );
     box box = tree.box();
     geometry::intersection result = includes( view, box );
 
     if ( result == geometry::outside )
         return;
 
-    u32 w = bit_slide< u32 >( box.width, slide );
-    u32 h = bit_slide< u32 >( box.height, slide );
+    u32 out_w = bit_slide< u32 >( box.width, slide );
+    u32 out_h = bit_slide< u32 >( box.height, slide );
 
-    if ( !w || !h )
+    if ( !out_w || !out_h )
         return;
 
     f32 out_x = begin_x + bit_slide< u32 >( box.x, slide );
     f32 out_y = begin_y + bit_slide< u32 >( box.y, slide );
-    box_tree::data_tuple out( w, h, out_x, out_y );
+    box_tree::data_tuple out( out_w, out_h, out_x, out_y );
     box_tree::data_tuple in( 1, 1, 0, 0 );
 
     if ( result == geometry::intersect )
