@@ -7,6 +7,7 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
+//--- check_tree -----------------------------------------------------------------------------------
 void check_tree( const box_tree& tree, const box_tree::iterator& i, u16 width, u16 x )
 {
     OOE_CHECK( "i != tree.end()", i != tree.end() );
@@ -18,6 +19,7 @@ void check_tree( const box_tree& tree, const box_tree::iterator& i, u16 width, u
     OOE_CHECK( box.y << " == " << x, box.y == x );
 }
 
+//--- check_size -----------------------------------------------------------------------------------
 void check_size( const box_tree::layer_vector& layer, up_t size )
 {
     OOE_CHECK( layer.size() << " == " << size, layer.size() == size );
@@ -27,6 +29,7 @@ void check_size( const box_tree::layer_vector& layer, up_t size )
         OOE_CHECK( i->size() << " == 1", i->size() == 1 );
 }
 
+//--- check_data -----------------------------------------------------------------------------------
 void check_data( const box_tree::data_tuple& data, f32 width, f32 x )
 {
     OOE_CHECK( data._0 << " == " << width, is_equal( data._0, width ) );
@@ -35,7 +38,21 @@ void check_data( const box_tree::data_tuple& data, f32 width, f32 x )
     OOE_CHECK( data._3 << " == " << x, is_equal( data._3, x ) );
 }
 
-typedef unit::group< anonymous_t, anonymous_t, 2 > group_type;
+//--- data -----------------------------------------------------------------------------------------
+class data
+{
+public:
+    data( void )
+        : colour( 255, 255, 255, 255 ), pointer( static_cast< s32* >( 0 ) )
+    {
+    }
+
+protected:
+    ooe::colour colour;
+    opaque_ptr pointer;
+};
+
+typedef unit::group< anonymous_t, data, 3 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "box_tree" );
 
@@ -47,20 +64,17 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 {
     std::cerr << "box_tree successive insert";
 
-    colour colour( 0, 0, 0, 0 );
-    opaque_ptr pointer( static_cast< s32* >( 0 ) );
-
     box_tree tree( box( 1 << 10, 1 << 10, 0, 0 ), colour, pointer );
     box_tree::layer_vector layer = tree.view( 1 << 11, 1 << 11, 0, 0, 0 );
     check_size( layer, 1 );
     check_data( layer[ 0 ][ 0 ]._0, 1 << 10, 0 );
     box_tree* leaf = &tree;
-    box_tree::iterator iterator;
 
     // insert successive sub-trees and ensure they've been inserted correctly
-    for ( up_t i = 0; i < 3; ++i )
+    for ( up_t i = 0; i != 5; ++i )
     {
-        iterator = leaf->insert( box( 1 << 10, 1 << 10, 1 << 9, 1 << 9 ), colour, pointer );
+        box_tree::iterator iterator =
+            leaf->insert( box( 1 << 10, 1 << 10, 1 << 9, 1 << 9 ), colour, pointer );
         check_tree( *leaf, iterator, 1 << 10, 1 << 9 );
         leaf = &*iterator;
         layer = tree.view( 1 << 11, 1 << 11, 0, 0, 0 );
@@ -79,9 +93,6 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
 {
     std::cerr << "box_tree insert at offset";
-
-    colour colour( 0, 0, 0, 0 );
-    opaque_ptr pointer( static_cast< s32* >( 0 ) );
 
     box_tree tree( box( 1 << 10, 1 << 10, 0, 0 ), colour, pointer );
     box_tree::layer_vector layer = tree.view( 1 << 11, 1 << 11, 0, 0, 0 );
@@ -102,6 +113,20 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
     check_data( layer[ 0 ][ 0 ]._0, 1 << 10, 0 );
     check_data( layer[ 1 ][ 0 ]._0, 1 << 9, 1 << 8 );
     check_data( layer[ 2 ][ 0 ]._0, 1 << 8, 1 << 8 );
+}
+
+OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
+{
+    std::cerr << "box_tree zoom";
+
+    box_tree tree( box( 1 << 10, 1 << 10, 0, 0 ), colour, pointer );
+
+    for ( up_t i = 0; i != 9; ++i )
+    {
+        box_tree::layer_vector layer = tree.view( 1 << 11, 1 << 11, 1 << 9, 1 << 9, i );
+        check_size( layer, 1 );
+        check_data( layer[ 0 ][ 0 ]._0, 1 << ( 10 + i ), -( 1 << ( 9 + i ) ) );
+    }
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

@@ -70,8 +70,8 @@ void find_view( const box_tree& tree, box_tree::layer_vector& layer, f32 begin_x
     if ( !w || !h )
         return;
 
-    f32 out_x = begin_x + bit_slide( box.x, slide );
-    f32 out_y = begin_y + bit_slide( box.y, slide );
+    f32 out_x = begin_x + bit_slide< u32 >( box.x, slide );
+    f32 out_y = begin_y + bit_slide< u32 >( box.y, slide );
     box_tree::data_tuple out( w, h, out_x, out_y );
     box_tree::data_tuple in( 1, 1, 0, 0 );
 
@@ -187,8 +187,9 @@ box_tree::find_tuple box_tree::find( fx1664 x, fx1664 y )
 
 box_tree::layer_vector box_tree::view( u16 width, u16 height, fx1664 x, fx1664 y, s16 z ) const
 {
-    f32 begin_x = -bit_slide( x, z ).floating_point();
-    f32 begin_y = -bit_slide( y, z ).floating_point();
+    f32 slide = -exp2f( z );
+    f32 begin_x = x.floating_point() * slide;
+    f32 begin_y = y.floating_point() * slide;
     u16 level_limit = std::min( log2f( width ), log2f( height ) );
     layer_vector layer;
     find_view( *this, layer, begin_x, begin_y, width, height, x, y, z, 0, z + level_limit );
