@@ -136,6 +136,12 @@ inline fx1664 saturated_shift( fx1664 fx, s8 s )
     return fx;
 }
 
+inline fx1664 clamped_subtract( fx1664 fx, u16 i )
+{
+    u16 m = fx.magnitude();
+    return fx1664( i > m ? 0 : m - i, i > m ? 0 : fx.fraction() );
+}
+
 OOE_NAMESPACE_END( ( ooe ) )
 
 #endif  // OOE_FOUNDATION_UTILITY_FIXED_POINT_HPP

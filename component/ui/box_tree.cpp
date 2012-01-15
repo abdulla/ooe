@@ -91,11 +91,9 @@ void find_view( const box_tree& tree, box_tree::layer_vector& layer, f32 begin_x
     layer.resize( i < layer.size() ? layer.size() : i + 1 );
     layer[ i ].push_back( make_tuple( out, in, tree.colour(), tree.get() ) );
 
-    x.magnitude( box.x > x.magnitude() ? 0 : x.magnitude() - box.x );
-    x.fraction( box.x > x.magnitude() ? 0 : x.fraction() );
+    x = clamped_subtract( x, box.x );
     x = saturated_shift( x, 1 );
-    y.magnitude( box.y > y.magnitude() ? 0 : y.magnitude() - box.y );
-    y.fraction( box.y > y.magnitude() ? 0 : y.fraction() );
+    y = clamped_subtract( y, box.y );
     y = saturated_shift( y, 1 );
 
     for ( box_tree::const_iterator j = tree.begin(), j_end = tree.end(); j != j_end; ++j )
