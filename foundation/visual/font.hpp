@@ -61,8 +61,7 @@ public:
     enum number_type
     {
         glyphs,
-        strikes,
-        first
+        strikes
     };
 
     face( const library&, const descriptor& );
@@ -71,6 +70,7 @@ public:
     std::string string( string_type ) const;
     u32 number( number_type ) const;
 
+    u32 glyph_index( u32 ) const;
     f32 kerning( u32, u32, u32 ) const;
     font::bitmap bitmap( u32, u32 ) const;
 

@@ -37,10 +37,10 @@ struct state
     f32 x;
     f32 y;
     u32 font_size;
-    u32 last_point;
+    u32 last_index;
 
-    state( f32 x_, f32 y_, u32 font_size_, u32 last_point_ )
-        : x( x_ ), y( y_ ), font_size( font_size_ ), last_point( last_point_ )
+    state( f32 x_, f32 y_, u32 font_size_, u32 last_index_ )
+        : x( x_ ), y( y_ ), font_size( font_size_ ), last_index( last_index_ )
     {
     }
 };
@@ -95,15 +95,15 @@ bool handle_space( u32 code_point, const text& text, state& state, s8 zoom )
 }
 
 void add_glyph( const font_source::glyph_type& glyph, const colour& colour, const state& state,
-    void* data, u32 size, s8 shift, u8 level )
+    void* data, u32 size, s8 slide, u8 level )
 {
     const font::metric& metric = glyph._0;
 
     f32* coords = add< f32 >( data, 0 );
-    coords[ 0 ] = bit_slide( metric.width, shift );
-    coords[ 1 ] = bit_slide( metric.height, shift );
-    coords[ 2 ] = std::floor( state.x + bit_slide( metric.left, shift ) );
-    coords[ 3 ] = std::ceil( state.y + state.font_size - bit_slide( metric.top, shift ) );
+    coords[ 0 ] = bit_slide( metric.width, slide );
+    coords[ 1 ] = bit_slide( metric.height, slide );
+    coords[ 2 ] = std::floor( state.x + bit_slide( metric.left, slide ) );
+    coords[ 3 ] = std::ceil( state.y + state.font_size - bit_slide( metric.top, slide ) );
 
     coords[ 4 ] = divide( metric.width << level, size );
     coords[ 5 ] = divide( metric.height << level, size );
@@ -133,7 +133,8 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
     state.y = std::max< f32 >( state.y, bit_slide( text.y, limit.zoom ) );
     f32 width = limit.width - bit_slide( text.x, limit.zoom );
     void* data = next.data;
-    s8 shift = inverse_clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
+    s8 slide = inverse_clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
+    f32 multiplier = exp2f( slide );
     u8 level = limit.max - clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
 
     for ( string_iterator j = next.j, j_end = text.data.end(); j != j_end; )
@@ -147,11 +148,13 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
             word = marker( next.i, j, data, 0 );
             continue;
         }
-        else if ( state.last_point )
-            state.x += source.kerning( state.last_point, code_point, level ) * exp2f( shift );
 
-        font_source::glyph_type glyph = source.glyph( code_point, level );
-        f32 advance = glyph._0.advance * exp2f( shift );
+        u32 glyph_index = source.glyph_index( code_point );
+        font_source::glyph_type glyph = source.glyph( glyph_index, level );
+        f32 advance = glyph._0.advance * multiplier;
+
+        if ( state.last_index )
+            state.x += source.kerning( state.last_index, glyph_index, level ) * multiplier;
 
         // line boundary (excluding glyphs wider than a line)
         if ( state.x + advance > width && prior != line.j )
@@ -163,19 +166,19 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
 
             // if the word is larger than the line width, break up the word
             word.width = 0;
-            state.last_point = 0;
+            state.last_index = 0;
             j = prior;
             line = word = marker( next.i, j, data, 0 );
             continue;
         }
 
         texture.load( glyph._0.width, glyph._0.height, glyph._1, glyph._2, level );
-        add_glyph( glyph, text.colour, state, data, limit.size, shift, level );
+        add_glyph( glyph, text.colour, state, data, limit.size, slide, level );
 
         data = add< void >( data, point_size );
         state.x += advance;
         word.width += advance;
-        state.last_point = code_point;
+        state.last_index = glyph_index;
     }
 
     text_iterator i = next.i + 1;

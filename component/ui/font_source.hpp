@@ -24,6 +24,7 @@ public:
     virtual image_format::type format( void ) const;
 
     u16 font_size( void ) const;
+    u32 glyph_index( u32 ) const;
     f32 kerning( u32, u32, u8 ) const;
     glyph_type glyph( u32, u8 ) const;
 
@@ -34,7 +35,6 @@ private:
 
     const u32 source_size;
     const u32 glyphs;
-    const u32 first;
     const u8 level_limit;
 
     mutable ooe::mutex mutex;
