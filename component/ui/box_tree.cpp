@@ -186,9 +186,9 @@ box_tree::find_tuple box_tree::find( fx1664 x, fx1664 y )
 
 box_tree::layer_vector box_tree::view( u16 width, u16 height, fx1664 x, fx1664 y, s16 z ) const
 {
-    f32 slide = -exp2f( z );
-    f32 begin_x = x.floating_point() * slide;
-    f32 begin_y = y.floating_point() * slide;
+    f32 multiplier = -exp2f( z );
+    f32 begin_x = x.floating_point() * multiplier;
+    f32 begin_y = y.floating_point() * multiplier;
     u16 level_limit = std::min( log2f( width ), log2f( height ) );
     layer_vector layer;
     find_view( *this, layer, begin_x, begin_y, width, height, x, y, z, 0, z + level_limit );
