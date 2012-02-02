@@ -40,12 +40,12 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
         OOE_CHECK( "not found: " << i, found == cache.end() );
     }
 
-    for ( u32 i = 16; i != 32; ++i )
+    u32 j = 16;
+
+    for ( cache_type::const_iterator i = cache.begin(), end = cache.end(); i != end; ++i, ++j )
     {
-        cache_type::const_iterator found = cache.find( i );
-        OOE_CHECK( "found: " << i, found != cache.end() );
-        OOE_CHECK( i << " == " << found->first, i == found->first );
-        OOE_CHECK( i << " == " << found->second, i == found->second );
+        OOE_CHECK( j << " == " << i->first, j == i->first );
+        OOE_CHECK( j << " == " << i->second, j == i->second );
     }
 }
 
