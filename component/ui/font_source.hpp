@@ -5,6 +5,7 @@
 
 #include "component/ui/virtual_texture.hpp"
 #include "foundation/parallel/lock.hpp"
+#include "foundation/utility/fixed_cache.hpp"
 #include "foundation/visual/font.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -29,6 +30,10 @@ public:
     glyph_type glyph( u32, u8 ) const;
 
 private:
+    typedef fixed_cache< u32, u32 > index_cache_type;
+    typedef fixed_cache< tuple< u32, u32 >, f32 > kerning_cache_type;
+
+    mutable ooe::mutex mutex;
     const font::face& face;
     const u16 face_size;
     const std::string root;
@@ -37,7 +42,8 @@ private:
     const u32 glyphs;
     const u8 level_limit;
 
-    mutable ooe::mutex mutex;
+    mutable index_cache_type index_cache;
+    mutable kerning_cache_type kerning_cache;
     ooe::memory memory;
 
     virtual image read( const pyramid_index& );

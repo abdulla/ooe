@@ -3,6 +3,8 @@
 #include <cctype>
 #include <cmath>
 
+#include <boost/functional/hash.hpp>
+
 #include "component/ui/font_source.hpp"
 #include "foundation/io/directory.hpp"
 #include "foundation/io/file.hpp"
@@ -10,6 +12,18 @@
 #include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
 #include "foundation/utility/miscellany.hpp"
+
+OOE_NAMESPACE_BEGIN( ( std )( tr1 ) )
+
+template<>
+    inline up_t hash< tuple< u32, u32 > >::operator ()( tuple< u32, u32 > t ) const
+{
+    up_t result = boost::hash< u32 >()( t._0 );
+    boost::hash_combine( result, t._1 );
+    return result;
+}
+
+OOE_NAMESPACE_END( ( std )( tr1 ) )
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
@@ -87,12 +101,10 @@ void copy_partial( image& image, const font::bitmap& bitmap, u16 x, u16 y )
 
     u8* target = image.as< u8 >();
     const u8* source = bitmap.data + x * 3 + y * bitmap.pitch;
-
     u16 width = std::min< u16 >( page_wide, bitmap.metric.width - x );
     u16 height = std::min< u16 >( page_wide, bitmap.metric.height - y );
 
-    for ( u16 i = 0; i != height;
-        ++i, target += row_size( image ), source += bitmap.pitch )
+    for ( u16 i = 0; i != height; ++i, target += row_size( image ), source += bitmap.pitch )
         copy_row( source + ( x ? 0 : 3 ), target, width );
 }
 
@@ -100,10 +112,11 @@ void copy_square( image& image, const font::bitmap& bitmap, u16 x, u16 y )
 {
     u8* target = image.as< u8 >() + ( x + y * image.width ) * 4;
     const u8* source = bitmap.data;
+    u16 width = std::min< u16 >( page_wide - x, bitmap.metric.width );
+    u16 height = std::min< u16 >( page_wide - y, bitmap.metric.height );
 
-    for ( u16 i = 0; i != bitmap.metric.height;
-        ++i, target += row_size( image ), source += bitmap.pitch )
-        copy_row( source + 3, target, bitmap.metric.width );
+    for ( u16 i = 0; i != height; ++i, target += row_size( image ), source += bitmap.pitch )
+        copy_row( source + 3, target, width );
 }
 
 const image& write_image( const image& image, const std::string& path )
@@ -131,9 +144,10 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- font_source ----------------------------------------------------------------------------------
 font_source::font_source( const font::face& face_, u16 face_size_, const std::string& root_ )
-    : face( face_ ), face_size( check_size( face_size_ ) ), root( get_root( root_, face ) ),
-    source_size( get_size( face, face_size ) ), glyphs( face.number( font::face::glyphs ) ),
-    level_limit( log2f( source_size / page_wide ) ), mutex(),
+    : mutex(), face( face_ ), face_size( check_size( face_size_ ) ),
+    root( get_root( root_, face ) ), source_size( get_size( face, face_size ) ),
+    glyphs( face.number( font::face::glyphs ) ), level_limit( log2f( source_size / page_wide ) ),
+    index_cache( 1 << 9 ), kerning_cache( 1 << 14 ),
     memory( open_memory( root, glyphs, level_limit + 1 ) )
 {
 }
@@ -164,14 +178,29 @@ u16 font_source::font_size( void ) const
 
 u32 font_source::glyph_index( u32 code_point ) const
 {
+    index_cache_type::const_iterator i = index_cache.find( code_point );
+
+    if ( i != index_cache.end() )
+        return i->second;
+
     lock lock( mutex );
-    return face.glyph_index( code_point );
+    u32 index = face.glyph_index( code_point );
+    index_cache.insert( std::make_pair( code_point, index ) );
+    return index;
 }
 
 f32 font_source::kerning( u32 left, u32 right, u8 level ) const
 {
+    kerning_cache_type::key_type key( left, right );
+    kerning_cache_type::const_iterator i = kerning_cache.find( key );
+
+    if ( i != kerning_cache.end() )
+        return i->second;
+
     lock lock( mutex );
-    return face.kerning( left, right, face_size >> level );
+    f32 advance = face.kerning( left, right, face_size >> level );
+    kerning_cache.insert( std::make_pair( key, advance ) );
+    return advance;
 }
 
 font_source::glyph_type font_source::glyph( u32 glyph_index_, u8 level ) const
