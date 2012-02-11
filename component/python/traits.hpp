@@ -40,10 +40,10 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_sequence< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference container )
+    static void call( data* data_, typename call_traits< t >::reference container )
     {
         typedef typename no_ref< t >::type type;
-        list list( data );
+        list list( data_ );
         up_t array_size = list.size();
 
         type out;
@@ -82,10 +82,10 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_set< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference set )
+    static void call( data* data_, typename call_traits< t >::reference set )
     {
         typedef typename no_ref< t >::type type;
-        python::set py_set( data );
+        python::set py_set( data_ );
         iterator iterator = py_set.get();
         object item;
 
@@ -122,10 +122,10 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_map< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference map )
+    static void call( data* data_, typename call_traits< t >::reference map )
     {
         typedef typename no_ref< t >::type type;
-        dictionary dictionary( data );
+        dictionary dictionary( data_ );
         type out;
 
         for ( dictionary::tuple tuple( 0, 0, 0 ); dictionary.next( tuple ); )
@@ -165,9 +165,9 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_pair< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference pair )
+    static void call( data* data_, typename call_traits< t >::reference pair )
     {
-        tuple tuple( data );
+        tuple tuple( data_ );
         up_t tuple_size = tuple.size();
 
         if ( tuple_size != 2 )
@@ -219,10 +219,10 @@ OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 template< typename t >
     struct as< t, typename enable_if_c< tuple_size< t >::value == LIMIT >::type >
 {
-    static void call( data* data,
+    static void call( data* data_,
         typename call_traits< t >::reference BOOST_PP_EXPR_IF( LIMIT, tuple ) )
     {
-        python::tuple py_tuple( data );
+        python::tuple py_tuple( data_ );
         up_t tuple_size = py_tuple.size();
 
         if ( tuple_size != LIMIT )

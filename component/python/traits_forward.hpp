@@ -21,9 +21,9 @@ template< typename t >
 
 //--- destroy --------------------------------------------------------------------------------------
 template< typename t >
-    void destroy( data* data )
+    void destroy( data* data_ )
 {
-    delete static_cast< t* >( capsule( data ).pointer() );
+    delete static_cast< t* >( capsule( data_ ).pointer() );
 }
 
 //--- traits: default ------------------------------------------------------------------------------
@@ -50,9 +50,9 @@ template< typename NO_SPECIALISATION_DEFINED, typename = void >
 template< typename t >
     struct as< t, typename enable_if< is_empty< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference )
+    static void call( data* data_, typename call_traits< t >::reference )
     {
-        if ( !is_none( data ) )
+        if ( !is_none( data_ ) )
             throw error::python() << "Object is not none";
     }
 };
@@ -70,9 +70,9 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< component::is_boolean< t > >::type >
 {
-    static void call( data* data, bool& boolean )
+    static void call( data* data_, bool& boolean )
     {
-        boolean = python::boolean( data ).get();
+        boolean = python::boolean( data_ ).get();
     }
 };
 
@@ -89,9 +89,9 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< component::is_integral< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference integral )
+    static void call( data* data_, typename call_traits< t >::reference integral )
     {
-        integral = python::integral( data ).get();
+        integral = python::integral( data_ ).get();
     }
 };
 
@@ -108,9 +108,9 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< component::is_floating_point< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference floating_point )
+    static void call( data* data_, typename call_traits< t >::reference floating_point )
     {
-        floating_point = python::floating_point( data ).get();
+        floating_point = python::floating_point( data_ ).get();
     }
 };
 
@@ -127,9 +127,9 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_string< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference string )
+    static void call( data* data_, typename call_traits< t >::reference string )
     {
-        string::tuple tuple = python::string( data ).get();
+        string::tuple tuple = python::string( data_ ).get();
         string = string_make< typename no_ref< t >::type >( tuple._0, tuple._1 );
     }
 };
@@ -147,10 +147,10 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< component::is_pointer< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference pointer )
+    static void call( data* data_, typename call_traits< t >::reference pointer )
     {
         typedef typename no_ref< t >::type type;
-        pointer = get_pointer< typename no_qual< t >::type >( capsule( data ) );
+        pointer = get_pointer< typename no_qual< t >::type >( capsule( data_ ) );
     }
 };
 
@@ -168,11 +168,11 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< component::is_class< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference class_ )
+    static void call( data* data_, typename call_traits< t >::reference class_ )
     {
         typedef typename no_ref< t >::type type;
         typedef typename remove_member_const< type >::type meta_type;
-        class_ = *get_pointer< meta_type >( capsule( data ) );
+        class_ = *get_pointer< meta_type >( capsule( data_ ) );
     }
 };
 
@@ -211,10 +211,10 @@ template< typename t >
 template< typename t >
     struct as< t, typename enable_if< is_destruct< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference destruct )
+    static void call( data* data_, typename call_traits< t >::reference destruct )
     {
         typedef typename t::value_type type;
-        capsule capsule( data );
+        capsule capsule( data_ );
         destruct = get_pointer< type >( capsule );
         capsule.reset();
     }
@@ -234,10 +234,10 @@ template< typename INVALID_USAGE >
 template< typename t >
     struct as< t, typename enable_if< is_array< t > >::type >
 {
-    static void call( data* data, typename call_traits< t >::reference array )
+    static void call( data* data_, typename call_traits< t >::reference array )
     {
         typedef typename no_ref< t >::type type;
-        list list( data );
+        list list( data_ );
         up_t py_size = list.size();
         up_t array_size = extent< type >::value;
 

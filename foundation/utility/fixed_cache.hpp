@@ -23,13 +23,13 @@ public:
 	typedef std::tr1::unordered_map< key_type, const_iterator > map_type;
 	typedef std::pair< const_iterator, bool > insert_type;
 
-	fixed_cache( size_t max_ )
+	fixed_cache( std::size_t max_ )
 		: max( max_ ), list(), map( 0 )
 	{
 		// map.reserve( max );
 	}
 
-	size_t size( void ) const
+	std::size_t size( void ) const
 	{
 		return map.size();
 	}
@@ -77,7 +77,7 @@ public:
 	}
 
 private:
-	size_t max;
+	std::size_t max;
 	list_type list;
 	map_type map;
 };

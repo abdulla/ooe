@@ -7,9 +7,9 @@
 OOE_NAMESPACE_BEGIN( ( ooe )( python ) )
 
 //--- is_none --------------------------------------------------------------------------------------
-bool is_none( data* data )
+bool is_none( data* data_ )
 {
-    return data == Py_None;
+    return data_ == Py_None;
 }
 
 //--- none -----------------------------------------------------------------------------------------
@@ -129,8 +129,8 @@ object object::str( void ) const
 }
 
 //--- capsule --------------------------------------------------------------------------------------
-capsule::capsule( void* pointer_, component::throw_type function_, destructor destructor )
-    : object_base( PyCapsule_New( pointer_, 0, destructor ) )
+capsule::capsule( void* pointer_, component::throw_type function_, destructor destructor_ )
+    : object_base( PyCapsule_New( pointer_, 0, destructor_ ) )
 {
     if ( PyCapsule_SetContext( data, ptr_cast( function_ ) ) )
     {
