@@ -13,14 +13,10 @@ platform::context_type context_construct( const ooe::view_data& view )
 {
     NSOpenGLPixelFormatAttribute attribute[] =
     {
-        NSOpenGLPFAColorSize,       24,
-        NSOpenGLPFAAlphaSize,       8,
-        NSOpenGLPFADepthSize,       24,
-        NSOpenGLPFAStencilSize,     0,
-
-        NSOpenGLPFADoubleBuffer,    true,
-        NSOpenGLPFANoRecovery,      true,
-        NSOpenGLPFAAccelerated,     true,
+    //  NSOpenGLPFAOpenGLProfile,   NSOpenGLProfileVersion3_2Core,
+        NSOpenGLPFADepthSize,       32,
+        NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAAllowOfflineRenderers,
         0
     };
 
@@ -35,10 +31,7 @@ platform::context_type context_construct( const ooe::view_data& view )
 
     if ( !nsgl )
         throw error::runtime( "opengl: " ) << "Unable to create context";
-    else if ( CGLEnable( static_cast< CGLContextObj >( nsgl.CGLContextObj ), kCGLCEMPEngine ) )
-        throw error::runtime( "opengl: " ) << "Unable to enable multi-threaded execution";
-
-    if ( view.window )
+    else if ( view.window )
         [ nsgl setView: view.window.contentView ];
     else
         [ nsgl setFullScreen ];
