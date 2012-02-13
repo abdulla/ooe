@@ -54,7 +54,7 @@ extern "C" void OOE_VISIBLE context_open( const ooe::view_data& view )
 {
     ooe::s32 attributes[] =
     {
-        GLX_DEPTH_SIZE,     32,
+        GLX_DEPTH_SIZE,     24,
         GLX_DOUBLEBUFFER,
         0
     };
