@@ -9,7 +9,6 @@ import share.waf
 
 preproc.strict_quotes = 1
 top = '.'
-out = '/' + os.readlink( '/tmp' ) + '/ooe'
 
 def options( context ):
     context.load( 'compiler_c compiler_cxx' )
@@ -30,6 +29,14 @@ def options( context ):
         dest = 'debug',
         help = 'Configures a release build' )
 
+    group.add_option(
+        '-o',
+        '--out',
+        default = '/' + os.readlink( '/tmp' ) + '/ooe',
+        dest = 'out',
+        help = 'Directory for build output [default: %default]',
+        type = 'string' )
+
 def configure( context ):
     platform, compiler = choose( context )
 
@@ -49,11 +56,14 @@ def build( context ):
     context.recurse( 'component external foundation test' )
 
 def install( context ):
-    if context.cmd == 'install':
+    if context.cmd != 'install':
         return
 
     context.path.find_or_declare( 'log' ).mkdir()
-    context.symlink_as( '${PREFIX}/share', context.path.find_dir( 'share' ).abspath() )
+    context.symlink_as(
+        '${PREFIX}/share', context.path.find_dir( 'share' ).abspath(), postpone = False )
+    context.install_files(
+        '${PREFIX}/bin', context.path.find_resource( 'share/xml/Info.plist' ), postpone = False )
 
 def choose( context ):
     if sys.platform.startswith( 'darwin' ):
@@ -64,6 +74,9 @@ def choose( context ):
         from share.waf.gcc import compiler
     else:
         context.fatal( 'Unknown platform: ' + sys.platform )
+
+    global out
+    out = context.options.out
 
     variant = compiler.debug if context.options.debug else compiler.release
     compiler.flags.extend( variant.flags )
