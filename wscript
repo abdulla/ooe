@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ## Copyright (C) 2012 Abdulla Kamar. All rights reserved. ##
 
 import os
@@ -9,6 +10,7 @@ import share.waf
 
 preproc.strict_quotes = 1
 top = '.'
+out = '/' + os.readlink( '/tmp' ) + '/ooe'
 
 def options( context ):
     context.load( 'compiler_c compiler_cxx' )
@@ -28,14 +30,6 @@ def options( context ):
         action = 'store_false',
         dest = 'debug',
         help = 'Configures a release build' )
-
-    group.add_option(
-        '-o',
-        '--out',
-        default = '/' + os.readlink( '/tmp' ) + '/ooe',
-        dest = 'out',
-        help = 'Directory for build output [default: %default]',
-        type = 'string' )
 
 def configure( context ):
     platform, compiler = choose( context )
@@ -74,9 +68,6 @@ def choose( context ):
         from share.waf.gcc import compiler
     else:
         context.fatal( 'Unknown platform: ' + sys.platform )
-
-    global out
-    out = context.options.out
 
     variant = compiler.debug if context.options.debug else compiler.release
     compiler.flags.extend( variant.flags )
