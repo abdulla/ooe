@@ -155,7 +155,12 @@ page_cache::page_cache
     : pool( pool_ ), page_size_( check_page_size( size ) ), format_( cache_format ),
     array( make_array( device, format_, page_size_ ) ), list(), map(), pages(), loads( 0 ), queue()
 {
-    for ( u16 i = 0, end = device->limit( device::array_size ); i != end; ++i )
+    u16 array_size = device->limit( device::array_size );
+
+    if ( !array_size )
+        throw error::runtime( "page_cache: " ) << "Device does not support texture arrays";
+
+    for ( u16 i = 0; i != array_size; ++i )
         list.push_back( cache_type( i, key_type( 0, pyramid_index() ), false ) );
 }
 
@@ -225,7 +230,7 @@ void page_cache::write( void )
         for ( ; page != end && page->_2; ++page ) {}
 
         if ( page == end )
-            throw error::runtime( "virtual_texture: " ) << "All pages are locked";
+            throw error::runtime( "page_cache: " ) << "All pages are locked";
 
         // if page has been previously assigned, evict entry
         if ( page->_1._0 )
