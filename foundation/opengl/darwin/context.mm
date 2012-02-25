@@ -16,6 +16,7 @@ platform::context_type context_construct( const ooe::view_data& view )
         NSOpenGLPFAOpenGLProfile,   NSOpenGLProfileVersion3_2Core,
         NSOpenGLPFADepthSize,       24,
         NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAAccelerated,
         NSOpenGLPFAAllowOfflineRenderers,
         0
     };
