@@ -93,15 +93,15 @@ void load_symbols( void )
     ReadPixels = find< ReadPixels_t >( "glReadPixels" );
     Clear = find< Clear_t >( "glClear" );
 
-    GenVertexArrays = find< GenVertexArrays_t >( "glGenVertexArrays" OOE_APPLE_SYMBOL );
-    DeleteVertexArrays = find< DeleteVertexArrays_t >( "glDeleteVertexArrays" OOE_APPLE_SYMBOL );
-    BindVertexArray = find< BindVertexArray_t >( "glBindVertexArray" OOE_APPLE_SYMBOL );
+    GenVertexArrays = find< GenVertexArrays_t >( "glGenVertexArrays" );
+    DeleteVertexArrays = find< DeleteVertexArrays_t >( "glDeleteVertexArrays" );
+    BindVertexArray = find< BindVertexArray_t >( "glBindVertexArray" );
     EnableVertexAttribArray = find< EnableVertexAttribArray_t >( "glEnableVertexAttribArray" );
     VertexAttribPointer = find< VertexAttribPointer_t >( "glVertexAttribPointer" );
     VertexAttribDivisor = find< VertexAttribDivisor_t >( "glVertexAttribDivisorARB" );
 
     DrawBuffers = find< DrawBuffers_t >( "glDrawBuffers" );
-    DrawElementsInstanced = find< DrawElementsInstanced_t >( "glDrawElementsInstancedARB" );
+    DrawElementsInstanced = find< DrawElementsInstanced_t >( "glDrawElementsInstanced" );
 }
 
 //--- functions ------------------------------------------------------------------------------------

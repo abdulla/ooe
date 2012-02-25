@@ -6,8 +6,6 @@
 #include "foundation/utility/fundamental.hpp"
 #include "foundation/utility/macro.hpp"
 
-#include OOE_PATH( foundation/opengl, symbol_forward.hpp )
-
 OOE_NAMESPACE_BEGIN( ( ooe )( opengl ) )
 
 //--- load_symbols ---------------------------------------------------------------------------------

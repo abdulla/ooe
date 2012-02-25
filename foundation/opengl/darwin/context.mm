@@ -13,7 +13,7 @@ platform::context_type context_construct( const ooe::view_data& view )
 {
     NSOpenGLPixelFormatAttribute attribute[] =
     {
-    //  NSOpenGLPFAOpenGLProfile,   NSOpenGLProfileVersion3_2Core,
+        NSOpenGLPFAOpenGLProfile,   NSOpenGLProfileVersion3_2Core,
         NSOpenGLPFADepthSize,       24,
         NSOpenGLPFADoubleBuffer,
         NSOpenGLPFAAllowOfflineRenderers,
