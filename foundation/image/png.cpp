@@ -125,7 +125,7 @@ struct png_write_state
         if ( !png )
             throw error::runtime( "png: " ) << "Unable to create write structure";
 
-        png_set_compression_level( png, Z_BEST_COMPRESSION );
+        png_set_compression_level( png, 9 );
         png_set_write_fn( png, &file, png_write, png_sync );
     }
 
