@@ -83,7 +83,7 @@ program_ptr make_program
 {
     property_tree pt;
     read_json( canonical_path( path ), pt );
-    std::string header;
+    std::string header = "#version 150\n";
     shader_vector vector;
 
     struct id_type

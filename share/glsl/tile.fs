@@ -1,9 +1,10 @@
 /* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 uniform vsampler2D texture;
-varying vec2 coord;
+in vec2 coord;
+out vec4 colour;
 
 void main( void )
 {
-    gl_FragColor = vtexture2D( texture, coord );
+    colour = vtexture2D( texture, coord );
 }

@@ -10,7 +10,7 @@ vec3 vlookup( vsampler2D sampler, vec2 virtual )
     for ( int bias = sampler.bias_range.x; entry.x == -1 && bias != sampler.bias_range.y; ++bias )
     {
         float scale = exp2( float( bias ) );
-        entry = texture2DGrad( sampler.page_table, virtual, dx * scale, dy * scale ).xy;
+        entry = textureGrad( sampler.page_table, virtual, dx * scale, dy * scale ).xy;
     }
 
     float shift = exp2( float( entry.y ) );
@@ -20,12 +20,12 @@ vec3 vlookup( vsampler2D sampler, vec2 virtual )
 vec4 vtexture2D( vsampler2D sampler, vec2 virtual )
 {
     vec3 physical = vlookup( sampler, virtual );
-    return texture2DArray( sampler.page_cache, physical );
+    return texture( sampler.page_cache, physical );
 }
 
 vec4 vtexel2D( vsampler2D sampler, vec2 virtual )
 {
     vec3 physical = vlookup( sampler, virtual );
     physical.xy *= exp2( float( sampler.bias_range.x ) );
-    return texelFetch2DArray( sampler.page_cache, ivec3( physical ), 0 );
+    return texelFetch( sampler.page_cache, ivec3( physical ), 0 );
 }
