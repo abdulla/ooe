@@ -19,9 +19,11 @@ const u32 size = 256;
 const image_format::type format = image_format::rgba_dxt1;
 
 const c8 vertex_shader[] =
-    "uniform mat4 projection;\n\
-    attribute vec2 vertex;\n\
-    varying vec2 texcoord;\n\
+    "#version 150\n\
+    \n\
+    uniform mat4 projection;\n\
+    in vec2 vertex;\n\
+    out vec2 texcoord;\n\
     \n\
     void main( void )\n\
     {\n\
@@ -30,15 +32,16 @@ const c8 vertex_shader[] =
     }";
 
 const c8 fragment_shader[] =
-    "#extension GL_EXT_gpu_shader4 : enable\n\
+    "#version 150\n\
     \n\
     uniform sampler2DArray sampler;\n\
     uniform int index;\n\
-    varying vec2 texcoord;\n\
+    in vec2 texcoord;\n\
+    out vec4 colour;\n\
     \n\
     void main( void )\n\
     {\n\
-        gl_FragColor = texture2DArray( sampler, vec3( texcoord, index ) );\n\
+        colour = texture( sampler, vec3( texcoord, index ) );\n\
     }";
 
 image make_image( u8 red, u8 green, u8 blue )

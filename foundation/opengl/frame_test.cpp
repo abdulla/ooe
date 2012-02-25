@@ -16,9 +16,11 @@ const f32 height = 480;
 const u32 size = 256;
 
 const c8 vertex_shader[] =
-    "uniform mat4 projection;\n\
+    "#version 150\n\
+    \n\
+    uniform mat4 projection;\n\
     uniform float depth;\n\
-    attribute vec2 vertex;\n\
+    in vec2 vertex;\n\
     \n\
     void main( void )\n\
     {\n\
@@ -26,10 +28,10 @@ const c8 vertex_shader[] =
     }";
 
 const c8 fragment_shader[] =
-    "#extension GL_EXT_gpu_shader4 : enable\n\
+    "#version 150\n\
     \n\
     uniform vec3 colour;\n\
-    varying out vec4 texture;\n\
+    out vec4 texture;\n\
     \n\
     void main( void )\n\
     {\n\
