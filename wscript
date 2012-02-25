@@ -56,8 +56,8 @@ def install( context ):
     context.path.find_or_declare( 'log' ).mkdir()
     context.symlink_as(
         '${PREFIX}/share', context.path.find_dir( 'share' ).abspath(), postpone = False )
-    context.install_files(
-        '${PREFIX}/bin', context.path.find_resource( 'share/xml/Info.plist' ), postpone = False )
+#   context.install_files(
+#       '${PREFIX}/bin', context.path.find_resource( 'share/xml/Info.plist' ), postpone = False )
 
 def choose( context ):
     if sys.platform.startswith( 'darwin' ):
