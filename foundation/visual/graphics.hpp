@@ -141,53 +141,14 @@ struct block
     virtual void input( const std::string&, const texture_array_ptr& ) = 0;
     virtual void input( const std::string&, type, bool, const buffer_ptr& ) = 0;
 
-    void input( const std::string& name, s32 a )
-    {
-        s32 data[] = { a };
-        input( name, &data, 1 );
-    }
-
-    void input( const std::string& name, s32 a, s32 b )
-    {
-        s32 data[] = { a, b };
-        input( name, &data, 1 );
-    }
-
-    void input( const std::string& name, s32 a, s32 b, s32 c )
-    {
-        s32 data[] = { a, b, c };
-        input( name, &data, 1 );
-    }
-
-    void input( const std::string& name, s32 a, s32 b, s32 c, s32 d )
-    {
-        s32 data[] = { a, b, c, d };
-        input( name, &data, 1 );
-    }
-
-    void input( const std::string& name, f32 a )
-    {
-        f32 data[] = { a };
-        input( name, &data, 1 );
-    }
-
-    void input( const std::string& name, f32 a, f32 b )
-    {
-        f32 data[] = { a, b };
-        input( name, &data, 1 );
-    }
-
-    void input( const std::string& name, f32 a, f32 b, f32 c )
-    {
-        f32 data[] = { a, b, c };
-        input( name, &data, 1 );
-    }
-
-    void input( const std::string& name, f32 a, f32 b, f32 c, f32 d )
-    {
-        f32 data[] = { a, b, c, d };
-        input( name, &data, 1 );
-    }
+    void input( const std::string&, s32 ) OOE_VISIBLE;
+    void input( const std::string&, s32, s32 ) OOE_VISIBLE;
+    void input( const std::string&, s32, s32, s32 ) OOE_VISIBLE;
+    void input( const std::string&, s32, s32, s32, s32 ) OOE_VISIBLE;
+    void input( const std::string&, f32 ) OOE_VISIBLE;
+    void input( const std::string&, f32, f32 ) OOE_VISIBLE;
+    void input( const std::string&, f32, f32, f32 ) OOE_VISIBLE;
+    void input( const std::string&, f32, f32, f32, f32 ) OOE_VISIBLE;
 
     template< u8 size >
         void input( const std::string& name, const matrix< size >& m )
