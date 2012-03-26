@@ -102,7 +102,7 @@ void add_glyph( const font_source::glyph_type& glyph, const colour& colour, cons
     f32* coords = add< f32 >( data, 0 );
     coords[ 0 ] = bit_slide( metric.width, slide );
     coords[ 1 ] = bit_slide( metric.height, slide );
-    coords[ 2 ] = std::floor( state.x + bit_slide( metric.left, slide ) );
+    coords[ 2 ] = state.x + bit_slide( metric.left, slide );
     coords[ 3 ] = std::ceil( state.y + state.font_size - bit_slide( metric.top, slide ) );
 
     coords[ 4 ] = divide( metric.width << level, size );

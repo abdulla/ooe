@@ -5,6 +5,7 @@ uniform vec2 view;
 uniform vec2 translate;
 uniform int depth;
 in vec2 vertex;
+out vec2 subtexel;
 out vec2 coord;
 out vec4 tint;
 
@@ -16,8 +17,9 @@ in vec4 colour;
 
 void main( void )
 {
+    subtexel = fract( vertex_translate );
     coord = vertex * coord_scale + coord_translate;
     tint = colour / 255.;
-    vec2 point = vertex * vertex_scale + vertex_translate + translate;
+    vec2 point = vertex * vertex_scale + floor( vertex_translate ) + translate;
     gl_Position = projection * vec4( point + view, depth, 1 );
 }
