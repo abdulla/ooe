@@ -173,19 +173,15 @@ void draw_box( const device_ptr& device, block_ptr& block, const frame_ptr& fram
     u8 point_size = 4 * sizeof( f32 ) + 4 * sizeof( u8 );
     buffer_ptr point = device->buffer( point_size * data.size(), buffer::point );
     {
-        map_ptr map = point->map( buffer::write );
-        void* map_data = map->data;
+        checked_map map = point->map( buffer::write );
 
         for ( box_tree::data_vector::const_iterator i = data.begin(), end = data.end();
             i != end; ++i )
         {
             // scale + translate
-            std::memcpy( map_data, &i->_0, 4 * sizeof( f32 ) );
-            map_data = add< void >( map_data, 4 * sizeof( f32 ) );
-
+            map.write( &i->_0, 4 * sizeof( f32 ) );
             // colour
-            std::memcpy( map_data, &i->_2, 4 * sizeof( u8 ) );
-            map_data = add< void >( map_data, 4 * sizeof( u8 ) );
+            map.write( &i->_2, 4 * sizeof( u8 ) );
         }
     }
 

@@ -8,7 +8,7 @@
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- colour ---------------------------------------------------------------------------------------
-struct colour
+struct OOE_PACKED colour
 {
     u8 red;
     u8 green;
@@ -25,17 +25,9 @@ struct colour
 inline buffer_ptr make_index( const device_ptr& device )
 {
     buffer_ptr index = device->buffer( sizeof( u16 ) * 6, buffer::index );
-    {
-        map_ptr map = index->map( buffer::write );
-        u16* value = static_cast< u16* >( map->data );
-
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-        value[ 2 ] = 2;
-        value[ 3 ] = 2;
-        value[ 4 ] = 1;
-        value[ 5 ] = 3;
-    }
+    checked_map map = index->map( buffer::write );
+    u16 value[] = { 0, 1, 2, 2, 1, 3 };
+    map.write( value, sizeof( value ) );
     return index;
 }
 
@@ -43,26 +35,19 @@ inline buffer_ptr make_index( const device_ptr& device )
 inline buffer_ptr make_point( const device_ptr& device )
 {
     buffer_ptr point = device->buffer( sizeof( f32 ) * 2 * 4, buffer::point );
+    checked_map map = point->map( buffer::write );
+    f32 value[] =
     {
-        map_ptr map = point->map( buffer::write );
-        f32* value = static_cast< f32* >( map->data );
-
         // top left
-        value[ 0 ] = 0;
-        value[ 1 ] = 1;
-
+        0, 1,
         // bottom left
-        value[ 2 ] = 0;
-        value[ 3 ] = 0;
-
+        0, 0,
         // top right
-        value[ 4 ] = 1;
-        value[ 5 ] = 1;
-
+        1, 1,
         // bottom right
-        value[ 6 ] = 1;
-        value[ 7 ] = 0;
-    }
+        1, 0
+    };
+    map.write( value, sizeof( value ) );
     return point;
 }
 

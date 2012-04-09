@@ -53,6 +53,18 @@ struct map
 
 typedef shared_ptr< map > map_ptr;
 
+//--- checked_map ----------------------------------------------------------------------------------
+class OOE_VISIBLE checked_map
+{
+public:
+    checked_map( const map_ptr& );
+    void write( const void*, up_t );
+
+private:
+    const map_ptr map;
+    up_t cursor;
+};
+
 //--- buffer ---------------------------------------------------------------------------------------
 struct buffer
 {

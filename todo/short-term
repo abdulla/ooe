@@ -9,3 +9,7 @@ make text shader read from framebuffer to correctly get background to mix font w
 add a wrapper around map_ptr that provides a simple way to write primitives
 - protected_map->write< u8, 4 >( source ) --- to write 4 u8s
 - should also check that no writes occur beyond the end of the buffer
+- possibly a buffer creation type too, protected_buffer< u8, 4, f32, 8 >::size
+
+byte-swap functions should labelled with be/le and be from be/le to native
+- these functions should work transparent of the host platform

@@ -1,6 +1,7 @@
 /* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
 #include "foundation/utility/error.hpp"
+#include "foundation/utility/miscellany.hpp"
 #include "foundation/visual/graphics.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -9,6 +10,24 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 map::map( void* data_, up_t size_ )
     : data( data_ ), size( size_ )
 {
+}
+
+//--- checked_map ----------------------------------------------------------------------------------
+checked_map::checked_map( const map_ptr& map_ )
+    : map( map_ ), cursor( 0 )
+{
+}
+
+void checked_map::write( const void* source, up_t bytes )
+{
+    up_t seek = cursor + bytes;
+
+    if ( seek > map->size )
+        throw error::runtime( "checked_map: " ) << "Out of bounds: " << seek << " > " << map->size;
+
+    void* target = add< void >( map->data, cursor );
+    std::memcpy( target, source, bytes );
+    cursor = seek;
 }
 
 //--- block ----------------------------------------------------------------------------------------
