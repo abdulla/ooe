@@ -132,7 +132,7 @@ object object::str( void ) const
 capsule::capsule( void* pointer_, component::throw_type function_, destructor destructor_ )
     : object_base( PyCapsule_New( pointer_, 0, destructor_ ) )
 {
-    if ( PyCapsule_SetContext( data, ptr_cast( function_ ) ) )
+    if ( PyCapsule_SetContext( data, byte_cast< void* >( function_ ) ) )
     {
         Py_DECREF( data );
         throw error::python() << "Unable to set context of capsule";
@@ -153,7 +153,7 @@ void* capsule::pointer( void ) const
 
 component::throw_type capsule::function( void ) const
 {
-    return ptr_cast< component::throw_type >( PyCapsule_GetContext( data ) );
+    return byte_cast< component::throw_type >( PyCapsule_GetContext( data ) );
 }
 
 void capsule::reset( void )

@@ -14,7 +14,7 @@ template< typename t >
     t* get_pointer( const capsule& capsule )
 {
     if ( component::meta_catch< t >( capsule.function() ) )
-        return ptr_cast< t* >( capsule.pointer() );
+        return byte_cast< t* >( capsule.pointer() );
 
     throw error::python() << "Bad argument, \"" << demangle( typeid( t ).name() ) << "\" expected";
 }
@@ -160,7 +160,7 @@ template< typename t >
     static data* call( typename call_traits< t >::param_type pointer )
     {
         typedef typename no_qual< t >::type type;
-        return capsule( ptr_cast( pointer ), component::meta_throw< type > );
+        return capsule( byte_cast< void* >( pointer ), component::meta_throw< type > );
     }
 };
 

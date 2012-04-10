@@ -44,23 +44,6 @@ template< typename in_t, typename out_t, typename skip_t >
     return j;
 }
 
-//--- ptr_cast -------------------------------------------------------------------------------------
-template< typename type >
-    type ptr_cast( void* pointer )
-{
-    union { void* in; type out; } pun;
-    pun.in = pointer;
-    return pun.out;
-}
-
-template< typename type >
-    void* ptr_cast( type pointer )
-{
-    union { type in; void* out; } pun;
-    pun.in = pointer;
-    return pun.out;
-}
-
 //--- byte_cast ------------------------------------------------------------------------------------
 template< typename s, typename t >
     s byte_cast( t in )

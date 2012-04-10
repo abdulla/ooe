@@ -25,7 +25,7 @@ template< typename t >
     stack stack( state_ );
     stack.get_metatable( 1 );
     stack.raw_geti( -1, 1 );
-    delete ptr_cast< t* >( stack.to_userdata( -1 ) );
+    delete byte_cast< t* >( stack.to_userdata( -1 ) );
     return 0;
 }
 
@@ -275,7 +275,7 @@ template< typename t >
 
     // throw function = metatable[ 2 ]
     stack.raw_geti( -1, 2 );
-    component::throw_type tf = ptr_cast< component::throw_type >( stack.to_userdata( -1 ) );
+    component::throw_type tf = byte_cast< component::throw_type >( stack.to_userdata( -1 ) );
     stack.pop( 1 );
 
     if ( !component::meta_catch< typename remove_member_const< t >::type >( tf ) )
@@ -288,7 +288,7 @@ template< typename t >
 
     // pointer = metatable[ 1 ]
     stack.raw_geti( -1, 1 );
-    t* pointer = ptr_cast< t* >( stack.to_userdata( -1 ) );
+    t* pointer = byte_cast< t* >( stack.to_userdata( -1 ) );
     stack.pop( 2 );
 
     return pointer;
@@ -302,12 +302,12 @@ template< typename t >
     stack.create_table( 2, gc != 0 );
 
     // metatable[ 1 ] = pointer
-    stack.push_lightuserdata( ptr_cast( pointer ) );
+    stack.push_lightuserdata( byte_cast< void* >( pointer ) );
     stack.raw_seti( -2, 1 );
 
     // metatable[ 2 ] = throw function
     component::throw_type tf = component::meta_throw< typename remove_member_const< t >::type >;
-    stack.push_lightuserdata( ptr_cast( tf ) );
+    stack.push_lightuserdata( byte_cast< void* >( tf ) );
     stack.raw_seti( -2, 2 );
 
     // metatable[ "__gc" ] = gc function
