@@ -3,12 +3,13 @@
 #include <limits>
 
 #include "foundation/utility/binary.hpp"
+#include "foundation/utility/convert.hpp"
 #include "test/unit/check.hpp"
 #include "test/unit/group.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
-typedef unit::group< anonymous_t, anonymous_t, 4 > group_type;
+typedef unit::group< anonymous_t, anonymous_t, 6 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "binary" );
 
@@ -89,6 +90,40 @@ OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
         u32 x = saturated_shift( 0xffu, i );
         OOE_CHECK( "saturated_shift( 0xffu, " << i << " ) == 0xffffffff", x == 0xffffffff );
     }
+}
+
+OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
+{
+    std::cerr << "little_endian";
+
+    union
+    {
+        u8 bytes[ 4 ];
+        u32 value;
+    } pun =
+    {
+        { 0x11, 0x22, 0x33, 0x44 }
+    };
+
+    u32 value = little_endian< u32 >( pun.value );
+    OOE_CHECK( "0x" << hex( value ) << " == 0x44332211", value == 0x44332211 );
+}
+
+OOE_TEST void fixture_type::test< 5 >( anonymous_t& )
+{
+    std::cerr << "big_endian";
+
+    union
+    {
+        u8 bytes[ 4 ];
+        u32 value;
+    } pun =
+    {
+        { 0x44, 0x33, 0x22, 0x11 }
+    };
+
+    u32 value = big_endian< u32 >( pun.value );
+    OOE_CHECK( "0x" << hex( value ) << " == 0x44332211", value == 0x44332211 );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

@@ -78,34 +78,30 @@ inline u32 parity( u32 value )
     return ( 0x6996 >> value ) & 0x01;
 }
 
-//--- endian_swap ----------------------------------------------------------------------------------
-inline u8 endian_swap( u8 value )
+//--- little_endian --------------------------------------------------------------------------------
+template< typename t >
+    t little_endian( t value )
 {
-    return value;
+    u8* byte = reinterpret_cast< u8* >( &value );
+    t result = 0;
+
+    for ( u8 i = 0; i != sizeof( t ); ++i )
+        result |= byte[ i ] << ( i * 8 );
+
+    return result;
 }
 
-inline u16 endian_swap( u16 value_ )
+//--- big_endian -----------------------------------------------------------------------------------
+template< typename t >
+    t big_endian( t value )
 {
-    u32 value = value_;
-    return static_cast< u16 >( ( value >> 8 ) | ( value << 8 ) );
-}
+    u8* byte = reinterpret_cast< u8* >( &value );
+    t result = 0;
 
-inline u32 endian_swap( u32 value )
-{
-    return ( value >> 24 ) | ( value << 24 ) |
-        ( ( value & 0x00ff0000 ) >> 8 ) | ( ( value & 0x0000ff00 ) << 8 );
-}
+    for ( u8 i = 0; i != sizeof( t ); ++i )
+        result |= byte[ sizeof( t ) - i - 1 ] << ( i * 8 );
 
-inline u64 endian_swap( u64 value )
-{
-    return ( value >> 56 ) |
-        ( ( value & 0x00ff000000000000ll ) >> 40 ) |
-        ( ( value & 0x0000ff0000000000ll ) >> 24 ) |
-        ( ( value & 0x000000ff00000000ll ) >> 8 ) |
-        ( value << 56 ) |
-        ( ( value & 0x000000000000ff00ll ) << 40 ) |
-        ( ( value & 0x0000000000ff0000ll ) << 24 ) |
-        ( ( value & 0x00000000ff000000ll ) << 8 );
+    return result;
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
