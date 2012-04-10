@@ -5,6 +5,8 @@
     #ifndef OOE_FOUNDATION_UTILITY_MISCELLANY_HPP
     #define OOE_FOUNDATION_UTILITY_MISCELLANY_HPP
 
+#include <cstring>
+
 #include "foundation/utility/traits.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
@@ -57,6 +59,16 @@ template< typename type >
     union { type in; void* out; } pun;
     pun.in = pointer;
     return pun.out;
+}
+
+//--- byte_cast ------------------------------------------------------------------------------------
+template< typename s, typename t >
+    s byte_cast( t in )
+{
+    OOE_STATIC_ASSERT( sizeof( s ) == sizeof( t ) );
+    s out;
+    std::memcpy( &out, &in, sizeof( s ) );
+    return out;
 }
 
 //--- destroy --------------------------------------------------------------------------------------
