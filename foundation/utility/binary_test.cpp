@@ -9,6 +9,12 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
+union pun32
+{
+    u8 bytes[ 4 ];
+    u32 value;
+};
+
 typedef unit::group< anonymous_t, anonymous_t, 6 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "binary" );
@@ -96,15 +102,7 @@ OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
 {
     std::cerr << "little_endian";
 
-    union
-    {
-        u8 bytes[ 4 ];
-        u32 value;
-    } pun =
-    {
-        { 0x11, 0x22, 0x33, 0x44 }
-    };
-
+    pun32 pun = { { 0x11, 0x22, 0x33, 0x44 } };
     u32 value = little_endian< u32 >( pun.value );
     OOE_CHECK( "0x" << hex( value ) << " == 0x44332211", value == 0x44332211 );
 }
@@ -113,15 +111,7 @@ OOE_TEST void fixture_type::test< 5 >( anonymous_t& )
 {
     std::cerr << "big_endian";
 
-    union
-    {
-        u8 bytes[ 4 ];
-        u32 value;
-    } pun =
-    {
-        { 0x44, 0x33, 0x22, 0x11 }
-    };
-
+    pun32 pun = { { 0x44, 0x33, 0x22, 0x11 } };
     u32 value = big_endian< u32 >( pun.value );
     OOE_CHECK( "0x" << hex( value ) << " == 0x44332211", value == 0x44332211 );
 }
