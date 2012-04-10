@@ -6,5 +6,4 @@ support: http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt
 
 make text shader read from framebuffer to correctly get background to mix font with
 
-byte-swap functions should labelled with be/le and be from be/le to native
-- these functions should work transparent of the host platform
+make dds and archive use little_endian/big_endian
