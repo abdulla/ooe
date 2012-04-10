@@ -49,11 +49,11 @@ struct marker
 {
     text_iterator i;
     string_iterator j;
-    void* data;
+    checked_map map;
     f32 width;
 
-    marker( text_iterator i_, string_iterator j_, void* data_, f32 width_ )
-        : i( i_ ), j( j_ ), data( data_ ), width( width_ )
+    marker( text_iterator i_, string_iterator j_, const checked_map& map_, f32 width_ )
+        : i( i_ ), j( j_ ), map( map_ ), width( width_ )
     {
     }
 };
@@ -95,26 +95,24 @@ bool handle_space( u32 code_point, const text& text, state& state, s8 zoom )
 }
 
 void add_glyph( const font_source::glyph_type& glyph, const colour& colour, const state& state,
-    void* data, u32 size, s8 slide, u8 level )
+    checked_map& map, u32 size, s8 slide, u8 level )
 {
     const font::metric& metric = glyph._0;
+    f32 coords[] =
+    {
+        bit_slide( metric.width, slide ),
+        bit_slide( metric.height, slide ),
+        state.x + bit_slide( metric.left, slide ),
+        std::ceil( state.y + state.font_size - bit_slide( metric.top, slide ) ),
 
-    f32* coords = add< f32 >( data, 0 );
-    coords[ 0 ] = bit_slide( metric.width, slide );
-    coords[ 1 ] = bit_slide( metric.height, slide );
-    coords[ 2 ] = state.x + bit_slide( metric.left, slide );
-    coords[ 3 ] = std::ceil( state.y + state.font_size - bit_slide( metric.top, slide ) );
+        divide( metric.width << level, size ),
+        divide( metric.height << level, size ),
+        divide( glyph._1, size ),
+        divide( glyph._2, size )
+    };
 
-    coords[ 4 ] = divide( metric.width << level, size );
-    coords[ 5 ] = divide( metric.height << level, size );
-    coords[ 6 ] = divide( glyph._1, size );
-    coords[ 7 ] = divide( glyph._2, size );
-
-    u8* rgba = add< u8 >( data, 8 * sizeof( f32 ) );
-    rgba[ 0 ] = colour.red;
-    rgba[ 1 ] = colour.green;
-    rgba[ 2 ] = colour.blue;
-    rgba[ 3 ] = colour.alpha;
+    map.write( coords, sizeof( coords ) );
+    map.write( &colour, sizeof( colour ) );
 }
 
 marker add_text( const font_source& source, virtual_texture& texture, const limit& limit,
@@ -132,10 +130,10 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
 
     state.y = std::max< f32 >( state.y, bit_slide( text.y, limit.zoom ) );
     f32 width = limit.width - bit_slide( text.x, limit.zoom );
-    void* data = next.data;
     s8 slide = inverse_clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
     f32 multiplier = exp2f( slide );
     u8 level = limit.max - clamp< s8 >( text.level + limit.zoom, limit.min, limit.max );
+    checked_map map = next.map;
 
     for ( string_iterator j = next.j, j_end = text.data.end(); j != j_end; )
     {
@@ -145,7 +143,7 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
         // word boundary
         if ( handle_space( code_point, text, state, limit.zoom ) )
         {
-            word = marker( next.i, j, data, 0 );
+            word = marker( next.i, j, map, 0 );
             continue;
         }
 
@@ -168,21 +166,21 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
             word.width = 0;
             state.last_index = 0;
             j = prior;
-            line = word = marker( next.i, j, data, 0 );
+            line = word = marker( next.i, j, map, 0 );
             continue;
         }
 
         texture.load( glyph._0.width, glyph._0.height, glyph._1, glyph._2, level );
-        add_glyph( glyph, text.colour, state, data, limit.size, slide, level );
+        add_glyph( glyph, text.colour, state, map, limit.size, slide, level );
 
-        data = add< void >( data, point_size );
         state.x += advance;
         word.width += advance;
         state.last_index = glyph_index;
     }
 
     text_iterator i = next.i + 1;
-    return marker( i, i != i_end ? i->data.begin() : string_iterator(), data, 0 );
+    string_iterator j = i != i_end ? i->data.begin() : string_iterator();
+    return marker( i, j, map, 0 );
 }
 
 OOE_ANONYMOUS_END( ( ooe ) )
@@ -209,11 +207,11 @@ u32 text_layout::input( block_ptr& block, const text_vector& text, f32 width, s8
         return 0;
 
     buffer_ptr point = device->buffer( point_size * glyphs, buffer::point );
-    map_ptr map = point->map( buffer::write );
+    checked_map map = point->map( buffer::write );
 
     limit limit( source, width, zoom );
     state state( bit_slide( text[ 0 ].x, zoom ), 0, 1 << ( text[ 0 ].level + zoom ), 0 );
-    marker next( text.begin(), text[ 0 ].data.begin(), map->data, 0 );
+    marker next( text.begin(), text[ 0 ].data.begin(), map, 0 );
     marker line = next;
     marker word = next;
 

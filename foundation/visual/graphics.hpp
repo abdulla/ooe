@@ -61,7 +61,7 @@ public:
     void write( const void*, up_t );
 
 private:
-    const map_ptr map;
+    map_ptr map;
     up_t cursor;
 };
 
