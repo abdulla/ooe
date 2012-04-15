@@ -4,6 +4,7 @@
 
 #include "foundation/io/archive.hpp"
 #include "foundation/io/error.hpp"
+#include "foundation/utility/binary.hpp"
 #include "foundation/utility/miscellany.hpp"
 #include "foundation/utility/scoped.hpp"
 
@@ -12,7 +13,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 enum method_type
 {
     store,
-    deflate = 8
+    flate = 8
 };
 
 struct OOE_PACKED directory_header
@@ -37,7 +38,7 @@ struct OOE_PACKED entry_header
     u16 used;           // version used to create entry
     u16 need;           // version needed to extract entry
     u16 flags;
-    u16 method;         // should be deflate
+    u16 method;         // should be flate
     u16 time;
     u16 date;
     u32 crc;
@@ -59,7 +60,7 @@ struct file_header
     u32 id;
     u16 version;
     u16 flags;
-    u16 method;         // should be deflate
+    u16 method;         // should be flate
     u16 time;
     u16 date;
     u32 crc;
@@ -143,9 +144,10 @@ archive_iterator::archive_iterator( const void* entry_ )
 void archive_iterator::increment( void )
 {
     const entry_header* e = static_cast< const entry_header* >( entry );
-    e = add< entry_header >
-        ( e, sizeof( *e ) + e->name_length + e->extra_length + e->comment_length );
-    entry = e->id == entry_header::signature ? e : 0;
+    up_t size = sizeof( *e ) + little_endian( e->name_length ) + little_endian( e->extra_length ) +
+        little_endian( e->comment_length );
+    e = add< entry_header >( e, size );
+    entry = little_endian( e->id ) == entry_header::signature ? e : 0;
 }
 
 bool archive_iterator::equal( const archive_iterator& other ) const
@@ -156,21 +158,21 @@ bool archive_iterator::equal( const archive_iterator& other ) const
 std::string archive_iterator::dereference( void ) const
 {
     const entry_header* e = static_cast< const entry_header* >( entry );
-    return std::string( add< c8 >( e, sizeof( *e ) ), e->name_length );
+    return std::string( add< c8 >( e, sizeof( *e ) ), little_endian( e->name_length ) );
 }
 
 //--- archive --------------------------------------------------------------------------------------
 archive::archive( const descriptor& desc )
     : memory( desc ), central_directory()
 {
-    if ( memory.as< file_header >()->id != file_header::signature )
+    if ( little_endian( memory.as< file_header >()->id ) != file_header::signature )
         throw error::io( "archive: " ) << "Descriptor is not a ZIP archive";
 
     const directory_header* sentinel = memory.as< directory_header >();
     const directory_header* directory =
         add< directory_header >( sentinel, memory.size() - sizeof( *directory ) );
 
-    while ( directory >= sentinel && directory->id != directory_header::signature )
+    while ( directory >= sentinel && little_endian( directory->id ) != directory_header::signature )
         directory = add< directory_header >( directory, -1 );
 
     if ( directory == sentinel )
@@ -179,9 +181,10 @@ archive::archive( const descriptor& desc )
         directory->entries_number != directory->entries_length )
         throw error::io( "archive: " ) << "Multi-part ZIP archive not supported";
 
-    const entry_header* entry = add< entry_header >( memory.get(), directory->offset );
+    const entry_header* entry =
+        add< entry_header >( memory.get(), little_endian( directory->offset ) );
 
-    if ( entry->id != entry_header::signature )
+    if ( little_endian( entry->id ) != entry_header::signature )
         throw error::io( "archive: " ) << "Invalid central directory entry in ZIP archive";
 
     central_directory = entry;
@@ -200,24 +203,25 @@ archive::iterator archive::end( void ) const
 archive::file archive::open( iterator i ) const
 {
     const entry_header& entry = *static_cast< const entry_header* >( i.entry );
-    const file_header& file_ = *add< file_header >( memory.get(), entry.offset );
+    const file_header& file_ = *add< file_header >( memory.get(), little_endian( entry.offset ) );
     const c8* entry_name = add< c8 >( &entry, sizeof( entry ) );
     const c8* file_name = add< c8 >( &file_, sizeof( file_ ) );
+    up_t size = little_endian( file_.name_length );
 
-    if ( file_.id != file_header::signature )
+    if ( little_endian( file_.id ) != file_header::signature )
         throw error::io( "archive: " ) << "Invalid file entry in ZIP archive";
-    else if ( entry.name_length != file_.name_length ||
-        std::memcmp( entry_name, file_name, entry.name_length ) )
-        throw error::io( "archive: " ) << "Name mismatch: " <<
-            std::string( entry_name, entry.name_length ) << " != " <<
-            std::string( file_name, file_.name_length );
+    else if ( entry.name_length != file_.name_length || std::memcmp( entry_name, file_name, size ) )
+        throw error::io( "archive: " ) << "Name mismatch: " << std::string( entry_name, size ) <<
+            " != " << std::string( file_name, size );
 
-    const u8* data = add< u8 >( file_name, file_.name_length + file_.extra_length );
+    const u8* data = add< u8 >( file_name, size + little_endian( file_.extra_length ) );
+    up_t inflated = little_endian( file_.size_inflated );
+    u32 crc = little_endian( file_.crc );
 
-    if ( file_.method == store )
-        return file( data, file_.size_inflated, file_.crc );
+    if ( little_endian( file_.method ) == store )
+        return file( data, inflated, crc );
     else
-        return file( data, file_.size_deflated, file_.size_inflated, file_.crc );
+        return file( data, little_endian( file_.size_deflated ), inflated, crc );
 }
 
 archive::file archive::open( const std::string& path ) const
