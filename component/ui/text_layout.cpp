@@ -13,7 +13,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 typedef text_vector::const_iterator text_iterator;
 typedef std::string::const_iterator string_iterator;
-const u8 point_size = 8 * sizeof( f32 ) + 4 * sizeof( u8 );
+const u8 point_size = 9 * sizeof( f32 ) + 4 * sizeof( u8 );
 const f32 line_spacing = .5;
 const f32 word_spacing = .25;
 
@@ -108,7 +108,9 @@ void add_glyph( const font_source::glyph_type& glyph, const colour& colour, cons
         divide( metric.width << level, size ),
         divide( metric.height << level, size ),
         divide( glyph._1, size ),
-        divide( glyph._2, size )
+        divide( glyph._2, size ),
+
+        divide( 1 << level, size )
     };
 
     map.write( coords, sizeof( coords ) );
@@ -222,6 +224,7 @@ u32 text_layout::input( block_ptr& block, const text_vector& text, f32 width, s8
     block->input( "vertex_translate", block::f32_2, true, point );
     block->input( "coord_scale", block::f32_2, true, point );
     block->input( "coord_translate", block::f32_2, true, point );
+    block->input( "texel_size", block::f32_1, true, point );
     block->input( "colour", block::u8_4, true, point );
     texture.input( block, "texture" );
     return glyphs;

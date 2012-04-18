@@ -7,5 +7,5 @@ struct vsampler2D
     sampler2DArray page_cache;
 };
 
-vec4 vtexture2D( vsampler2D, vec2 );
-vec4 vtexel2D( vsampler2D, vec2 );
+vec4 vtexture( vsampler2D, vec2 );
+vec4 vtexelFetch( vsampler2D, vec2 );

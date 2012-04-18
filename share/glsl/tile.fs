@@ -6,5 +6,5 @@ out vec4 colour;
 
 void main( void )
 {
-    colour = vtexture2D( texture, coord );
+    colour = vtexture( texture, coord );
 }

@@ -17,13 +17,13 @@ vec3 vlookup( vsampler2D sampler, vec2 virtual )
     return vec3( fract( virtual * shift ), entry.x );
 }
 
-vec4 vtexture2D( vsampler2D sampler, vec2 virtual )
+vec4 vtexture( vsampler2D sampler, vec2 virtual )
 {
     vec3 physical = vlookup( sampler, virtual );
     return texture( sampler.page_cache, physical );
 }
 
-vec4 vtexel2D( vsampler2D sampler, vec2 virtual )
+vec4 vtexelFetch( vsampler2D sampler, vec2 virtual )
 {
     vec3 physical = vlookup( sampler, virtual );
     physical.xy *= exp2( float( sampler.bias_range.x ) );
