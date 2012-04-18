@@ -6,6 +6,7 @@
 
 #include "foundation/image/dds.hpp"
 #include "foundation/io/file.hpp"
+#include "foundation/utility/binary.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
@@ -112,38 +113,40 @@ image decode( const descriptor& desc )
 {
     file file( desc );
     u32 fourcc;
+    dds_header header;
 
     if ( file.read( &fourcc, sizeof( fourcc ) ) != sizeof( fourcc ) )
         throw error::runtime( "dds: " ) << "Unable to read fourcc";
     else if ( fourcc != OOE_FOURCC( 'D', 'D', 'S', ' ' ) )
         throw error::runtime( "dds: " ) << "Image is not a DirectDraw Surface";
-
-    dds_header header;
-
-    if ( file.read( &header, sizeof( header ) ) != sizeof( header ) )
+    else if ( file.read( &header, sizeof( header ) ) != sizeof( header ) )
         throw error::runtime( "dds: " ) << "Unable to read header";
-    else if ( header.size != sizeof( header ) )
-        throw error::runtime( "dds: " ) << "Incorrect header size " << header.size;
-    else if ( header.format.size != sizeof( dds_format ) )
-        throw error::runtime( "dds: " ) <<
-            "Incorrect pixel format size " << header.format.size;
-    else if ( ~header.flags & dds_header::use_texture )
+
+    up_t header_size = little_endian( header.size );
+    up_t format_size = little_endian( header.format.size );
+
+    if ( header_size != sizeof( header ) )
+        throw error::runtime( "dds: " ) << "Incorrect header size " << header_size;
+    else if ( format_size != sizeof( dds_format ) )
+        throw error::runtime( "dds: " ) << "Incorrect pixel format size " << format_size;
+    else if ( ~little_endian( header.flags ) & dds_header::use_texture )
         throw error::runtime( "dds: " ) << "Image is not 2-dimensional";
-    else if ( ~header.format.flags & dds_format::use_fourcc )
+    else if ( ~little_endian( header.format.flags ) & dds_format::use_fourcc )
         throw error::runtime( "dds: " ) << "Unsupported pixel format";
 
     image_format::type type = dds_image_format( header.format.fourcc );
-    image image( header.width, header.height, type );
+    image image( little_endian( header.width ), little_endian( header.height ), type );
+    up_t linear_size = little_endian( header.linear_size );
     up_t byte_size = ooe::byte_size( image );
     up_t size = file.size();
 
     // conditionally verify linear_size, needed to work around microsoft bug
-    if ( header.flags & dds_header::use_linear_size && header.linear_size != byte_size )
+    if ( little_endian( header.flags ) & dds_header::use_linear_size && linear_size != byte_size )
         throw error::runtime( "dds: " ) <<
-            "Linear size " << header.linear_size << " does not match image size " << byte_size;
-    else if ( header.linear_size + sizeof( dds_header ) + 4 > size )
+            "Linear size " << linear_size << " does not match image size " << byte_size;
+    else if ( linear_size + sizeof( dds_header ) + 4 > size )
         throw error::runtime( "dds: " ) <<
-            "Linear size " << header.linear_size << " is greater than file size " << size;
+            "Linear size " << linear_size << " is greater than file size " << size;
 
     file.read( image.get(), byte_size );
     return image;
@@ -153,21 +156,22 @@ void encode( const image& image, const descriptor& desc )
 {
     file file( desc );
     u32 fourcc = OOE_FOURCC( 'D', 'D', 'S', ' ' );
+    up_t linear_size = byte_size( image );
 
     dds_header header;
     std::memset( &header, 0, sizeof( dds_header ) );
-    header.size = sizeof( dds_header );
-    header.flags = dds_header::use_texture | dds_header::use_linear_size;
-    header.height = image.height;
-    header.width = image.width;
-    header.linear_size = byte_size( image );
-    header.format.size = sizeof( dds_format );
-    header.format.flags = dds_format::use_fourcc;
+    header.size = little_endian< u32 >( sizeof( dds_header ) );
+    header.flags = little_endian< u32 >( dds_header::use_texture | dds_header::use_linear_size );
+    header.height = little_endian< u32 >( image.height );
+    header.width = little_endian< u32 >( image.width );
+    header.linear_size = little_endian< u32 >( linear_size );
+    header.format.size = little_endian< u32 >( sizeof( dds_format ) );
+    header.format.flags = little_endian< u32 >( dds_format::use_fourcc );
     header.format.fourcc = dds_image_fourcc( image.format );
 
     if ( file.write( &fourcc, sizeof( fourcc ) ) != sizeof( fourcc ) ||
         file.write( &header, sizeof( header ) )  != sizeof( header ) ||
-        file.write( image.get(), header.linear_size ) != header.linear_size )
+        file.write( image.get(), linear_size ) != linear_size )
         throw error::runtime( "dds: " ) << "Unable to write image";
 }
 
