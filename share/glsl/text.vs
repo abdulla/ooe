@@ -23,6 +23,6 @@ void main( void )
     coord_1 = vertex * coord_scale + coord_translate;
     coord_2 = coord_1 - vec2( texel_size, 0 );
     tint = colour / 255.;
-    vec2 point = vertex * vertex_scale + ceil( vertex_translate ) + translate;
+    vec2 point = vertex * vertex_scale + floor( vertex_translate ) + translate;
     gl_Position = projection * vec4( point + view, depth, 1 );
 }
