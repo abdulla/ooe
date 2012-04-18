@@ -7,5 +7,3 @@ support: http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt
 make text shader read from framebuffer to correctly get background to mix font with
 
 fix sub-pixel positioning
-
-make dds and archive use little_endian/big_endian
