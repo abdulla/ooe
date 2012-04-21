@@ -116,12 +116,12 @@ f32 face::kerning( u32 left, u32 right, u32 size ) const
     return delta.x / 64.;
 }
 
-bitmap face::bitmap( u32 code_point, u32 size ) const
+bitmap face::bitmap( u32 index, u32 size ) const
 {
     if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
         throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
-    else if ( FT_Load_Glyph( face_, code_point, load_flags ) )
-        throw error::runtime( "font::face: " ) << "Unable to load " << code_point;
+    else if ( FT_Load_Glyph( face_, index, load_flags ) )
+        throw error::runtime( "font::face: " ) << "Unable to load glyph index " << index;
 
     FT_Glyph_Metrics& m = face_->glyph->metrics;
     FT_Bitmap& b = face_->glyph->bitmap;
