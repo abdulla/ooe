@@ -54,8 +54,8 @@ library::~library( void )
 
 //--- metric ---------------------------------------------------------------------------------------
 metric::metric( s32 left_, s32 top_, s32 advance_, u16 width_, u16 height_ )
-    : left( left_ / 64 ), top( top_ / 64 ), advance( advance_ / 64. ), width( ( width_ / 3 ) - 2 ),
-    height( height_ )
+    : left( left_ / 64. ), top( top_ / 64. ), advance( advance_ / 64. ),
+    width( ( width_ / 3 ) - 2 ), height( height_ )
 {
 }
 
