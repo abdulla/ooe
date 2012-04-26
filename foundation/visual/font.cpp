@@ -14,6 +14,24 @@ OOE_ANONYMOUS_BEGIN( ( ooe )( font ) )
 const u32 load_flags = FT_LOAD_RENDER | FT_LOAD_PEDANTIC | FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING |
     FT_LOAD_NO_AUTOHINT | FT_LOAD_TARGET_LCD;
 
+FT_Pos translate( face::bitmap_type subpixel )
+{
+    switch ( subpixel )
+    {
+    case face::bitmap_type::red:
+        return 0;
+
+    case face::bitmap_type::green:
+        return 21;
+
+    case face::bitmap_type::blue:
+        return 42;
+
+    default:
+        throw error::runtime( "font::face: " ) << "Unknown sub-pixel position: " << subpixel;
+    }
+}
+
 OOE_ANONYMOUS_END( ( ooe )( font ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( font ) )
@@ -36,8 +54,8 @@ library::~library( void )
 
 //--- metric ---------------------------------------------------------------------------------------
 metric::metric( s32 left_, s32 top_, s32 advance_, u16 width_, u16 height_ )
-    : left( left_ >> 6 ), top( top_ >> 6 ), advance( advance_ / 64. ),
-    width( ( width_ / 3 ) - 2 ), height( height_ )
+    : left( left_ / 64 ), top( top_ / 64 ), advance( advance_ / 64. ), width( ( width_ / 3 ) - 2 ),
+    height( height_ )
 {
 }
 
@@ -116,8 +134,11 @@ f32 face::kerning( u32 left, u32 right, u32 size ) const
     return delta.x / 64.;
 }
 
-bitmap face::bitmap( u32 index, u32 size ) const
+bitmap face::bitmap( u32 index, u32 size, bitmap_type subpixel ) const
 {
+    FT_Vector delta = { translate( subpixel ), 0 };
+    FT_Set_Transform( face, 0, &delta );
+
     if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
         throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
     else if ( FT_Load_Glyph( face_, index, load_flags ) )

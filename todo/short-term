@@ -5,3 +5,8 @@ make font_source store data in png to reduce IO and space on disk
 support: http://www.opengl.org/registry/specs/ARB/texture_compression_rgtc.txt
 
 make text shader read from framebuffer to correctly get background to mix font with
+
+modify checked_map to be a template based on a struct, forcing only writes of that struct
+
+create a new font_source to store all three sub-pixel versions of a glyph
+- this should also be flexible with sizes and layouts
