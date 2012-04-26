@@ -18,13 +18,13 @@ FT_Pos translate( face::bitmap_type subpixel )
 {
     switch ( subpixel )
     {
-    case face::bitmap_type::red:
+    case face::red:
         return 0;
 
-    case face::bitmap_type::green:
+    case face::green:
         return 21;
 
-    case face::bitmap_type::blue:
+    case face::blue:
         return 42;
 
     default:
@@ -137,7 +137,7 @@ f32 face::kerning( u32 left, u32 right, u32 size ) const
 bitmap face::bitmap( u32 index, u32 size, bitmap_type subpixel ) const
 {
     FT_Vector delta = { translate( subpixel ), 0 };
-    FT_Set_Transform( face, 0, &delta );
+    FT_Set_Transform( face_, 0, &delta );
 
     if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
         throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
