@@ -71,6 +71,8 @@ face::face( const library& library, const descriptor& desc )
 {
     if ( FT_New_Memory_Face( library.freetype, memory.as< u8 >(), memory.size(), 0, &face_ ) )
         throw error::runtime( "font::face: " ) << "Unable to open font face";
+    else if ( FT_Select_Charmap( face_, FT_ENCODING_UNICODE ) )
+        throw error::runtime( "font::face: " ) << "Unable to select unicode character map";
 }
 
 face::~face( void )
