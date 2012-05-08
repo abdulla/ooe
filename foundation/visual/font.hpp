@@ -78,7 +78,7 @@ public:
     u32 number( number_type ) const;
 
     u32 glyph_index( u32 ) const;
-    f32 kerning( u32, u32, u32 ) const;
+    u32 kerning( u32, u32 ) const;
     font::bitmap bitmap( u32, u32, bitmap_type = red ) const;
 
 private:

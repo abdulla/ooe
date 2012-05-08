@@ -122,18 +122,15 @@ u32 face::glyph_index( u32 code_point ) const
     return index;
 }
 
-f32 face::kerning( u32 left, u32 right, u32 size ) const
+u32 face::kerning( u32 left, u32 right ) const
 {
-    if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
-        throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
-
     FT_Vector delta;
 
-    if ( FT_Get_Kerning( face_, left, right, FT_KERNING_UNFITTED, &delta ) )
+    if ( FT_Get_Kerning( face_, left, right, FT_KERNING_UNSCALED, &delta ) )
         throw error::runtime( "font::face: " ) <<
             "Unable to get kerning for " << left << " and " << right;
 
-    return delta.x / 64.;
+    return delta.x;
 }
 
 bitmap face::bitmap( u32 index, u32 size, bitmap_type subpixel ) const
