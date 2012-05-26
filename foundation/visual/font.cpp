@@ -11,8 +11,9 @@
 
 OOE_ANONYMOUS_BEGIN( ( ooe )( font ) )
 
-const u32 load_flags = FT_LOAD_RENDER | FT_LOAD_PEDANTIC | FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING |
-    FT_LOAD_NO_AUTOHINT | FT_LOAD_TARGET_LCD;
+const u32 metric_flags = FT_LOAD_PEDANTIC | FT_LOAD_NO_SCALE;
+const u32 bitmap_flags = FT_LOAD_PEDANTIC | FT_LOAD_RENDER | FT_LOAD_TARGET_LCD |
+    FT_LOAD_NO_BITMAP | FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT;
 
 FT_Pos translate( face::bitmap_type subpixel )
 {
@@ -53,15 +54,14 @@ library::~library( void )
 }
 
 //--- metric ---------------------------------------------------------------------------------------
-metric::metric( s32 left_, s32 top_, s32 advance_, u16 width_, u16 height_ )
-    : left( left_ / 64. ), top( top_ / 64. ), advance( advance_ / 64. ),
-    width( ( width_ / 3 ) - 2 ), height( height_ )
+metric::metric( f32 left_, f32 top_, f32 advance_ )
+    : left( left_ ), top( top_ ), advance( advance_ )
 {
 }
 
 //--- bitmap ---------------------------------------------------------------------------------------
-bitmap::bitmap( const font::metric& metric_, s32 pitch_, const u8* data_ )
-    : metric( metric_ ), pitch( pitch_ ), data( data_ )
+bitmap::bitmap( u16 width_, u16 height_, s32 pitch_, const u8* data_ )
+    : width( width_ ), height( height_ ), pitch( pitch_ ), data( data_ )
 {
 }
 
@@ -122,7 +122,7 @@ u32 face::glyph_index( u32 code_point ) const
     return index;
 }
 
-u32 face::kerning( u32 left, u32 right ) const
+f32 face::kerning( u32 left, u32 right ) const
 {
     FT_Vector delta;
 
@@ -130,7 +130,17 @@ u32 face::kerning( u32 left, u32 right ) const
         throw error::runtime( "font::face: " ) <<
             "Unable to get kerning for " << left << " and " << right;
 
-    return delta.x;
+    return delta.x / face_->units_per_EM;
+}
+
+metric face::metric( u32 index ) const
+{
+    if ( FT_Load_Glyph( face_, index, metric_flags ) )
+        throw error::runtime( "font::face: " ) << "Unable to load glyph index " << index;
+
+    FT_Glyph_Metrics& m = face_->glyph->metrics;
+    f32 em = face_->units_per_EM;
+    return font::metric( m.horiBearingX / em, m.horiBearingY / em, m.horiAdvance / em );
 }
 
 bitmap face::bitmap( u32 index, u32 size, bitmap_type subpixel ) const
@@ -140,13 +150,11 @@ bitmap face::bitmap( u32 index, u32 size, bitmap_type subpixel ) const
 
     if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
         throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
-    else if ( FT_Load_Glyph( face_, index, load_flags ) )
+    else if ( FT_Load_Glyph( face_, index, bitmap_flags ) )
         throw error::runtime( "font::face: " ) << "Unable to load glyph index " << index;
 
-    FT_Glyph_Metrics& m = face_->glyph->metrics;
     FT_Bitmap& b = face_->glyph->bitmap;
-    font::metric metric( m.horiBearingX, m.horiBearingY, m.horiAdvance, b.width, b.rows );
-    return font::bitmap( metric, b.pitch, b.buffer );
+    return font::bitmap( b.width > 8 ? ( b.width / 3 ) - 2 : 0, b.rows, b.pitch, b.buffer );
 }
 
 OOE_NAMESPACE_END( ( ooe )( font ) )

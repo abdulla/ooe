@@ -33,10 +33,12 @@ const image_format::type image_type = image_format::rgba_u8;
 struct source_metric
     : public font::metric
 {
+    u16 width;
+    u16 height;
     bool valid;
 
-    source_metric( const font::metric& metric_, bool valid_ )
-        : metric( metric_ ), valid( valid_ )
+    source_metric( const font::metric& metric_, u16 width_, u16 height_, bool valid_ )
+        : metric( metric_ ), width( width_ ), height( height_ ), valid( valid_ )
     {
     }
 };
@@ -96,13 +98,13 @@ void copy_row( const u8* i, u8* j, u16 size )
 
 void copy_partial( image& image, const font::bitmap& bitmap, u16 x, u16 y )
 {
-    if ( x >= bitmap.metric.width || y >= bitmap.metric.height )
+    if ( x >= bitmap.width || y >= bitmap.height )
         return;
 
     u8* target = image.as< u8 >();
     const u8* source = bitmap.data + x * 3 + y * bitmap.pitch;
-    u16 width = std::min< u16 >( page_wide, bitmap.metric.width - x );
-    u16 height = std::min< u16 >( page_wide, bitmap.metric.height - y );
+    u16 width = std::min< u16 >( page_wide, bitmap.width - x );
+    u16 height = std::min< u16 >( page_wide, bitmap.height - y );
 
     for ( u16 i = 0; i != height; ++i, target += row_size( image ), source += bitmap.pitch )
         copy_row( source + ( x ? 0 : 3 ), target, width );
@@ -112,8 +114,8 @@ void copy_square( image& image, const font::bitmap& bitmap, u16 x, u16 y )
 {
     u8* target = image.as< u8 >() + ( x + y * image.width ) * 4;
     const u8* source = bitmap.data;
-    u16 width = std::min< u16 >( page_wide - x, bitmap.metric.width );
-    u16 height = std::min< u16 >( page_wide - y, bitmap.metric.height );
+    u16 width = std::min< u16 >( page_wide - x, bitmap.width );
+    u16 height = std::min< u16 >( page_wide - y, bitmap.height );
 
     for ( u16 i = 0; i != height; ++i, target += row_size( image ), source += bitmap.pitch )
         copy_row( source + 3, target, width );
@@ -126,16 +128,14 @@ const image& write_image( const image& image, const std::string& path )
     return image;
 }
 
-void write_metric( const memory& memory, u32 glyph_index, u32 glyphs, u8 level_inverse,
-    const font::metric& metric )
-{
-    source_metric* metrics = memory.as< source_metric >() + glyph_index + glyphs * level_inverse;
-    *metrics = source_metric( metric, true );
-}
-
 source_metric& read_metric( const memory& memory, u32 glyph_index, u32 glyphs, u8 level_inverse )
 {
     return memory.as< source_metric >()[ glyph_index + glyphs * level_inverse ];
+}
+
+void write_metric( source_metric& sm, const font::metric& metric, const font::bitmap& bitmap )
+{
+    sm = source_metric( metric, bitmap.width, bitmap.height, true );
 }
 
 OOE_ANONYMOUS_END( ( ooe ) )
@@ -189,7 +189,7 @@ u32 font_source::glyph_index( u32 code_point ) const
     return index;
 }
 
-f32 font_source::kerning( u32 left, u32 right, u8 level ) const
+f32 font_source::kerning( u32 left, u32 right ) const
 {
     kerning_cache_type::key_type key( left, right );
     kerning_cache_type::const_iterator i = kerning_cache.find( key );
@@ -198,7 +198,7 @@ f32 font_source::kerning( u32 left, u32 right, u8 level ) const
         return i->second;
 
     lock lock( mutex );
-    f32 advance = face.kerning( left, right, face_size >> level );
+    f32 advance = face.kerning( left, right );
     kerning_cache.insert( std::make_pair( key, advance ) );
     return advance;
 }
@@ -213,19 +213,22 @@ font_source::glyph_type font_source::glyph( u32 glyph_index_, u8 level ) const
             "Mipmap level " << level << " > maximum level " << level_limit;
 
     u8 level_inverse = level_limit - level;
-    source_metric& metric = read_metric( memory, glyph_index_, glyphs, level_inverse );
+    source_metric& sm = read_metric( memory, glyph_index_, glyphs, level_inverse );
 
-    if ( !metric.valid )
+    if ( !sm.valid )
     {
         lock lock( mutex );
+        font::metric metric = face.metric( glyph_index_ );
         font::bitmap bitmap = face.bitmap( glyph_index_, face_size >> level );
-        metric = source_metric( bitmap.metric, true );
+        write_metric( sm, metric, bitmap );
     }
 
     u32 glyphs_per_row = source_size / face_size;
     return glyph_type
     (
-        metric,
+        sm,
+        sm.width,
+        sm.height,
         ( glyph_index_ % glyphs_per_row ) * face_size,
         ( glyph_index_ / glyphs_per_row ) * face_size
     );
@@ -262,9 +265,11 @@ image font_source::read( const pyramid_index& index )
         u32 y_offset = ( index.y % pages_per_glyph ) * page_wide;
 
         lock lock( mutex );
+        font::metric metric = face.metric( base_index );
         font::bitmap bitmap = face.bitmap( base_index, level_size );
         copy_partial( image, bitmap, x_offset, y_offset );
-        write_metric( memory, base_index, glyphs, level_inverse, bitmap.metric );
+        source_metric& sm = read_metric( memory, base_index, glyphs, level_inverse );
+        write_metric( sm, metric, bitmap );
         return write_image( image, path );
     }
 
@@ -278,9 +283,11 @@ image font_source::read( const pyramid_index& index )
                 return write_image( image, path );
 
             lock lock( mutex );
+            font::metric metric = face.metric( glyph_index_ );
             font::bitmap bitmap = face.bitmap( glyph_index_, level_size );
             copy_square( image, bitmap, i * level_size, j * level_size );
-            write_metric( memory, glyph_index_, glyphs, level_inverse, bitmap.metric );
+            source_metric& sm = read_metric( memory, glyph_index_, glyphs, level_inverse );
+            write_metric( sm, metric, bitmap );
         }
     }
 

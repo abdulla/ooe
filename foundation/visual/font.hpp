@@ -31,20 +31,19 @@ struct metric
     f32 left;
     f32 top;
     f32 advance;
-    u16 width;
-    u16 height;
 
-    metric( s32, s32, s32, u16, u16 );
+    metric( f32, f32, f32 );
 };
 
 //--- bitmap ---------------------------------------------------------------------------------------
 struct bitmap
 {
-    font::metric metric;
+    u16 width;
+    u16 height;
     s32 pitch;
     const u8* data;
 
-    bitmap( const font::metric&, s32, const u8* );
+    bitmap( u16, u16, s32, const u8* );
 };
 
 //--- face -----------------------------------------------------------------------------------------
@@ -78,7 +77,8 @@ public:
     u32 number( number_type ) const;
 
     u32 glyph_index( u32 ) const;
-    u32 kerning( u32, u32 ) const;
+    f32 kerning( u32, u32 ) const;
+    font::metric metric( u32 ) const;
     font::bitmap bitmap( u32, u32, bitmap_type = red ) const;
 
 private:
