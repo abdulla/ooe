@@ -20,6 +20,8 @@ void main( void )
     tint = colour / 255.;
 
     // TODO: change round() to floor() when sub-pixel glyphs are used
-    vec2 point = vertex * vertex_scale + round( vertex_translate ) + translate;
+    float x = round( vertex_translate.x );
+    float y = ceil( vertex_translate.y );
+    vec2 point = vertex * vertex_scale + vec2( x, y ) + translate;
     gl_Position = projection * vec4( point + view, depth, 1 );
 }
