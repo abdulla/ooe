@@ -126,7 +126,6 @@ marker add_text( const font_source& source, virtual_texture& texture, const limi
     // if the font size is greater than the line height, adjust the line height
     if ( font_size > state.line_height )
     {
-        // state.x = bit_slide( line.i->x, limit.zoom );
         state.line_height = font_size;
         return line;
     }
