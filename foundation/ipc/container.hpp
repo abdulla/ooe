@@ -77,9 +77,9 @@ public:
     void deallocate( pointer p, size_type )
     {
         if ( memory && p == memory->as< type >() )
-            memory_ptr().swap( memory );
+            memory.reset();
         else if ( reserve && p == reserve->as< type >() )
-            memory_ptr().swap( reserve );
+            reserve.reset();
         else
             throw error::runtime( "ipc::allocator: " ) << "Invalid pointer " << p;
     }

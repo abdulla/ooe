@@ -36,7 +36,7 @@ public:
 
     virtual void allocate( up_t size )
     {
-        scoped_array< u8 >( new u8[ size ] ).swap( memory );
+        memory.reset( new u8[ size ] );
     }
 
     virtual u8* get( up_t preserved ) const
@@ -71,8 +71,7 @@ public:
     virtual void allocate( up_t size )
     {
         size = round_up( size + executable::static_page_size, executable::static_page_size );
-        scoped_ptr< shared_memory >
-            ( new shared_memory( unique_name(), shared_memory::create, size ) ).swap( memory );
+        memory.reset( new shared_memory( unique_name(), shared_memory::create, size ) );
 
         ooe::memory::region
             window( size - executable::static_page_size, executable::static_page_size );
@@ -86,12 +85,12 @@ public:
 
     void deallocate( void )
     {
-        scoped_ptr< shared_memory >( 0 ).swap( memory );
+        memory.reset();
     }
 
     void set( const std::string& name_ )
     {
-        scoped_ptr< shared_memory >( new shared_memory( name_ ) ).swap( memory );
+        memory.reset( new shared_memory( name_ ) );
 
         ooe::memory::region
             window( memory->size() - executable::static_page_size, executable::static_page_size );

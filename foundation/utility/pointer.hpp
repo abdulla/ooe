@@ -64,11 +64,10 @@ public:
         return pass_back;
     }
 
-    void swap( scoped_base& exchange )
+    void reset( type* pointer = 0 )
     {
-        type* save = value;
-        value = exchange.value;
-        exchange.value = save;
+        function( value );
+        value = pointer;
     }
 
 protected:
@@ -231,11 +230,10 @@ public:
         return reinterpret_cast< to* >( data->get() );
     }
 
-    void swap( shared_base& exchange )
+    void reset( type* value = 0 )
     {
-        data_type* save = data;
-        data = exchange.data;
-        exchange.data = save;
+        data->decrement();
+        data = new data_type( value );
     }
 
 protected:
@@ -418,11 +416,11 @@ public:
         return data->destructor();
     }
 
-    void swap( opaque_ptr& exchange )
+    template< typename t >
+        void reset( t* value, function_type function = deallocate_ptr< t > )
     {
-        opaque_data* save = data;
-        data = exchange.data;
-        exchange.data = save;
+        data->decrement();
+        data = new opaque_data( value, function );
     }
 
 private:

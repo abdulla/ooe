@@ -282,7 +282,7 @@ void make_tile( const descriptor& desc, thread_pool& pool, const std::string& ro
     u32 height_limit = ceiling< u32 >( reader->height, page_size );
     u32 w = width_limit;
     u32 h = height_limit;
-    reader_ptr().swap( reader );
+    reader.reset();
     page_vector().swap( pages );
 
     // resample

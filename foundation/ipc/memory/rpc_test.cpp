@@ -106,7 +106,7 @@ public:
         std::string name = ipc::unique_name();
         ipc::barrier_wait wait( name );
         io_triplet io( -1, executable::null_fd(), -1 );
-        fork_ptr( new scoped_fork( io ) ).swap( fork );
+        fork.reset( new scoped_fork( io ) );
 
         if ( fork->is_child() )
         {
