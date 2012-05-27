@@ -57,13 +57,12 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     scoped_ptr< up_t > other( value );
     OOE_CHECK( "other.release() == value", other.release() == value );
 
-    ptr.swap( other );
-    OOE_CHECK( "ptr.get() == 0", ptr.get() == 0 );
-    OOE_CHECK( "other.get() == value", other.get() == value );
+    up_t* reset = new up_t( 8 );
+    ptr.reset( reset );
+    OOE_CHECK( "ptr.reset( reset ) == reset", ptr.get() == reset );
 
-    other.swap( ptr );
-    OOE_CHECK( "ptr.get() == value", ptr.get() == value );
-    OOE_CHECK( "other.get() == 0", other.get() == 0 );
+    ptr.reset();
+    OOE_CHECK( "ptr.reset() == 0", !ptr.get() );
 }
 
 OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
@@ -84,20 +83,18 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
     OOE_CHECK( "ptr.operator ->() == value", ptr.operator ->() == value );
     OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
-    shared_ptr< up_t > other;
-    ptr.swap( other );
-    OOE_CHECK( "ptr.get() == 0", ptr.get() == 0 );
-    OOE_CHECK( "other.get() == value", other.get() == value );
-
-    other.swap( ptr );
-    OOE_CHECK( "ptr.get() == value", ptr.get() == value );
-    OOE_CHECK( "other.get() == 0", other.get() == 0 );
-
     {
         shared_ptr< up_t > copy( ptr );
         OOE_CHECK( "copy.get() == value", copy.get() == value );
     }
     OOE_CHECK( "copy: ptr.get() == value", ptr.get() == value );
+
+    up_t* reset = new up_t( 8 );
+    ptr.reset( reset );
+    OOE_CHECK( "ptr.reset( reset ) == reset", ptr.get() == reset );
+
+    ptr.reset();
+    OOE_CHECK( "ptr.reset() == 0", !ptr.get() );
 }
 
 OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
@@ -116,20 +113,15 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
     OOE_CHECK( "ptr.get() == value", ptr.get() == value );
     OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
 
-    opaque_ptr other( static_cast< up_t* >( 0 ) );
-    ptr.swap( other );
-    OOE_CHECK( "ptr.get() == 0", ptr.get() == 0 );
-    OOE_CHECK( "other.get() == value", other.get() == value );
-
-    other.swap( ptr );
-    OOE_CHECK( "ptr.get() == value", ptr.get() == value );
-    OOE_CHECK( "other.get() == 0", other.get() == 0 );
-
     {
         opaque_ptr copy( ptr );
         OOE_CHECK( "copy.get() == value", copy.get() == value );
     }
     OOE_CHECK( "copy: ptr.get() == value", ptr.get() == value );
+
+    up_t* reset = new up_t( 8 );
+    ptr.reset( reset );
+    OOE_CHECK( "ptr.reset( reset ) == reset", ptr.get() == reset );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
