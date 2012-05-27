@@ -19,8 +19,8 @@ void split_node( bin_node& node, u32 width, u32 height )
     const rect& r = node.rect;
     rect a( r.x, r.y, r.width, r.height );
     rect b( r.x + width, r.y + height, r.width - width, r.height - height );
-    bin_node::node_type( new bin_node( a ) ).swap( node.left );
-    bin_node::node_type( new bin_node( b ) ).swap( node.right );
+    node.left.reset( new bin_node( a ) );
+    node.right.reset( new bin_node( b ) );
 }
 
 OOE_ANONYMOUS_END( ( ooe ) )
