@@ -3,6 +3,9 @@
 #ifndef OOE_COMPONENT_UI_BIN_HPP
 #define OOE_COMPONENT_UI_BIN_HPP
 
+#include "foundation/utility/pointer.hpp"
+#include "foundation/utility/tuple.hpp"
+
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- rect -----------------------------------------------------------------------------------------
@@ -32,7 +35,7 @@ struct bin_node
 class bin
 {
 public:
-    typedef tuple< rect, bool > insert_type;
+    typedef tuple< u32, u32, bool > insert_type;
 
     bin( u32 );
     insert_type insert( u32, u32 );
