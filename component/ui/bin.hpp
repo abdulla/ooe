@@ -37,8 +37,10 @@ class bin
 public:
     typedef tuple< u32, u32, bool > insert_type;
 
-    bin( u32 );
+    bin( u32, u32 );
+
     insert_type insert( u32, u32 );
+    void clear( void );
 
 private:
     bin_node node;

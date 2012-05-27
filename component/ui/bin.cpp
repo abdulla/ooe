@@ -8,6 +8,8 @@ bin_node* find_root( bin_node* node, u32 width, u32 height )
 {
     if ( !node->left )
         return width > node->rect.width || height > node->rect.height ? 0 : node;
+    else if ( !node->right->rect.width || !node->right->rect.height )
+        return 0;
     else if ( ( node = find_root( node->left, width, height ) ) )
         return node;
     else
@@ -40,8 +42,8 @@ bin_node::bin_node( const ooe::rect& rect_ )
 }
 
 //--- bin ------------------------------------------------------------------------------------------
-bin::bin( u32 size )
-    : node( rect( 0, 0, size, size ) )
+bin::bin( u32 width, u32 height )
+    : node( rect( 0, 0, width, height ) )
 {
 }
 
@@ -56,12 +58,18 @@ bin::insert_type bin::insert( u32 width, u32 height )
     u32 wide = rect.width - width;
     u32 tall = rect.height - height;
 
-    if ( wide > tall )
+    if ( wide >= tall )
         split_node( *root, width, 0 );
     else
         split_node( *root, 0, height );
 
     return insert_type( rect.x, rect.y, true );
+}
+
+void bin::clear( void )
+{
+    node.left.reset();
+    node.right.reset();
 }
 
 OOE_NAMESPACE_END( ( ooe ) )
