@@ -33,6 +33,32 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
 
     result = bin.insert( 1024, 1024 );
     OOE_CHECK( "consecutive insert( 1024, 1024 )._2 == false", !result._2 );
+
+    u32 x[] = { 0, 0, 512, 512 };
+    u32 y[] = { 0, 512, 0, 512 };
+    bin.clear();
+
+    for ( up_t i = 0; i != 4; ++i )
+    {
+        result = bin.insert( 512, 512 );
+        OOE_CHECK( i << ". " << result._0 << " == " << x[ i ], result._0 == x[ i ] );
+        OOE_CHECK( i << ". " << result._1 << " == " << y[ i ], result._1 == y[ i ] );
+        OOE_CHECK( i << ". " << result._2 << " == true", result._2 );
+    }
+
+    OOE_CHECK( "insert into full", !bin.insert( 512, 512 )._2 );
+
+    bin.clear();
+
+    for ( up_t i = 0; i != 16; ++i )
+        OOE_CHECK( i << ". inserted", bin.insert( 256, 256 )._2 );
+
+    OOE_CHECK( "insert into full", !bin.insert( 256, 256 )._2 );
+
+    bin.clear();
+    OOE_CHECK( "insert 0 width", !bin.insert( 0, 1024 )._2 );
+    OOE_CHECK( "insert 0 height", !bin.insert( 1024, 0 )._2 );
+    OOE_CHECK( "insert 0 both", !bin.insert( 0, 0 )._2 );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

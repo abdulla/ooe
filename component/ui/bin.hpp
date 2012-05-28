@@ -25,6 +25,7 @@ struct bin_node
     typedef scoped_ptr< bin_node > node_type;
 
     ooe::rect rect;
+    bool full;
     node_type left;
     node_type right;
 
