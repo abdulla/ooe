@@ -6,23 +6,27 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 bin_node* find_root( bin_node* node, u32 width, u32 height )
 {
+    if ( node->full )
+        return 0;
     if ( !node->left )
         return width > node->rect.width || height > node->rect.height ? 0 : node;
-    else if ( !node->right->rect.width || !node->right->rect.height )
-        return 0;
-    else if ( ( node = find_root( node->left, width, height ) ) )
-        return node;
+    else if ( bin_node* left = find_root( node->left, width, height ) )
+        return left;
     else
         return find_root( node->right, width, height );
 }
 
-void split_node( bin_node& node, u32 width, u32 height )
+void split_node( bin_node& node, u32 width, u32 height, bool full )
 {
     const rect& r = node.rect;
-    rect a( r.x, r.y, r.width, r.height );
-    rect b( r.x + width, r.y + height, r.width - width, r.height - height );
+    rect a( r.x, r.y, width ? width : r.width, height ? height : r.height );
     node.left.reset( new bin_node( a ) );
-    node.right.reset( new bin_node( b ) );
+
+    if ( !full )
+    {
+        rect b( r.x + width, r.y + height, r.width - width, r.height - height );
+        node.right.reset( new bin_node( b ) );
+    }
 }
 
 OOE_ANONYMOUS_END( ( ooe ) )
@@ -37,7 +41,7 @@ rect::rect( u32 x_, u32 y_, u32 width_, u32 height_ )
 
 //--- bin_node -------------------------------------------------------------------------------------
 bin_node::bin_node( const ooe::rect& rect_ )
-    : rect( rect_ ), left( 0 ), right( 0 )
+    : rect( rect_ ), full( false ), left( 0 ), right( 0 )
 {
 }
 
@@ -49,25 +53,39 @@ bin::bin( u32 width, u32 height )
 
 bin::insert_type bin::insert( u32 width, u32 height )
 {
+    if ( !width || !height )
+        return insert_type( 0, 0, false );
+
     bin_node* root = find_root( &node, width, height );
 
     if ( !root )
         return insert_type( 0, 0, false );
 
-    const rect& rect = root->rect;
-    u32 wide = rect.width - width;
-    u32 tall = rect.height - height;
+    while ( true )
+    {
+        const rect& rect = root->rect;
+        u32 wide = rect.width - width;
+        u32 tall = rect.height - height;
+        bool full = !wide && !tall;
 
-    if ( wide >= tall )
-        split_node( *root, width, 0 );
-    else
-        split_node( *root, 0, height );
+        if ( full )
+        {
+            root->full = true;
+            return insert_type( rect.x, rect.y, true );
+        }
 
-    return insert_type( rect.x, rect.y, true );
+        if ( wide >= tall )
+            split_node( *root, width, 0, full );
+        else
+            split_node( *root, 0, height, full );
+
+        root = root->left;
+    }
 }
 
 void bin::clear( void )
 {
+    node.full = false;
     node.left.reset();
     node.right.reset();
 }
