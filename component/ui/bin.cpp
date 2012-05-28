@@ -53,6 +53,7 @@ bin::bin( u32 width, u32 height )
 
 bin::insert_type bin::insert( u32 width, u32 height )
 {
+    // see: http://www.blackpawn.com/texts/lightmaps
     if ( !width || !height )
         return insert_type( 0, 0, false );
 
