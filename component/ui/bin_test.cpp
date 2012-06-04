@@ -19,20 +19,14 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     std::cerr << "insert";
 
     bin bin( 1024, 1024 );
-    bin::insert_type result = bin.insert( 1025, 1025 );
-    OOE_CHECK( "insert( 1025, 1025 )._2 == false", !result._2 );
-    result = bin.insert( 1025, 1024 );
-    OOE_CHECK( "insert( 1025, 1024 )._2 == false", !result._2 );
-    result = bin.insert( 1024, 1025 );
-    OOE_CHECK( "insert( 1024, 1025 )._2 == false", !result._2 );
+    OOE_CHECK( "insert too large", bin.insert( 1025, 1025 ) == bin::insert_type( 0, false ) );
+    OOE_CHECK( "insert too large", bin.insert( 1025, 1024 ) == bin::insert_type( 0, false ) );
+    OOE_CHECK( "insert too large", bin.insert( 1024, 1025 ) == bin::insert_type( 0, false ) );
 
-    result = bin.insert( 1024, 1024 );
-    OOE_CHECK( "insert( 1024, 1024 )._0 == 0", result._0 == 0 );
-    OOE_CHECK( "insert( 1024, 1024 )._1 == 0", result._1 == 0 );
-    OOE_CHECK( "insert( 1024, 1024 )._2 == true", result._2 );
+    bin::insert_type result = bin.insert( 1024, 1024 );
+    OOE_CHECK( "insert exact", *result._0 == rect( 0, 0, 1024, 1024 ) && result._1 );
 
-    result = bin.insert( 1024, 1024 );
-    OOE_CHECK( "consecutive insert( 1024, 1024 )._2 == false", !result._2 );
+    OOE_CHECK( "insert into full", bin.insert( 1024, 1024 ) == bin::insert_type( 0, false ) );
 
     u32 x[] = { 0, 0, 512, 512 };
     u32 y[] = { 0, 512, 0, 512 };
@@ -41,24 +35,22 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     for ( up_t i = 0; i != 4; ++i )
     {
         result = bin.insert( 512, 512 );
-        OOE_CHECK( i << ". " << result._0 << " == " << x[ i ], result._0 == x[ i ] );
-        OOE_CHECK( i << ". " << result._1 << " == " << y[ i ], result._1 == y[ i ] );
-        OOE_CHECK( i << ". " << result._2 << " == true", result._2 );
+        OOE_CHECK( i , *result._0 == rect( x[ i ], y[ i ], 512, 512 ) && result._1 );
     }
 
-    OOE_CHECK( "insert into full", !bin.insert( 512, 512 )._2 );
+    OOE_CHECK( "insert into full", bin.insert( 512, 512 ) == bin::insert_type( 0, false ) );
 
     bin.clear();
 
     for ( up_t i = 0; i != 16; ++i )
-        OOE_CHECK( i << ". inserted", bin.insert( 256, 256 )._2 );
+        OOE_CHECK( i << ". inserted", bin.insert( 256, 256 )._1 );
 
-    OOE_CHECK( "insert into full", !bin.insert( 256, 256 )._2 );
+    OOE_CHECK( "insert into full", bin.insert( 256, 256 ) == bin::insert_type( 0, false ) );
 
     bin.clear();
-    OOE_CHECK( "insert 0 width", !bin.insert( 0, 1024 )._2 );
-    OOE_CHECK( "insert 0 height", !bin.insert( 1024, 0 )._2 );
-    OOE_CHECK( "insert 0 both", !bin.insert( 0, 0 )._2 );
+    OOE_CHECK( "insert 0 width", bin.insert( 0, 1024 ) == bin::insert_type( 0, false ) );
+    OOE_CHECK( "insert 0 height", bin.insert( 1024, 0 ) == bin::insert_type( 0, false ) );
+    OOE_CHECK( "insert 0 both", bin.insert( 0, 0 ) == bin::insert_type( 0, false ) );
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

@@ -39,6 +39,11 @@ rect::rect( u32 x_, u32 y_, u32 width_, u32 height_ )
 {
 }
 
+bool operator ==( const rect& r, const rect& s )
+{
+    return r.x == s.x && r.y == s.y && r.width == s.width && r.height == s.height;
+}
+
 //--- bin_node -------------------------------------------------------------------------------------
 bin_node::bin_node( const ooe::rect& rect_ )
     : rect( rect_ ), full( false ), left( 0 ), right( 0 )
@@ -55,12 +60,12 @@ bin::insert_type bin::insert( u32 width, u32 height )
 {
     // see: http://www.blackpawn.com/texts/lightmaps
     if ( !width || !height )
-        return insert_type( 0, 0, false );
+        return insert_type( 0, false );
 
     bin_node* root = find_root( &node, width, height );
 
     if ( !root )
-        return insert_type( 0, 0, false );
+        return insert_type( 0, false );
 
     while ( true )
     {
@@ -72,7 +77,7 @@ bin::insert_type bin::insert( u32 width, u32 height )
         if ( full )
         {
             root->full = true;
-            return insert_type( rect.x, rect.y, true );
+            return insert_type( &rect, true );
         }
 
         if ( wide >= tall )

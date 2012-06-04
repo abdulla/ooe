@@ -19,6 +19,8 @@ struct rect
     rect( u32, u32, u32, u32 );
 };
 
+bool operator ==( const rect&, const rect& );
+
 //--- bin_node -------------------------------------------------------------------------------------
 struct bin_node
 {
@@ -36,7 +38,7 @@ struct bin_node
 class bin
 {
 public:
-    typedef tuple< u32, u32, bool > insert_type;
+    typedef tuple< const rect*, bool > insert_type;
 
     bin( u32, u32 );
 
