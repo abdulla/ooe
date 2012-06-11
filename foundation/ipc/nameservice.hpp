@@ -17,7 +17,6 @@ public:
 
     nameservice( void );
 
-    void upgrade( const list_type& );
     operator const ipc::switchboard&( void ) const;
 
     index_t find( const std::string&, const std::string& ) const;

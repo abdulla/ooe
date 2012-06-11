@@ -12,7 +12,7 @@ def build( context ):
         use = 'io parallel' )
 
     context.program(
-        source = 'shared_memory_test.cpp upgrade_test.cpp memory/rpc_test.cpp socket/rpc_test.cpp',
+        source = 'shared_memory_test.cpp memory/rpc_test.cpp socket/rpc_test.cpp',
         target = 'ipc_test',
         use = 'ipc unit' )
 
