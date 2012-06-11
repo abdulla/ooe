@@ -28,11 +28,13 @@ private:
 //--- metric ---------------------------------------------------------------------------------------
 struct metric
 {
+    f32 width;
+    f32 height;
     f32 left;
     f32 top;
     f32 advance;
 
-    metric( f32, f32, f32 );
+    metric( f32, f32, f32, f32, f32 );
 };
 
 //--- bitmap ---------------------------------------------------------------------------------------
@@ -51,18 +53,6 @@ class OOE_VISIBLE face
     : private noncopyable
 {
 public:
-    enum string_type
-    {
-        family,
-        style
-    };
-
-    enum number_type
-    {
-        glyphs,
-        strikes
-    };
-
     enum bitmap_type
     {
         red,
@@ -73,8 +63,9 @@ public:
     face( const library&, const descriptor& );
     ~face( void );
 
-    std::string string( string_type ) const;
-    u32 number( number_type ) const;
+    std::string family( void ) const;
+    std::string style( void ) const;
+    up_t size( void ) const;
 
     u32 glyph_index( u32 ) const;
     f32 kerning( u32, u32 ) const;

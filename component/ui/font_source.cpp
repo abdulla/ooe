@@ -58,7 +58,7 @@ u16 check_size( u16 face_size )
 
 std::string get_root( const std::string& root, const font::face& face )
 {
-    std::string suffix = face.string( font::face::family ) + '-' + face.string( font::face::style );
+    std::string suffix = face.family() + '-' + face.style();
     std::transform( suffix.begin(), suffix.end(), suffix.begin(), transform );
     std::string path = canonical_path( root ) + '/' + suffix;
 
@@ -70,7 +70,7 @@ std::string get_root( const std::string& root, const font::face& face )
 
 u32 get_size( const font::face& face, u16 face_size )
 {
-    u32 root = std::sqrt( face.number( font::face::glyphs ) );
+    u32 root = std::sqrt( face.size() );
     return bit_round_up( root ) * face_size;
 }
 
@@ -146,7 +146,7 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 font_source::font_source( const font::face& face_, u16 face_size_, const std::string& root_ )
     : mutex(), face( face_ ), face_size( check_size( face_size_ ) ),
     root( get_root( root_, face ) ), source_size( get_size( face, face_size ) ),
-    glyphs( face.number( font::face::glyphs ) ), level_limit( log2f( source_size / page_wide ) ),
+    glyphs( face.size() ), level_limit( log2f( source_size / page_wide ) ),
     index_cache( 1 << 9 ), kerning_cache( 1 << 14 ),
     memory( open_memory( root, glyphs, level_limit + 1 ) )
 {

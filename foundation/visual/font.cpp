@@ -54,8 +54,8 @@ library::~library( void )
 }
 
 //--- metric ---------------------------------------------------------------------------------------
-metric::metric( f32 left_, f32 top_, f32 advance_ )
-    : left( left_ ), top( top_ ), advance( advance_ )
+metric::metric( f32 width_, f32 height_, f32 left_, f32 top_, f32 advance_ )
+    : width( width_ ), height( height_ ), left( left_ ), top( top_ ), advance( advance_ )
 {
 }
 
@@ -81,34 +81,19 @@ face::~face( void )
         OOE_CONSOLE( "font::face: " << "Unable to close font face" );
 }
 
-std::string face::string( string_type type ) const
+std::string face::family( void ) const
 {
-    switch ( type )
-    {
-    case family:
-        return face_->family_name;
-
-    case style:
-        return face_->style_name;
-
-    default:
-        throw error::runtime( "font::face: " ) << "Unknown string type: " << type;
-    }
+    return face_->family_name;
 }
 
-u32 face::number( number_type type ) const
+std::string face::style( void ) const
 {
-    switch ( type )
-    {
-    case glyphs:
-        return face_->num_glyphs;
+    return face_->style_name;
+}
 
-    case strikes:
-        return face_->num_fixed_sizes;
-
-    default:
-        throw error::runtime( "font::face: " ) << "Unknown number type: " << type;
-    }
+up_t face::size( void ) const
+{
+    return face_->num_glyphs;
 }
 
 u32 face::glyph_index( u32 code_point ) const
@@ -140,16 +125,17 @@ metric face::metric( u32 index ) const
 
     FT_Glyph_Metrics& m = face_->glyph->metrics;
     f32 em = face_->units_per_EM;
-    return font::metric( m.horiBearingX / em, m.horiBearingY / em, m.horiAdvance / em );
+    return font::metric( m.width / em, m.height / em, m.horiBearingX / em, m.horiBearingY / em,
+        m.horiAdvance / em );
 }
 
-bitmap face::bitmap( u32 index, u32 size, bitmap_type subpixel ) const
+bitmap face::bitmap( u32 index, u32 size_, bitmap_type subpixel ) const
 {
     FT_Vector delta = { translate( subpixel ), 0 };
     FT_Set_Transform( face_, 0, &delta );
 
-    if ( FT_Set_Pixel_Sizes( face_, size, 0 ) )
-        throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size;
+    if ( FT_Set_Pixel_Sizes( face_, size_, 0 ) )
+        throw error::runtime( "font::face: " ) << "Unable to set pixel size to " << size_;
     else if ( FT_Load_Glyph( face_, index, bitmap_flags ) )
         throw error::runtime( "font::face: " ) << "Unable to load glyph index " << index;
 

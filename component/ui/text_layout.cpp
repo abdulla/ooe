@@ -100,12 +100,13 @@ void add_glyph( const font_source::glyph_type& glyph, const colour& colour, cons
     checked_map& map, u32 size, s8 slide, u8 level )
 {
     const font::metric& metric = glyph._0;
+    f32 height_diff = bit_slide( glyph._2, slide ) - metric.height * state.font_size;
     f32 coords[] =
     {
         bit_slide( glyph._1, slide ),
         bit_slide( glyph._2, slide ),
         state.x + metric.left * state.font_size,
-        state.y + state.line_height - metric.top * state.font_size,
+        state.y + state.line_height - metric.top * state.font_size - height_diff,
 
         divide( glyph._1 << level, size ),
         divide( glyph._2 << level, size ),
