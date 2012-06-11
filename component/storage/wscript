@@ -2,6 +2,6 @@
 
 def build( context ):
     context.program(
-        source = 'main.cpp',
+        source = 'server/main.cpp',
         target = 'storage',
         use = 'ipc' )
