@@ -8,8 +8,8 @@
 #include "component/registry/registry.hpp"
 #include "foundation/executable/fork_io.hpp"
 #include "foundation/executable/program.hpp"
+#include "foundation/ipc/nameservice.hpp"
 #include "foundation/ipc/semaphore.hpp"
-#include "foundation/ipc/switchboard.hpp"
 #include "foundation/ipc/memory/rpc.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/parallel/lock.hpp"
@@ -197,18 +197,14 @@ bool launch( const std::string& root, const std::string&, s32 argc, c8** argv )
     }
 
     surrogate_path = root + "surrogate";
-    ipc::switchboard switchboard;
 
-    if ( switchboard.insert( find ) != 1 )
-        throw error::runtime( "registry: " ) << "\"find\" not at index 1";
-    else if ( switchboard.insert( insert ) != 2 )
-        throw error::runtime( "registry: " ) << "\"insert\" not at index 2";
-    else if ( switchboard.insert( surrogate ) != 3 )
-        throw error::runtime( "registry: " ) << "\"surrogate\" not at index 3";
-    else if ( switchboard.insert( list_all ) != 4 )
-        throw error::runtime( "registry: " ) << "\"list_all\" not at index 4";
+    ipc::nameservice nameservice;
+    nameservice.insert( "find", find );
+    nameservice.insert( "insert", insert );
+    nameservice.insert( "surrogate", surrogate );
+    nameservice.insert( "list_all", list_all );
 
-    ipc::memory::server server( switchboard );
+    ipc::memory::server server( nameservice );
     listen listen( ipc::server_address( "ooe.registry" ) );
 
     if ( up_name )

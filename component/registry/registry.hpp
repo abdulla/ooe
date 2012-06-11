@@ -5,6 +5,7 @@
 
 #include "component/registry/interface.hpp"
 #include "foundation/ipc/memory/client.hpp"
+#include "foundation/ipc/memory/rpc.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
@@ -29,6 +30,7 @@ public:
 
 private:
     ipc::memory::client client;
+    ipc::memory::find_all::result_type result;
 };
 
 OOE_NAMESPACE_END( ( ooe ) )

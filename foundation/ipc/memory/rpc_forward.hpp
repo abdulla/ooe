@@ -6,6 +6,7 @@
     #define OOE_FOUNDATION_IPC_MEMORY_RPC_FORWARD_HPP
 
 #include "foundation/ipc/error.hpp"
+#include "foundation/ipc/fundamental.hpp"
 #include "foundation/ipc/io_buffer.hpp"
 #include "foundation/ipc/traits.hpp"
 #include "foundation/ipc/memory/transport.hpp"
