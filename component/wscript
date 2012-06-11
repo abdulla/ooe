@@ -1,4 +1,4 @@
 ## Copyright (C) 2012 Abdulla Kamar. All rights reserved. ##
 
 def build( context ):
-    context.recurse( 'lua python registry ui' )
+    context.recurse( 'lua python registry storage ui' )
