@@ -38,7 +38,7 @@ s32 find( state* state )
     {
         up_t j = i->find( '/' );
 
-        if ( j == ~up_t( 0 ) )
+        if ( j == std::string::npos )
             throw error::runtime( "lua::find: " ) << "Invalid function \"" << *i << '\"';
 
         interface.insert( i->substr( 0, j ), i->substr( j + 1 ) );

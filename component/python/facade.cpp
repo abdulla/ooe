@@ -36,7 +36,7 @@ data* find( data*, data* list )
     {
         up_t j = i->find( '/' );
 
-        if ( j == ~up_t( 0 ) )
+        if ( j == std::string::npos )
             throw error::runtime( "python::find: " ) << "Invalid function \"" << *i << '\"';
 
         interface.insert( i->substr( 0, j ), i->substr( j + 1 ) );
