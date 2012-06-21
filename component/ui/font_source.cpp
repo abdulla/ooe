@@ -60,7 +60,7 @@ std::string get_root( const std::string& root, const font::face& face )
 {
     std::string suffix = face.family() + '-' + face.style();
     std::transform( suffix.begin(), suffix.end(), suffix.begin(), transform );
-    std::string path = canonical_path( root ) + '/' + suffix;
+    std::string path = canonical_path( root ) + '/' + suffix + '/';
 
     if ( !exists( path ) )
         make_directory( path );
@@ -76,7 +76,7 @@ u32 get_size( const font::face& face, u16 face_size )
 
 memory open_memory( const std::string& root, u32 glyphs, u8 levels )
 {
-    descriptor desc( root + "/metric", descriptor::read_write );
+    descriptor desc( root + "metric", descriptor::read_write );
     up_t size = sizeof( source_metric ) * glyphs * levels;
 
     if ( desc.size() < size )
@@ -240,7 +240,7 @@ image font_source::read( const pyramid_index& index )
     image image( page_wide, page_wide, image_type );
     std::string path( root );
     u8 level_inverse = level_limit - index.level;
-    path << '/' << index.x << '_' << index.y << '_' << level_inverse << ".raw";
+    path << index.x << '_' << index.y << '_' << level_inverse << ".raw";
 
     if ( exists( path ) )
     {

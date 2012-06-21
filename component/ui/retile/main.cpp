@@ -42,7 +42,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
         switch ( option )
         {
         case 'r':
-            root = canonical_path( optarg );
+            root = canonical_path( optarg ) + '/';
             break;
 
         case 't':
@@ -65,7 +65,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     }
 
     boost::property_tree::ptree pt;
-    read_json( root + "/metadata", pt );
+    read_json( root + "metadata", pt );
     decoder_type = pt.get< std::string >( "type" );
     decoder = find_decoder( decoder_type );
     encoder = find_encoder( encoder_type );
@@ -85,7 +85,7 @@ bool launch( const std::string&, const std::string&, s32 argc, c8** argv )
     }
 
     pt.put( "type", encoder_type );
-    write_json( root + "/metadata", pt );
+    write_json( root + "metadata", pt );
     return true;
 }
 

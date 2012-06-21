@@ -49,7 +49,7 @@ template< typename t >
 void write_metadata
     ( const std::string& root, const std::string& type, const reader_ptr reader, u32 level_limit )
 {
-    file file( descriptor( root + "/metadata", descriptor::write_new ) );
+    file file( descriptor( root + "metadata", descriptor::write_new ) );
     file <<
         "{\n"
         "    \"type\": \"" << type << "\",\n"
@@ -141,11 +141,11 @@ OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 //--- tile_source ----------------------------------------------------------------------------------
 tile_source::tile_source( const std::string& root_ )
-    : root( root_ ), type(), decoder(), size_(), page_size_(), format_(), level_limit(), width(),
-    height()
+    : root( root_ + '/' ), type(), decoder(), size_(), page_size_(), format_(), level_limit(),
+    width(), height()
 {
     boost::property_tree::ptree pt;
-    read_json( canonical_path( root + "/metadata" ), pt );
+    read_json( canonical_path( root + "metadata" ), pt );
 
     type = pt.get< std::string >( "type" );
     level_limit = pt.get< u8 >( "level_limit" );
@@ -153,7 +153,7 @@ tile_source::tile_source( const std::string& root_ )
     height = pt.get< u32 >( "height" );
 
     decoder = find_decoder( type );
-    image image = decoder( root + "/0_0_0." + type );
+    image image = decoder( root + "0_0_0." + type );
     size_ = image.width << level_limit;
     page_size_ = image.width;
     format_ = image.format;
@@ -235,7 +235,7 @@ std::string make_path
     ( const std::string& root, const pyramid_index& index, const std::string& type )
 {
     std::string path( root );
-    path << '/' << index.x << '_' << index.y << '_' << index.level << '.' << type;
+    path << index.x << '_' << index.y << '_' << index.level << '.' << type;
     return path;
 }
 
