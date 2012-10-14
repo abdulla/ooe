@@ -68,7 +68,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST( 0 )
 {
     std::cerr << "test texture array\n";
 

@@ -39,20 +39,21 @@ class setup
 {
 public:
     setup( void )
-        : path_( executable::path()._0 ), fork( 0 )
+        : fork( 0 )
     {
+        path_ = executable::path()._0;
         start_server();
         registry registry;
         registry.insert( registry::library, path_ + "../lib/libhello" OOE_EXTENSION );
     }
 
-    std::string path() const
+    static const std::string& path( void )
     {
         return path_;
     }
 
 private:
-    std::string path_;
+    static std::string path_;
     fork_ptr fork;
 
     void start_server( void )
@@ -71,6 +72,8 @@ private:
     }
 };
 
+std::string setup::path_;
+
 typedef unit::group< setup, anonymous_t, 6 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "registry" );
@@ -79,7 +82,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( setup& )
+OOE_TEST( 0 )
 {
     std::cerr << "search registry for an interface and list all modules";
 
@@ -93,11 +96,11 @@ OOE_TEST void fixture_type::test< 0 >( setup& )
     OOE_CHECK( "vector.size()", vector.size() );
 }
 
-OOE_TEST void fixture_type::test< 1 >( setup& setup )
+OOE_TEST( 1 )
 {
     std::cerr << "load module in-process";
 
-    std::string path = setup.path() + "../lib/libhello" OOE_EXTENSION;
+    std::string path = setup::path() + "../lib/libhello" OOE_EXTENSION;
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
@@ -109,11 +112,11 @@ OOE_TEST void fixture_type::test< 1 >( setup& setup )
     std::cout << "local-doc( hello ): " << local.doc< void ( * )( void ) >( "hello" ) << '\n';
 }
 
-OOE_TEST void fixture_type::test< 2 >( setup& setup )
+OOE_TEST( 2 )
 {
     std::cerr << "load module as surrogate";
 
-    std::string path = setup.path() + "../lib/libhello" OOE_EXTENSION;
+    std::string path = setup::path() + "../lib/libhello" OOE_EXTENSION;
 
     interface interface;
     interface.insert< void ( void ) >( "hello" );
@@ -126,7 +129,7 @@ OOE_TEST void fixture_type::test< 2 >( setup& setup )
     std::cout << "remote-doc( hello ): " << remote.doc< void ( void ) >( "hello" ) << '\n';
 }
 
-OOE_TEST void fixture_type::test< 3 >( setup& setup )
+OOE_TEST( 3 )
 {
     std::cerr << "insert and load module as server";
 
@@ -139,7 +142,7 @@ OOE_TEST void fixture_type::test< 3 >( setup& setup )
 
         if ( fork->is_child() )
         {
-            fork_io::execute( setup.path() + "hello", "-u", name.c_str(), NULL );
+            fork_io::execute( setup::path() + "hello", "-u", name.c_str(), NULL );
             fork_io::exit( true );
         }
     }
@@ -150,21 +153,21 @@ OOE_TEST void fixture_type::test< 3 >( setup& setup )
     remote.find< void ( void ) >( "hello" )();
 }
 
-OOE_TEST void fixture_type::test< 4 >( setup& setup )
+OOE_TEST( 4 )
 {
     std::cerr << "load module in lua";
 
-    std::string executable = setup.path() + "lua_host";
-    std::string script = setup.path() + "../share/test/script.lua";
+    std::string executable = setup::path() + "lua_host";
+    std::string script = setup::path() + "../share/test/script.lua";
     spawn( executable, script );
 }
 
-OOE_TEST void fixture_type::test< 5 >( setup& setup )
+OOE_TEST( 5 )
 {
     std::cerr << "load module in python";
 
-    std::string executable = setup.path() + "python_host";
-    std::string script = setup.path() + "../share/test/script.py";
+    std::string executable = setup::path() + "python_host";
+    std::string script = setup::path() + "../share/test/script.py";
     spawn( executable, script );
 }
 

@@ -23,7 +23,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST( 0 )
 {
     std::cerr << "is_bit_round";
 
@@ -40,7 +40,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     }
 }
 
-OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
+OOE_TEST( 1 )
 {
     std::cerr << "bit_round_up";
 
@@ -53,7 +53,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
     }
 }
 
-OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
+OOE_TEST( 2 )
 {
     std::cerr << "bit_round_down";
 
@@ -67,7 +67,7 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
     }
 }
 
-OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
+OOE_TEST( 3 )
 {
     std::cerr << "saturated_shift";
 
@@ -98,7 +98,7 @@ OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
     }
 }
 
-OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
+OOE_TEST( 4 )
 {
     std::cerr << "little_endian";
 
@@ -107,7 +107,7 @@ OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
     OOE_CHECK( "0x" << hex( value ) << " == 0x44332211", value == 0x44332211 );
 }
 
-OOE_TEST void fixture_type::test< 5 >( anonymous_t& )
+OOE_TEST( 5 )
 {
     std::cerr << "big_endian";
 

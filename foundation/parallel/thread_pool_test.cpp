@@ -24,14 +24,14 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST( 0 )
 {
     std::cerr << "start/stop thread_pool\n";
 
     thread_pool pool( "pool" );
 }
 
-OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
+OOE_TEST( 1 )
 {
     std::cerr << "insert tasks in to thread_pool\n";
 
@@ -43,7 +43,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
     OOE_CHECK( "result_of_3() == 3", result_of_3() == 3 );
 }
 
-OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
+OOE_TEST( 2 )
 {
     std::cerr << "throw in thread_pool\n";
 
@@ -53,7 +53,7 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
     OOE_EXCEPT( "result_of_throw()", error::runtime, result_of_throw() );
 }
 
-OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
+OOE_TEST( 3 )
 {
     std::cerr << "insert large number of tasks in to thread_pool\n";
 

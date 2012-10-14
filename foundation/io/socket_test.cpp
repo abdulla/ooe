@@ -14,45 +14,12 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 const c8 path[] = _PATH_TMP "ooe.test.file";
 
-//--- setup ----------------------------------------------------------------------------------------
-class setup
+void shutdown( void* pointer )
 {
-public:
-    setup( void )
-        : pair( make_pair() ), poll( make_pair() )
-    {
-        u32 value = 0xdeadbeef;
-        descriptor desc( path, descriptor::read_write | descriptor::truncate );
-        file( desc ).write( &value, sizeof( value ) );
-        pair._0.send( desc );
-    }
+    static_cast< socket* >( pointer )->shutdown( socket::read );
+}
 
-    ~setup( void )
-    {
-        erase( path );
-    }
-
-    descriptor receive( void )
-    {
-        return pair._1.receive();
-    }
-
-    socket get( void ) const
-    {
-        return poll._1;
-    }
-
-    void shutdown( void* )
-    {
-        poll._1.shutdown( socket::read );
-    }
-
-private:
-    socket_pair pair;
-    socket_pair poll;
-};
-
-typedef unit::group< setup, anonymous_t, 3 > group_type;
+typedef unit::group< anonymous_t, anonymous_t, 3 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "socket" );
 
@@ -60,30 +27,39 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( setup& setup )
+OOE_TEST( 0 )
 {
     std::cerr << "send/receive descriptor";
 
-    u32 value;
-    file file( setup.receive() );
+    socket_pair pair = make_pair();
+
+    u32 value = 0xdeadbeef;
+    descriptor desc( path, descriptor::read_write | descriptor::truncate );
+    file( desc ).write( &value, sizeof( value ) );
+    pair._0.send( desc );
+
+    value = 0;
+    file file( pair._1.receive() );
     file.seek( 0, file::begin );
     file.read( &value, sizeof( value ) );
 
     OOE_CHECK( "value == 0xdeadbeef", value == 0xdeadbeef );
 }
 
-OOE_TEST void fixture_type::test< 1 >( setup& setup )
+OOE_TEST( 1 )
 {
     std::cerr << "poll on shutdown";
 
-    poll poll;
-    poll.insert( setup.get() );
+    socket_pair pair = make_pair();
 
-    thread thread( "shutdown", make_function( setup, &setup::shutdown ), 0 );
+    poll poll;
+    poll.insert( pair._0 );
+
+    thread thread( "shutdown", shutdown, &pair._0 );
     poll.wait();
 }
 
-OOE_TEST void fixture_type::test< 2 >( setup& )
+OOE_TEST( 2 )
 {
     std::cerr << "internet query for localhost";
 

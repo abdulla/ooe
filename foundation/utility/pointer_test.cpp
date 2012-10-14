@@ -36,7 +36,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST( 0 )
 {
     std::cerr << "scoped_ptr\n";
 
@@ -65,7 +65,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     OOE_CHECK( "ptr.reset() == 0", !ptr.get() );
 }
 
-OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
+OOE_TEST( 1 )
 {
     std::cerr << "shared_ptr\n";
 
@@ -97,7 +97,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
     OOE_CHECK( "ptr.reset() == 0", !ptr.get() );
 }
 
-OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
+OOE_TEST( 2 )
 {
     std::cerr << "opaque_ptr\n";
 
