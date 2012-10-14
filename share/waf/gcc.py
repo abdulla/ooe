@@ -9,8 +9,8 @@ class compiler:
 
         '-Wall', '-Wcast-align', '-Werror', '-Wextra', '-Wfatal-errors', '-Wfloat-equal',
         '-Wformat=2', '-Wmissing-include-dirs', '-Wno-long-long', '-Wnon-virtual-dtor',
-        '-Woverloaded-virtual', '-Wpointer-arith', '-Wreorder', '-Wshadow', '-Wstrict-aliasing',
-        '-Wswitch-default', '-Wundef', '-Wwrite-strings' ]
+        '-Woverloaded-virtual', '-Wpointer-arith', '-Wreorder', '-Wshadow', '-Wswitch-default',
+        '-Wundef', '-Wwrite-strings' ]
 
     class debug:
         defines = [ '_FORTIFY_SOURCE=2' ]

@@ -18,14 +18,13 @@ class platform:
     class image:
         includes = ''
         libpath = ''
-        system_includes = ''
 
     class opengl:
         framework = ''
         lib = 'GL'
 
     class python:
-        lib = 'python3.2'
+        lib = 'python3.3'
         libpath = ''
 
     class ui:

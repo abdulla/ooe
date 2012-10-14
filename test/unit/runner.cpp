@@ -25,7 +25,7 @@ typedef tuple< bool, std::string > vector_tuple;
 typedef std::vector< vector_tuple > vector_type;
 bool test_status;
 
-bool run_test( const group_base::const_iterator& i, void* pointer, bool no_stdout )
+bool run_test( const group_base::const_iterator& i, bool no_stdout )
 {
     try
     {
@@ -33,7 +33,7 @@ bool run_test( const group_base::const_iterator& i, void* pointer, bool no_stdou
             executable::move_fd( executable::null_fd(), STDOUT_FILENO );
 
         test_status = true;
-        ( *i )( pointer );
+        ( *i )();
         return test_status;
     }
     catch ( error::runtime& error )
@@ -95,7 +95,7 @@ void collect_tests( vector_type& vector, list_type& list, time_t timeout )
     }
 }
 
-vector_type run_group( group_base& group, void* pointer, time_t timeout, bool no_stdout )
+vector_type run_group( group_base& group, time_t timeout, bool no_stdout )
 {
     list_type list;
     up_t j = 0;
@@ -108,7 +108,7 @@ vector_type run_group( group_base& group, void* pointer, time_t timeout, bool no
         if ( !fork_io.is_child() )
             list.push_back( list_tuple( j++, fork_io, pair._0, timer() ) );
         else
-            fork_io::exit( run_test( i, pointer, no_stdout ) );
+            fork_io::exit( run_test( i, no_stdout ) );
     }
 
     vector_type vector( j );
@@ -119,7 +119,7 @@ vector_type run_group( group_base& group, void* pointer, time_t timeout, bool no
     return vector;
 }
 
-vector_type run_group_nofork( group_base& group, void* pointer, bool no_stdout )
+vector_type run_group_nofork( group_base& group, bool no_stdout )
 {
     file_pair pair = make_pipe();
     s32 stderr_fd = executable::copy_fd( STDERR_FILENO );
@@ -128,7 +128,7 @@ vector_type run_group_nofork( group_base& group, void* pointer, bool no_stdout )
 
     for ( group_base::const_iterator i = group.begin(), end = group.end(); i != end; ++i )
     {
-        bool result = run_test( i, pointer, no_stdout );
+        bool result = run_test( i, no_stdout );
         vector.push_back( make_tuple( result, read( pair._0 ) ) );
     }
 
@@ -188,9 +188,9 @@ bool safe_run
         vector_type vector;
 
         if ( no_fork )
-            vector = run_group_nofork( *i->second, pointer, no_stdout );
+            vector = run_group_nofork( *i->second, no_stdout );
         else
-            vector = run_group( *i->second, pointer, timeout, no_stdout );
+            vector = run_group( *i->second, timeout, no_stdout );
 
         print_tests( i->first, vector );
         return is_successful( vector );

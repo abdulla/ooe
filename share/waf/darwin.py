@@ -20,15 +20,14 @@ class platform:
     class image:
         includes = '/sw/lib/libjpeg-turbo/include'
         libpath = '/sw/lib/libjpeg-turbo/lib'
-        system_includes = '/sw/include/OpenEXR'
 
     class opengl:
         framework = 'AppKit OpenGL'
         lib = ''
 
     class python:
-        lib = 'python3.2m'
-        libpath = '/sw/lib/python3.2/config-3.2m'
+        lib = 'python3.3m'
+        libpath = '/sw/lib/python3.3/config-3.3m'
 
     class ui:
         system_includes = '/sw/include/utf8cpp'

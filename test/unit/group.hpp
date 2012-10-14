@@ -11,7 +11,10 @@
 #include "foundation/utility/tuple.hpp"
 #include "test/unit/runner.hpp"
 
-#define OOE_TEST template<> template<>
+#define OOE_TEST( NUMBER )\
+    template<>\
+    template<>\
+    void fixture_type::test< NUMBER >( void )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
@@ -19,12 +22,12 @@ template< typename, up_t >
     struct insert_test;
 
 //--- fixture --------------------------------------------------------------------------------------
-template< typename setup, typename data >
+template< typename data >
     struct fixture
     : private data
 {
     template< up_t i >
-        void test( setup& )
+        void test( void )
     {
         std::cerr << "Fix test group: Test " << i << " is empty\n";
         fail();
@@ -35,7 +38,7 @@ template< typename setup, typename data >
 class group_base
 {
 public:
-    typedef void ( * function_type )( void* );
+    typedef void ( * function_type )( void );
     typedef std::vector< function_type > vector_type;
     typedef vector_type::const_iterator const_iterator;
 
@@ -57,12 +60,12 @@ template< typename setup, typename data, up_t size >
 {
 public:
     typedef setup setup_type;
-    typedef fixture< setup_type, data > fixture_type;
+    typedef fixture< data > fixture_type;
 
     group( const std::string& name, runner& runner = global_runner )
         : group_base()
     {
-        insert_test< group, size >::call( *this );
+        insert_test< fixture_type, size >::call( *this );
         runner.insert( name, *this );
     }
 
@@ -74,26 +77,32 @@ private:
 };
 
 //--- invoke_test ----------------------------------------------------------------------------------
-template< typename group, void ( group::fixture_type::* member )( typename group::setup_type& ) >
-    void invoke_test( void* pointer )
+template< typename fixture, void ( fixture::* member )( void ) >
+    void invoke_test_member( fixture& instance )
 {
-    typename group::fixture_type instance;
-    ( instance.*member )( *static_cast< typename group::setup_type* >( pointer ) );
+    ( instance.*member )();
+}
+
+template< typename fixture, void ( fixture::* member )( void ) >
+    void invoke_test( void )
+{
+    fixture instance;
+    invoke_test_member< fixture, member >( instance );
 }
 
 //--- insert_test ----------------------------------------------------------------------------------
-template< typename group, up_t i >
+template< typename fixture, up_t i >
     struct insert_test
 {
     static void call( group_base& base )
     {
-        insert_test< group, i - 1 >::call( base );
-        base.insert( invoke_test< group, &group::fixture_type::template test< i - 1 > > );
+        insert_test< fixture, i - 1 >::call( base );
+        base.insert( invoke_test< fixture, &fixture::template test< i - 1 > > );
     }
 };
 
-template< typename group >
-    struct insert_test< group, 0 >
+template< typename fixture >
+    struct insert_test< fixture, 0 >
 {
     static void call( group_base& )
     {

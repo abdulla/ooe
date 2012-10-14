@@ -60,7 +60,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST( 0 )
 {
     std::cerr << "box_tree successive insert";
 
@@ -90,7 +90,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     }
 }
 
-OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
+OOE_TEST( 1 )
 {
     std::cerr << "box_tree insert at offset";
 
@@ -115,7 +115,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
     check_data( layer[ 2 ][ 0 ]._0, 1 << 8, 1 << 8 );
 }
 
-OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
+OOE_TEST( 2 )
 {
     std::cerr << "box_tree zoom";
 

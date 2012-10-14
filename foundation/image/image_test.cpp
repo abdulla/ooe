@@ -43,7 +43,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
+OOE_TEST( 0 )
 {
     std::cerr << "uncompressed_image";
     ooe::image image( 16, 16, image_format::rgba_u8 );
@@ -61,7 +61,7 @@ OOE_TEST void fixture_type::test< 0 >( anonymous_t& )
     OOE_CHECK( "byte_size( image ) == 1024", byte_size( image ) == 1024 );
 }
 
-OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
+OOE_TEST( 1 )
 {
     std::cerr << "dxt";
     ooe::image image = make_image< u8 >( 255, 255, 255, image_format::rgba_u8 );
@@ -82,7 +82,7 @@ OOE_TEST void fixture_type::test< 1 >( anonymous_t& )
     OOE_CHECK( "byte_size( dxt5 ) == 256", byte_size( dxt5 ) == 256 );
 }
 
-OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
+OOE_TEST( 2 )
 {
     std::cerr << "dds";
     const c8 path[] = _PATH_TMP "ooe.test.dds";
@@ -123,7 +123,7 @@ OOE_TEST void fixture_type::test< 2 >( anonymous_t& )
     erase( path );
 }
 
-OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
+OOE_TEST( 3 )
 {
     std::cerr << "jpeg";
     const c8 path[] = _PATH_TMP "ooe.test.jpg";
@@ -161,7 +161,7 @@ OOE_TEST void fixture_type::test< 3 >( anonymous_t& )
     erase( path );
 }
 
-OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
+OOE_TEST( 4 )
 {
     std::cerr << "jpeg2000";
     const c8 path[] = _PATH_TMP "ooe.test.jp2";
@@ -186,7 +186,7 @@ OOE_TEST void fixture_type::test< 4 >( anonymous_t& )
     erase( path );
 }
 
-OOE_TEST void fixture_type::test< 5 >( anonymous_t& )
+OOE_TEST( 5 )
 {
     std::cerr << "png";
     const c8 path[] = _PATH_TMP "ooe.test.png";

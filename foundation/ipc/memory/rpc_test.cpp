@@ -160,7 +160,7 @@ OOE_ANONYMOUS_END( ( ooe ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-OOE_TEST void fixture_type::test< 0 >( setup& )
+OOE_TEST( 0 )
 {
     std::cerr << "test basic primitives";
 
@@ -197,7 +197,7 @@ OOE_TEST void fixture_type::test< 0 >( setup& )
     print_destruct( p );
 }
 
-OOE_TEST void fixture_type::test< 1 >( setup& )
+OOE_TEST( 1 )
 {
     std::cerr << "test std::vector, ipc::vector, and ipc::jumbo";
 
@@ -221,7 +221,7 @@ OOE_TEST void fixture_type::test< 1 >( setup& )
     ipc::memory::call< jumbo_type ( const jumbo_type& ) >( client, "jumbo_test" )( jumbo );
 }
 
-OOE_TEST void fixture_type::test< 2 >( setup& )
+OOE_TEST( 2 )
 {
     std::cerr << "test class member function and garbage collector";
 
@@ -236,7 +236,7 @@ OOE_TEST void fixture_type::test< 2 >( setup& )
     std::cout << "print::get = " << print_get( p ) << '\n';
 }
 
-OOE_TEST void fixture_type::test< 3 >( setup& )
+OOE_TEST( 3 )
 {
     std::cerr << "test exceptions";
 
