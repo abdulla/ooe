@@ -26,8 +26,8 @@ class platform:
         lib = ''
 
     class python:
-        lib = 'python3.2m'
-        libpath = '/sw/lib/python3.2/config-3.2m'
+        lib = 'python3.3m'
+        libpath = '/sw/lib/python3.3/config-3.3m'
 
     class ui:
         system_includes = '/sw/include/utf8cpp'

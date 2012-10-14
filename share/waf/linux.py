@@ -24,7 +24,7 @@ class platform:
         lib = 'GL'
 
     class python:
-        lib = 'python3.2'
+        lib = 'python3.3'
         libpath = ''
 
     class ui:
