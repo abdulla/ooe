@@ -2,13 +2,11 @@
 ## Copyright (C) 2012 Abdulla Kamar. All rights reserved. ##
 
 import os
-import preproc
 import sys
 import waflib
 
 import share.waf
 
-preproc.strict_quotes = 1
 top = '.'
 out = '/' + os.readlink( '/tmp' ) + '/ooe'
 
