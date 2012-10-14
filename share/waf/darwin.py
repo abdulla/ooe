@@ -20,7 +20,6 @@ class platform:
     class image:
         includes = '/sw/lib/libjpeg-turbo/include'
         libpath = '/sw/lib/libjpeg-turbo/lib'
-        system_includes = '/sw/include/OpenEXR'
 
     class opengl:
         framework = 'AppKit OpenGL'

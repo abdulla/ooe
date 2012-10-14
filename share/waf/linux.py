@@ -18,7 +18,6 @@ class platform:
     class image:
         includes = ''
         libpath = ''
-        system_includes = ''
 
     class opengl:
         framework = ''

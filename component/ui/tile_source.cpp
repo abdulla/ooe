@@ -5,7 +5,6 @@
 
 #include "component/ui/tile_source.hpp"
 #include "foundation/image/dds.hpp"
-#include "foundation/image/exr.hpp"
 #include "foundation/image/jpeg.hpp"
 #include "foundation/image/jpeg2000.hpp"
 #include "foundation/image/png.hpp"
@@ -207,7 +206,6 @@ decoder_type find_decoder( const std::string& type )
     codec_pair< decoder_type > pairs[] =
     {
         {   "dds", dds::decode      },
-        {   "exr", exr::decode      },
         {   "jp2", jpeg2000::decode },
         {   "jpg", jpeg::decode     },
         {   "png", png::decode      }
