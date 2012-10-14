@@ -103,8 +103,8 @@ void add_glyph( const font_source::glyph_type& glyph, const colour& colour, cons
     f32 height_diff = bit_slide( glyph._2, slide ) - metric.height * state.font_size;
     f32 coords[] =
     {
-        bit_slide( glyph._1, slide ),
-        bit_slide( glyph._2, slide ),
+        static_cast< f32 >( bit_slide( glyph._1, slide ) ),
+        static_cast< f32 >( bit_slide( glyph._2, slide ) ),
         state.x + metric.left * state.font_size,
         state.y + state.line_height - metric.top * state.font_size - height_diff,
 
