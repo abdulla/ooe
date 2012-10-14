@@ -50,11 +50,6 @@ up_t ipc_doc( const any& any, io_buffer& buffer, pool& pool )
     return return_write< std::string >( buffer, pool, doc );
 }
 
-up_t ipc_upgrade( const any&, io_buffer&, pool& )
-{
-    throw error::runtime( "ipc::nameservice: " ) << "Server upgraded, function missing";
-}
-
 void load_switchboard( switchboard& switchboard, any any )
 {
     if ( switchboard.insert_direct( ipc_find, any ) != 1 )
@@ -78,57 +73,6 @@ nameservice::nameservice( void )
     : switchboard(), vector(), map()
 {
     load_switchboard( switchboard, this );
-}
-
-void nameservice::upgrade( const list_type& names )
-{
-    typedef std::set< tuple_type > set_type;
-    set_type set;
-    vector_type upgrade_vector;
-    ipc::switchboard upgrade_switchboard;
-    load_switchboard( upgrade_switchboard, this );
-
-    for ( up_t i = 0, end = names.size(); i != end; ++i )
-    {
-        const tuple_type& name = names[ i ];
-        index_t index = i + index_adjust;
-        set.insert( name );
-
-        std::pair< map_type::iterator, bool > pair =
-            map.insert( std::make_pair( names[ i ], index ) );
-        switchboard::tuple_type tuple( 0, 0 );
-
-        if ( pair.second )
-        {
-            upgrade_vector.push_back( 0 );
-            tuple = switchboard::tuple_type( ipc_upgrade, 0 );
-        }
-        else
-        {
-            upgrade_vector.push_back( vector[ pair.first->second - index_adjust ] );
-            tuple = switchboard[ pair.first->second ];
-            pair.first->second = index;
-        }
-
-        if ( upgrade_switchboard.insert_direct( tuple._0, tuple._1 ) != index )
-            throw error::runtime( "ipc::nameservice: " ) <<
-                '\"' << name._0 << "\" of type \"" << name._1 << "\" not at index " << index;
-    }
-
-    set_type::const_iterator set_end = set.end();
-
-    for ( map_type::iterator i = map.begin(), end = map.end(); i != end; ++i )
-    {
-        if ( set.find( i->first ) != set_end )
-            continue;
-
-        upgrade_vector.push_back( vector[ i->second - index_adjust ] );
-        switchboard::tuple_type tuple = switchboard[ i->second ];
-        i->second = upgrade_switchboard.insert_direct( tuple._0, tuple._1 );
-    }
-
-    vector.swap( upgrade_vector );
-    switchboard.swap( upgrade_switchboard );
 }
 
 nameservice::operator const ipc::switchboard&( void ) const
