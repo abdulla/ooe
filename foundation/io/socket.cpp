@@ -94,8 +94,10 @@ descriptor socket::receive( void )
 
     if ( recvmsg( get(), &message, MSG_WAITALL ) == -1 )
         throw error::io( "socket: " ) << "Unable to receive descriptor: " << error::number( errno );
+    else if ( control.cmsg_level != SOL_SOCKET )
+        throw error::io( "socket: " ) << "Received unknown message level: " << control.cmsg_level;
     else if ( control.cmsg_type != SCM_RIGHTS )
-        throw error::io( "socket: " ) << "Received unknown type: " << control.cmsg_type;
+        throw error::io( "socket: " ) << "Received unknown message type: " << control.cmsg_type;
 
     return descriptor( *reinterpret_cast< s32* >( CMSG_DATA( &control ) ) );
 }
