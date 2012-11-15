@@ -18,7 +18,7 @@ class compiler:
 
     class release:
         defines = []
-        flags = [ '-O3', '-g0', '-fomit-frame-pointer', '-ffast-math', '-ftracer', '-fweb' ]
+        flags = [ '-O2', '-g0', '-fomit-frame-pointer' ]
 
 @waflib.TaskGen.feature( 'c' )
 @waflib.TaskGen.feature( 'cxx' )
