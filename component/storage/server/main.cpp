@@ -1,25 +1,47 @@
 /* Copyright (C) 2012 Abdulla Kamar. All rights reserved. */
 
+#include "component/storage/digest.hpp"
 #include "foundation/executable/program.hpp"
 #include "foundation/io/directory.hpp"
-#include "foundation/io/memory.hpp"
+#include "foundation/io/file.hpp"
 #include "foundation/ipc/nameservice.hpp"
 #include "foundation/ipc/memory/server.hpp"
 #include "foundation/utility/error.hpp"
 
 OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
+typedef std::vector< std::string > list_type;
 std::string ref_path;
 
-sha256 read_ref( const std::string& name )
+std::string build_path( const std::string& name )
 {
     if ( name.empty() || name[ 0 ] == '.' || name.find( '/' ) != std::string::npos )
         throw error::runtime( "storage: " ) << "Invalid name \"" << name << '\"';
 
-    std::string path = canonical_path( ref_path + name );
-    memory::region region( 0, sizeof( sha256 ) );
-    memory memory( path, memory::read, region );
-    return *memory.as< sha256 >();
+    return canonical_path( ref_path + name );
+}
+
+sha256 ref_read( const std::string& name )
+{
+    std::string path = build_path( name );
+    sha256 hash;
+    file( path ).read( &hash, sizeof( hash ) );
+    return hash;
+}
+
+void ref_write( const std::string& name, sha256 hash )
+{
+    std::string path = build_path( name );
+    descriptor desc( path, descriptor::write_new );
+    file( desc ).write( &hash, sizeof( hash ) );
+}
+
+list_type ref_list( void )
+{
+    directory dir( ref_path );
+    list_type list;
+    std::copy( list.begin(), list.end(), std::back_inserter( list ) );
+    return list;
 }
 
 //--- launch ---------------------------------------------------------------------------------------
@@ -28,7 +50,9 @@ bool launch( const std::string& root, const std::string&, s32, c8** )
     ref_path = root + "../cache/ref/";
 
     ipc::nameservice nameservice;
-    nameservice.insert( "read_ref", read_ref );
+    nameservice.insert( "ref_read", ref_read );
+    nameservice.insert( "ref_write", ref_write );
+    nameservice.insert( "ref_list", ref_list );
 
     ipc::memory::server server( nameservice );
     listen listen( ipc::server_address( "ooe.storage" ) );

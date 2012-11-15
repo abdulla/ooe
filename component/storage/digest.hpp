@@ -5,6 +5,8 @@
 
 #include <openssl/sha.h>
 
+#include "foundation/utility/fundamental.hpp"
+
 OOE_NAMESPACE_BEGIN( ( ooe ) )
 
 struct sha256
