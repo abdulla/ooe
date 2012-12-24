@@ -6,6 +6,7 @@
 #include <map>
 
 #include "foundation/utility/macro.hpp"
+#include "foundation/utility/pointer.hpp"
 #include "foundation/utility/string.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
@@ -19,7 +20,7 @@ public:
     typedef std::map< std::string, group_base* > map_type;
     typedef map_type::const_iterator const_iterator;
 
-    runner( void );
+    runner( void ) OOE_VISIBLE;
 
     const_iterator begin( void ) const;
     const_iterator end( void ) const;
@@ -31,7 +32,7 @@ private:
     map_type map;
 };
 
-extern runner global_runner OOE_VISIBLE;
+extern lazy_ptr< runner > global_runner OOE_VISIBLE;
 
 //--- fail -----------------------------------------------------------------------------------------
 void fail( void ) OOE_VISIBLE;

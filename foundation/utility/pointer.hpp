@@ -427,6 +427,43 @@ private:
     opaque_data* data;
 };
 
+//--- lazy_ptr -------------------------------------------------------------------------------------
+template< typename type >
+    class lazy_ptr
+{
+public:
+    lazy_ptr( void )
+        : value( 0 )
+    {
+    }
+
+    ~lazy_ptr( void )
+    {
+        delete value;
+    }
+
+    type& operator *( void )
+    {
+        return *get();
+    }
+
+    type* operator ->( void )
+    {
+        return get();
+    }
+
+private:
+    type* value;
+
+    type* get( void )
+    {
+        if ( !value )
+            value = new type;
+
+        return value;
+    }
+};
+
 OOE_NAMESPACE_END( ( ooe ) )
 
 #endif  // OOE_FOUNDATION_UTILITY_POINTER_HPP
