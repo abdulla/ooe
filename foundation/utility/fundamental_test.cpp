@@ -18,46 +18,46 @@ OOE_TEST( 0 )
 {
     std::cerr << "types have correct properties";
 
-    OOE_CHECK( "s8 is signed", is_signed< s8 >::value );
-    OOE_CHECK( "s16 is signed", is_signed< s16 >::value );
-    OOE_CHECK( "s32 is signed", is_signed< s32 >::value );
-    OOE_CHECK( "s64 is signed", is_signed< s64 >::value );
-    OOE_CHECK( "sp_t is signed", is_signed< sp_t >::value );
+    OOE_CHECK( is_signed< s8 >::value ) << "s8 is not signed";
+    OOE_CHECK( is_signed< s16 >::value ) << "s16 is not signed";
+    OOE_CHECK( is_signed< s32 >::value ) << "s32 is not signed";
+    OOE_CHECK( is_signed< s64 >::value ) << "s64 is not signed";
+    OOE_CHECK( is_signed< sp_t >::value ) << "sp_t is not signed";
 
-    OOE_CHECK( "u8 is unsigned", is_unsigned< u8 >::value );
-    OOE_CHECK( "u16 is unsigned", is_unsigned< u16 >::value );
-    OOE_CHECK( "u32 is unsigned", is_unsigned< u32 >::value );
-    OOE_CHECK( "u64 is unsigned", is_unsigned< u64 >::value );
-    OOE_CHECK( "up_t is unsigned", is_unsigned< up_t >::value );
+    OOE_CHECK( is_unsigned< u8 >::value ) << "u8 is not unsigned";
+    OOE_CHECK( is_unsigned< u16 >::value ) << "u16 is not unsigned";
+    OOE_CHECK( is_unsigned< u32 >::value ) << "u32 is not unsigned";
+    OOE_CHECK( is_unsigned< u64 >::value ) << "u64 is not unsigned";
+    OOE_CHECK( is_unsigned< up_t >::value ) << "up_t is not unsigned";
 
-    OOE_CHECK( "f32 is floating point", is_floating_point< f32 >::value );
-    OOE_CHECK( "f64 is floating point", is_floating_point< f64 >::value );
+    OOE_CHECK( is_floating_point< f32 >::value ) << "f32 is not floating point";
+    OOE_CHECK( is_floating_point< f64 >::value ) << "f64 is not floating point";
 
-    OOE_CHECK( "c8 is integral", is_integral< c8 >::value );
-    OOE_CHECK( "c32 is integral", is_integral< c32 >::value );
+    OOE_CHECK( is_integral< c8 >::value ) << "c8 is not integral";
+    OOE_CHECK( is_integral< c32 >::value ) << "c32 is not integral";
 }
 
 OOE_TEST( 1 )
 {
     std::cerr << "types have correct size";
 
-    OOE_CHECK( "s8 is 8 bits", sizeof( s8 ) == 1 );
-    OOE_CHECK( "s16 is 16 bits", sizeof( s16 ) == 2 );
-    OOE_CHECK( "s32 is 32 bits", sizeof( s32 ) == 4 );
-    OOE_CHECK( "s64 is 64 bits", sizeof( s64 ) == 8 );
-    OOE_CHECK( "sp_t is pointer sized", sizeof( sp_t ) == sizeof( void* ) );
+    OOE_CHECK( sizeof( s8 ) == 1 ) << "s8 is not 8 bits";
+    OOE_CHECK( sizeof( s16 ) == 2 ) << "s16 is not 16 bits";
+    OOE_CHECK( sizeof( s32 ) == 4 ) << "s32 is not 32 bits";
+    OOE_CHECK( sizeof( s64 ) == 8 ) << "s64 is not 64 bits";
+    OOE_CHECK( sizeof( sp_t ) == sizeof( void* ) ) << "sp_t is not pointer sized";
 
-    OOE_CHECK( "u8 is 8 bits", sizeof( u8 ) == 1 );
-    OOE_CHECK( "u16 is 16 bits", sizeof( u16 ) == 2 );
-    OOE_CHECK( "u32 is 32 bits", sizeof( u32 ) == 4 );
-    OOE_CHECK( "u64 is 64 bits", sizeof( u64 ) == 8 );
-    OOE_CHECK( "up_t is pointer sized", sizeof( up_t ) == sizeof( void* ) );
+    OOE_CHECK( sizeof( u8 ) == 1 ) << "u8 is not 8 bits";
+    OOE_CHECK( sizeof( u16 ) == 2 ) << "u16 is not 16 bits";
+    OOE_CHECK( sizeof( u32 ) == 4 ) << "u32 is not 32 bits";
+    OOE_CHECK( sizeof( u64 ) == 8 ) << "u64 is not 64 bits";
+    OOE_CHECK( sizeof( up_t ) == sizeof( void* ) ) << "up_t is not pointer sized";
 
-    OOE_CHECK( "f32 is 32 bits", sizeof( f32 ) == 4 );
-    OOE_CHECK( "f64 is 64 bits", sizeof( f64 ) == 8 );
+    OOE_CHECK( sizeof( f32 ) == 4 ) << "f32 is not 32 bits";
+    OOE_CHECK( sizeof( f64 ) == 8 ) << "f64 is not 64 bits";
 
-    OOE_CHECK( "c8 is 8 bits", sizeof( c8 ) == 1 );
-    OOE_CHECK( "c32 is 32 bits", sizeof( c32 ) == 4 );
+    OOE_CHECK( sizeof( c8 ) == 1 ) << "c8 is not 8 bits";
+    OOE_CHECK( sizeof( c32 ) == 4 ) << "c32 is not 32 bits";
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

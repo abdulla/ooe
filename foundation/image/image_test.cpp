@@ -48,17 +48,16 @@ OOE_TEST( 0 )
     std::cerr << "uncompressed_image";
     ooe::image image( 16, 16, image_format::rgba_u8 );
 
-    OOE_CHECK( "image.width == 16", image.width == 16 );
-    OOE_CHECK( "image.height == 16", image.height == 16 );
-    OOE_CHECK( "image.format == uncompressed_image::rgba_u8",
-        image.format == image_format::rgba_u8 );
-    OOE_CHECK( "image.get()", image.get() );
-    OOE_CHECK( "subpixels( image ) == 4", subpixels( image ) == 4 );
-    OOE_CHECK( "subpixel_size( image ) == 1", subpixel_size( image ) == 1 );
-    OOE_CHECK( "pixel_size( image ) == 4", pixels( image ) == 256 );
-    OOE_CHECK( "pixel_size( image ) == 4", pixel_size( image ) == 4 );
-    OOE_CHECK( "row_size( image ) == 64", row_size( image ) == 64 );
-    OOE_CHECK( "byte_size( image ) == 1024", byte_size( image ) == 1024 );
+    OOE_CHECK( image.width == 16 );
+    OOE_CHECK( image.height == 16 );
+    OOE_CHECK( image.format == image_format::rgba_u8 );
+    OOE_CHECK( image.get() );
+    OOE_CHECK( subpixels( image ) == 4 );
+    OOE_CHECK( subpixel_size( image ) == 1 );
+    OOE_CHECK( pixels( image ) == 256 );
+    OOE_CHECK( pixel_size( image ) == 4 );
+    OOE_CHECK( row_size( image ) == 64 );
+    OOE_CHECK( byte_size( image ) == 1024 );
 }
 
 OOE_TEST( 1 )
@@ -68,18 +67,18 @@ OOE_TEST( 1 )
 
     ooe::image dxt1 = dxt::encode( image, image_format::rgba_dxt1 );
     ooe::image dxt1_uncompressed = dxt::decode( dxt1 );
-    OOE_CHECK( "block_size( dxt1 ) == 8", block_size( dxt1 ) == 8 );
-    OOE_CHECK( "byte_size( dxt1 ) == 128", byte_size( dxt1 ) == 128 );
+    OOE_CHECK( block_size( dxt1 ) == 8 );
+    OOE_CHECK( byte_size( dxt1 ) == 128 );
 
     ooe::image dxt3 = dxt::encode( image, image_format::rgba_dxt3 );
     ooe::image dxt3_uncompressed = dxt::decode( dxt3 );
-    OOE_CHECK( "block_size( dxt3 ) == 16", block_size( dxt3 ) == 16 );
-    OOE_CHECK( "byte_size( dxt3 ) == 256", byte_size( dxt3 ) == 256 );
+    OOE_CHECK( block_size( dxt3 ) == 16 );
+    OOE_CHECK( byte_size( dxt3 ) == 256 );
 
     ooe::image dxt5 = dxt::encode( image, image_format::rgba_dxt5 );
     ooe::image dxt5_uncompressed = dxt::decode( dxt5 );
-    OOE_CHECK( "block_size( dxt5 ) == 16", block_size( dxt5 ) == 16 );
-    OOE_CHECK( "byte_size( dxt5 ) == 256", byte_size( dxt5 ) == 256 );
+    OOE_CHECK( block_size( dxt5 ) == 16 );
+    OOE_CHECK( byte_size( dxt5 ) == 256 );
 }
 
 OOE_TEST( 2 )
@@ -110,13 +109,14 @@ OOE_TEST( 2 )
             image dxt_out = dds::decode( descriptor( path ) );
             image output = dxt::decode( dxt_out );
 
-            OOE_CHECK( "dxt sizes match", byte_size( dxt_in ) == byte_size( dxt_out ) );
-            OOE_CHECK( "dxt data matches",
-                !std::memcmp( dxt_in.get(), dxt_out.get(), byte_size( dxt_in ) ) );
+            OOE_CHECK( byte_size( dxt_in ) == byte_size( dxt_out ) ) << "dxt sizes do not match";
+            OOE_CHECK( !std::memcmp( dxt_in.get(), dxt_out.get(), byte_size( dxt_in ) ) ) <<
+                "dxt data does not match";
 
-            OOE_CHECK( "decoded sizes match", byte_size( input[ j ] ) == byte_size( output ) );
-            OOE_CHECK( "decoded data matches",
-                !std::memcmp( input[ j ].get(), output.get(), byte_size( output ) ) );
+            OOE_CHECK( byte_size( input[ j ] ) == byte_size( output ) ) <<
+                "decoded sizes do not match";
+            OOE_CHECK( !std::memcmp( input[ j ].get(), output.get(), byte_size( output ) ) ) <<
+                "decoded data does not match";
         }
     }
 
@@ -140,22 +140,23 @@ OOE_TEST( 3 )
     {
         jpeg::encode( input[ i ], descriptor( path, descriptor::write_new ) );
         image output = jpeg::decode( descriptor( path ) );
-        OOE_CHECK( "decoded metadata matches", input[ i ] == output );
-        OOE_CHECK( "decoded sizes match", byte_size( input[ i ] ) == byte_size( output ) );
+        OOE_CHECK( input[ i ] == output ) << "decoded metadata does not match";
+        OOE_CHECK( byte_size( input[ i ] ) == byte_size( output ) ) << "decoded sizes do not match";
 
         reader_ptr reader = jpeg::open( descriptor( path ) );
-        OOE_CHECK( "reader metadata matches", input[ i ] == *reader );
-        OOE_CHECK( "reader size matches", byte_size( input[ i ] ) == byte_size( *reader ) );
+        OOE_CHECK( input[ i ] == *reader ) << "reader metadata does not match";
+        OOE_CHECK( byte_size( input[ i ] ) == byte_size( *reader ) ) <<
+            "reader size does not match";
 
         std::memset( output.get(), 0, byte_size( output ) );
         up_t row_size = ooe::row_size( *reader );
         u32 rows = 0;
 
         for ( u8* j = output.as< u8 >(); reader->decode_row(); ++rows, j += row_size )
-            OOE_CHECK( "read row " << rows,
-                reader->read_pixels( j, reader->width ) == reader->width );
+            OOE_CHECK( reader->read_pixels( j, reader->width ) == reader->width ) <<
+                "read row " << rows;
 
-        OOE_CHECK( "reader read complete image", rows == reader->height );
+        OOE_CHECK( rows == reader->height ) << "reader read complete image";
     }
 
     erase( path );
@@ -178,9 +179,9 @@ OOE_TEST( 4 )
         jpeg2000::encode( input[ i ], descriptor( path, descriptor::write_new ) );
         image output = jpeg2000::decode( descriptor( path ) );
 
-        OOE_CHECK( "decoded sizes match", byte_size( input[ i ] ) == byte_size( output ) );
-        OOE_CHECK( "decoded data matches",
-            !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) );
+        OOE_CHECK( byte_size( input[ i ] ) == byte_size( output ) ) << "decoded sizes do not match";
+        OOE_CHECK( !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) ) <<
+            "decoded data does not match";
     }
 
     erase( path );
@@ -202,26 +203,27 @@ OOE_TEST( 5 )
     {
         png::encode( input[ i ], descriptor( path, descriptor::write_new ) );
         image output = png::decode( descriptor( path ) );
-        OOE_CHECK( "decoded metadata matches", input[ i ] == output );
-        OOE_CHECK( "decoded sizes match", byte_size( input[ i ] ) == byte_size( output ) );
-        OOE_CHECK( "decoded data matches",
-            !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) );
+        OOE_CHECK( input[ i ] == output ) << "decoded metadata does not match";
+        OOE_CHECK( byte_size( input[ i ] ) == byte_size( output ) ) << "decoded sizes do not match";
+        OOE_CHECK( !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) ) <<
+            "decoded data does not match";
 
         reader_ptr reader = png::open( descriptor( path ) );
-        OOE_CHECK( "reader metadata matches", input[ i ] == *reader );
-        OOE_CHECK( "reader size matches", byte_size( input[ i ] ) == byte_size( *reader ) );
+        OOE_CHECK( input[ i ] == *reader ) << "reader metadata does not match";
+        OOE_CHECK( byte_size( input[ i ] ) == byte_size( *reader ) ) <<
+            "reader size does not match";
 
         std::memset( output.get(), 0, byte_size( output ) );
         up_t row_size = ooe::row_size( *reader );
         u32 rows = 0;
 
         for ( u8* j = output.as< u8 >(); reader->decode_row(); ++rows, j += row_size )
-            OOE_CHECK( "read row " << rows,
-                reader->read_pixels( j, reader->width ) == reader->width );
+            OOE_CHECK( reader->read_pixels( j, reader->width ) == reader->width ) <<
+                "read row " << rows;
 
-        OOE_CHECK( "reader read complete image", rows == reader->height );
-        OOE_CHECK( "reader data matches",
-            !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) );
+        OOE_CHECK( rows == reader->height ) << "reader did not read complete image";
+        OOE_CHECK( !std::memcmp( input[ i ].get(), output.get(), byte_size( output ) ) ) <<
+            "reader data does not match";
     }
 
     erase( path );

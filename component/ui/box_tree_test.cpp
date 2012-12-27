@@ -10,32 +10,32 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 //--- check_tree -----------------------------------------------------------------------------------
 void check_tree( const box_tree& tree, const box_tree::iterator& i, u16 width, u16 x )
 {
-    OOE_CHECK( "i != tree.end()", i != tree.end() );
+    OOE_CHECK( i != tree.end() );
 
     ooe::box box = i->box();
-    OOE_CHECK( box.width << " == " << width, box.width == width );
-    OOE_CHECK( box.height << " == " << width, box.height == width );
-    OOE_CHECK( box.x << " == " << x, box.x == x );
-    OOE_CHECK( box.y << " == " << x, box.y == x );
+    OOE_CHECK( box.width == width ) << box.width << " == " << width;
+    OOE_CHECK( box.height == width ) << box.height << " == " << width;
+    OOE_CHECK( box.x == x ) << box.x << " == " << x;
+    OOE_CHECK( box.y == x ) << box.y << " == " << x;
 }
 
 //--- check_size -----------------------------------------------------------------------------------
 void check_size( const box_tree::layer_vector& layer, up_t size )
 {
-    OOE_CHECK( layer.size() << " == " << size, layer.size() == size );
+    OOE_CHECK( layer.size() == size ) << layer.size() << " == " << size;
 
     for ( box_tree::layer_vector::const_iterator i = layer.begin(), end = layer.end();
         i != end; ++i )
-        OOE_CHECK( i->size() << " == 1", i->size() == 1 );
+        OOE_CHECK( i->size() == 1 ) << i->size() << " == 1";
 }
 
 //--- check_data -----------------------------------------------------------------------------------
 void check_data( const box_tree::data_tuple& data, f32 width, f32 x )
 {
-    OOE_CHECK( data._0 << " == " << width, is_equal( data._0, width ) );
-    OOE_CHECK( data._1 << " == " << width, is_equal( data._1, width ) );
-    OOE_CHECK( data._2 << " == " << x, is_equal( data._2, x ) );
-    OOE_CHECK( data._3 << " == " << x, is_equal( data._3, x ) );
+    OOE_CHECK( is_equal( data._0, width ) ) << data._0 << " == " << width;
+    OOE_CHECK( is_equal( data._1, width ) ) << data._1 << " == " << width;
+    OOE_CHECK( is_equal( data._2, x ) ) << data._2 << " == " << x;
+    OOE_CHECK( is_equal( data._3, x ) ) << data._3 << " == " << x;
 }
 
 //--- data -----------------------------------------------------------------------------------------

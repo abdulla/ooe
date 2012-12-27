@@ -26,26 +26,26 @@ OOE_TEST( 0 )
     for ( u32 i = 0; i != 32; ++i )
     {
         cache_type::insert_type inserted = cache.insert( std::make_pair( i, i ) );
-        OOE_CHECK( "size: " << cache.size(), cache.size() == std::min( i + 1u, 16u ) );
-        OOE_CHECK( "inserted: " << i, inserted.second );
+        OOE_CHECK( cache.size() == std::min( i + 1u, 16u ) ) << "size: " << cache.size();
+        OOE_CHECK( inserted.second ) << "inserted: " << i;
         cache_type::const_iterator found = cache.find( i );
-        OOE_CHECK( "found: " << i, found != cache.end() );
-        OOE_CHECK( i << " == " << found->first, i == found->first );
-        OOE_CHECK( i << " == " << found->second, i == found->second );
+        OOE_CHECK( found != cache.end() ) << "found: " << i;
+        OOE_CHECK( i == found->first ) << i << " == " << found->first;
+        OOE_CHECK( i == found->second ) << i << " == " << found->second;
     }
 
     for ( u32 i = 0; i != 16; ++i )
     {
         cache_type::const_iterator found = cache.find( i );
-        OOE_CHECK( "not found: " << i, found == cache.end() );
+        OOE_CHECK( found == cache.end() ) << "not found: " << i;
     }
 
     u32 j = 16;
 
     for ( cache_type::const_iterator i = cache.begin(), end = cache.end(); i != end; ++i, ++j )
     {
-        OOE_CHECK( j << " == " << i->first, j == i->first );
-        OOE_CHECK( j << " == " << i->second, j == i->second );
+        OOE_CHECK( j == i->first ) << j << " == " << i->first;
+        OOE_CHECK( j == i->second ) << j << " == " << i->second;
     }
 }
 

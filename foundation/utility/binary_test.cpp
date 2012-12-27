@@ -31,12 +31,12 @@ OOE_TEST( 0 )
     {
         if ( i == base2 )
         {
-            OOE_CHECK( i << " is a power of 2", is_bit_round( i ) );
+            OOE_CHECK( is_bit_round( i ) ) << i << " is not a power of 2";
             base2 <<= 1;
             continue;
         }
 
-        OOE_CHECK( i << " is not a power of 2", !is_bit_round( i ) );
+        OOE_CHECK( !is_bit_round( i ) ) << i << " is a power of 2";
     }
 }
 
@@ -46,7 +46,7 @@ OOE_TEST( 1 )
 
     for ( u16 i = 0, base2 = 1; i != std::numeric_limits< u16 >::max(); ++i )
     {
-        OOE_CHECK( "bit_round_up( " << i << " ) == " << base2, bit_round_up( i ) == base2 );
+        OOE_CHECK( bit_round_up( i ) == base2 ) << "bit_round_up( " << i << " ) == " << base2;
 
         if ( i == base2 )
             base2 <<= 1;
@@ -59,8 +59,8 @@ OOE_TEST( 2 )
 
     for ( u16 i = 0, base2 = 1; i != std::numeric_limits< u16 >::max(); ++i )
     {
-        OOE_CHECK( "bit_round_down( " << i << " ) == " << base2,
-            bit_round_down( i ) == ( base2 >> 1 ) );
+        OOE_CHECK( bit_round_down( i ) == ( base2 >> 1 ) ) <<
+            "bit_round_down( " << i << " ) == " << base2;
 
         if ( i == base2 )
             base2 <<= 1;
@@ -75,26 +75,26 @@ OOE_TEST( 3 )
     for ( u16 i = 0; i != 32; ++i )
     {
         u32 x = saturated_shift( 1u, i );
-        OOE_CHECK( "saturated_shift( 1u, " << i << " ) == 1u << " << i, x == 1u << i );
+        OOE_CHECK( x == 1u << i ) << "saturated_shift( 1u, " << i << " ) == 1u << " << i;
     }
 
     for ( u16 i = 32; i != 64; ++i )
     {
         u32 x = saturated_shift( 1, i );
-        OOE_CHECK( "saturated_shift( 1u, " << i << " ) == 0xffffffff", x == 0xffffffff );
+        OOE_CHECK( x == 0xffffffff ) << "saturated_shift( 1u, " << i << " ) == 0xffffffff";
     }
 
     // shift multiple bytes
     for ( u16 i = 0; i != 25; ++i )
     {
         u32 x = saturated_shift( 0xffu, i );
-        OOE_CHECK( "saturated_shift( 0xffu, " << i << " ) == 0xffu << " << i, x == 0xffu << i );
+        OOE_CHECK( x == 0xffu << i ) << "saturated_shift( 0xffu, " << i << " ) == 0xffu << " << i;
     }
 
     for ( u16 i = 25; i != 40; ++i )
     {
         u32 x = saturated_shift( 0xffu, i );
-        OOE_CHECK( "saturated_shift( 0xffu, " << i << " ) == 0xffffffff", x == 0xffffffff );
+        OOE_CHECK( x == 0xffffffff ) << "saturated_shift( 0xffu, " << i << " ) == 0xffffffff";
     }
 }
 
@@ -104,7 +104,7 @@ OOE_TEST( 4 )
 
     pun32 pun = { { 0x11, 0x22, 0x33, 0x44 } };
     u32 value = little_endian< u32 >( pun.value );
-    OOE_CHECK( "0x" << hex( value ) << " == 0x44332211", value == 0x44332211 );
+    OOE_CHECK( value == 0x44332211 ) << "0x" << hex( value ) << " == 0x44332211";
 }
 
 OOE_TEST( 5 )
@@ -113,7 +113,7 @@ OOE_TEST( 5 )
 
     pun32 pun = { { 0x44, 0x33, 0x22, 0x11 } };
     u32 value = big_endian< u32 >( pun.value );
-    OOE_CHECK( "0x" << hex( value ) << " == 0x44332211", value == 0x44332211 );
+    OOE_CHECK( value == 0x44332211 ) << "0x" << hex( value ) << " == 0x44332211";
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

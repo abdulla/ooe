@@ -2,6 +2,7 @@
 
 def build( context ):
     context.program(
-        source = 'binary_test.cpp fixed_cache_test.cpp fundamental_test.cpp pointer_test.cpp',
+        source = 'binary_test.cpp fixed_cache_test.cpp fundamental_test.cpp pointer_test.cpp ' +
+            'string_test.cpp',
         target = 'utility_test',
         use = 'unit' )

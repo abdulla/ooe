@@ -14,13 +14,11 @@ do\
 }\
 while ( false )
 
-#define OOE_CHECK( reason, boolean )\
-do\
-{\
-    if ( !( boolean ) )\
-        OOE_FAIL( reason, #boolean );\
-}\
-while ( false )
+#define OOE_CHECK( boolean )\
+    ( boolean ) ? ( void ) 0 : ooe::unit::fail(), std::cerr <<\
+        "\n\n" << #boolean << "\n"\
+        "\tLine " << __LINE__ << ", File \"" __FILE__ "\"\n"\
+        "\t"
 
 #define OOE_EXCEPT( reason, exception, raise )\
 do\

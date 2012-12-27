@@ -39,8 +39,8 @@ OOE_TEST( 1 )
     result< s32 > result_of_2 = async( pool, make_function( increment ), 1 );
     result< s32 > result_of_3 = async( pool, make_function( increment ), 2 );
 
-    OOE_CHECK( "result_of_2() == 2", result_of_2() == 2 );
-    OOE_CHECK( "result_of_3() == 3", result_of_3() == 3 );
+    OOE_CHECK( result_of_2() == 2 );
+    OOE_CHECK( result_of_3() == 3 );
 }
 
 OOE_TEST( 2 )
