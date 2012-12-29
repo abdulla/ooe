@@ -31,7 +31,7 @@ void spawn( const std::string& executable, const std::string& script )
         fork_io::exit( false );
     }
 
-    OOE_CHECK( "fork.wait() == success", fork.wait() == fork_io::success );
+    OOE_CHECK( fork.wait() == fork_io::success );
 }
 
 //--- setup ----------------------------------------------------------------------------------------
@@ -91,9 +91,9 @@ OOE_TEST( 0 )
 
     registry registry;
     registry::info_vector vector = registry.find( interface );
-    OOE_CHECK( "vector.size()", vector.size() );
+    OOE_CHECK( vector.size() );
     vector = registry.list_all();
-    OOE_CHECK( "vector.size()", vector.size() );
+    OOE_CHECK( vector.size() );
 }
 
 OOE_TEST( 1 )
@@ -107,7 +107,7 @@ OOE_TEST( 1 )
 
     local local( path );
     local.find< void ( * )( void ) >( "hello" )();
-    OOE_CHECK( "local.supports( interface )", local.supports( interface ) );
+    OOE_CHECK( local.supports( interface ) );
 
     std::cout << "local-doc( hello ): " << local.doc< void ( * )( void ) >( "hello" ) << '\n';
 }
@@ -124,7 +124,7 @@ OOE_TEST( 2 )
     registry registry;
     remote remote( ipc::local_name( registry.surrogate( path ) ) );
     remote.find< void ( void ) >( "hello" )();
-    OOE_CHECK( "remote.supports( interface )", remote.supports( interface ) );
+    OOE_CHECK( remote.supports( interface ) );
 
     std::cout << "remote-doc( hello ): " << remote.doc< void ( void ) >( "hello" ) << '\n';
 }

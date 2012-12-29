@@ -28,7 +28,7 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
         case 'l':
             std::cout << "Available groups of tests:\n";
 
-            for ( runner::const_iterator i = global_runner.begin(), end = global_runner.end();
+            for ( runner::const_iterator i = global_runner->begin(), end = global_runner->end();
                 i != end; ++i )
                 std::cout << "    " << i->first << '\n';
 
@@ -59,13 +59,13 @@ bool unit_launch( const std::string&, const std::string& name, s32 argc, c8** ar
     }
 
     if ( optind == argc )
-        return global_runner.run( timeout, no_stdout, no_fork );
+        return global_runner->run( timeout, no_stdout, no_fork );
 
     bool success = true;
 
     for ( s32 i = optind; i != argc; ++i )
     {
-        if ( !global_runner.run( argv[ i ], timeout, no_stdout, no_fork ) )
+        if ( !global_runner->run( argv[ i ], timeout, no_stdout, no_fork ) )
             success = false;
     }
 
@@ -76,7 +76,7 @@ OOE_ANONYMOUS_END( ( ooe )( unit ) )
 
 OOE_NAMESPACE_BEGIN( ( ooe )( unit ) )
 
-runner global_runner;
+lazy_ptr< runner > global_runner;
 
 s32 launch( s32 argc, c8** argv )
 {

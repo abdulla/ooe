@@ -44,25 +44,25 @@ OOE_TEST( 0 )
     {
         scoped_ptr< destruct_test > ptr( new destruct_test( did_destruct ) );
     }
-    OOE_CHECK( "destruct_test::~destruct_test()", did_destruct );
+    OOE_CHECK( did_destruct );
 
     up_t* value = new up_t( 7 );
     scoped_ptr< up_t > ptr( value );
-    OOE_CHECK( "*ptr == *value", *ptr == *value );
-    OOE_CHECK( "ptr == value", ptr == value );
-    OOE_CHECK( "ptr.get() == value", ptr.get() == value );
-    OOE_CHECK( "ptr.operator ->() == value", ptr.operator ->() == value );
-    OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
+    OOE_CHECK( *ptr == *value );
+    OOE_CHECK( ptr == value );
+    OOE_CHECK( ptr.get() == value );
+    OOE_CHECK( ptr.operator ->() == value );
+    OOE_CHECK( ptr.as< up_t >() == value );
 
     scoped_ptr< up_t > other( value );
-    OOE_CHECK( "other.release() == value", other.release() == value );
+    OOE_CHECK( other.release() == value );
 
     up_t* reset = new up_t( 8 );
     ptr.reset( reset );
-    OOE_CHECK( "ptr.reset( reset ) == reset", ptr.get() == reset );
+    OOE_CHECK( ptr.get() == reset ) << "ptr.reset( reset ) == reset";
 
     ptr.reset();
-    OOE_CHECK( "ptr.reset() == 0", !ptr.get() );
+    OOE_CHECK( !ptr.get() ) << "ptr.reset() == 0";
 }
 
 OOE_TEST( 1 )
@@ -73,28 +73,28 @@ OOE_TEST( 1 )
     {
         shared_ptr< destruct_test > ptr( new destruct_test( did_destruct ) );
     }
-    OOE_CHECK( "destruct_test::~destruct_test()", did_destruct );
+    OOE_CHECK( did_destruct );
 
     up_t* value = new up_t( 7 );
     shared_ptr< up_t > ptr( value );
-    OOE_CHECK( "*ptr == *value", *ptr == *value );
-    OOE_CHECK( "ptr == value", ptr == value );
-    OOE_CHECK( "ptr.get() == value", ptr.get() == value );
-    OOE_CHECK( "ptr.operator ->() == value", ptr.operator ->() == value );
-    OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
+    OOE_CHECK( *ptr == *value );
+    OOE_CHECK( ptr == value );
+    OOE_CHECK( ptr.get() == value );
+    OOE_CHECK( ptr.operator ->() == value );
+    OOE_CHECK( ptr.as< up_t >() == value );
 
     {
         shared_ptr< up_t > copy( ptr );
-        OOE_CHECK( "copy.get() == value", copy.get() == value );
+        OOE_CHECK( copy.get() == value );
     }
-    OOE_CHECK( "copy: ptr.get() == value", ptr.get() == value );
+    OOE_CHECK( ptr.get() == value ) << "copy: ptr.get() == value";
 
     up_t* reset = new up_t( 8 );
     ptr.reset( reset );
-    OOE_CHECK( "ptr.reset( reset ) == reset", ptr.get() == reset );
+    OOE_CHECK( ptr.get() == reset ) << "ptr.reset( reset ) == reset";
 
     ptr.reset();
-    OOE_CHECK( "ptr.reset() == 0", !ptr.get() );
+    OOE_CHECK( !ptr.get() ) << "ptr.reset() == 0";
 }
 
 OOE_TEST( 2 )
@@ -105,23 +105,23 @@ OOE_TEST( 2 )
     {
         opaque_ptr ptr( new destruct_test( did_destruct ) );
     }
-    OOE_CHECK( "destruct_test::~destruct_test()", did_destruct );
+    OOE_CHECK( did_destruct );
 
     up_t* value = new up_t( 7 );
     opaque_ptr ptr( value );
-    OOE_CHECK( "ptr == value", ptr == value );
-    OOE_CHECK( "ptr.get() == value", ptr.get() == value );
-    OOE_CHECK( "ptr.as< up_t >() == value", ptr.as< up_t >() == value );
+    OOE_CHECK( ptr == value );
+    OOE_CHECK( ptr.get() == value );
+    OOE_CHECK( ptr.as< up_t >() == value );
 
     {
         opaque_ptr copy( ptr );
-        OOE_CHECK( "copy.get() == value", copy.get() == value );
+        OOE_CHECK( copy.get() == value );
     }
-    OOE_CHECK( "copy: ptr.get() == value", ptr.get() == value );
+    OOE_CHECK( ptr.get() == value ) << "copy: ptr.get() == value";
 
     up_t* reset = new up_t( 8 );
     ptr.reset( reset );
-    OOE_CHECK( "ptr.reset( reset ) == reset", ptr.get() == reset );
+    OOE_CHECK( ptr.get() == reset ) << "ptr.reset( reset ) == reset";
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )

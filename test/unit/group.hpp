@@ -62,7 +62,7 @@ public:
     typedef setup setup_type;
     typedef fixture< data > fixture_type;
 
-    group( const std::string& name, runner& runner = global_runner )
+    group( const std::string& name, runner& runner = *global_runner )
         : group_base()
     {
         insert_test< fixture_type, size >::call( *this );

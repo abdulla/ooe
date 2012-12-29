@@ -80,9 +80,10 @@ OOE_TEST( 0 )
     device_ptr device = library.find< device_open_type >( "device_open" )( view, false );
 
     const s32 array_size = device->limit( device::array_size );
+    OOE_CHECK( array_size ) << "texture array size " << array_size << " > 0 ";
+
     texture_array_ptr texture_array =
         device->texture_array( image_metadata( size, size, format ), array_size );
-    OOE_CHECK( "texture array size " << array_size << " > 0 ", array_size );
 
     shader_vector vector;
     vector.push_back( device->shader( vertex_shader, shader::vertex ) );

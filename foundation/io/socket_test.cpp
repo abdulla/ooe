@@ -43,7 +43,7 @@ OOE_TEST( 0 )
     file.seek( 0, file::begin );
     file.read( &value, sizeof( value ) );
 
-    OOE_CHECK( "value == 0xdeadbeef", value == 0xdeadbeef );
+    OOE_CHECK( value == 0xdeadbeef );
 }
 
 OOE_TEST( 1 )

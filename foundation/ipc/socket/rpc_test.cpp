@@ -242,21 +242,21 @@ OOE_TEST( 3 )
     std::cerr << "test exceptions";
 
     ipc::socket::rpc< void ( void ) > out_of_range( client, ~u32( 0 ) );
-    OOE_EXCEPT( "out-of-range index", error::runtime, out_of_range()() );
+    OOE_EXCEPT( error::runtime, out_of_range()() ) << "out-of-range index";
 
     ipc::socket::find find( client );
-    OOE_EXCEPT( "find non-existant function", error::runtime, find( "no_function", "no_type" )() );
+    OOE_EXCEPT( error::runtime, find( "no_function", "no_type" )() ) <<
+        "find non-existant function";
 
     ipc::socket::find_all find_all( client );
     ipc::socket::find_all::parameter_type parameter( 2, make_tuple( "no_function", "no_type" ) );
-    OOE_EXCEPT( "find-all non-existant functions", error::runtime, find_all( parameter )() );
+    OOE_EXCEPT( error::runtime, find_all( parameter )() ) << "find-all non-existant functions";
 
     ipc::socket::call< void ( print* ) > print_show( client, "print_show" );
-    OOE_EXCEPT( "null-pointer argument", error::runtime, print_show( 0 )() );
+    OOE_EXCEPT( error::runtime, print_show( 0 )() ) << "null-pointer argument";
 
-    ipc::socket::call< void ( destruct_ptr< print > ) >
-        print_destruct( client, "print_destruct" );
-    OOE_EXCEPT( "unknown destruct_ptr argument", error::runtime, print_destruct( 0 )() );
+    ipc::socket::call< void ( destruct_ptr< print > ) > print_destruct( client, "print_destruct" );
+    OOE_EXCEPT( error::runtime, print_destruct( 0 )() ) << "unknown destruct_ptr argument";
 }
 
 OOE_NAMESPACE_END( ( ooe )( unit ) )
