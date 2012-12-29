@@ -50,7 +50,7 @@ OOE_TEST( 2 )
     thread_pool pool( "pool" );
     result< void > result_of_throw = async( pool, make_function( throwable ) );
 
-    OOE_EXCEPT( "result_of_throw()", error::runtime, result_of_throw() );
+    OOE_EXCEPT( error::runtime, result_of_throw() );
 }
 
 OOE_TEST( 3 )
