@@ -6,7 +6,6 @@
 #include "component/lua/facade.hpp"
 #include "component/python/facade.hpp"
 #include "component/registry/builder.hpp"
-#include "component/registry/local.hpp"
 #include "component/registry/remote.hpp"
 
 OOE_NAMESPACE_BEGIN( ( ooe ) )
