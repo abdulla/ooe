@@ -29,7 +29,6 @@ public:
 
     switchboard( void ) OOE_VISIBLE;
 
-    void swap( switchboard& );
     size_type execute( index_t, io_buffer&, pool& ) const;
     index_t insert_direct( call_type, any ) OOE_VISIBLE;
     tuple_type operator []( index_t ) const OOE_VISIBLE;

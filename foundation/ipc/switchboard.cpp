@@ -30,11 +30,6 @@ switchboard::switchboard( void )
     insert_direct( ipc_null, 0 );
 }
 
-void switchboard::swap( switchboard& other )
-{
-    vector.swap( other.vector );
-}
-
 switchboard::size_type switchboard::execute( index_t index, io_buffer& buffer, pool& pool ) const
 {
     bool executed = false;
