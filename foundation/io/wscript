@@ -12,7 +12,7 @@ def build( context ):
         use = 'executable' )
 
     context.program(
-        source = 'archive_test.cpp directory_test.cpp socket_test.cpp',
+        source = 'archive_test.cpp directory_test.cpp poll_test.cpp socket_test.cpp',
         target = 'io_test',
         use = 'parallel unit' )
 

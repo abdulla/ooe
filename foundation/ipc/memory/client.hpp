@@ -14,9 +14,11 @@ public:
     client( const local_address& );
     ~client( void );
 
+    operator ooe::socket&( void );
     operator memory::transport&( void );
 
 private:
+    ooe::connect connect;
     memory::transport transport;
     memory::link_client link;
 };

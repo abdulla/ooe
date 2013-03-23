@@ -20,6 +20,12 @@ template< typename, typename = void >
 template< typename, typename = void >
     struct write;
 
+template< typename, typename = void >
+    struct receive;
+
+template< typename, typename = void >
+    struct send;
+
 //--- is_pod ---------------------------------------------------------------------------------------
 template< typename t >
     struct is_pod
@@ -58,6 +64,14 @@ template< typename NO_SPECIALISATION_DEFINED, typename >
     {
         OOE_STATIC_ASSERT( !sizeof( NO_SPECIALISATION_DEFINED ) );
         return 0;
+    }
+};
+
+template< typename NO_SPECIALISATION_DEFINED, typename >
+    struct receive
+{
+    static descriptor call( socket& )
+    {
     }
 };
 

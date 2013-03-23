@@ -19,6 +19,12 @@ template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t 
 template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t ) >
     struct stream_write;
 
+template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t ) >
+    struct stream_receive;
+
+template< BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT( OOE_PP_LIMIT, typename t, void_t ) >
+    struct stream_send;
+
 //--- traits: container ----------------------------------------------------------------------------
 template< typename t >
     struct size< t, typename enable_if< is_stdcontainer< t > >::type >

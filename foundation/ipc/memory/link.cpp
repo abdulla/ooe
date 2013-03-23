@@ -4,6 +4,15 @@
 #include "foundation/ipc/memory/link.hpp"
 #include "foundation/ipc/memory/server.hpp"
 
+OOE_ANONYMOUS_BEGIN( ( ooe ) )
+
+void process( bool& await, const descriptor&, poll::type type )
+{
+    await = type == poll::input;
+}
+
+OOE_ANONYMOUS_END( ( ooe ) )
+
 OOE_NAMESPACE_BEGIN( ( ooe )( ipc )( memory ) )
 
 //--- link_server ----------------------------------------------------------------------------------
@@ -22,8 +31,11 @@ link_server::operator bool( void ) const
 void link_server::main( void* pointer )
 {
     poll poll;
-    poll.insert( socket );
-    poll.wait();
+    bool await = true;
+    poll.insert( socket, poll::function_type( await, process ) );
+
+    while ( await )
+        poll.wait();
 
     if ( state.exchange( false ) )
         server.erase( iterator );
@@ -55,8 +67,11 @@ link_client::operator bool( void ) const
 void link_client::main( void* pointer )
 {
     poll poll;
-    poll.insert( socket );
-    poll.wait();
+    bool await = true;
+    poll.insert( socket, poll::function_type( await, process ) );
+
+    while ( await )
+        poll.wait();
 
     if ( !state.exchange( false ) )
         return;

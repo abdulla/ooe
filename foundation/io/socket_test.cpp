@@ -2,9 +2,7 @@
 
 #include <paths.h>
 
-#include "foundation/io/directory.hpp"
 #include "foundation/io/file.hpp"
-#include "foundation/io/poll.hpp"
 #include "foundation/io/socket.hpp"
 #include "foundation/parallel/thread.hpp"
 #include "test/unit/check.hpp"
@@ -14,12 +12,7 @@ OOE_ANONYMOUS_BEGIN( ( ooe ) )
 
 const c8 path[] = _PATH_TMP "ooe.test.file";
 
-void shutdown( void* pointer )
-{
-    static_cast< socket* >( pointer )->shutdown( socket::read );
-}
-
-typedef unit::group< anonymous_t, anonymous_t, 3 > group_type;
+typedef unit::group< anonymous_t, anonymous_t, 2 > group_type;
 typedef group_type::fixture_type fixture_type;
 group_type group( "socket" );
 
@@ -47,19 +40,6 @@ OOE_TEST( 0 )
 }
 
 OOE_TEST( 1 )
-{
-    std::cerr << "poll on shutdown";
-
-    socket_pair pair = make_pair();
-
-    poll poll;
-    poll.insert( pair._0 );
-
-    thread thread( "shutdown", shutdown, &pair._0 );
-    poll.wait();
-}
-
-OOE_TEST( 2 )
 {
     std::cerr << "internet query for localhost";
 
